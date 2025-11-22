@@ -448,14 +448,7 @@ function populateCampaignFilterDropdown() {
         select.appendChild(option);
     });
     
-    // Update the selected campaign info display for default selection
-    if (defaultCampaign) {
-        updateSelectedCampaignInfo();
-        // Load dashboard data for default campaign
-        loadDashboardData();
-    }
-    
-    // Attach change event listener to campaign filter
+    // Attach change event listener to campaign filter BEFORE loading data
     // Remove existing listener first to prevent duplicates
     const newSelect = select.cloneNode(true);
     select.parentNode.replaceChild(newSelect, select);
@@ -466,6 +459,13 @@ function populateCampaignFilterDropdown() {
         applyCampaignFilter();
     });
     console.log('✅ Campaign filter change listener attached');
+    
+    // SECURITY FIX: Load ALL dashboard data (including Survey Insights) for default campaign
+    // This prevents the race condition where Survey Insights APIs are called without campaign_id
+    if (defaultCampaign) {
+        console.log('🔒 Loading all data for default campaign:', defaultCampaign.name);
+        applyCampaignFilter(); // This loads dashboard + Survey Insights + Recent Responses
+    }
 }
 
 // Apply campaign filter to analytics

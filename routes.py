@@ -2124,9 +2124,10 @@ def health_check():
 def api_company_nps():
     """API endpoint for company-segregated NPS data with pagination, search, and filtering - OPTIMIZED to eliminate N+1 queries"""
     try:
-        from models import SurveyResponse
+        from models import SurveyResponse, Campaign
         from sqlalchemy import func, case
         from sqlalchemy.sql import label
+        from business_auth_routes import get_current_business_account
         
         # Get pagination and filter parameters
         page = request.args.get('page', 1, type=int)
@@ -2137,7 +2138,50 @@ def api_company_nps():
         
         logger.info(f"📊 /api/company_nps called - campaign_id: {campaign_id}, page: {page}, search: '{search_query}'")
         
+        # SECURITY: Determine target business account to enforce multi-tenant isolation
+        current_account = get_current_business_account()
+        if current_account:
+            target_business_account_id = current_account.id
+            account_context = f"business account {current_account.name}"
+        else:
+            target_business_account_id = 1
+            account_context = "demo account"
+        
+        # SECURITY: If no campaign specified, default to active campaign for target business account
+        if campaign_id is None:
+            active_campaign = Campaign.query.filter_by(
+                business_account_id=target_business_account_id,
+                status='active'
+            ).order_by(Campaign.id.desc()).first()
+            if active_campaign:
+                campaign_id = active_campaign.id
+                logger.info(f"📊 /api/company_nps defaulting to {account_context} active campaign: {active_campaign.name} (ID: {campaign_id})")
+            else:
+                logger.info(f"📊 /api/company_nps - No active campaign for {account_context}, returning empty data")
+                return jsonify({
+                    'success': True,
+                    'data': [],
+                    'pagination': {
+                        'page': 1,
+                        'per_page': per_page,
+                        'total': 0,
+                        'pages': 1,
+                        'has_prev': False,
+                        'has_next': False
+                    }
+                })
+        
+        # SECURITY: Validate campaign belongs to target business account (runs AFTER defaulting)
+        campaign = Campaign.query.filter_by(
+            id=campaign_id,
+            business_account_id=target_business_account_id
+        ).first()
+        if not campaign:
+            logger.warning(f"🔒 /api/company_nps - Campaign {campaign_id} access denied for {account_context}")
+            return jsonify({'error': 'Campaign not found or access denied'}), 404
+        
         # Step 1: Create subquery to get latest churn risk per company (SINGLE QUERY)
+        # SECURITY: campaign_id is guaranteed to be set by security check above
         latest_churn_subquery = db.session.query(
             func.upper(SurveyResponse.company_name).label('company_upper'),
             SurveyResponse.churn_risk_level,
@@ -2146,11 +2190,9 @@ def api_company_nps():
                 order_by=SurveyResponse.created_at.desc()
             ).label('rn')
         ).filter(
-            SurveyResponse.company_name.isnot(None)
+            SurveyResponse.company_name.isnot(None),
+            SurveyResponse.campaign_id == campaign_id
         )
-        
-        if campaign_id:
-            latest_churn_subquery = latest_churn_subquery.filter(SurveyResponse.campaign_id == campaign_id)
         
         latest_churn_subquery = latest_churn_subquery.subquery()
         
@@ -2163,6 +2205,7 @@ def api_company_nps():
         ).subquery()
         
         # Step 3: Build main query with aggregations
+        # SECURITY: campaign_id is guaranteed to be set and validated against business account
         base_query = db.session.query(
             func.max(SurveyResponse.company_name).label('company_name'),
             func.upper(SurveyResponse.company_name).label('company_upper'),
@@ -2172,12 +2215,9 @@ def api_company_nps():
             func.count(func.nullif(SurveyResponse.nps_score >= 9, False)).label('promoters'),
             func.count(func.nullif(SurveyResponse.nps_score <= 6, False)).label('detractors')
         ).filter(
-            SurveyResponse.company_name.isnot(None)
+            SurveyResponse.company_name.isnot(None),
+            SurveyResponse.campaign_id == campaign_id
         )
-        
-        # Apply campaign filter (CRITICAL: NPS must be campaign-specific)
-        if campaign_id:
-            base_query = base_query.filter(SurveyResponse.campaign_id == campaign_id)
         
         # Apply search filter at database level
         if search_query:
@@ -2301,8 +2341,9 @@ def api_company_trends():
 def api_tenure_nps():
     """API endpoint for tenure-segregated NPS data with pagination - OPTIMIZED to eliminate N+1 queries"""
     try:
-        from models import SurveyResponse
+        from models import SurveyResponse, Campaign
         from sqlalchemy import func
+        from business_auth_routes import get_current_business_account
         
         # Get pagination parameters
         page = request.args.get('page', 1, type=int)
@@ -2311,7 +2352,50 @@ def api_tenure_nps():
         
         logger.info(f"📊 /api/tenure_nps called - campaign_id: {campaign_id}, page: {page}")
         
+        # SECURITY: Determine target business account to enforce multi-tenant isolation
+        current_account = get_current_business_account()
+        if current_account:
+            target_business_account_id = current_account.id
+            account_context = f"business account {current_account.name}"
+        else:
+            target_business_account_id = 1
+            account_context = "demo account"
+        
+        # SECURITY: If no campaign specified, default to active campaign for target business account
+        if campaign_id is None:
+            active_campaign = Campaign.query.filter_by(
+                business_account_id=target_business_account_id,
+                status='active'
+            ).order_by(Campaign.id.desc()).first()
+            if active_campaign:
+                campaign_id = active_campaign.id
+                logger.info(f"📊 /api/tenure_nps defaulting to {account_context} active campaign: {active_campaign.name} (ID: {campaign_id})")
+            else:
+                logger.info(f"📊 /api/tenure_nps - No active campaign for {account_context}, returning empty data")
+                return jsonify({
+                    'success': True,
+                    'data': [],
+                    'pagination': {
+                        'page': 1,
+                        'per_page': per_page,
+                        'total': 0,
+                        'pages': 1,
+                        'has_prev': False,
+                        'has_next': False
+                    }
+                })
+        
+        # SECURITY: Validate campaign belongs to target business account (runs AFTER defaulting)
+        campaign = Campaign.query.filter_by(
+            id=campaign_id,
+            business_account_id=target_business_account_id
+        ).first()
+        if not campaign:
+            logger.warning(f"🔒 /api/tenure_nps - Campaign {campaign_id} access denied for {account_context}")
+            return jsonify({'error': 'Campaign not found or access denied'}), 404
+        
         # Step 1: Create subquery to get latest churn risk per tenure group (SINGLE QUERY)
+        # SECURITY: campaign_id is guaranteed to be set by security check above
         latest_churn_subquery = db.session.query(
             SurveyResponse.tenure_with_fc,
             SurveyResponse.churn_risk_level,
@@ -2320,11 +2404,9 @@ def api_tenure_nps():
                 order_by=SurveyResponse.created_at.desc()
             ).label('rn')
         ).filter(
-            SurveyResponse.tenure_with_fc.isnot(None)
+            SurveyResponse.tenure_with_fc.isnot(None),
+            SurveyResponse.campaign_id == campaign_id
         )
-        
-        if campaign_id:
-            latest_churn_subquery = latest_churn_subquery.filter(SurveyResponse.campaign_id == campaign_id)
         
         latest_churn_subquery = latest_churn_subquery.subquery()
         
@@ -2337,6 +2419,7 @@ def api_tenure_nps():
         ).subquery()
         
         # Step 3: Build main query with aggregations
+        # SECURITY: campaign_id is guaranteed to be set and validated against business account
         tenure_stats_query = db.session.query(
             SurveyResponse.tenure_with_fc,
             func.count(SurveyResponse.id).label('total_responses'),
@@ -2345,12 +2428,9 @@ def api_tenure_nps():
             func.count(func.nullif(SurveyResponse.nps_score >= 9, False)).label('promoters'),
             func.count(func.nullif(SurveyResponse.nps_score <= 6, False)).label('detractors')
         ).filter(
-            SurveyResponse.tenure_with_fc.isnot(None)
+            SurveyResponse.tenure_with_fc.isnot(None),
+            SurveyResponse.campaign_id == campaign_id
         )
-        
-        # Apply campaign filter (CRITICAL: NPS must be campaign-specific)
-        if campaign_id:
-            tenure_stats_query = tenure_stats_query.filter(SurveyResponse.campaign_id == campaign_id)
         
         tenure_stats_subq = tenure_stats_query.group_by(SurveyResponse.tenure_with_fc).subquery()
         
@@ -2449,7 +2529,9 @@ def api_tenure_nps():
 def api_account_intelligence():
     """API endpoint for Account Intelligence with pagination, search, and filtering"""
     try:
+        from models import Campaign
         from data_storage import get_dashboard_data
+        from business_auth_routes import get_current_business_account
         
         # Get pagination and filter parameters
         page = request.args.get('page', 1, type=int)
@@ -2460,19 +2542,53 @@ def api_account_intelligence():
         has_opportunities = request.args.get('has_opportunities', '').strip().lower()
         has_risks = request.args.get('has_risks', '').strip().lower()
         min_responses = request.args.get('min_responses', type=int)
-        
-        # Get campaign filter (REQUIRED for Account Intelligence - prevents cross-campaign aggregation)
         campaign_id = request.args.get('campaign', type=int)
         
-        # VALIDATION: Require campaign_id to prevent mixing French/English data
-        if not campaign_id:
-            return jsonify({
-                'success': False,
-                'error': 'Campaign selection required',
-                'message': 'Please select a campaign to view account intelligence data'
-            }), 400
+        logger.info(f"📊 /api/account_intelligence called - campaign_id: {campaign_id}, page: {page}")
         
-        # Get dashboard data which includes account_intelligence
+        # SECURITY: Determine target business account to enforce multi-tenant isolation
+        current_account = get_current_business_account()
+        if current_account:
+            target_business_account_id = current_account.id
+            account_context = f"business account {current_account.name}"
+        else:
+            target_business_account_id = 1
+            account_context = "demo account"
+        
+        # SECURITY: If no campaign specified, default to active campaign for target business account
+        if campaign_id is None:
+            active_campaign = Campaign.query.filter_by(
+                business_account_id=target_business_account_id,
+                status='active'
+            ).order_by(Campaign.id.desc()).first()
+            if active_campaign:
+                campaign_id = active_campaign.id
+                logger.info(f"📊 /api/account_intelligence defaulting to {account_context} active campaign: {active_campaign.name} (ID: {campaign_id})")
+            else:
+                logger.info(f"📊 /api/account_intelligence - No active campaign for {account_context}, returning empty data")
+                return jsonify({
+                    'success': True,
+                    'data': [],
+                    'pagination': {
+                        'page': 1,
+                        'per_page': per_page,
+                        'total': 0,
+                        'pages': 1,
+                        'has_prev': False,
+                        'has_next': False
+                    }
+                })
+        
+        # SECURITY: Validate campaign belongs to target business account (runs AFTER defaulting)
+        campaign = Campaign.query.filter_by(
+            id=campaign_id,
+            business_account_id=target_business_account_id
+        ).first()
+        if not campaign:
+            logger.warning(f"🔒 /api/account_intelligence - Campaign {campaign_id} access denied for {account_context}")
+            return jsonify({'error': 'Campaign not found or access denied'}), 404
+        
+        # Get dashboard data which includes account_intelligence (campaign_id now guaranteed and validated)
         dashboard_data = get_dashboard_data(campaign_id=campaign_id)
         all_accounts = dashboard_data.get('account_intelligence', [])
         
