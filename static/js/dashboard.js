@@ -116,21 +116,33 @@ function initializeCampaigns() {
     campaignsInitialized = true;
     console.log('🌍 Translations ready, initializing campaigns...');
     
-    // Load campaign filter options first, then initial dashboard data
-    loadCampaignFilterOptions().then(() => {
-        // Update global campaign indicator after filter is populated
-        updateGlobalCampaignIndicator();
-        
-        // Only load dashboard data if no default campaign was auto-selected
-        if (!selectedCampaignId) {
-            loadDashboardData().catch(error => {
-                console.error('Initial dashboard load failed:', error);
-            });
-        }
-    });
+    // CRITICAL FIX (Nov 22, 2025): For authenticated business users, add a small delay
+    // to ensure session cookies are fully established before first API request.
+    // This prevents "demo data flash" where unauthenticated request defaults to demo account.
+    const isBusinessAuth = window.isBusinessAuthenticated === true;
+    const authDelay = isBusinessAuth ? 150 : 0; // 150ms delay for authenticated users
     
-    // Load campaign comparison options
-    loadComparisonCampaignOptions();
+    if (isBusinessAuth) {
+        console.log('🔐 Business authenticated - adding 150ms delay for session cookie establishment');
+    }
+    
+    // Load campaign filter options first, then initial dashboard data
+    setTimeout(() => {
+        loadCampaignFilterOptions().then(() => {
+            // Update global campaign indicator after filter is populated
+            updateGlobalCampaignIndicator();
+            
+            // Only load dashboard data if no default campaign was auto-selected
+            if (!selectedCampaignId) {
+                loadDashboardData().catch(error => {
+                    console.error('Initial dashboard load failed:', error);
+                });
+            }
+        });
+        
+        // Load campaign comparison options
+        loadComparisonCampaignOptions();
+    }, authDelay);
 }
 
 // ============================================================================
