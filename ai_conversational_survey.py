@@ -2,6 +2,8 @@ import os
 import json
 import uuid
 import logging
+import time
+import random
 from datetime import datetime
 from typing import Dict, Any, List, Optional
 from openai import OpenAI
@@ -206,6 +208,46 @@ class AIConversationalSurvey:
         # Use template service for dynamic or demo-specific welcome messages
         return self.template_service.generate_welcome_message(respondent_name)
     
+    def _call_openai_with_retry(self, **api_params) -> Any:
+        """Call OpenAI API with exponential backoff and jitter for rate limiting
+        
+        Implements:
+        - Base delay: 5 seconds
+        - Max delay: 60 seconds
+        - Jitter: randomized delay to prevent thundering herd
+        - Max retries: 3
+        """
+        max_retries = 3
+        base_delay = 5  # 5 seconds base
+        max_delay = 60  # 60 seconds cap
+        
+        for attempt in range(max_retries):
+            try:
+                response = self.openai_client.chat.completions.create(**api_params)
+                return response
+                
+            except Exception as e:
+                error_str = str(e)
+                
+                # Check if it's a rate limit error (429)
+                is_rate_limit = '429' in error_str or 'rate_limit' in error_str.lower()
+                
+                if is_rate_limit and attempt < max_retries - 1:
+                    # Calculate exponential backoff with jitter
+                    delay = min(base_delay * (2 ** attempt), max_delay)
+                    jitter = random.uniform(0, delay * 0.1)  # 10% jitter
+                    total_delay = delay + jitter
+                    
+                    logger.warning(f"Rate limit hit (429), retrying in {total_delay:.1f}s (attempt {attempt + 1}/{max_retries})")
+                    time.sleep(total_delay)
+                    continue
+                else:
+                    # Not a rate limit error or final attempt failed
+                    raise e
+        
+        # All retries exhausted
+        raise Exception(f"OpenAI API failed after {max_retries} retries")
+    
     def _process_with_ai_combined(self, user_input: str, context: Dict[str, Any]) -> Dict[str, Any]:
         """PERFORMANCE OPTIMIZATION: Single API call for extraction + next question
         
@@ -305,7 +347,8 @@ CRITICAL RULES:
             })
             
             # CRITICAL: Use system/user message structure for proper language enforcement
-            response = self.openai_client.chat.completions.create(
+            # Use retry helper with exponential backoff to handle rate limiting
+            response = self._call_openai_with_retry(
                 model=conversation_model,
                 messages=[
                     {"role": "system", "content": system_prompt},
