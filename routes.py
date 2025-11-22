@@ -2589,7 +2589,8 @@ def api_account_intelligence():
             return jsonify({'error': 'Campaign not found or access denied'}), 404
         
         # Get dashboard data which includes account_intelligence (campaign_id now guaranteed and validated)
-        dashboard_data = get_dashboard_data(campaign_id=campaign_id)
+        # SECURITY: Pass business_account_id to enable segmentation analytics filtering
+        dashboard_data = get_dashboard_data(campaign_id=campaign_id, business_account_id=target_business_account_id)
         all_accounts = dashboard_data.get('account_intelligence', [])
         
         # Apply filters

@@ -201,7 +201,8 @@ def get_dashboard_data_cached(campaign_id=None, business_account_id=None):
     
     # Fallback to original implementation
     logger.info(f"⏪ Using ORIGINAL dashboard queries | Cache: {cache_config.is_enabled()}")
-    result = get_dashboard_data(campaign_id)
+    # SECURITY: Pass business_account_id to prevent segmentation analytics data leakage
+    result = get_dashboard_data(campaign_id, business_account_id)
     
     # Log execution time for performance monitoring
     execution_time = (time.time() - start_time) * 1000  # Convert to ms
@@ -209,7 +210,7 @@ def get_dashboard_data_cached(campaign_id=None, business_account_id=None):
     
     return result
 
-def get_dashboard_data(campaign_id=None):
+def get_dashboard_data(campaign_id=None, business_account_id=None):
     """Compile dashboard data for visualization with optional campaign filtering"""
     try:
         # ============================================================================
@@ -911,7 +912,7 @@ def get_dashboard_data(campaign_id=None):
             },
             'company_nps_data': company_nps_data,
             'tenure_nps_data': tenure_nps_data,
-            'segmentation_analytics': calculate_segmentation_analytics(campaign_id) if campaign_id else {}
+            'segmentation_analytics': calculate_segmentation_analytics(campaign_id, business_account_id) if campaign_id else {}
         }
         
     except Exception as e:
@@ -1216,10 +1217,14 @@ def get_company_trends():
         return {}
 
 
-def calculate_segmentation_analytics(campaign_id):
+def calculate_segmentation_analytics(campaign_id, business_account_id=None):
     """
     Calculate NPS and satisfaction analytics segmented by participant attributes.
     Returns analytics grouped by role, region, customer_tier, and client_industry.
+    
+    Args:
+        campaign_id: Campaign ID to filter responses
+        business_account_id: Business account ID to filter participants (for multi-tenant isolation)
     """
     try:
         from models import Participant, CampaignParticipant
@@ -1241,7 +1246,15 @@ def calculate_segmentation_analytics(campaign_id):
         ).filter(
             SurveyResponse.campaign_id == campaign_id,
             SurveyResponse.nps_score.isnot(None)
-        ).all()
+        )
+        
+        # SECURITY: Filter by business account to prevent cross-tenant data leakage
+        if business_account_id:
+            segmentation_query = segmentation_query.filter(
+                Participant.business_account_id == business_account_id
+            )
+        
+        segmentation_query = segmentation_query.all()
         
         if not segmentation_query:
             return {}
