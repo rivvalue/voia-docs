@@ -372,8 +372,11 @@ def get_optimized_dashboard_data(campaign_id=None, business_account_id=None):
     from data_storage import calculate_segmentation_analytics, get_company_nps_data, get_tenure_nps_data
     
     # Calculate segmentation analytics with business account scoping for multi-tenant security
+    import logging
+    logger = logging.getLogger(__name__)
+    logger.info(f"🔍 OPTIMIZER: Calling segmentation analytics for campaign_id={campaign_id}, business_account_id={business_account_id}")
     segmentation_data = calculate_segmentation_analytics(campaign_id, business_account_id) if campaign_id else {}
-    print(f"🔍 OPTIMIZER DEBUG - Campaign {campaign_id}: Segmentation keys = {list(segmentation_data.keys())}")
+    logger.info(f"🔍 OPTIMIZER: Segmentation returned {len(segmentation_data)} top-level keys: {list(segmentation_data.keys())}")
     
     return {
         'total_responses': total_responses,

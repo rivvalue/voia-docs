@@ -179,13 +179,14 @@ def get_dashboard_data_cached(campaign_id=None, business_account_id=None):
     Cache can be disabled/configured by admins via environment variables.
     
     Phase 2: 2-hour cache TTL for 10x performance improvement on repeat visits.
+    SECURITY: Cache key MUST include business_account_id to prevent cross-tenant data leakage.
     """
     import time
     start_time = time.time()
     
-    # Generate cache key for logging
-    cache_key = f"dashboard_data_{campaign_id}_{business_account_id}"
-    logger.info(f"📊 Dashboard data request | Key: {cache_key} | Cache enabled: {cache_config.is_enabled()}")
+    # Generate TENANT-SCOPED cache key for multi-tenant security
+    cache_key = f"dashboard_data_campaign{campaign_id}_tenant{business_account_id}"
+    logger.info(f"🔍 DEBUG: Dashboard cache request | Campaign: {campaign_id} | Business Account: {business_account_id} | Cache Key: {cache_key}")
     
     # Check if we should use optimized queries
     use_optimized = os.environ.get('USE_OPTIMIZED_DASHBOARD', 'true').lower() == 'true'
@@ -1264,12 +1265,15 @@ def calculate_segmentation_analytics(campaign_id, business_account_id=None):
                 Campaign.business_account_id == business_account_id
             )
         
-        print(f"DEBUG: Executing segmentation query for campaign {campaign_id}, business_account {business_account_id}")
+        logger.info(f"🔍 SEGMENTATION DEBUG: Executing query for campaign_id={campaign_id}, business_account_id={business_account_id}")
         segmentation_results = segmentation_query.all()
-        print(f"DEBUG: Segmentation query returned {len(segmentation_results)} rows")
+        logger.info(f"🔍 SEGMENTATION DEBUG: Query returned {len(segmentation_results)} rows")
+        
+        if len(segmentation_results) > 0:
+            logger.info(f"✅ SEGMENTATION DEBUG: Sample data - Role: {segmentation_results[0].role}, Tier: {segmentation_results[0].customer_tier}")
         
         if not segmentation_results:
-            print(f"DEBUG: No segmentation data for campaign {campaign_id}")
+            logger.warning(f"⚠️ SEGMENTATION DEBUG: No data found for campaign_id={campaign_id}, business_account_id={business_account_id}")
             return {}
         
         # Initialize segment collectors
