@@ -420,6 +420,10 @@ class PromptTemplateService:
         
         return "professional"  # Default
     
+    def get_language_code(self) -> str:
+        """Get campaign language code for fallback questions (HOT PATH - uses cached primitive)"""
+        return self._campaign_language_code
+    
     def get_effective_industry(self) -> Optional[str]:
         """Get effective industry for topic hints (HOT PATH - uses cached primitives)
         

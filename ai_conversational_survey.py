@@ -176,7 +176,9 @@ class AIConversationalSurvey:
             # CRITICAL: Override OpenAI's is_complete decision - backend decides
             if next_question.get('is_complete'):
                 logger.warning(f"⚠️ OpenAI tried to end survey at step {self.step_count} - OVERRIDDEN by backend")
-                next_question['is_complete'] = False  # Force continue
+                # Don't just set is_complete=False, REPLACE the completion message with a new question
+                next_question = self._generate_fallback_question(user_input, context)
+                next_question['is_complete'] = False  # Ensure backend control
         
         # Add AI response to conversation history
         if not next_question.get('is_complete', False):
@@ -1033,6 +1035,57 @@ RESPONSE FORMAT - Return JSON:
         
         return "\n".join(formatted)
     
+    def _get_translated_message(self, key: str, **kwargs) -> str:
+        """Get translated fallback message based on campaign language"""
+        lang = self.template_service.get_language_code()
+        company_name = kwargs.get('company_name', '')
+        score = kwargs.get('score', '')
+        
+        messages = {
+            'nps_promoter': {
+                'en': f"Wonderful! A {score} is fantastic. What specifically about {company_name} made your experience so great?",
+                'fr': f"Merveilleux! Un {score} est fantastique. Qu'est-ce qui a rendu votre expérience avec {company_name} si exceptionnelle?"
+            },
+            'nps_passive': {
+                'en': f"Thanks for the {score}! What would it take to make you even more likely to recommend {company_name}?",
+                'fr': f"Merci pour ce {score}! Que faudrait-il pour que vous soyez encore plus susceptible de recommander {company_name}?"
+            },
+            'nps_detractor': {
+                'en': f"I appreciate your honesty with the {score}. What are the main issues that are holding you back from recommending {company_name}?",
+                'fr': f"J'apprécie votre franchise avec ce {score}. Quels sont les principaux problèmes qui vous empêchent de recommander {company_name}?"
+            },
+            'nps_question': {
+                'en': f"On a scale of 0-10, how likely are you to recommend {company_name} to a friend or colleague?",
+                'fr': f"Sur une échelle de 0 à 10, quelle est la probabilité que vous recommandiez {company_name} à un ami ou collègue?"
+            },
+            'tenure_question': {
+                'en': f"How long have you been working with {company_name}? Please choose from: Less than 6 months, 6 months - 1 year, 1-2 years, 2-3 years, 3-5 years, 5-10 years, or More than 10 years.",
+                'fr': f"Depuis combien de temps travaillez-vous avec {company_name}? Veuillez choisir parmi: Moins de 6 mois, 6 mois - 1 an, 1-2 ans, 2-3 ans, 3-5 ans, 5-10 ans, ou Plus de 10 ans."
+            },
+            'satisfaction_question': {
+                'en': f"How would you describe your overall satisfaction with {company_name}'s service? Very satisfied, satisfied, neutral, dissatisfied, or very dissatisfied?",
+                'fr': f"Comment décririez-vous votre satisfaction globale avec le service de {company_name}? Très satisfait, satisfait, neutre, insatisfait, ou très insatisfait?"
+            },
+            'service_quality': {
+                'en': f"How would you rate the quality of {company_name}'s professional services? Excellent, good, average, poor, or very poor?",
+                'fr': f"Comment évalueriez-vous la qualité des services professionnels de {company_name}? Excellent, bon, moyen, médiocre, ou très médiocre?"
+            },
+            'product_value': {
+                'en': f"How would you rate the value and quality of {company_name}'s products or solutions? Excellent, good, average, poor, or very poor?",
+                'fr': f"Comment évalueriez-vous la valeur et la qualité des produits ou solutions de {company_name}? Excellent, bon, moyen, médiocre, ou très médiocre?"
+            },
+            'pricing_value': {
+                'en': f"How do you feel about {company_name}'s pricing? Do you find it excellent value, good value, fair, expensive, or very expensive?",
+                'fr': f"Que pensez-vous des tarifs de {company_name}? Trouvez-vous qu'ils offrent une excellente valeur, une bonne valeur, sont équitables, chers, ou très chers?"
+            },
+            'support_quality': {
+                'en': f"How would you rate {company_name}'s support and customer service? Excellent, good, average, poor, or very poor?",
+                'fr': f"Comment évalueriez-vous le support et le service client de {company_name}? Excellent, bon, moyen, médiocre, ou très médiocre?"
+            }
+        }
+        
+        return messages.get(key, {}).get(lang, messages.get(key, {}).get('en', ''))
+    
     def _generate_fallback_question(self, user_input: str, context: Dict[str, Any]) -> Dict[str, Any]:
         """Fixed progression logic based on step count and missing data"""
         extracted = self.extracted_data
@@ -1052,7 +1105,7 @@ RESPONSE FORMAT - Return JSON:
             score = self.extracted_data['nps_score']
             if score >= 9:
                 return {
-                    'message': f"Wonderful! A {score} is fantastic. What specifically about {company_name} made your experience so great?",
+                    'message': self._get_translated_message('nps_promoter', company_name=company_name, score=score),
                     'message_type': 'ai_question',
                     'step': 'nps_reasoning',
                     'progress': 40,
@@ -1060,7 +1113,7 @@ RESPONSE FORMAT - Return JSON:
                 }
             elif score >= 7:
                 return {
-                    'message': f"Thanks for the {score}! What would it take to make you even more likely to recommend {company_name}?",
+                    'message': self._get_translated_message('nps_passive', company_name=company_name, score=score),
                     'message_type': 'ai_question',
                     'step': 'nps_reasoning',
                     'progress': 40,
@@ -1068,7 +1121,7 @@ RESPONSE FORMAT - Return JSON:
                 }
             else:
                 return {
-                    'message': f"I appreciate your honesty with the {score}. What are the main issues that are holding you back from recommending {company_name}?",
+                    'message': self._get_translated_message('nps_detractor', company_name=company_name, score=score),
                     'message_type': 'ai_question',
                     'step': 'nps_reasoning',
                     'progress': 40,
@@ -1080,7 +1133,7 @@ RESPONSE FORMAT - Return JSON:
             # First question: Ask for tenure with {company_name} ONLY if we don't have it
             if self.extracted_data.get('tenure_with_fc') is None:
                 return {
-                    'message': f"How long have you been working with {company_name}? Please choose from: Less than 6 months, 6 months - 1 year, 1-2 years, 2-3 years, 3-5 years, 5-10 years, or More than 10 years.",
+                    'message': self._get_translated_message('tenure_question', company_name=company_name),
                     'message_type': 'ai_question',
                     'step': 'tenure_collection',
                     'progress': 15,
@@ -1090,7 +1143,7 @@ RESPONSE FORMAT - Return JSON:
                 # We already have tenure, skip to NPS question
                 # Don't manipulate step count - let natural progression continue
                 return {
-                    'message': f"On a scale of 0-10, how likely are you to recommend {company_name} to a friend or colleague?",
+                    'message': self._get_translated_message('nps_question', company_name=company_name),
                     'message_type': 'ai_question',
                     'step': 'nps_collection',
                     'progress': 25,
@@ -1101,7 +1154,7 @@ RESPONSE FORMAT - Return JSON:
             # Second question: Ask for NPS about {company_name} (the supplier) ONLY if we don't have it
             if self.extracted_data.get('nps_score') is None:
                 return {
-                    'message': f"On a scale of 0-10, how likely are you to recommend {company_name} to a friend or colleague?",
+                    'message': self._get_translated_message('nps_question', company_name=company_name),
                     'message_type': 'ai_question',
                     'step': 'nps_collection',
                     'progress': 25,
@@ -1118,7 +1171,7 @@ RESPONSE FORMAT - Return JSON:
                 score = extracted.get('nps_score') or self.extracted_data.get('nps_score')
                 if score is not None and score >= 9:
                     return {
-                        'message': f"Wonderful! A {score} is fantastic. What specifically about {company_name} made your experience so great?",
+                        'message': self._get_translated_message('nps_promoter', company_name=company_name, score=score),
                         'message_type': 'ai_question',
                         'step': 'nps_reasoning',
                         'progress': 40,
@@ -1126,7 +1179,7 @@ RESPONSE FORMAT - Return JSON:
                     }
                 elif score is not None and score >= 7:
                     return {
-                        'message': f"Thanks for the {score}! What would it take to make you even more likely to recommend {company_name}?",
+                        'message': self._get_translated_message('nps_passive', company_name=company_name, score=score),
                         'message_type': 'ai_question',
                         'step': 'nps_reasoning',
                         'progress': 40,
@@ -1134,7 +1187,7 @@ RESPONSE FORMAT - Return JSON:
                     }
                 else:
                     return {
-                        'message': f"I appreciate your honesty with the {score}. What are the main issues that are holding you back from recommending {company_name}?",
+                        'message': self._get_translated_message('nps_detractor', company_name=company_name, score=score),
                         'message_type': 'ai_question',
                         'step': 'nps_reasoning',
                         'progress': 40,
@@ -1145,7 +1198,7 @@ RESPONSE FORMAT - Return JSON:
                 # This response is the user's answer to the NPS reasoning question
                 # Move to satisfaction question
                 return {
-                    'message': f"How would you describe your overall satisfaction with {company_name}'s service? Very satisfied, satisfied, neutral, dissatisfied, or very dissatisfied?",
+                    'message': self._get_translated_message('satisfaction_question', company_name=company_name),
                     'message_type': 'ai_question',
                     'step': 'satisfaction',
                     'progress': 40,
@@ -1155,7 +1208,7 @@ RESPONSE FORMAT - Return JSON:
         elif self.step_count == 4:
             # Fourth question: Overall satisfaction rating
             return {
-                'message': f"How would you describe your overall satisfaction with {company_name}'s service? Very satisfied, satisfied, neutral, dissatisfied, or very dissatisfied?",
+                'message': self._get_translated_message('satisfaction_question', company_name=company_name),
                 'message_type': 'ai_question',
                 'step': 'satisfaction',
                 'progress': 45,
@@ -1165,7 +1218,7 @@ RESPONSE FORMAT - Return JSON:
         elif self.step_count == 5:
             # Fifth question: Professional services quality rating
             return {
-                'message': f"How would you rate the quality of {company_name}'s professional services? Excellent, good, average, poor, or very poor?",
+                'message': self._get_translated_message('service_quality', company_name=company_name),
                 'message_type': 'ai_question',
                 'step': 'service_quality',
                 'progress': 50,
@@ -1175,7 +1228,7 @@ RESPONSE FORMAT - Return JSON:
         elif self.step_count == 6:
             # Sixth question: Product value rating
             return {
-                'message': f"How would you rate the value and quality of {company_name}'s products or solutions? Excellent, good, average, poor, or very poor?",
+                'message': self._get_translated_message('product_value', company_name=company_name),
                 'message_type': 'ai_question',
                 'step': 'product_value',
                 'progress': 55,
@@ -1185,7 +1238,7 @@ RESPONSE FORMAT - Return JSON:
         elif self.step_count == 7:
             # Seventh question: Pricing appreciation rating
             return {
-                'message': f"How do you feel about {company_name}'s pricing? Do you find it excellent value, good value, fair, expensive, or very expensive?",
+                'message': self._get_translated_message('pricing_value', company_name=company_name),
                 'message_type': 'ai_question',
                 'step': 'pricing_value',
                 'progress': 65,
@@ -1195,7 +1248,7 @@ RESPONSE FORMAT - Return JSON:
         elif self.step_count == 8:
             # Eighth question: Support services rating
             return {
-                'message': f"How would you rate {company_name}'s support and customer service? Excellent, good, average, poor, or very poor?",
+                'message': self._get_translated_message('support_quality', company_name=company_name),
                 'message_type': 'ai_question',
                 'step': 'support_quality',
                 'progress': 75,
