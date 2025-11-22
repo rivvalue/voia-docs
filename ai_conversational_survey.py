@@ -914,10 +914,8 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
             else:
                 final_instructions = """Be conversational, empathetic, and adaptive to their communication style."""
             
-            # Add customer's latest response and next question priority to the prompt
-            full_prompt = f"""{system_prompt}
-
-CUSTOMER'S LATEST RESPONSE: "{user_input}"
+            # Build user prompt with customer response and next priority
+            user_prompt = f"""CUSTOMER'S LATEST RESPONSE: "{user_input}"
 
 NEXT LOGICAL QUESTION PRIORITY:
 {next_priority}
@@ -938,7 +936,8 @@ RESPONSE FORMAT - Return JSON:
                 'step': self.step_count,
                 'timestamp': datetime.utcnow().isoformat(),
                 'prompt_type': 'question_generation',
-                'full_prompt': full_prompt,
+                'system_prompt': system_prompt,
+                'user_prompt': user_prompt,
                 'language': campaign_language,
                 'user_input': user_input[:100]  # Truncate for privacy
             })
@@ -946,9 +945,13 @@ RESPONSE FORMAT - Return JSON:
             # Model selection via environment variable for cost optimization
             conversation_model = os.environ.get('AI_CONVERSATION_MODEL', 'gpt-4o')
             
+            # CRITICAL: Use system/user message structure for proper language enforcement
             response = self.openai_client.chat.completions.create(
                 model=conversation_model,
-                messages=[{"role": "user", "content": full_prompt}],
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt}
+                ],
                 response_format={"type": "json_object"},
                 max_tokens=300,
                 temperature=0.8
