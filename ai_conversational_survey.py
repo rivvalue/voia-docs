@@ -45,6 +45,9 @@ class AIConversationalSurvey:
         # Store participant data for personalized prompts
         self.participant_data = participant_data
         
+        # Track all AI prompts for debugging (language issues, prompt effectiveness, etc.)
+        self.ai_prompts_log = []
+        
         # CRITICAL FIX: Pre-populate tenure from participant_data if available
         # This ensures tenure is always loaded into extracted_data, not just when passed as parameter
         if participant_data and participant_data.get('tenure_with_fc'):
