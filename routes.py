@@ -1502,46 +1502,9 @@ def campaign_insights():
                          business_account_id=business_account_id,
                          branding_context=branding_context)
 
-@app.route('/api/dashboard_data_demo')
-def dashboard_data_demo():
-    """Public demo endpoint - always returns Archelo Group demo data"""
-    try:
-        from models import Campaign
-        from data_storage import get_dashboard_data_cached
-        
-        # Always use demo account for public access
-        target_business_account_id = 1
-        campaign_id = request.args.get('campaign_id', type=int)
-        
-        # Default to active demo campaign if none specified
-        if campaign_id is None:
-            active_campaign = Campaign.query.filter_by(
-                business_account_id=1,
-                status='active'
-            ).order_by(Campaign.id.desc()).first()
-            if active_campaign:
-                campaign_id = active_campaign.id
-        
-        if campaign_id is not None:
-            data = get_dashboard_data_cached(campaign_id=campaign_id, business_account_id=1)
-        else:
-            data = {
-                'total_responses': 0,
-                'nps_score': 0,
-                'recent_responses': 0,
-                'sentiment_distribution': [],
-                'nps_distribution': [],
-                'top_themes': []
-            }
-        
-        return jsonify(data)
-    except Exception as e:
-        logger.error(f"Error fetching demo dashboard data: {e}")
-        return jsonify({'error': 'Failed to fetch dashboard data'}), 500
-
 @app.route('/api/dashboard_data')
 def dashboard_data():
-    """API endpoint for authenticated dashboard data - requires business login"""
+    """API endpoint for dashboard data with optional campaign filtering"""
     try:
         # Import models to avoid circular imports
         from models import Campaign
@@ -1550,16 +1513,24 @@ def dashboard_data():
         
         # Get campaign filter parameter
         campaign_id = request.args.get('campaign_id', type=int)
+        allow_demo = request.args.get('allow_demo', 'false').lower() == 'true'
         
-        # SECURITY FIX (Nov 22, 2025): Campaign Insights page also calls this endpoint
-        # Block demo fallback entirely to prevent cross-tenant data flash
+        # SECURITY FIX (Nov 22, 2025): Only allow demo fallback when explicitly requested
         current_account = get_current_business_account()
         if not current_account:
-            return jsonify({'error': 'Authentication required'}), 401
-        
-        target_business_account_id = current_account.id
-        account_context = f"business account {current_account.name}"
-        logger.info(f"✅ Authenticated request - Business Account: {current_account.name} (ID: {target_business_account_id})")
+            if allow_demo:
+                # Dashboard page for unauthenticated users - use demo account
+                target_business_account_id = 1
+                account_context = "demo account"
+                logger.info(f"⚠️ Unauthenticated request with allow_demo=true - Defaulting to demo account (ID: 1)")
+            else:
+                # Campaign Insights or authenticated-only page - require login
+                return jsonify({'error': 'Authentication required'}), 401
+        else:
+            # Authenticated user - use their account
+            target_business_account_id = current_account.id
+            account_context = f"business account {current_account.name}"
+            logger.info(f"✅ Authenticated request - Business Account: {current_account.name} (ID: {target_business_account_id})")
         
         # If campaign_id provided, validate it belongs to target business account
         if campaign_id:

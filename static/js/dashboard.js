@@ -1450,6 +1450,11 @@ function loadDashboardData() {
         urlParams.append('campaign_id', selectedCampaignId);
     }
     
+    // Allow demo fallback for unauthenticated users on Dashboard page only
+    if (!window.isBusinessAuthenticated) {
+        urlParams.append('allow_demo', 'true');
+    }
+    
     // Add cache-busting timestamp
     urlParams.append('_t', Date.now());
     
