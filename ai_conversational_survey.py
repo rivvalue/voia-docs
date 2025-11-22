@@ -120,28 +120,10 @@ class AIConversationalSurvey:
             'timestamp': 'now'
         })
         
-        # Extract data from user input
-        extracted = self._extract_survey_data_with_ai(user_input, context)
-        
-        # Track what was just extracted for debugging - but PREVENT overwrites of existing data
-        newly_extracted = {}
-        for key, value in extracted.items():
-            if value is not None:
-                # CRITICAL: Only update if we don't already have this data to prevent overwrites
-                if self.extracted_data.get(key) is None:
-                    newly_extracted[key] = value
-                    self.extracted_data[key] = value
-                    logger.debug(f"Locked field: {key} (first capture)")
-                else:
-                    # Data already exists, don't overwrite - log the attempt
-                    logger.debug(f"Data protection: prevented overwrite of {key}")
-        
-        self.survey_data['extracted_data'] = self.extracted_data
-        
-        # Increment step count BEFORE generating next question
+        # Increment step count BEFORE processing
         self.step_count += 1
         
-        logger.debug(f"Step {self.step_count}: New fields={list(newly_extracted.keys())}, Total fields={len(self.extracted_data)}")
+        logger.debug(f"Step {self.step_count}: Processing user input")
         logger.debug(f"User input: {_mask_pii(user_input)}")
         
         # ANTI-LOOP PROTECTION: Prevent infinite loops but allow service questions
@@ -170,8 +152,32 @@ class AIConversationalSurvey:
             self.is_complete = True
             logger.info(f"✅ BACKEND COMPLETION: Survey ended by VOÏA at step {self.step_count}")
         else:
-            # Generate next AI question using updated data
-            next_question = self._generate_ai_question(user_input, context)
+            # PERFORMANCE FIX: Single combined AI call for extraction + next question
+            combined_result = self._process_with_ai_combined(user_input, context)
+            
+            if combined_result['success']:
+                # Update extracted data from combined result
+                extracted = combined_result.get('extracted_data', {})
+                newly_extracted = {}
+                for key, value in extracted.items():
+                    if value is not None and self.extracted_data.get(key) is None:
+                        newly_extracted[key] = value
+                        self.extracted_data[key] = value
+                        logger.debug(f"Locked field: {key} (first capture)")
+                
+                self.survey_data['extracted_data'] = self.extracted_data
+                logger.debug(f"Step {self.step_count}: New fields={list(newly_extracted.keys())}, Total fields={len(self.extracted_data)}")
+                
+                # Use AI-generated next question
+                next_question = combined_result['next_question']
+            else:
+                # Fallback: Use rule-based extraction + fallback questions
+                logger.warning(f"AI combined call failed, using fallback at step {self.step_count}")
+                extracted = self._extract_survey_data_fallback(user_input)
+                for key, value in extracted.items():
+                    if value is not None and self.extracted_data.get(key) is None:
+                        self.extracted_data[key] = value
+                next_question = self._generate_fallback_question(user_input, context)
             
             # CRITICAL: Override OpenAI's is_complete decision - backend decides
             if next_question.get('is_complete'):
@@ -199,6 +205,111 @@ class AIConversationalSurvey:
         """Generate personalized welcome message using template service"""
         # Use template service for dynamic or demo-specific welcome messages
         return self.template_service.generate_welcome_message(respondent_name)
+    
+    def _process_with_ai_combined(self, user_input: str, context: Dict[str, Any]) -> Dict[str, Any]:
+        """PERFORMANCE OPTIMIZATION: Single API call for extraction + next question
+        
+        This reduces API calls from 2 to 1 per user response, cutting rate limit pressure in half
+        """
+        try:
+            # Get context
+            company_name = self.template_service.get_company_name()
+            campaign_language = self.template_service.get_language_code()
+            survey_config = self.template_service.build_survey_config_json(self.participant_data)
+            
+            # Build missing goals context
+            missing_goals = self._get_missing_goals()
+            missing_goals_text = ", ".join(missing_goals) if missing_goals else "All goals collected"
+            
+            # Build conversation history for context
+            history_text = self._format_conversation_history()
+            
+            # Generate hybrid prompt from template service
+            hybrid_prompt = self.template_service._generate_hybrid_prompt(
+                company_name=company_name,
+                participant_data=self.participant_data,
+                conversation_history=history_text
+            )
+            
+            prompt = f"""{hybrid_prompt}
+
+CURRENT STATE:
+- Step: {self.step_count}
+- Missing campaign goals: {missing_goals_text}
+- Already collected data: {list(self.extracted_data.keys())}
+
+USER'S LATEST RESPONSE: "{user_input}"
+
+YOUR TASK (COMPLETE BOTH IN ONE RESPONSE):
+1. Extract any relevant data from the user's response
+2. Generate the next conversational question based on missing goals
+
+Return JSON with this EXACT format:
+{{
+    "extracted_data": {{
+        "nps_score": number or null,
+        "nps_category": string or null,
+        "satisfaction_rating": number or null,
+        "service_rating": number or null,
+        "product_value_rating": number or null,
+        "pricing_rating": number or null,
+        "support_rating": number or null,
+        "product_quality_feedback": string or null,
+        "support_experience_feedback": string or null,
+        "service_rating_feedback": string or null,
+        "user_experience_feedback": string or null,
+        "feature_requests": string or null,
+        "general_feedback": string or null,
+        "nps_reasoning": string or null,
+        "improvement_feedback": string or null,
+        "additional_comments": string or null
+    }},
+    "next_question": {{
+        "message": "Your next question in {campaign_language}",
+        "message_type": "ai_question",
+        "step": "descriptive_step_name",
+        "progress": number,
+        "is_complete": false
+    }}
+}}
+
+CRITICAL: Keep is_complete=false. Backend controls survey completion, not you."""
+
+            # Model selection via environment variable
+            conversation_model = os.environ.get('AI_CONVERSATION_MODEL', 'gpt-4o')
+            
+            # Log the full prompt for debugging
+            self.ai_prompts_log.append({
+                'step': self.step_count,
+                'type': 'combined_extraction_and_question',
+                'prompt': prompt,
+                'timestamp': 'now'
+            })
+            
+            response = self.openai_client.chat.completions.create(
+                model=conversation_model,
+                messages=[{"role": "user", "content": prompt}],
+                response_format={"type": "json_object"},
+                max_tokens=800,
+                temperature=0.7
+            )
+            
+            content = response.choices[0].message.content
+            if content:
+                result = json.loads(content)
+                logger.info(f"✅ Combined AI call successful at step {self.step_count}")
+                return {
+                    'success': True,
+                    'extracted_data': result.get('extracted_data', {}),
+                    'next_question': result.get('next_question', {})
+                }
+            else:
+                logger.warning(f"Empty response from combined AI call")
+                return {'success': False}
+                
+        except Exception as e:
+            logger.warning(f"Combined AI call failed: {str(e)[:100]}")
+            return {'success': False}
     
     def _extract_survey_data_with_ai(self, user_input: str, context: Dict[str, Any]) -> Dict[str, Any]:
         """CAMPAIGN-AWARE: Extract structured survey data from natural language using OpenAI"""
