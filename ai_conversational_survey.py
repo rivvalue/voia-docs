@@ -902,6 +902,17 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
                 participant_data=self.participant_data
             )
             
+            # Get campaign language for language-aware final instructions
+            campaign_language = self.template_service._campaign_language_code or 'en'
+            
+            # Create language-aware final instructions (CRITICAL FIX: prevents English override)
+            if campaign_language == 'fr':
+                final_instructions = """Soyez conversationnel, empathique et adaptez-vous à leur style de communication."""
+            elif campaign_language == 'es':
+                final_instructions = """Sea conversacional, empático y adaptativo a su estilo de comunicación."""
+            else:
+                final_instructions = """Be conversational, empathetic, and adaptive to their communication style."""
+            
             # Add customer's latest response and next question priority to the prompt
             full_prompt = f"""{system_prompt}
 
@@ -919,7 +930,17 @@ RESPONSE FORMAT - Return JSON:
     "is_complete": true/false
 }}
 
-Be conversational, empathetic, and adaptive to their communication style."""
+{final_instructions}"""
+            
+            # Log full prompt for debugging (language issues, prompt effectiveness, etc.)
+            self.ai_prompts_log.append({
+                'step': self.step_count,
+                'timestamp': datetime.utcnow().isoformat(),
+                'prompt_type': 'question_generation',
+                'full_prompt': full_prompt,
+                'language': campaign_language,
+                'user_input': user_input[:100]  # Truncate for privacy
+            })
 
             # Model selection via environment variable for cost optimization
             conversation_model = os.environ.get('AI_CONVERSATION_MODEL', 'gpt-4o')
