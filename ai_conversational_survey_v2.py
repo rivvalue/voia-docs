@@ -45,6 +45,38 @@ from session_state_utils import (
 logger = logging.getLogger(__name__)
 
 
+# ============================================================================
+# EXTRACTION PROMPT CONFIGURATION
+# ============================================================================
+# Feature flag for revised extraction prompt (Nov 2025)
+# Set USE_REVISED_EXTRACTION_PROMPT=false to rollback to original prompt
+USE_REVISED_EXTRACTION_PROMPT = os.environ.get('USE_REVISED_EXTRACTION_PROMPT', 'true').lower() == 'true'
+
+# Field mapping: Prompt field names → Database column names
+# Allows descriptive prompt fields while maintaining DB compatibility
+EXTRACTION_TO_DB_FIELD_MAP = {
+    # Ratings (prompt uses descriptive names)
+    'overall_satisfaction_rating': 'satisfaction_rating',
+    'pricing_value_rating': 'pricing_rating',
+    'service_rating': 'service_rating',  # Already matches
+    'product_appreciation_rating': 'product_value_rating',
+    
+    # NPS (recommendation metrics, separate from satisfaction)
+    'nps_score': 'nps_score',  # Already matches
+    'nps_reasoning': 'recommendation_reason',
+    
+    # Text feedback
+    'detailed_feedback': 'general_feedback',
+    'pricing_satisfaction': 'improvement_feedback',
+    
+    # Arrays (needs JSON serialization)
+    'feature_requests': 'feature_requests',
+    
+    # Support rating (already matches, kept for completeness)
+    'support_rating': 'support_rating'
+}
+
+
 def _mask_pii(text, max_length=100):
     """Mask PII and truncate text for logging"""
     if not text:
