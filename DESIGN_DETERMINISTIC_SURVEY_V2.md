@@ -301,30 +301,46 @@ def _extract_with_ai(self, user_message: str) -> Dict:
     # Critical for understanding pronouns ("it", "they") and multi-turn clarifications
     conversation_context = self._format_conversation_history(last_n=6)
     
-    prompt = f"""You are a data extraction assistant for VOÏA surveys.
-Extract ONLY the relevant fields from the user's response below.
-Respond EXCLUSIVELY in valid JSON format.
+    prompt = f"""You are a data extraction assistant for the VOÏA survey platform.
 
-Language: {language}
-Possible fields: {all_fields}
+Your task:
+- Read the user's latest response.
+- Extract all clearly provided information relevant to the fields below.
+- Use the previous conversation context ONLY to interpret pronouns or references.
+- Return ONLY the fields that appear in the current user response (directly or through context).
+- Do NOT speculate or infer information not clearly stated.
 
-Previous conversation context (for understanding references):
-{conversation_context}
+ALL_POSSIBLE_FIELDS = {all_fields}
 
-Current user response: {user_message}
+Previous conversation context (summary):
+\"\"\"{conversation_context}\"\"\"
 
-Rules:
-- Extract only fields mentioned in the current response
-- Use conversation context to resolve pronouns and references
-- Use null for missing fields
-- Return valid JSON only
-- Do NOT generate questions
-- Do NOT assess completion
+Current user response:
+\"\"\"{user_message}\"\"\"
 
-Example:
-User previously said: "Your product quality is good"
-Current response: "It's reliable" 
-→ Extract: {{"product_quality_feedback": "reliable"}}
+RULES:
+- Only output fields for which the user clearly provided information.
+- If a field is not mentioned, DO NOT include it in the JSON output at all.
+- Do NOT output null values.
+- Do NOT generate questions.
+- Do NOT perform survey flow logic.
+- Values must be short, semantic summaries (not long paragraphs).
+- Respond with VALID JSON ONLY.
+
+Examples:
+
+1. Off-topic extraction:
+   User says: "It's still unstable and support never replies."
+   Output: {{"product_quality_feedback": "unstable", "support_experience_feedback": "support slow to reply"}}
+
+2. Nothing to extract:
+   User says: "I'm not sure yet."
+   Output: {{}}
+
+3. Pronoun resolution using context:
+   Context shows: Previous discussion about product "Saaspasse"
+   User says: "It crashes frequently"
+   Output: {{"product_quality_feedback": "crashes frequently"}}
 """
     
     # Use configured model (from environment/business settings, NOT hardcoded)
@@ -337,6 +353,21 @@ Current response: "It's reliable"
 - `self.extraction_model` sourced from business account or environment config
 - Supports VOÏA's AI cost optimization strategy (tiered routing: gpt-4o-mini vs gpt-4o)
 - Never hardcode model names - allows per-tenant overrides
+
+**Data Merge Strategy:**
+```python
+# Controller safely merges sparse payloads (only non-null fields returned)
+extracted_data.update(new_fields)  # Latest non-empty value wins
+
+# Handles user reversals automatically:
+# Turn 1: User says "I rate it 8"  → {"nps_score": 8}
+# Turn 3: User says "Actually, 7" → {"nps_score": 7}  # Overwrites with latest
+```
+
+**Token Efficiency:**
+- Sends ALL possible fields every turn (~20-30 fields, ~400 tokens)
+- Rationale: Enables off-topic capture (user mentions pricing while discussing product)
+- Tradeoff accepted: Slightly higher token cost for comprehensive data capture
 
 **Error Handling:**
 - Invalid JSON → Log error, return empty dict, continue
