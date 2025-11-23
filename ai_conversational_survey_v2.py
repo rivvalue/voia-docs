@@ -916,9 +916,21 @@ def finalize_ai_conversational_survey_v2(context: Dict[str, Any]) -> Dict[str, A
     Returns:
         Structured survey data dict for database persistence
     """
+    from models import ActiveConversation
+    import json
+    
     conversation_id = context.get('conversation_id')
     
     logger.info(f"✅ Finalizing V2 deterministic conversation: {conversation_id}")
+    
+    # FIX (Nov 23, 2025): Load ActiveConversation to get participant_data
+    active_conv = ActiveConversation.query.filter_by(conversation_id=conversation_id).first()
+    if not active_conv:
+        logger.error(f"FINALIZATION ERROR: No ActiveConversation found for {conversation_id}")
+        raise ValueError(f"V2 finalization failed: missing ActiveConversation for {conversation_id}")
+    
+    # Parse participant_data JSON to get required fields
+    participant_data = json.loads(active_conv.participant_data) if active_conv.participant_data else {}
     
     # Load persisted V2 state from database
     persisted_state = load_conversation_state(conversation_id)
@@ -943,10 +955,10 @@ def finalize_ai_conversational_survey_v2(context: Dict[str, Any]) -> Dict[str, A
     logger.info(f"V2 State loaded: {len(extracted_data)} fields, {step_count} steps, complete={is_complete}")
     logger.debug(f"Topic question counts: {topic_question_counts}")
     
-    # FIX (Nov 23, 2025): Extract company_name and respondent_name from context or extracted_data
+    # FIX (Nov 23, 2025): Extract company_name and respondent_name from participant_data (authoritative source)
     # These are required NOT NULL fields in the database
-    company_name = context.get('company_name') or extracted_data.get('company_name')
-    respondent_name = context.get('respondent_name') or extracted_data.get('respondent_name')
+    company_name = participant_data.get('company_name') or extracted_data.get('company_name') or context.get('company_name')
+    respondent_name = participant_data.get('respondent_name') or extracted_data.get('respondent_name') or context.get('respondent_name')
     
     # Return structured data for database persistence
     # Format matches V1 for database compatibility
