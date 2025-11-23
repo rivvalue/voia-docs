@@ -237,7 +237,13 @@ def _map_role_to_tier(role_string: Optional[str]) -> str:
 class PromptTemplateService:
     """Service for generating dynamic survey prompts based on business account configuration"""
     
-    def __init__(self, business_account_id: Optional[int] = None, campaign_id: Optional[int] = None):
+    def __init__(
+        self, 
+        business_account_id: Optional[int] = None, 
+        campaign_id: Optional[int] = None,
+        campaign: Optional[Any] = None,
+        language: Optional[str] = None
+    ):
         """
         Initialize prompt template service with hybrid business+campaign data support
         
@@ -245,21 +251,26 @@ class PromptTemplateService:
         - Hot path attributes (high frequency): Extracted to primitives at init (no session issues)
         - Cold path attributes (rare): Lazy-loaded via ID lookup when needed
         
+        FIX (Nov 23, 2025): Accept campaign object to avoid session detachment issues
+        
         Args:
             business_account_id: ID of business account for customized prompts, 
                                None for demo mode
             campaign_id: ID of campaign for campaign-specific customization,
                         takes precedence over business account data
+            campaign: Optional Campaign object (preferred over campaign_id to avoid session issues)
+            language: Optional language override (e.g., 'en', 'fr')
         """
         # Store IDs for cold path lazy reload
         self.business_account_id = business_account_id
         self.campaign_id = campaign_id
+        self.language_override = language  # Store language override for AI prompts
         
         # Load ORM objects ONCE for hot path extraction
-        campaign = None
+        # PREFER passed campaign object over database lookup
         business_account = None
         
-        if campaign_id:
+        if campaign is None and campaign_id:
             try:
                 campaign = Campaign.query.get(campaign_id)
                 if not campaign:
@@ -272,6 +283,12 @@ class PromptTemplateService:
                 import logging
                 logging.error(f"Error loading campaign {campaign_id}: {e}")
                 campaign = None
+        elif campaign:
+            # Use passed campaign object (avoids session issues)
+            self.campaign_id = campaign.id
+            if campaign.business_account_id:
+                self.business_account_id = campaign.business_account_id
+                business_account_id = campaign.business_account_id
         
         if business_account_id:
             business_account = BusinessAccount.query.get(business_account_id)

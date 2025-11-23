@@ -101,8 +101,24 @@ class DeterministicSurveyController:
         self.campaign = Campaign.query.filter_by(id=campaign_id).first() if campaign_id else None
         self.business_account = BusinessAccount.query.filter_by(id=business_account_id).first() if business_account_id else None
         
+        # Get language from campaign or session (FIX Nov 23, 2025)
+        from flask import session
+        self.language = None
+        if self.campaign and hasattr(self.campaign, 'language_code'):
+            self.language = self.campaign.language_code
+        elif 'language' in session:
+            self.language = session.get('language', 'en')
+        else:
+            self.language = 'en'  # Default fallback
+        
         # Initialize prompt template service for campaign-specific prompts
-        self.template_service = PromptTemplateService(business_account_id, campaign_id)
+        # FIX (Nov 23, 2025): Pass campaign object and language to avoid session/language issues
+        self.template_service = PromptTemplateService(
+            business_account_id=business_account_id,
+            campaign_id=campaign_id,
+            campaign=self.campaign,  # Pass object to avoid session detachment
+            language=self.language   # Pass language for AI prompt enforcement
+        )
         
         # V2 State (will be loaded from session or initialized fresh)
         self.extracted_data: Dict[str, Any] = {}
@@ -375,11 +391,26 @@ class DeterministicSurveyController:
                 'timestamp': datetime.utcnow().isoformat()
             })
             
+            # Build language-aware system prompt (FIX Nov 23, 2025)
+            language_instruction = ""
+            if self.language and self.language != 'en':
+                language_map = {
+                    'fr': 'French',
+                    'es': 'Spanish',
+                    'de': 'German',
+                    'it': 'Italian',
+                    'pt': 'Portuguese'
+                }
+                language_name = language_map.get(self.language, self.language)
+                language_instruction = f"\n\nIMPORTANT: Generate the question in {language_name} language. The entire conversation must remain in {language_name}."
+            
+            system_prompt = f"You are a conversational survey assistant. Generate natural, engaging questions for the specified topic.{language_instruction}"
+            
             # Call OpenAI for question generation
             response = self.openai_client.chat.completions.create(
                 model="gpt-4o-mini",  # Use cost-optimized model
                 messages=[
-                    {"role": "system", "content": "You are a conversational survey assistant. Generate natural, engaging questions for the specified topic."},
+                    {"role": "system", "content": system_prompt},
                     {"role": "user", "content": question_prompt}
                 ],
                 temperature=0.7  # Allow some creativity in phrasing
@@ -611,6 +642,8 @@ Return ONLY the question text, no JSON, no explanation."""
         CRITICAL FIX (Nov 23, 2025): Integrates with real template service configuration.
         Uses build_survey_config_json() to get campaign-configured goals with role filtering.
         
+        FIX (Nov 23, 2025): Added topic normalization to handle meta-topics like "NPS Score"
+        
         Returns:
             List of goal dicts with topic, fields, priority, is_required
         """
@@ -638,13 +671,20 @@ Return ONLY the question text, no JSON, no explanation."""
         goals = []
         for goal in template_goals:
             priority = goal.get('priority', 999)
+            topic_name = goal.get('topic', 'Unknown')
+            
+            # FIX: Normalize meta-topics that reference survey methodology itself
+            # "NPS Score" is not a valid topic (it's the survey tool), map to "NPS" (the reasoning/feedback)
+            if topic_name.lower() in ['nps score', 'score nps', 'nps score reasoning']:
+                logger.warning(f"Normalizing meta-topic '{topic_name}' → 'NPS' to avoid circular questions")
+                topic_name = 'NPS'
             
             # Use template service's is_required metadata (authoritative source)
             # Fallback to priority-based logic only if metadata missing (backward compatibility)
             is_required = goal.get('is_required', priority <= 2)
             
             goals.append({
-                'topic': goal.get('topic', 'Unknown'),
+                'topic': topic_name,
                 'fields': goal.get('fields', []),
                 'priority': priority,
                 'is_required': is_required,  # Now from template service, not derived!
