@@ -3058,7 +3058,12 @@ def finalize_conversation():
         # V2 uses dedicated finalization handler for deterministic state
         if use_deterministic_v2:
             logger.info(f"✅ Finalizing V2 deterministic conversation: {conversation_id}")
-            structured_data = finalize_ai_conversational_survey_v2(survey_data)
+            try:
+                structured_data = finalize_ai_conversational_survey_v2(survey_data)
+            except ValueError as e:
+                logger.error(f"V2 finalization failed: {str(e)}, falling back to V1")
+                # Fallback to V1 finalization if V2 state corrupted
+                structured_data = finalize_ai_conversational_survey(survey_data)
         else:
             logger.debug(f"Finalizing V1 conversation: {conversation_id}")
             structured_data = finalize_ai_conversational_survey(survey_data)

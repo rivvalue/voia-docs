@@ -880,17 +880,13 @@ def finalize_ai_conversational_survey_v2(context: Dict[str, Any]) -> Dict[str, A
     
     if not persisted_state:
         logger.error(f"FINALIZATION ERROR: No persisted state for V2 conversation {conversation_id}")
-        # Fallback to V1 finalization for recovery
-        logger.warning("Falling back to V1 finalization...")
-        from ai_conversational_survey import finalize_ai_conversational_survey
-        return finalize_ai_conversational_survey(context)
+        raise ValueError(f"V2 finalization failed: missing state for conversation {conversation_id}")
     
     # Verify this is a V2 conversation
     controller_version = persisted_state.get('controller_version', 'unknown')
     if controller_version != 'v2_deterministic':
-        logger.warning(f"Not a V2 conversation (version={controller_version}), falling back to V1")
-        from ai_conversational_survey import finalize_ai_conversational_survey
-        return finalize_ai_conversational_survey(context)
+        logger.error(f"FINALIZATION ERROR: Wrong controller version (expected v2_deterministic, got {controller_version})")
+        raise ValueError(f"V2 finalization failed: controller_version mismatch ({controller_version})")
     
     # Extract V2-specific state
     extracted_data = persisted_state.get('extracted_data', {})
