@@ -152,8 +152,8 @@ def get_next_goal(
         1. If current_goal_pointer set AND allow_multi_turn:
            - Check if current goal still has missing fields
            - Check per-topic follow-up limit:
-             * Must-ask: BYPASS limit (unlimited follow-ups for completion)
-             * Optional: ENFORCE limit (accept partial data when exceeded)
+             * ALL topics: ENFORCE limit (accept partial data when exceeded)
+             * FIX (Nov 23, 2025): Removed must-ask bypass to prevent infinite loops
            - If allowed, return (current_goal, missing_fields, is_follow_up=True)
         2. Otherwise, iterate goals by priority:
            - TIER 1: Must-ask topics (is_required=True)
@@ -172,8 +172,8 @@ def get_next_goal(
         topic_question_counts = {'Product Quality': 3}  # 3 questions asked (1 initial + 2 follow-ups)
         max_follow_up_per_topic = 2
         
-        # Must-ask topic: bypasses limit even at 3 questions
-        # Returns: (Product Quality goal, ['feedback'], is_follow_up=True)
+        # FIX (Nov 23, 2025): ALL topics respect limit, even must-ask
+        # Returns: (None, [], False) - limit reached, moves to next topic
     """
     # Default to empty dict if None (avoid None checks throughout)
     topic_question_counts = topic_question_counts or {}
@@ -207,32 +207,26 @@ def get_next_goal(
             )
             
             if missing_fields:
-                # NEW: Check per-topic follow-up limit
+                # NEW: Check per-topic follow-up limit (ENFORCED FOR ALL TOPICS)
                 questions_asked = topic_question_counts.get(current_goal_pointer, 1)
                 follow_ups_used = questions_asked - 1  # First question isn't a follow-up
                 is_required = current_goal.get('is_required', True)
                 
-                # Must-ask topics BYPASS limit, optional topics ENFORCE limit
-                if is_required:
-                    # Must-ask: unlimited follow-ups to ensure completion
+                # FIX (Nov 23, 2025): ALL topics must respect follow-up limit (no bypass)
+                if follow_ups_used < max_follow_up_per_topic:
+                    # Under limit: allow follow-up
+                    topic_type = "MUST-ASK" if is_required else "OPTIONAL"
                     logger.info(
-                        f"📍 Multi-turn on MUST-ASK '{current_goal_pointer}' "
-                        f"(follow-ups used: {follow_ups_used}, bypassing limit)"
-                    )
-                    return current_goal, missing_fields, True
-                    
-                elif follow_ups_used < max_follow_up_per_topic:
-                    # Optional: under limit, allow follow-up
-                    logger.info(
-                        f"📍 Multi-turn on OPTIONAL '{current_goal_pointer}' "
+                        f"📍 Multi-turn on {topic_type} '{current_goal_pointer}' "
                         f"(follow-ups: {follow_ups_used}/{max_follow_up_per_topic})"
                     )
                     return current_goal, missing_fields, True
                     
                 else:
-                    # Optional: limit exceeded, accept partial data and move on
+                    # Limit exceeded: accept partial data and move on
+                    topic_type = "MUST-ASK" if is_required else "OPTIONAL"
                     logger.info(
-                        f"⚠️ Follow-up limit reached for OPTIONAL '{current_goal_pointer}' "
+                        f"⚠️ Follow-up limit reached for {topic_type} '{current_goal_pointer}' "
                         f"({follow_ups_used}/{max_follow_up_per_topic}) - accepting partial data"
                     )
                     # Fall through to next topic selection
@@ -246,6 +240,15 @@ def get_next_goal(
     for goal in sorted(must_ask_goals, key=lambda g: g.get('priority', 999)):
         topic = goal.get('topic', 'Unknown')
         fields = goal.get('fields', [])
+        
+        # FIX (Nov 23, 2025): Skip must-ask topics that have exhausted follow-up limit
+        # This prevents infinite loop when must-ask topic hits limit but still has missing fields
+        questions_asked = topic_question_counts.get(topic, 0)
+        follow_ups_used = max(0, questions_asked - 1)  # First question isn't a follow-up
+        
+        if follow_ups_used >= max_follow_up_per_topic:
+            logger.debug(f"   Skipping MUST-ASK topic '{topic}' - follow-up limit exhausted ({follow_ups_used}/{max_follow_up_per_topic})")
+            continue  # Skip this exhausted must-ask topic
         
         missing_fields = _get_missing_fields(fields, extracted_data, prefilled_fields)
         
