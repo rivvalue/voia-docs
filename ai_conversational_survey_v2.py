@@ -457,12 +457,16 @@ class DeterministicSurveyController:
             
             logger.debug(f"LLM extracted (raw): {_mask_pii(raw_extracted)}")
             
-            # Map to database field names before storing
-            mapped_data = self._map_extracted_fields_to_db(raw_extracted)
-            
-            logger.debug(f"LLM extracted (mapped): {_mask_pii(mapped_data)}")
-            
-            return mapped_data
+            # Map to database field names ONLY if using revised prompt
+            # This ensures rollback works correctly (old prompt = no mapping)
+            if USE_REVISED_EXTRACTION_PROMPT:
+                mapped_data = self._map_extracted_fields_to_db(raw_extracted)
+                logger.debug(f"LLM extracted (mapped): {_mask_pii(mapped_data)}")
+                return mapped_data
+            else:
+                # Original prompt returns data with DB column names already
+                logger.debug(f"LLM extracted (original prompt, no mapping): {_mask_pii(raw_extracted)}")
+                return raw_extracted
             
         except Exception as e:
             logger.error(f"Extraction error: {e}")
