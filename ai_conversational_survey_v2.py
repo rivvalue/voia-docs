@@ -12,6 +12,29 @@ Key Design Principles:
 
 Created: November 23, 2025
 Feature Flag: DETERMINISTIC_SURVEY_FLOW
+
+ROLLBACK PROCEDURE (Revised Extraction Prompt)
+===============================================
+If the revised extraction prompt (Nov 2025) causes issues, rollback immediately:
+
+1. Set environment variable:
+   USE_REVISED_EXTRACTION_PROMPT=false
+
+2. Restart the workflow:
+   - In Replit UI: Click "Stop" then "Run" on the workflow
+   - Or use: `pkill gunicorn && gunicorn --bind 0.0.0.0:5000 --reuse-port --reload main:app`
+
+3. Verify rollback:
+   - Check logs for "ORIGINAL extraction prompt" messages
+   - Complete a test survey and verify data extraction works
+
+The system will automatically revert to the original prompt (pre-Nov 2025) which uses:
+- Direct database field names (satisfaction_rating, pricing_rating, etc.)
+- No field mapping layer
+- Original validation rules
+
+To re-enable the revised prompt:
+   USE_REVISED_EXTRACTION_PROMPT=true (or remove the variable, defaults to true)
 """
 
 import os
@@ -1101,6 +1124,10 @@ def finalize_ai_conversational_survey_v2(context: Dict[str, Any]) -> Dict[str, A
     import json
     
     conversation_id = context.get('conversation_id')
+    
+    if not conversation_id:
+        logger.error("FINALIZATION ERROR: Missing conversation_id in context")
+        raise ValueError("V2 finalization failed: conversation_id required")
     
     logger.info(f"✅ Finalizing V2 deterministic conversation: {conversation_id}")
     
