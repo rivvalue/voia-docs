@@ -15,7 +15,7 @@ from business_auth_routes import require_business_auth, require_permission, get_
 from feature_flags import feature_flags
 from conversational_survey import start_conversational_survey, process_conversation_response, finalize_conversational_survey
 from ai_conversational_survey import start_ai_conversational_survey, process_ai_conversation_response, finalize_ai_conversational_survey
-from ai_conversational_survey_v2 import start_ai_conversational_survey_v2, process_ai_conversation_response_v2
+from ai_conversational_survey_v2 import start_ai_conversational_survey_v2, process_ai_conversation_response_v2, finalize_ai_conversational_survey_v2
 from audit_utils import queue_audit_log
 from datetime import datetime, timedelta, date
 import json
@@ -3055,13 +3055,13 @@ def finalize_conversation():
         use_deterministic_v2 = (controller_version == 'v2_deterministic')
         
         # Convert conversational data to structured survey format
-        # V2 and V1 finalization are compatible - V1 handles both
-        structured_data = finalize_ai_conversational_survey(survey_data)
-        
+        # V2 uses dedicated finalization handler for deterministic state
         if use_deterministic_v2:
             logger.info(f"✅ Finalizing V2 deterministic conversation: {conversation_id}")
+            structured_data = finalize_ai_conversational_survey_v2(survey_data)
         else:
             logger.debug(f"Finalizing V1 conversation: {conversation_id}")
+            structured_data = finalize_ai_conversational_survey(survey_data)
         
         # Get campaign and association data from session (new system)
         association_id = session.get('association_id')

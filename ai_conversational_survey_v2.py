@@ -633,23 +633,21 @@ Return ONLY the question text, no JSON, no explanation."""
             ]
         
         # Transform template service goals to V2 format
-        # NOTE: PromptTemplateService does NOT return is_required metadata (confirmed Nov 23, 2025)
-        # We derive must-ask vs optional from priority since campaigns prioritize critical topics first
+        # V2 FIX (Nov 23, 2025): PromptTemplateService NOW returns is_required metadata
+        # Source of truth: Campaign.prioritized_topics (is_required=True) vs Campaign.optional_topics (is_required=False)
         goals = []
         for goal in template_goals:
             priority = goal.get('priority', 999)
             
-            # MUST-ASK LOGIC: First 2 topics (priority <= 2) are always required
-            # Typically NPS (priority 0/1) + one core business metric (priority 1/2)
-            # Everything after priority 2 is optional (best-effort with follow-up limits)
-            # This ensures critical data collection while allowing graceful completion
-            is_required = priority <= 2  # Configurable threshold - could be env var
+            # Use template service's is_required metadata (authoritative source)
+            # Fallback to priority-based logic only if metadata missing (backward compatibility)
+            is_required = goal.get('is_required', priority <= 2)
             
             goals.append({
                 'topic': goal.get('topic', 'Unknown'),
                 'fields': goal.get('fields', []),
                 'priority': priority,
-                'is_required': is_required,
+                'is_required': is_required,  # Now from template service, not derived!
                 'description': goal.get('description', '')
             })
         
@@ -718,6 +716,9 @@ Return ONLY the question text, no JSON, no explanation."""
         """
         Get current controller state as dict for persistence.
         
+        V2 ENHANCEMENT (Nov 23, 2025): Now includes controller_version and is_complete
+        for finalization route branching and completion state tracking.
+        
         Returns:
             State dict for session_state_utils
         """
@@ -733,7 +734,9 @@ Return ONLY the question text, no JSON, no explanation."""
             'current_goal_pointer': self.current_goal_pointer,
             'topic_question_counts': self.topic_question_counts,
             'last_activity': datetime.utcnow().isoformat(),
-            'resume_offered': False
+            'resume_offered': False,
+            'controller_version': 'v2_deterministic',  # V2 ENHANCEMENT: For finalization routing
+            'is_complete': self.is_complete  # V2 ENHANCEMENT: Completion state tracking
         }
     
     def load_conversation_state(self, conversation_id: str) -> bool:
@@ -850,3 +853,78 @@ def process_ai_conversation_response_v2(
     logger.debug(f"V2 response processed: complete={response.get('is_complete')}")
     
     return response
+
+
+def finalize_ai_conversational_survey_v2(context: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    V2-specific finalization for deterministic survey conversations.
+    
+    CRITICAL (Nov 23, 2025): Loads V2 deterministic state from database including:
+    - controller_version='v2_deterministic' (for route branching)
+    - is_complete=True (completion verification)
+    - topic_question_counts (per-topic follow-up tracking)
+    - extracted_data (structured survey responses)
+    
+    Args:
+        context: Survey context with conversation_id, business_account_id, campaign_id
+    
+    Returns:
+        Structured survey data dict for database persistence
+    """
+    conversation_id = context.get('conversation_id')
+    
+    logger.info(f"✅ Finalizing V2 deterministic conversation: {conversation_id}")
+    
+    # Load persisted V2 state from database
+    persisted_state = load_conversation_state(conversation_id)
+    
+    if not persisted_state:
+        logger.error(f"FINALIZATION ERROR: No persisted state for V2 conversation {conversation_id}")
+        # Fallback to V1 finalization for recovery
+        logger.warning("Falling back to V1 finalization...")
+        from ai_conversational_survey import finalize_ai_conversational_survey
+        return finalize_ai_conversational_survey(context)
+    
+    # Verify this is a V2 conversation
+    controller_version = persisted_state.get('controller_version', 'unknown')
+    if controller_version != 'v2_deterministic':
+        logger.warning(f"Not a V2 conversation (version={controller_version}), falling back to V1")
+        from ai_conversational_survey import finalize_ai_conversational_survey
+        return finalize_ai_conversational_survey(context)
+    
+    # Extract V2-specific state
+    extracted_data = persisted_state.get('extracted_data', {})
+    conversation_history = persisted_state.get('conversation_history', [])
+    step_count = persisted_state.get('step_count', 0)
+    topic_question_counts = persisted_state.get('topic_question_counts', {})
+    is_complete = persisted_state.get('is_complete', False)
+    
+    logger.info(f"V2 State loaded: {len(extracted_data)} fields, {step_count} steps, complete={is_complete}")
+    logger.debug(f"Topic question counts: {topic_question_counts}")
+    
+    # Return structured data for database persistence
+    # Format matches V1 for database compatibility
+    structured_data = {
+        'extracted_data': extracted_data,
+        'conversation_history': conversation_history,
+        'step_count': step_count,
+        'topic_question_counts': topic_question_counts,
+        'is_complete': is_complete,
+        'controller_version': 'v2_deterministic',
+        
+        # Map extracted data to database fields (V1 compatibility)
+        'nps_score': extracted_data.get('nps_score'),
+        'nps_reasoning': extracted_data.get('nps_reasoning'),
+        'satisfaction_rating': extracted_data.get('satisfaction_rating'),
+        'service_rating': extracted_data.get('service_rating'),
+        'product_value_rating': extracted_data.get('product_value_rating'),
+        'pricing_rating': extracted_data.get('pricing_rating'),
+        'support_rating': extracted_data.get('support_rating'),
+        'improvement_feedback': extracted_data.get('improvement_feedback'),
+        'additional_comments': extracted_data.get('additional_comments'),
+        'tenure_with_fc': extracted_data.get('tenure_with_fc')
+    }
+    
+    logger.info(f"✅ V2 finalization complete: {len(structured_data)} total fields")
+    
+    return structured_data
