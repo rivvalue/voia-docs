@@ -181,6 +181,7 @@ def create_campaign():
         campaign.start_date = start_date_obj
         campaign.end_date = end_date_obj
         campaign.business_account_id = current_account.id
+        campaign.client_identifier = current_account.name  # Set to business account name for tracking
         campaign.status = 'draft'  # Initial status
         campaign.anonymize_responses = anonymize_responses
         

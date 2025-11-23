@@ -211,7 +211,9 @@ class Campaign(db.Model):
     language_code = db.Column(db.String(5), nullable=False, default='en', index=True)
     
     # Client tracking (for future multi-client support)
-    client_identifier = db.Column(db.String(200), nullable=False, default='archelo_group', index=True)
+    # Client identifier tracks which business account owns this campaign
+    # Set during creation to business_account.name for multi-tenant tracking
+    client_identifier = db.Column(db.String(200), nullable=True, index=True)
     
     # Business account ownership (Phase 2.5: Schema Fix)
     business_account_id = db.Column(db.Integer, db.ForeignKey('business_accounts.id'), nullable=True, index=True)
