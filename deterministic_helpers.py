@@ -6,6 +6,7 @@ These helpers provide backend-controlled flow logic for conversational surveys,
 removing AI decision-making from completion and topic selection.
 
 Created: November 22, 2025
+Updated: November 23, 2025 - Added per-topic follow-up limit enforcement
 Feature Flag: DETERMINISTIC_SURVEY_FLOW
 """
 
@@ -114,15 +115,18 @@ def get_next_goal(
     extracted_data: Dict,
     prefilled_fields: Set[str],
     current_goal_pointer: Optional[str] = None,
+    topic_question_counts: Optional[Dict[str, int]] = None,  # NEW: Per-topic counter
+    max_follow_up_per_topic: int = 2,                        # NEW: Campaign limit
     allow_multi_turn: bool = True,
     role_excluded_topics: Optional[Set[str]] = None,
     limit_optional_follow_ups: bool = True
 ) -> Tuple[Optional[Dict], List[str], bool]:
     """
-    Select the next goal and identify missing fields with TWO-TIER PRIORITY.
+    Select the next goal and identify missing fields with TWO-TIER PRIORITY and PER-TOPIC FOLLOW-UP LIMITS.
     
-    **CRITICAL CHANGE (Nov 22, 2025):** Implements must-ask vs optional topic prioritization.
-    Must-ask topics ALWAYS come before optional topics.
+    **CRITICAL CHANGES:**
+    - Nov 22, 2025: Implements must-ask vs optional topic prioritization
+    - Nov 23, 2025: Added per-topic follow-up counter enforcement (backend-controlled)
     
     This function provides deterministic topic selection, removing AI control
     over conversation flow.
@@ -132,10 +136,11 @@ def get_next_goal(
         extracted_data: Dict of collected field values
         prefilled_fields: Set of pre-populated field names
         current_goal_pointer: Name of topic currently being discussed (for multi-turn)
+        topic_question_counts: Dict tracking questions per topic (e.g., {"Product Quality": 2})
+        max_follow_up_per_topic: Campaign-configured follow-up limit (default: 2)
         allow_multi_turn: If True, stay on same topic for follow-up questions
         role_excluded_topics: Topics to exclude for this participant's role
-        limit_optional_follow_ups: If True, optional topics get max 1 follow-up
-                                  (conserve questions for must-ask)
+        limit_optional_follow_ups: If True, optional topics get limited follow-ups
     
     Returns:
         Tuple of (next_goal, missing_fields, is_follow_up):
@@ -143,35 +148,42 @@ def get_next_goal(
         - missing_fields: List of field names still needed
         - is_follow_up: True if this is a clarifying question on same topic
     
-    Algorithm (TWO-TIER PRIORITY):
+    Algorithm (TWO-TIER PRIORITY with FOLLOW-UP ENFORCEMENT):
         1. If current_goal_pointer set AND allow_multi_turn:
            - Check if current goal still has missing fields
-           - If yes, return (current_goal, missing_fields, is_follow_up=True)
+           - Check per-topic follow-up limit:
+             * Must-ask: BYPASS limit (unlimited follow-ups for completion)
+             * Optional: ENFORCE limit (accept partial data when exceeded)
+           - If allowed, return (current_goal, missing_fields, is_follow_up=True)
         2. Otherwise, iterate goals by priority:
+           - TIER 1: Must-ask topics (is_required=True)
+           - TIER 2: Optional topics (is_required=False, only if must-ask complete)
            - Find first goal with missing fields
            - Return (goal, missing_fields, is_follow_up=False)
         3. If no missing fields anywhere, return (None, [], False)
     
-    Multi-Turn Example:
-        User gives vague answer → some fields extracted but others missing
-        → get_next_goal() returns SAME goal with is_follow_up=True
-        → LLM generates clarifying question for same topic
-    
     Example:
         goals = [
-            {'topic': 'Product Quality', 'fields': ['nps_score', 'feedback'], 'priority': 1},
-            {'topic': 'Pricing', 'fields': ['pricing_rating'], 'priority': 2}
+            {'topic': 'Product Quality', 'fields': ['nps_score', 'feedback'], 'priority': 1, 'is_required': True},
+            {'topic': 'Pricing', 'fields': ['pricing_rating'], 'priority': 2, 'is_required': False}
         ]
-        extracted_data = {'nps_score': 8}  # Missing 'feedback'
+        extracted_data = {'nps_score': 8}
         current_goal_pointer = 'Product Quality'
+        topic_question_counts = {'Product Quality': 3}  # 3 questions asked (1 initial + 2 follow-ups)
+        max_follow_up_per_topic = 2
         
+        # Must-ask topic: bypasses limit even at 3 questions
         # Returns: (Product Quality goal, ['feedback'], is_follow_up=True)
     """
+    # Default to empty dict if None (avoid None checks throughout)
+    topic_question_counts = topic_question_counts or {}
     role_excluded_topics = role_excluded_topics or set()
     
     logger.debug(f"🔍 Getting next goal:")
     logger.debug(f"   Current pointer: {current_goal_pointer}")
     logger.debug(f"   Allow multi-turn: {allow_multi_turn}")
+    logger.debug(f"   Topic question counts: {topic_question_counts}")
+    logger.debug(f"   Max follow-ups per topic: {max_follow_up_per_topic}")
     logger.debug(f"   Extracted: {len(extracted_data)} fields")
     
     # Filter goals by role
@@ -180,7 +192,7 @@ def get_next_goal(
         if goal.get('topic') not in role_excluded_topics
     ]
     
-    # STEP 1: Multi-turn logic (stay on same topic if incomplete)
+    # STEP 1: Multi-turn logic with per-topic follow-up limit enforcement
     if current_goal_pointer and allow_multi_turn:
         current_goal = next(
             (g for g in applicable_goals if g.get('topic') == current_goal_pointer),
@@ -195,16 +207,35 @@ def get_next_goal(
             )
             
             if missing_fields:
-                # Check if we should do follow-up for this goal
+                # NEW: Check per-topic follow-up limit
+                questions_asked = topic_question_counts.get(current_goal_pointer, 1)
+                follow_ups_used = questions_asked - 1  # First question isn't a follow-up
                 is_required = current_goal.get('is_required', True)
-                allow_follow_up = is_required or not limit_optional_follow_ups
                 
-                if allow_follow_up:
-                    logger.info(f"📍 Multi-turn: Staying on '{current_goal_pointer}' ({'REQUIRED' if is_required else 'OPTIONAL'}, {len(missing_fields)} fields missing)")
-                    return current_goal, missing_fields, True  # is_follow_up=True
+                # Must-ask topics BYPASS limit, optional topics ENFORCE limit
+                if is_required:
+                    # Must-ask: unlimited follow-ups to ensure completion
+                    logger.info(
+                        f"📍 Multi-turn on MUST-ASK '{current_goal_pointer}' "
+                        f"(follow-ups used: {follow_ups_used}, bypassing limit)"
+                    )
+                    return current_goal, missing_fields, True
+                    
+                elif follow_ups_used < max_follow_up_per_topic:
+                    # Optional: under limit, allow follow-up
+                    logger.info(
+                        f"📍 Multi-turn on OPTIONAL '{current_goal_pointer}' "
+                        f"(follow-ups: {follow_ups_used}/{max_follow_up_per_topic})"
+                    )
+                    return current_goal, missing_fields, True
+                    
                 else:
-                    logger.debug(f"   Optional topic '{current_goal_pointer}' - accepting partial data (limit_optional_follow_ups=True)")
-                    # Move on - don't waste questions on optional follow-ups
+                    # Optional: limit exceeded, accept partial data and move on
+                    logger.info(
+                        f"⚠️ Follow-up limit reached for OPTIONAL '{current_goal_pointer}' "
+                        f"({follow_ups_used}/{max_follow_up_per_topic}) - accepting partial data"
+                    )
+                    # Fall through to next topic selection
             else:
                 logger.debug(f"   Current goal '{current_goal_pointer}' is now complete")
     
@@ -227,6 +258,15 @@ def get_next_goal(
     for goal in sorted(optional_goals, key=lambda g: g.get('priority', 999)):
         topic = goal.get('topic', 'Unknown')
         fields = goal.get('fields', [])
+        
+        # CRITICAL FIX (Nov 23, 2025): Skip optional topics that have exhausted follow-up limit
+        # This prevents infinite loop when optional topic hits limit but still has missing fields
+        questions_asked = topic_question_counts.get(topic, 0)
+        follow_ups_used = max(0, questions_asked - 1)  # First question isn't a follow-up
+        
+        if follow_ups_used >= max_follow_up_per_topic:
+            logger.debug(f"   Skipping OPTIONAL topic '{topic}' - follow-up limit exhausted ({follow_ups_used}/{max_follow_up_per_topic})")
+            continue  # Skip this exhausted optional topic
         
         missing_fields = _get_missing_fields(fields, extracted_data, prefilled_fields)
         
@@ -409,7 +449,7 @@ if __name__ == '__main__':
     """
     
     print("=" * 60)
-    print("TESTING DETERMINISTIC HELPERS")
+    print("TESTING DETERMINISTIC HELPERS (V2 - WITH FOLLOW-UP LIMITS)")
     print("=" * 60)
     
     # Test data
@@ -588,6 +628,93 @@ if __name__ == '__main__':
     assert goal['is_required'] == False, "Should be optional topic"
     print(f"✓ Correctly moved to OPTIONAL topic: '{goal['topic']}'")
     
+    # ===== NEW TESTS FOR FOLLOW-UP LIMIT ENFORCEMENT =====
+    
+    # Test 12: Optional topic hits follow-up limit
+    print("\n--- Test 12: Optional topic follow-up limit enforcement ---")
+    goal, missing, is_follow_up = get_next_goal(
+        goals=test_goals_with_required,
+        extracted_data={},  # Pricing still missing
+        prefilled_fields=set(),
+        current_goal_pointer='Pricing',  # Currently on optional topic
+        topic_question_counts={'Pricing': 3},  # 3 questions asked (1 initial + 2 follow-ups)
+        max_follow_up_per_topic=2,  # Limit is 2 follow-ups
+        allow_multi_turn=True
+    )
+    # Should force move to next topic (or None if all complete)
+    assert goal is None or goal['topic'] != 'Pricing', "Should NOT stay on Pricing after limit exceeded"
+    print("✓ Correctly enforced follow-up limit on OPTIONAL topic")
+    
+    # Test 13: Must-ask topic bypasses follow-up limit
+    print("\n--- Test 13: Must-ask topic bypasses follow-up limit ---")
+    goal, missing, is_follow_up = get_next_goal(
+        goals=test_goals_with_required,
+        extracted_data={},  # Product Quality still missing
+        prefilled_fields=set(),
+        current_goal_pointer='Product Quality',  # Currently on must-ask topic
+        topic_question_counts={'Product Quality': 5},  # 5 questions asked (way over limit)
+        max_follow_up_per_topic=2,  # Limit is 2 follow-ups
+        allow_multi_turn=True
+    )
+    # Should STAY on Product Quality despite exceeding limit (must-ask bypass)
+    assert goal['topic'] == 'Product Quality', "Should stay on MUST-ASK despite limit"
+    assert is_follow_up == True, "Should be follow-up"
+    print("✓ Correctly bypassed follow-up limit on MUST-ASK topic")
+    
+    # Test 14: Counter-based follow-up decision (under limit)
+    print("\n--- Test 14: Optional topic under follow-up limit ---")
+    goal, missing, is_follow_up = get_next_goal(
+        goals=test_goals_with_required,
+        extracted_data={},  # Pricing still missing
+        prefilled_fields=set(),
+        current_goal_pointer='Pricing',  # Currently on optional topic
+        topic_question_counts={'Pricing': 2},  # 2 questions asked (1 initial + 1 follow-up)
+        max_follow_up_per_topic=2,  # Limit is 2 follow-ups
+        allow_multi_turn=True
+    )
+    # Should stay on Pricing (under limit: 1 follow-up used, 2 allowed)
+    assert goal['topic'] == 'Pricing', "Should stay on OPTIONAL when under limit"
+    assert is_follow_up == True, "Should be follow-up"
+    print("✓ Correctly allowed follow-up on OPTIONAL topic (under limit)")
+    
+    # Test 15: CRITICAL - Exhausted optional topic is skipped (no infinite loop)
+    print("\n--- Test 15: Exhausted optional topic skipped in TIER 2 (infinite loop fix) ---")
+    test_goals_multi_optional = [
+        {
+            'topic': 'Product Quality',
+            'fields': ['nps_score'],
+            'priority': 1,
+            'is_required': True  # MUST ASK
+        },
+        {
+            'topic': 'Pricing',
+            'fields': ['pricing_rating'],
+            'priority': 2,
+            'is_required': False  # OPTIONAL
+        },
+        {
+            'topic': 'Support',
+            'fields': ['support_rating'],
+            'priority': 3,
+            'is_required': False  # OPTIONAL
+        }
+    ]
+    # Scenario: Must-ask complete, Pricing hit limit with missing data, Support not started
+    goal, missing, is_follow_up = get_next_goal(
+        goals=test_goals_multi_optional,
+        extracted_data={'nps_score': 9},  # Must-ask complete
+        prefilled_fields=set(),
+        current_goal_pointer=None,  # Not in multi-turn
+        topic_question_counts={'Pricing': 3},  # Pricing exhausted (1 initial + 2 follow-ups)
+        max_follow_up_per_topic=2,
+        allow_multi_turn=False
+    )
+    # Should skip exhausted Pricing and move to Support
+    assert goal is not None, "Should find next topic (not None)"
+    assert goal['topic'] == 'Support', "Should skip exhausted Pricing and select Support"
+    assert is_follow_up == False, "Should not be follow-up (new topic)"
+    print("✓ Correctly skipped exhausted optional topic and moved to next (no infinite loop)")
+    
     print("\n" + "=" * 60)
-    print("ALL TESTS PASSED ✓ (including must-ask/optional)")
+    print("ALL TESTS PASSED ✓ (including infinite loop fix)")
     print("=" * 60)
