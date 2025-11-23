@@ -19,46 +19,54 @@ def all_goals_completed(
     goals: List[Dict],
     extracted_data: Dict,
     prefilled_fields: Set[str],
-    role_excluded_topics: Optional[Set[str]] = None
+    role_excluded_topics: Optional[Set[str]] = None,
+    check_optional: bool = False
 ) -> bool:
     """
-    Deterministically check if ALL survey goals are completed.
+    Deterministically check if survey goals are completed.
+    
+    **CRITICAL CHANGE (Nov 22, 2025):** Now distinguishes between must-ask and optional topics.
+    Survey can end when ALL MUST-ASK topics are complete, even if optional topics remain.
     
     This function removes completion authority from the LLM and gives it
     to the backend, eliminating "early-stop bugs."
     
     Args:
-        goals: List of goal dicts with 'topic', 'fields', 'priority'
+        goals: List of goal dicts with 'topic', 'fields', 'priority', 'is_required'
         extracted_data: Dict of field_name -> value collected so far
         prefilled_fields: Set of field names pre-populated from participant data
                          (e.g., 'tenure_with_fc', 'company_name')
         role_excluded_topics: Set of topic names excluded for this participant's role
                              (e.g., {'Pricing Value'} for End Users)
+        check_optional: If True, checks optional topics too. If False (default),
+                       only checks must-ask topics (allows graceful end)
     
     Returns:
-        True if ALL required fields for ALL applicable goals are filled.
-        False if ANY field is missing.
+        True if ALL MUST-ASK goals are complete (or all goals if check_optional=True).
+        False if ANY must-ask field is missing.
     
     Algorithm:
         1. Filter out role-excluded topics
-        2. For each remaining goal:
+        2. Filter by is_required flag (if check_optional=False, only check required)
+        3. For each remaining goal:
            - Check if ALL its fields exist in (extracted_data OR prefilled_fields)
            - Return False immediately if any field missing
-        3. Return True only if all goals complete
+        4. Return True only if all checked goals complete
     
-    Example:
+    Example (Must-Ask Only):
         goals = [
-            {'topic': 'Product Quality', 'fields': ['nps_score', 'satisfaction_rating'], 'priority': 1},
-            {'topic': 'Support Quality', 'fields': ['support_rating'], 'priority': 2}
+            {'topic': 'Product Quality', 'fields': ['nps_score'], 'is_required': True},
+            {'topic': 'Pricing', 'fields': ['pricing_rating'], 'is_required': False}
         ]
-        extracted_data = {'nps_score': 9, 'satisfaction_rating': 8}
-        prefilled_fields = {'tenure_with_fc'}
+        extracted_data = {'nps_score': 9}  # Missing optional pricing_rating
         
-        # Missing 'support_rating' → Returns False
+        all_goals_completed(..., check_optional=False)  # Returns True (must-ask done)
+        all_goals_completed(..., check_optional=True)   # Returns False (optional missing)
     """
     role_excluded_topics = role_excluded_topics or set()
     
     logger.debug(f"🔍 Checking completion: {len(goals)} total goals, {len(role_excluded_topics)} excluded")
+    logger.debug(f"   Check optional: {check_optional}")
     logger.debug(f"   Extracted data has {len(extracted_data)} fields")
     logger.debug(f"   Prefilled data has {len(prefilled_fields)} fields")
     
@@ -68,7 +76,16 @@ def all_goals_completed(
         if goal.get('topic') not in role_excluded_topics
     ]
     
-    logger.debug(f"   After role filtering: {len(applicable_goals)} applicable goals")
+    # Filter by required/optional status
+    if not check_optional:
+        # Only check must-ask topics (optional can be incomplete)
+        applicable_goals = [
+            goal for goal in applicable_goals
+            if goal.get('is_required', True)  # Default to required if not specified
+        ]
+        logger.debug(f"   Checking ONLY must-ask topics")
+    
+    logger.debug(f"   After filtering: {len(applicable_goals)} applicable goals")
     
     for goal in sorted(applicable_goals, key=lambda g: g.get('priority', 999)):
         topic = goal.get('topic', 'Unknown')
@@ -98,21 +115,27 @@ def get_next_goal(
     prefilled_fields: Set[str],
     current_goal_pointer: Optional[str] = None,
     allow_multi_turn: bool = True,
-    role_excluded_topics: Optional[Set[str]] = None
+    role_excluded_topics: Optional[Set[str]] = None,
+    limit_optional_follow_ups: bool = True
 ) -> Tuple[Optional[Dict], List[str], bool]:
     """
-    Select the next goal and identify missing fields.
+    Select the next goal and identify missing fields with TWO-TIER PRIORITY.
+    
+    **CRITICAL CHANGE (Nov 22, 2025):** Implements must-ask vs optional topic prioritization.
+    Must-ask topics ALWAYS come before optional topics.
     
     This function provides deterministic topic selection, removing AI control
     over conversation flow.
     
     Args:
-        goals: List of goal dicts with 'topic', 'fields', 'priority'
+        goals: List of goal dicts with 'topic', 'fields', 'priority', 'is_required'
         extracted_data: Dict of collected field values
         prefilled_fields: Set of pre-populated field names
         current_goal_pointer: Name of topic currently being discussed (for multi-turn)
         allow_multi_turn: If True, stay on same topic for follow-up questions
         role_excluded_topics: Topics to exclude for this participant's role
+        limit_optional_follow_ups: If True, optional topics get max 1 follow-up
+                                  (conserve questions for must-ask)
     
     Returns:
         Tuple of (next_goal, missing_fields, is_follow_up):
@@ -120,7 +143,7 @@ def get_next_goal(
         - missing_fields: List of field names still needed
         - is_follow_up: True if this is a clarifying question on same topic
     
-    Algorithm:
+    Algorithm (TWO-TIER PRIORITY):
         1. If current_goal_pointer set AND allow_multi_turn:
            - Check if current goal still has missing fields
            - If yes, return (current_goal, missing_fields, is_follow_up=True)
@@ -172,20 +195,43 @@ def get_next_goal(
             )
             
             if missing_fields:
-                logger.info(f"📍 Multi-turn: Staying on '{current_goal_pointer}' ({len(missing_fields)} fields missing)")
-                return current_goal, missing_fields, True  # is_follow_up=True
+                # Check if we should do follow-up for this goal
+                is_required = current_goal.get('is_required', True)
+                allow_follow_up = is_required or not limit_optional_follow_ups
+                
+                if allow_follow_up:
+                    logger.info(f"📍 Multi-turn: Staying on '{current_goal_pointer}' ({'REQUIRED' if is_required else 'OPTIONAL'}, {len(missing_fields)} fields missing)")
+                    return current_goal, missing_fields, True  # is_follow_up=True
+                else:
+                    logger.debug(f"   Optional topic '{current_goal_pointer}' - accepting partial data (limit_optional_follow_ups=True)")
+                    # Move on - don't waste questions on optional follow-ups
             else:
                 logger.debug(f"   Current goal '{current_goal_pointer}' is now complete")
     
-    # STEP 2: Linear progression (find next incomplete goal by priority)
-    for goal in sorted(applicable_goals, key=lambda g: g.get('priority', 999)):
+    # STEP 2: TWO-TIER progression (must-ask first, then optional)
+    
+    # TIER 1: Must-ask topics (required=True)
+    must_ask_goals = [g for g in applicable_goals if g.get('is_required', True)]
+    for goal in sorted(must_ask_goals, key=lambda g: g.get('priority', 999)):
         topic = goal.get('topic', 'Unknown')
         fields = goal.get('fields', [])
         
         missing_fields = _get_missing_fields(fields, extracted_data, prefilled_fields)
         
         if missing_fields:
-            logger.info(f"📍 Next goal: '{topic}' (priority {goal.get('priority')}, {len(missing_fields)} fields needed)")
+            logger.info(f"📍 Next goal (MUST-ASK): '{topic}' (priority {goal.get('priority')}, {len(missing_fields)} fields needed)")
+            return goal, missing_fields, False  # is_follow_up=False
+    
+    # TIER 2: Optional topics (required=False) - only if all must-ask complete
+    optional_goals = [g for g in applicable_goals if not g.get('is_required', True)]
+    for goal in sorted(optional_goals, key=lambda g: g.get('priority', 999)):
+        topic = goal.get('topic', 'Unknown')
+        fields = goal.get('fields', [])
+        
+        missing_fields = _get_missing_fields(fields, extracted_data, prefilled_fields)
+        
+        if missing_fields:
+            logger.info(f"📍 Next goal (OPTIONAL): '{topic}' (priority {goal.get('priority')}, {len(missing_fields)} fields needed)")
             return goal, missing_fields, False  # is_follow_up=False
     
     # STEP 3: All goals complete
@@ -484,6 +530,64 @@ if __name__ == '__main__':
     assert missing == [], "Should have no missing fields"
     print("✓ Correctly identified survey completion")
     
+    # Test 8: Must-ask vs Optional (must-ask incomplete, can't end)
+    print("\n--- Test 8: Must-ask incomplete → survey cannot end ---")
+    test_goals_with_required = [
+        {
+            'topic': 'Product Quality',
+            'fields': ['nps_score'],
+            'priority': 1,
+            'is_required': True  # MUST ASK
+        },
+        {
+            'topic': 'Pricing',
+            'fields': ['pricing_rating'],
+            'priority': 2,
+            'is_required': False  # OPTIONAL
+        }
+    ]
+    result = all_goals_completed(
+        goals=test_goals_with_required,
+        extracted_data={'pricing_rating': 8},  # Only optional filled
+        prefilled_fields=set(),
+        check_optional=False
+    )
+    assert result == False, "Should return False when must-ask incomplete"
+    print("✓ Correctly blocked completion with must-ask missing")
+    
+    # Test 9: Must-ask complete, optional incomplete → can end
+    print("\n--- Test 9: Must-ask complete, optional incomplete → graceful end ---")
+    result = all_goals_completed(
+        goals=test_goals_with_required,
+        extracted_data={'nps_score': 9},  # Must-ask filled, optional missing
+        prefilled_fields=set(),
+        check_optional=False
+    )
+    assert result == True, "Should return True when must-ask complete (optional can be incomplete)"
+    print("✓ Correctly allowed completion with only must-ask done")
+    
+    # Test 10: Two-tier priority (must-ask first)
+    print("\n--- Test 10: Two-tier priority system ---")
+    goal, missing, is_follow_up = get_next_goal(
+        goals=test_goals_with_required,
+        extracted_data={},  # Nothing filled yet
+        prefilled_fields=set()
+    )
+    assert goal['topic'] == 'Product Quality', "Should prioritize must-ask topic first"
+    assert goal['is_required'] == True, "Should be a required topic"
+    print(f"✓ Correctly prioritized MUST-ASK topic: '{goal['topic']}'")
+    
+    # Test 11: Must-ask done, now ask optional
+    print("\n--- Test 11: After must-ask, ask optional ---")
+    goal, missing, is_follow_up = get_next_goal(
+        goals=test_goals_with_required,
+        extracted_data={'nps_score': 9},  # Must-ask complete
+        prefilled_fields=set()
+    )
+    assert goal['topic'] == 'Pricing', "Should move to optional topic after must-ask complete"
+    assert goal['is_required'] == False, "Should be optional topic"
+    print(f"✓ Correctly moved to OPTIONAL topic: '{goal['topic']}'")
+    
     print("\n" + "=" * 60)
-    print("ALL TESTS PASSED ✓")
+    print("ALL TESTS PASSED ✓ (including must-ask/optional)")
     print("=" * 60)
