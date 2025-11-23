@@ -955,10 +955,29 @@ def finalize_ai_conversational_survey_v2(context: Dict[str, Any]) -> Dict[str, A
     logger.info(f"V2 State loaded: {len(extracted_data)} fields, {step_count} steps, complete={is_complete}")
     logger.debug(f"Topic question counts: {topic_question_counts}")
     
-    # FIX (Nov 23, 2025): Extract company_name and respondent_name from participant_data (authoritative source)
-    # These are required NOT NULL fields in the database
-    company_name = participant_data.get('company_name') or extracted_data.get('company_name') or context.get('company_name')
-    respondent_name = participant_data.get('respondent_name') or extracted_data.get('respondent_name') or context.get('respondent_name')
+    # FIX (Nov 23, 2025): Map participant_data keys to database field names
+    # ActiveConversation uses: participant_name, participant_company
+    # Database expects: respondent_name, company_name
+    company_name = (
+        participant_data.get('participant_company') or  # Correct key from token schema
+        participant_data.get('company_name') or          # Legacy fallback
+        extracted_data.get('company_name') or
+        context.get('company_name')
+    )
+    respondent_name = (
+        participant_data.get('participant_name') or      # Correct key from token schema
+        participant_data.get('respondent_name') or       # Legacy fallback
+        extracted_data.get('respondent_name') or
+        context.get('respondent_name')
+    )
+    
+    # Defensive logging if fields still missing
+    if not company_name or not respondent_name:
+        logger.warning(
+            f"⚠️ Missing required fields after all lookups: "
+            f"company_name={company_name}, respondent_name={respondent_name}, "
+            f"participant_data keys={list(participant_data.keys())}"
+        )
     
     # Return structured data for database persistence
     # Format matches V1 for database compatibility
