@@ -477,7 +477,7 @@ class DeterministicSurveyController:
 2. Return SPARSE JSON (do NOT include null/empty fields)
 3. Use these field names if mentioned:
    - nps_score (0-10 integer)
-   - nps_reason (string)
+   - nps_reasoning (string)
    - satisfaction_rating (1-10 integer)
    - detailed_feedback (string)
    - pricing_satisfaction (string)
