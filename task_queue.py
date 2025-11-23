@@ -1082,7 +1082,11 @@ class TaskQueue:
             return None
     
     def cleanup_old_export_jobs(self, max_age_hours=24):
-        """Clean up old export jobs and their files from database"""
+        """
+        DEPRECATED: Clean up old ExportJob records (legacy system).
+        New exports use BulkOperationJob - see cleanup_old_bulk_export_jobs().
+        This method is kept for backwards compatibility only.
+        """
         from models import ExportJob
         from app import db
         
@@ -1097,7 +1101,7 @@ class TaskQueue:
                 if job.file_path and os.path.exists(job.file_path):
                     try:
                         os.remove(job.file_path)
-                        logger.info(f"Cleaned up export file: {job.file_path}")
+                        logger.info(f"Cleaned up legacy export file: {job.file_path}")
                     except Exception as e:
                         logger.error(f"Error cleaning up export file {job.file_path}: {e}")
                 
@@ -1106,10 +1110,59 @@ class TaskQueue:
             
             if old_jobs:
                 db.session.commit()
-                logger.info(f"Cleaned up {len(old_jobs)} old export jobs")
+                logger.info(f"Cleaned up {len(old_jobs)} old legacy export jobs")
         except Exception as e:
             logger.error(f"Error cleaning up old export jobs: {e}")
             db.session.rollback()
+    
+    def cleanup_old_bulk_export_jobs(self, max_age_hours=48):
+        """
+        Clean up old campaign export jobs from BulkOperationJob (unified async pattern).
+        Removes completed/failed export jobs older than max_age_hours and their files.
+        
+        Args:
+            max_age_hours: Age threshold in hours (default: 48 hours for exports)
+        """
+        from models import BulkOperationJob
+        from app import db
+        
+        try:
+            cutoff_time = datetime.utcnow() - timedelta(hours=max_age_hours)
+            
+            # Find old export jobs (only completed/failed, keep pending/processing)
+            old_export_jobs = BulkOperationJob.query.filter(
+                BulkOperationJob.operation_type == 'export_campaign',
+                BulkOperationJob.status.in_(['completed', 'failed']),
+                BulkOperationJob.completed_at < cutoff_time
+            ).all()
+            
+            cleaned_files = 0
+            for job in old_export_jobs:
+                # Clean up export file if it exists in result
+                try:
+                    result_data = json.loads(job.result) if job.result else {}
+                    file_path = result_data.get('file_path')
+                    
+                    if file_path and os.path.exists(file_path):
+                        os.remove(file_path)
+                        cleaned_files += 1
+                        logger.debug(f"Cleaned up export file: {file_path}")
+                except Exception as e:
+                    logger.error(f"Error cleaning up export file for job {job.job_id}: {e}")
+                
+                # Delete job from database
+                db.session.delete(job)
+            
+            if old_export_jobs:
+                db.session.commit()
+                logger.info(f"Cleaned up {len(old_export_jobs)} old export jobs ({cleaned_files} files removed)")
+            
+            return len(old_export_jobs)
+            
+        except Exception as e:
+            logger.error(f"Error cleaning up old bulk export jobs: {e}")
+            db.session.rollback()
+            return 0
     
     def _process_executive_report_task(self, task_data, worker_id):
         """Process executive report generation task (both new and regeneration)"""
