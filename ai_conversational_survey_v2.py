@@ -174,6 +174,11 @@ class DeterministicSurveyController:
         self.topic_question_counts = state['topic_question_counts']
         self.step_count = state['step_count']
         
+        # FIX (Nov 23, 2025): Store company_name and respondent_name for finalization
+        # These are required NOT NULL fields in database
+        self.extracted_data['company_name'] = company_name
+        self.extracted_data['respondent_name'] = respondent_name
+        
         # Pre-populate from participant data
         if self.participant_data.get('tenure_with_fc'):
             self.extracted_data['tenure_with_fc'] = self.participant_data['tenure_with_fc']
@@ -938,6 +943,11 @@ def finalize_ai_conversational_survey_v2(context: Dict[str, Any]) -> Dict[str, A
     logger.info(f"V2 State loaded: {len(extracted_data)} fields, {step_count} steps, complete={is_complete}")
     logger.debug(f"Topic question counts: {topic_question_counts}")
     
+    # FIX (Nov 23, 2025): Extract company_name and respondent_name from context or extracted_data
+    # These are required NOT NULL fields in the database
+    company_name = context.get('company_name') or extracted_data.get('company_name')
+    respondent_name = context.get('respondent_name') or extracted_data.get('respondent_name')
+    
     # Return structured data for database persistence
     # Format matches V1 for database compatibility
     structured_data = {
@@ -948,9 +958,15 @@ def finalize_ai_conversational_survey_v2(context: Dict[str, Any]) -> Dict[str, A
         'is_complete': is_complete,
         'controller_version': 'v2_deterministic',
         
+        # FIX (Nov 23, 2025): Add required NOT NULL fields for database
+        'company_name': company_name,
+        'respondent_name': respondent_name,
+        
         # Map extracted data to database fields (V1 compatibility)
         'nps_score': extracted_data.get('nps_score'),
         'nps_reasoning': extracted_data.get('nps_reasoning'),
+        # FIX (Nov 23, 2025): Database uses 'recommendation_reason' not 'nps_reasoning'
+        'recommendation_reason': extracted_data.get('nps_reasoning'),
         'satisfaction_rating': extracted_data.get('satisfaction_rating'),
         'service_rating': extracted_data.get('service_rating'),
         'product_value_rating': extracted_data.get('product_value_rating'),
@@ -961,6 +977,6 @@ def finalize_ai_conversational_survey_v2(context: Dict[str, Any]) -> Dict[str, A
         'tenure_with_fc': extracted_data.get('tenure_with_fc')
     }
     
-    logger.info(f"✅ V2 finalization complete: {len(structured_data)} total fields")
+    logger.info(f"✅ V2 finalization complete: {len(structured_data)} total fields, company={company_name}, respondent={respondent_name}")
     
     return structured_data
