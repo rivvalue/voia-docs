@@ -923,6 +923,7 @@ def finalize_ai_conversational_survey_v2(context: Dict[str, Any]) -> Dict[str, A
         Structured survey data dict for database persistence
     """
     from models import ActiveConversation
+    from session_state_utils import load_deterministic_state
     import json
     
     conversation_id = context.get('conversation_id')
@@ -939,7 +940,8 @@ def finalize_ai_conversational_survey_v2(context: Dict[str, Any]) -> Dict[str, A
     participant_data = json.loads(active_conv.participant_data) if active_conv.participant_data else {}
     
     # Load persisted V2 state from database
-    persisted_state = load_conversation_state(conversation_id)
+    # FIX (Nov 23, 2025): Use correct function name from session_state_utils
+    persisted_state = load_deterministic_state(conversation_id)
     
     if not persisted_state:
         logger.error(f"FINALIZATION ERROR: No persisted state for V2 conversation {conversation_id}")
