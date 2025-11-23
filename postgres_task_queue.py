@@ -568,6 +568,84 @@ class PostgresTaskQueue:
                 'error': str(e)
             }
     
+    # ============================================================================
+    # EXPORT JOB MANAGEMENT
+    # ============================================================================
+    # Added Nov 23, 2025: Parity with TaskQueue export functionality
+    # Fixes "PostgresTaskQueue has no attribute 'create_export_job'" error
+    
+    def create_export_job(self, campaign_id, business_account_id):
+        """Create a new export job and return job ID"""
+        from models import ExportJob
+        
+        job_id = str(uuid.uuid4())
+        
+        with app.app_context():
+            try:
+                # Create export job in database
+                export_job = ExportJob(
+                    id=job_id,
+                    campaign_id=campaign_id,
+                    business_account_id=business_account_id,
+                    status='queued',
+                    progress=0
+                )
+                
+                db.session.add(export_job)
+                db.session.commit()
+                
+                logger.info(f"Created export job {job_id} for campaign {campaign_id}")
+                
+                return job_id
+            except Exception as e:
+                logger.error(f"Error creating export job: {e}")
+                db.session.rollback()
+                raise
+    
+    def get_export_job_status(self, job_id):
+        """Get export job status from database"""
+        from models import ExportJob
+        
+        with app.app_context():
+            try:
+                export_job = ExportJob.query.get(job_id)
+                if export_job:
+                    return export_job.to_dict()
+                return None
+            except Exception as e:
+                logger.error(f"Error getting export job status: {e}")
+                return None
+    
+    def cleanup_old_export_jobs(self, max_age_hours=24):
+        """Clean up old export jobs and their files from database"""
+        from models import ExportJob
+        
+        with app.app_context():
+            try:
+                cutoff_time = datetime.utcnow() - timedelta(hours=max_age_hours)
+                
+                # Find old export jobs
+                old_jobs = ExportJob.query.filter(ExportJob.updated_at < cutoff_time).all()
+                
+                for job in old_jobs:
+                    # Clean up file if it exists
+                    if job.file_path and os.path.exists(job.file_path):
+                        try:
+                            os.remove(job.file_path)
+                            logger.info(f"Cleaned up export file: {job.file_path}")
+                        except Exception as e:
+                            logger.error(f"Error cleaning up export file {job.file_path}: {e}")
+                    
+                    # Delete job from database
+                    db.session.delete(job)
+                
+                if old_jobs:
+                    db.session.commit()
+                    logger.info(f"Cleaned up {len(old_jobs)} old export jobs")
+            except Exception as e:
+                logger.error(f"Error cleaning up old export jobs: {e}")
+                db.session.rollback()
+    
     def force_scheduler_run(self):
         """Force immediate scheduler run (for admin testing) with lock protection"""
         logger.info("Force running PostgreSQL queue scheduler...")
