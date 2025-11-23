@@ -1,0 +1,64 @@
+prompt = f"""Extract structured data from the user's response below.
+
+**STATIC CONTEXT (for understanding only, do NOT restate):**
+- Company: {company_name}
+- Product/Service: {product_description}
+- Industry: {industry}
+- Participant Role: {role}
+
+**RECENT CONVERSATION:**
+{context_snippet}
+
+**USER'S LATEST RESPONSE:**
+{user_message}
+
+**FIELDS YOU MAY FILL:**
+You may fill any of the following fields if the information is clearly present in the current response (or clearly implied from the response + context):
+
+- nps_score (0–10 integer; likelihood to recommend)
+- nps_reasoning (string; why that score)
+- overall_satisfaction_rating (1–10 integer; overall satisfaction, distinct from NPS)
+- detailed_feedback (string; general comments, problems, positives)
+- pricing_satisfaction (string; perception of price vs value, in text)
+- pricing_value_rating (1–10 integer; numeric rating of price/value fairness)
+- service_quality_rating (1–10 integer; quality of service / support)
+- support_rating (1–10 integer; if the user explicitly rates “support”)
+- product_appreciation_rating (1–10 integer; how much they like the product itself)
+- feature_requests (array of strings; concrete requested features or capabilities)
+
+**RATING RULES:**
+- Only fill a numeric rating field when the user gives an explicit number for that aspect
+  (e.g., "I’d give it 7", "7/10", "je dirais 8", "support is 4 out of 10").
+- Map the number to the correct field based on what the user is rating:
+  - overall / global satisfaction → overall_satisfaction_rating
+  - recommendation likelihood → nps_score
+  - service, support, account management → service_quality_rating or support_rating
+  - price, value for money, cost vs benefit → pricing_value_rating
+  - the product itself / tool / platform → product_appreciation_rating
+- Accept formats like:
+  - "7", "7/10", "7 sur 10", "4 out of 5"
+- If the scale is clearly 0–10 or 1–10, use the integer as-is.
+- If the scale is unclear or non-numeric, do NOT guess a rating.
+- Do NOT infer numeric ratings from adjectives alone ("good", "average", "excellent") without a number.
+
+**GENERAL EXTRACTION RULES:**
+1. Extract ONLY fields that are explicitly mentioned or clearly implied in the current response
+   (taking STATIC CONTEXT and RECENT CONVERSATION into account for pronouns like "it", "the tool", "the price").
+2. Capture feedback for topics even if they were not asked about yet
+   (e.g., if the user spontaneously comments on price or support, fill pricing_* or service_* fields).
+3. Return SPARSE JSON:
+   - Do NOT include fields that are not mentioned.
+   - Do NOT include null or empty values.
+4. feature_requests:
+   - If the user mentions specific features they want (e.g., "I wish it had X", "you should add Y"),
+     put each feature as a separate string in the feature_requests array.
+5. Do NOT generate questions.
+6. Do NOT assess survey completion or control flow.
+
+**OUTPUT FORMAT:**
+Return ONLY a single JSON object, like:
+{{
+  "field_name_1": value_1,
+  "field_name_2": value_2,
+  ...
+}}"""
