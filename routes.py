@@ -12,8 +12,10 @@ from task_queue import add_analysis_task, get_queue_stats, add_export_task, get_
 from rate_limiter import rate_limit
 from auth_system import require_auth, generate_user_token
 from business_auth_routes import require_business_auth, require_permission, get_current_business_account, get_current_business_user
+from feature_flags import feature_flags
 from conversational_survey import start_conversational_survey, process_conversation_response, finalize_conversational_survey
 from ai_conversational_survey import start_ai_conversational_survey, process_ai_conversation_response, finalize_ai_conversational_survey
+from ai_conversational_survey_v2 import start_ai_conversational_survey_v2, process_ai_conversation_response_v2
 from audit_utils import queue_audit_log
 from datetime import datetime, timedelta, date
 import json
@@ -2934,15 +2936,30 @@ def start_conversation():
         # Debug logging
         logger.info(f"Starting conversation for {respondent_name}, business_account_id: {business_account_id}, campaign_id: {campaign_id}, participant_data: {bool(participant_data)}")
         
-        # Start conversation with AI, passing tenure and participant_data
-        conversation_response = start_ai_conversational_survey(
-            company_name, 
-            respondent_name, 
-            tenure_with_fc, 
-            business_account_id=business_account_id, 
-            campaign_id=campaign_id,
-            participant_data=participant_data
-        )
+        # FEATURE FLAG: Deterministic Survey Flow V2  
+        # Use module-level feature_flags instance for consistency across requests
+        use_deterministic_v2 = feature_flags.is_feature_enabled('deterministic_survey_flow')
+        
+        if use_deterministic_v2:
+            logger.info(f"🎯 Using DETERMINISTIC V2 controller for conversation")
+            conversation_response = start_ai_conversational_survey_v2(
+                company_name, 
+                respondent_name, 
+                tenure_with_fc, 
+                business_account_id=business_account_id, 
+                campaign_id=campaign_id,
+                participant_data=participant_data
+            )
+        else:
+            logger.info(f"Using legacy V1 controller for conversation")
+            conversation_response = start_ai_conversational_survey(
+                company_name, 
+                respondent_name, 
+                tenure_with_fc, 
+                business_account_id=business_account_id, 
+                campaign_id=campaign_id,
+                participant_data=participant_data
+            )
         
         return jsonify({
             'conversation_id': conversation_response['conversation_id'],
@@ -2986,8 +3003,16 @@ def conversation_response():
         survey_data['business_account_id'] = session.get('business_account_id')
         survey_data['campaign_id'] = session.get('campaign_id')
         
-        # Process response with AI
-        ai_response = process_ai_conversation_response(user_input, survey_data)
+        # FEATURE FLAG: Deterministic Survey Flow V2
+        # Use module-level feature_flags instance for consistency across requests
+        use_deterministic_v2 = feature_flags.is_feature_enabled('deterministic_survey_flow')
+        
+        if use_deterministic_v2:
+            logger.debug(f"🎯 Using DETERMINISTIC V2 controller for response processing")
+            ai_response = process_ai_conversation_response_v2(user_input, survey_data)
+        else:
+            logger.debug(f"Using legacy V1 controller for response processing")
+            ai_response = process_ai_conversation_response(user_input, survey_data)
         
         return jsonify(ai_response)
         
@@ -3024,8 +3049,19 @@ def finalize_conversation():
         survey_data['conversation_id'] = conversation_id
         survey_data['conversation_history'] = json.dumps(messages)
         
+        # FEATURE FLAG: Deterministic Survey Flow V2
+        # Check if this conversation used V2 controller (stored in survey_data metadata)
+        controller_version = survey_data.get('controller_version', 'v1')
+        use_deterministic_v2 = (controller_version == 'v2_deterministic')
+        
         # Convert conversational data to structured survey format
+        # V2 and V1 finalization are compatible - V1 handles both
         structured_data = finalize_ai_conversational_survey(survey_data)
+        
+        if use_deterministic_v2:
+            logger.info(f"✅ Finalizing V2 deterministic conversation: {conversation_id}")
+        else:
+            logger.debug(f"Finalizing V1 conversation: {conversation_id}")
         
         # Get campaign and association data from session (new system)
         association_id = session.get('association_id')

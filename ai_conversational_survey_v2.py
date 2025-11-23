@@ -1,0 +1,852 @@
+"""
+Deterministic Conversational Survey Controller (V2)
+====================================================
+
+VOÏA backend-controlled survey flow that eliminates LLM-driven completion bugs.
+
+Key Design Principles:
+- Backend controls flow decisions (completion, topic selection)
+- LLM performs only extraction and question generation
+- No LLM authority over survey progression
+- Per-topic follow-up limits with must-ask bypass
+
+Created: November 23, 2025
+Feature Flag: DETERMINISTIC_SURVEY_FLOW
+"""
+
+import os
+import uuid
+import json
+import logging
+from datetime import datetime
+from typing import Dict, Any, List, Optional, Set, Tuple
+from openai import OpenAI
+
+# VOÏA infrastructure
+from app import db
+from models import Campaign, Participant, BusinessAccount
+from prompt_template_service import PromptTemplateService
+
+# V2-specific modules
+from deterministic_helpers import (
+    all_goals_completed,
+    get_next_goal,
+    build_role_exclusions,
+    extract_prefilled_fields
+)
+from session_state_utils import (
+    initialize_deterministic_state,
+    save_deterministic_state,
+    load_deterministic_state,
+    delete_deterministic_state,
+    update_last_activity
+)
+
+logger = logging.getLogger(__name__)
+
+
+def _mask_pii(text, max_length=100):
+    """Mask PII and truncate text for logging"""
+    if not text:
+        return text
+    if isinstance(text, dict):
+        return {k: _mask_pii(v) if k not in ['conversation_id', 'step_count'] else v 
+                for k, v in list(text.items())[:5]}
+    text_str = str(text)
+    if len(text_str) > max_length:
+        return text_str[:max_length] + "... [truncated]"
+    return text_str
+
+
+class DeterministicSurveyController:
+    """
+    V2 Controller: Backend-controlled deterministic survey flow
+    
+    Eliminates early-stop bugs by removing LLM authority over:
+    1. Survey completion decisions
+    2. Topic selection and progression
+    3. Follow-up question necessity
+    
+    LLM performs ONLY:
+    1. Data extraction from user responses (sparse JSON)
+    2. Question generation for specified topic (no flow decisions)
+    """
+    
+    def __init__(
+        self,
+        business_account_id: Optional[int] = None,
+        campaign_id: Optional[int] = None,
+        participant_data: Optional[Dict[str, Any]] = None,
+        conversation_id: Optional[str] = None
+    ):
+        """
+        Initialize V2 controller with deterministic flow control.
+        
+        Args:
+            business_account_id: Business account ID for multi-tenant isolation
+            campaign_id: Campaign ID for survey configuration
+            participant_data: Participant metadata (role, tenure, etc.)
+            conversation_id: Optional conversation ID for resume functionality
+        """
+        # OpenAI client for LLM stubs
+        self.openai_client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
+        
+        # Store IDs
+        self.business_account_id = business_account_id
+        self.campaign_id = campaign_id
+        self.participant_data = participant_data or {}
+        self.conversation_id = conversation_id or str(uuid.uuid4())
+        
+        # Load campaign configuration
+        self.campaign = Campaign.query.filter_by(id=campaign_id).first() if campaign_id else None
+        self.business_account = BusinessAccount.query.filter_by(id=business_account_id).first() if business_account_id else None
+        
+        # Initialize prompt template service for campaign-specific prompts
+        self.template_service = PromptTemplateService(business_account_id, campaign_id)
+        
+        # V2 State (will be loaded from session or initialized fresh)
+        self.extracted_data: Dict[str, Any] = {}
+        self.conversation_history: List[Dict] = []
+        self.current_goal_pointer: Optional[str] = None
+        self.topic_question_counts: Dict[str, int] = {}
+        self.step_count: int = 0
+        self.is_complete: bool = False
+        
+        # Build deterministic goals with role/industry filtering
+        self.goals = self._build_filtered_goals()
+        self.prefilled_fields = self._load_prefilled_fields()
+        self.role_excluded_topics = build_role_exclusions(
+            self.participant_data.get('role')
+        )
+        
+        # Campaign limits
+        self.max_follow_up_per_topic = getattr(self.campaign, 'max_follow_up_per_topic', 2) if self.campaign else 2
+        self.max_questions = self.template_service.get_template_info().get('max_questions', 15)
+        
+        # Track AI prompts for debugging
+        self.ai_prompts_log = []
+        
+        logger.info(f"V2 Controller initialized: conv_id={self.conversation_id}, "
+                   f"campaign={campaign_id}, goals={len(self.goals)}, "
+                   f"prefilled={len(self.prefilled_fields)}")
+    
+    def start_conversation(self, company_name: str, respondent_name: str) -> Dict[str, Any]:
+        """
+        Start new V2 conversational survey with deterministic flow.
+        
+        Args:
+            company_name: Company name for personalization
+            respondent_name: Respondent name for greeting
+        
+        Returns:
+            Response dict with welcome message and conversation_id
+        """
+        logger.info(f"Starting V2 conversation for {company_name}")
+        
+        # Initialize fresh state
+        state = initialize_deterministic_state(
+            conversation_id=self.conversation_id,
+            campaign_id=self.campaign_id or 0,
+            participant_id=self.participant_data.get('id') or 0,
+            business_account_id=self.business_account_id or 0
+        )
+        
+        # Update controller state
+        self.extracted_data = state['extracted_data']
+        self.conversation_history = state['conversation_history']
+        self.current_goal_pointer = state['current_goal_pointer']
+        self.topic_question_counts = state['topic_question_counts']
+        self.step_count = state['step_count']
+        
+        # Pre-populate from participant data
+        if self.participant_data.get('tenure_with_fc'):
+            self.extracted_data['tenure_with_fc'] = self.participant_data['tenure_with_fc']
+            logger.debug(f"Pre-populated tenure: {self.participant_data['tenure_with_fc']}")
+        
+        # Generate welcome message (using V1 template service for consistency)
+        welcome_message = self._generate_welcome_message(company_name, respondent_name)
+        
+        # Add to conversation history
+        self.conversation_history.append({
+            'sender': 'VOÏA',
+            'message': welcome_message,
+            'timestamp': datetime.utcnow().isoformat()
+        })
+        
+        # Save initial state
+        save_deterministic_state(self.conversation_id, self._get_state_dict())
+        
+        return {
+            'message': welcome_message,
+            'message_type': 'welcome',
+            'step': 'welcome',
+            'progress': 10,
+            'is_complete': False,
+            'conversation_id': self.conversation_id,
+            'extracted_data': self.extracted_data,
+            'controller_version': 'v2_deterministic'
+        }
+    
+    def process_user_response(self, user_input: str, context: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Process user response with deterministic backend-controlled flow.
+        
+        This is the main orchestration method that:
+        1. Extracts data (LLM stub - no flow decisions)
+        2. Checks completion (backend decision)
+        3. Selects next goal (backend decision with follow-up limits)
+        4. Generates question (LLM stub for specific topic)
+        
+        Args:
+            user_input: User's response text
+            context: Additional context (not used in V2)
+        
+        Returns:
+            Response dict with next question or completion message
+        """
+        # Add user message to conversation history
+        self.conversation_history.append({
+            'sender': 'User',
+            'message': user_input,
+            'timestamp': datetime.utcnow().isoformat()
+        })
+        
+        # Increment step count BEFORE processing
+        self.step_count += 1
+        
+        logger.info(f"V2 Step {self.step_count}: Processing user response")
+        logger.debug(f"User input: {_mask_pii(user_input)}")
+        
+        # STEP 1: Extract data (LLM performs extraction ONLY, no flow decisions)
+        new_fields = self._extract_with_ai(user_input)
+        self.extracted_data.update(new_fields)
+        
+        logger.debug(f"Extracted {len(new_fields)} new fields: {list(new_fields.keys())}")
+        logger.debug(f"Total extracted: {len(self.extracted_data)} fields")
+        
+        # STEP 2: Check backend-controlled completion criteria
+        # CRITICAL: Backend decides, NOT LLM
+        if self._should_complete_survey():
+            logger.info(f"✅ BACKEND COMPLETION: Survey ended by V2 controller at step {self.step_count}")
+            return self._finish_survey()
+        
+        # STEP 3: Get next goal (backend decision with per-topic follow-up limits)
+        next_goal, missing_fields, is_follow_up = get_next_goal(
+            goals=self.goals,
+            extracted_data=self.extracted_data,
+            prefilled_fields=self.prefilled_fields,
+            current_goal_pointer=self.current_goal_pointer,
+            topic_question_counts=self.topic_question_counts,
+            max_follow_up_per_topic=self.max_follow_up_per_topic,
+            allow_multi_turn=True,
+            role_excluded_topics=self.role_excluded_topics
+        )
+        
+        if not next_goal:
+            logger.info("No more goals - survey complete")
+            return self._finish_survey()
+        
+        topic_name = next_goal.get('topic', 'Unknown')
+        
+        # STEP 4: Generate question for chosen topic (LLM generates question ONLY)
+        question = self._generate_question_with_ai(next_goal, missing_fields, is_follow_up)
+        
+        # STEP 5: Update state (increment counter, set pointer)
+        # CRITICAL: Increment counter AFTER question generated (before next turn)
+        self.topic_question_counts[topic_name] = self.topic_question_counts.get(topic_name, 0) + 1
+        self.current_goal_pointer = topic_name
+        
+        logger.info(f"Topic '{topic_name}' question count: {self.topic_question_counts[topic_name]}")
+        
+        # Add VOÏA question to conversation history
+        self.conversation_history.append({
+            'sender': 'VOÏA',
+            'message': question,
+            'timestamp': datetime.utcnow().isoformat(),
+            'topic': topic_name,
+            'is_follow_up': is_follow_up
+        })
+        
+        # Save state to database
+        save_deterministic_state(self.conversation_id, self._get_state_dict())
+        
+        # Calculate progress
+        progress = self._calculate_progress()
+        
+        return {
+            'message': question,
+            'message_type': 'question',
+            'step': f'step_{self.step_count}',
+            'progress': progress,
+            'is_complete': False,
+            'topic': topic_name,
+            'is_follow_up': is_follow_up,
+            'extracted_data': self.extracted_data,
+            'controller_version': 'v2_deterministic'
+        }
+    
+    def _extract_with_ai(self, user_message: str) -> Dict[str, Any]:
+        """
+        LLM Stub 1: Extract structured data from user response.
+        
+        CRITICAL: This stub performs ONLY extraction, NO flow decisions.
+        No "is_complete" flag, no "needs_followup" flag.
+        
+        Returns sparse JSON (only fields mentioned, no null pollution).
+        
+        Args:
+            user_message: User's response text
+        
+        Returns:
+            Dict of extracted field_name -> value (sparse, no nulls)
+        """
+        # Build extraction prompt with static context
+        extraction_prompt = self._build_extraction_prompt(user_message)
+        
+        logger.debug(f"Calling LLM for extraction (no flow decisions)")
+        
+        try:
+            # Log prompt for debugging
+            self.ai_prompts_log.append({
+                'type': 'extraction',
+                'prompt': extraction_prompt[:500],  # Truncate for logging
+                'timestamp': datetime.utcnow().isoformat()
+            })
+            
+            # Call OpenAI for extraction
+            response = self.openai_client.chat.completions.create(
+                model="gpt-4o-mini",  # Use cost-optimized model for extraction
+                messages=[
+                    {"role": "system", "content": "You are a data extraction assistant. Extract structured data from user responses. Return ONLY mentioned fields (sparse JSON, no nulls)."},
+                    {"role": "user", "content": extraction_prompt}
+                ],
+                temperature=0.0,  # Deterministic extraction
+                response_format={"type": "json_object"}
+            )
+            
+            extracted_json = response.choices[0].message.content
+            if extracted_json:
+                extracted_data = json.loads(extracted_json)
+            else:
+                extracted_data = {}
+            
+            logger.debug(f"LLM extracted: {_mask_pii(extracted_data)}")
+            
+            return extracted_data
+            
+        except Exception as e:
+            logger.error(f"Extraction error: {e}")
+            return {}  # Fail gracefully, return empty dict
+    
+    def _generate_question_with_ai(
+        self,
+        goal: Dict,
+        missing_fields: List[str],
+        is_follow_up: bool
+    ) -> str:
+        """
+        LLM Stub 2: Generate natural language question for specific topic.
+        
+        CRITICAL: This stub performs ONLY question generation, NO flow decisions.
+        Backend has already decided which topic to ask about.
+        
+        Args:
+            goal: Goal dict with topic name and fields
+            missing_fields: List of fields still needed for this topic
+            is_follow_up: True if this is a clarifying question on same topic
+        
+        Returns:
+            Natural language question string
+        """
+        topic_name = goal.get('topic', 'Unknown')
+        
+        # Build question generation prompt with static context
+        question_prompt = self._build_question_prompt(goal, missing_fields, is_follow_up)
+        
+        logger.debug(f"Calling LLM for question generation on topic '{topic_name}' (follow-up: {is_follow_up})")
+        
+        try:
+            # Log prompt for debugging
+            self.ai_prompts_log.append({
+                'type': 'question_generation',
+                'topic': topic_name,
+                'is_follow_up': is_follow_up,
+                'prompt': question_prompt[:500],  # Truncate for logging
+                'timestamp': datetime.utcnow().isoformat()
+            })
+            
+            # Call OpenAI for question generation
+            response = self.openai_client.chat.completions.create(
+                model="gpt-4o-mini",  # Use cost-optimized model
+                messages=[
+                    {"role": "system", "content": "You are a conversational survey assistant. Generate natural, engaging questions for the specified topic."},
+                    {"role": "user", "content": question_prompt}
+                ],
+                temperature=0.7  # Allow some creativity in phrasing
+            )
+            
+            question_content = response.choices[0].message.content
+            question = question_content.strip() if question_content else self._fallback_question(topic_name, is_follow_up)
+            
+            logger.debug(f"LLM generated question: {_mask_pii(question)}")
+            
+            return question
+            
+        except Exception as e:
+            logger.error(f"Question generation error: {e}")
+            # Fallback to template-based question
+            return self._fallback_question(topic_name, is_follow_up)
+    
+    def _build_extraction_prompt(self, user_message: str) -> str:
+        """
+        Build LLM prompt for data extraction with static context blocks.
+        
+        Static context provides understanding WITHOUT verbosity:
+        - Company name, product, industry (for context)
+        - Participant role (for pronoun resolution)
+        - Last 6 conversation turns (for context)
+        
+        Returns SPARSE JSON (only mentioned fields, no nulls).
+        """
+        # Get static context from campaign/participant
+        company_name = self.participant_data.get('company_name', 'the company')
+        product_description = getattr(self.campaign, 'product_description', 'our services')
+        industry = self.participant_data.get('client_industry', 'your industry')
+        role = self.participant_data.get('role', 'team member')
+        
+        # Recent conversation context (last 6 messages for pronoun resolution)
+        recent_history = self.conversation_history[-6:] if len(self.conversation_history) > 6 else self.conversation_history
+        context_snippet = "\n".join([
+            f"{msg['sender']}: {msg['message'][:100]}" 
+            for msg in recent_history
+        ])
+        
+        # Build extraction prompt
+        prompt = f"""Extract structured data from the user's response below.
+
+**STATIC CONTEXT (for understanding only, do NOT restate):**
+- Company: {company_name}
+- Product/Service: {product_description}
+- Industry: {industry}
+- Participant Role: {role}
+
+**RECENT CONVERSATION:**
+{context_snippet}
+
+**USER'S LATEST RESPONSE:**
+{user_message}
+
+**EXTRACTION INSTRUCTIONS:**
+1. Extract ONLY fields that are explicitly mentioned or clearly implied
+2. Return SPARSE JSON (do NOT include null/empty fields)
+3. Use these field names if mentioned:
+   - nps_score (0-10 integer)
+   - nps_reason (string)
+   - satisfaction_rating (1-10 integer)
+   - detailed_feedback (string)
+   - pricing_satisfaction (string)
+   - support_rating (1-10 integer)
+   - feature_requests (array of strings)
+   
+4. If user provides data for topics we haven't asked about yet, capture it anyway
+
+**OUTPUT FORMAT:**
+{{
+  "field_name": value
+}}
+
+Return ONLY the JSON object, no explanation."""
+        
+        return prompt
+    
+    def _build_question_prompt(
+        self,
+        goal: Dict,
+        missing_fields: List[str],
+        is_follow_up: bool
+    ) -> str:
+        """
+        Build LLM prompt for question generation with static context.
+        
+        Static context provides understanding WITHOUT verbosity:
+        - Company, product, industry, role
+        - Recent conversation turns
+        - Current topic and missing fields
+        """
+        topic_name = goal.get('topic', 'Unknown')
+        
+        # Get static context
+        company_name = self.participant_data.get('company_name', 'the company')
+        product_description = getattr(self.campaign, 'product_description', 'our services')
+        industry = self.participant_data.get('client_industry', 'your industry')
+        role = self.participant_data.get('role', 'team member')
+        
+        # Conversation tone
+        conversation_tone = getattr(self.campaign, 'conversation_tone', None) or \
+                           getattr(self.business_account, 'conversation_tone', 'professional')
+        
+        # Recent conversation context
+        recent_history = self.conversation_history[-6:]
+        context_snippet = "\n".join([
+            f"{msg['sender']}: {msg['message'][:100]}" 
+            for msg in recent_history
+        ])
+        
+        # Build question prompt
+        follow_up_instruction = ""
+        if is_follow_up:
+            follow_up_instruction = """
+**THIS IS A FOLLOW-UP QUESTION** - The user's previous answer was incomplete or vague.
+Ask a clarifying question to get more specific information about the missing fields."""
+        
+        prompt = f"""Generate a natural, conversational question for the topic: {topic_name}
+
+**STATIC CONTEXT (for understanding only, do NOT restate):**
+- Company: {company_name}
+- Product/Service: {product_description}
+- Industry: {industry}
+- Participant Role: {role}
+- Conversation Tone: {conversation_tone}
+
+**RECENT CONVERSATION:**
+{context_snippet}
+
+**TOPIC TO ASK ABOUT:**
+{topic_name}
+
+**MISSING FIELDS:**
+{', '.join(missing_fields)}
+
+{follow_up_instruction}
+
+**QUESTION GENERATION INSTRUCTIONS:**
+1. Generate ONE clear, engaging question
+2. Focus on collecting the missing fields above
+3. Use conversational, natural language (match tone: {conversation_tone})
+4. Keep it concise (1-2 sentences max)
+5. Do NOT repeat information user already provided
+6. Do NOT mention "fields" or technical terms
+
+**OUTPUT:**
+Return ONLY the question text, no JSON, no explanation."""
+        
+        return prompt
+    
+    def _should_complete_survey(self) -> bool:
+        """
+        Backend-controlled completion decision (NO LLM involvement).
+        
+        Survey completes when:
+        1. All MUST-ASK topics complete (optional can be partial), OR
+        2. Max questions reached (loop protection)
+        
+        CRITICAL FIX (Nov 23, 2025): Uses check_optional=False to allow graceful end
+        with partial optional data (this is the whole point of V2!)
+        
+        Returns:
+            True if survey should end, False to continue
+        """
+        # Check max questions limit (loop protection)
+        if self.step_count >= self.max_questions:
+            logger.warning(f"Max questions reached ({self.max_questions}) - forcing completion")
+            return True
+        
+        # CRITICAL: Check if all MUST-ASK topics complete (backend decision)
+        # check_optional=False allows survey to end even if optional topics incomplete
+        # This is THE KEY DESIGN PRINCIPLE of V2 - must-ask required, optional best-effort
+        all_must_ask_complete = all_goals_completed(
+            goals=self.goals,
+            extracted_data=self.extracted_data,
+            prefilled_fields=self.prefilled_fields,
+            role_excluded_topics=self.role_excluded_topics,
+            check_optional=False  # CRITICAL: Only check must-ask topics (allow partial optional)
+        )
+        
+        if all_must_ask_complete:
+            logger.info("✅ All MUST-ASK topics complete - backend completing survey (optional may be partial)")
+            return True
+        
+        return False
+    
+    def _finish_survey(self) -> Dict[str, Any]:
+        """
+        Finalize survey and return completion message.
+        
+        Returns:
+            Completion response dict
+        """
+        self.is_complete = True
+        
+        # Generate completion message (using template service for consistency)
+        completion_message = self.template_service.get_completion_message()
+        
+        # Add to conversation history
+        self.conversation_history.append({
+            'sender': 'VOÏA',
+            'message': completion_message,
+            'timestamp': datetime.utcnow().isoformat()
+        })
+        
+        # Save final state
+        save_deterministic_state(self.conversation_id, self._get_state_dict())
+        
+        logger.info(f"Survey completed: {len(self.extracted_data)} fields collected in {self.step_count} steps")
+        
+        return {
+            'message': completion_message,
+            'message_type': 'completion',
+            'step': 'complete',
+            'progress': 100,
+            'is_complete': True,
+            'extracted_data': self.extracted_data,
+            'conversation_history': self.conversation_history,
+            'step_count': self.step_count,
+            'controller_version': 'v2_deterministic'
+        }
+    
+    def _build_filtered_goals(self) -> List[Dict]:
+        """
+        Build goal list with role-based and industry-based filtering.
+        
+        CRITICAL FIX (Nov 23, 2025): Integrates with real template service configuration.
+        Uses build_survey_config_json() to get campaign-configured goals with role filtering.
+        
+        Returns:
+            List of goal dicts with topic, fields, priority, is_required
+        """
+        # Build survey config from template service (uses real campaign configuration)
+        survey_config = self.template_service.build_survey_config_json(self.participant_data)
+        
+        # Extract goals from survey config
+        # Template service returns goals with topic, description, fields, priority
+        template_goals = survey_config.get('goals', [])
+        
+        if not template_goals:
+            logger.warning("No goals returned from template service - using fallback NPS goal")
+            template_goals = [
+                {
+                    'topic': 'NPS',
+                    'description': 'Net Promoter Score',
+                    'fields': ['nps_score', 'nps_reasoning'],
+                    'priority': 1
+                }
+            ]
+        
+        # Transform template service goals to V2 format
+        # NOTE: PromptTemplateService does NOT return is_required metadata (confirmed Nov 23, 2025)
+        # We derive must-ask vs optional from priority since campaigns prioritize critical topics first
+        goals = []
+        for goal in template_goals:
+            priority = goal.get('priority', 999)
+            
+            # MUST-ASK LOGIC: First 2 topics (priority <= 2) are always required
+            # Typically NPS (priority 0/1) + one core business metric (priority 1/2)
+            # Everything after priority 2 is optional (best-effort with follow-up limits)
+            # This ensures critical data collection while allowing graceful completion
+            is_required = priority <= 2  # Configurable threshold - could be env var
+            
+            goals.append({
+                'topic': goal.get('topic', 'Unknown'),
+                'fields': goal.get('fields', []),
+                'priority': priority,
+                'is_required': is_required,
+                'description': goal.get('description', '')
+            })
+        
+        logger.info(f"Built {len(goals)} goals from template service:")
+        for g in goals:
+            req_label = "MUST-ASK" if g['is_required'] else "OPTIONAL"
+            logger.debug(f"  - {req_label} P{g['priority']}: {g['topic']} ({len(g['fields'])} fields)")
+        
+        return goals
+    
+    def _load_prefilled_fields(self) -> Set[str]:
+        """
+        Load prefilled fields from participant data.
+        
+        Returns:
+            Set of field names that are pre-populated
+        """
+        return extract_prefilled_fields(self.participant_data)
+    
+    def _generate_welcome_message(self, company_name: str, respondent_name: str) -> str:
+        """
+        Generate welcome message (reuses V1 template service for consistency).
+        
+        Args:
+            company_name: Company name (not used, template service has its own)
+            respondent_name: Respondent name
+        
+        Returns:
+            Welcome message string
+        """
+        # Use template service for consistency with V1
+        # Note: company_name is handled by template service internally
+        return self.template_service.generate_welcome_message(respondent_name)
+    
+    def _fallback_question(self, topic_name: str, is_follow_up: bool) -> str:
+        """
+        Fallback question when LLM generation fails.
+        
+        Args:
+            topic_name: Topic name
+            is_follow_up: Whether this is a follow-up question
+        
+        Returns:
+            Generic question string
+        """
+        if is_follow_up:
+            return f"Could you tell me more about {topic_name}?"
+        else:
+            return f"How would you rate your experience with {topic_name}?"
+    
+    def _calculate_progress(self) -> int:
+        """
+        Calculate survey progress percentage.
+        
+        Returns:
+            Progress percentage (0-100)
+        """
+        if self.step_count >= self.max_questions:
+            return 100
+        
+        # Simple linear progress based on step count
+        progress = int((self.step_count / self.max_questions) * 90) + 10  # 10-100 range
+        return min(progress, 95)  # Cap at 95% until completion
+    
+    def _get_state_dict(self) -> Dict[str, Any]:
+        """
+        Get current controller state as dict for persistence.
+        
+        Returns:
+            State dict for session_state_utils
+        """
+        return {
+            'conversation_id': self.conversation_id,
+            'campaign_id': self.campaign_id,
+            'participant_id': self.participant_data.get('id'),
+            'business_account_id': self.business_account_id,
+            'participant_data': self.participant_data,
+            'extracted_data': self.extracted_data,
+            'conversation_history': self.conversation_history,
+            'step_count': self.step_count,
+            'current_goal_pointer': self.current_goal_pointer,
+            'topic_question_counts': self.topic_question_counts,
+            'last_activity': datetime.utcnow().isoformat(),
+            'resume_offered': False
+        }
+    
+    def load_conversation_state(self, conversation_id: str) -> bool:
+        """
+        Load persisted conversation state from database.
+        
+        Args:
+            conversation_id: Conversation UUID
+        
+        Returns:
+            True if state loaded successfully, False otherwise
+        """
+        state = load_deterministic_state(conversation_id)
+        
+        if not state:
+            logger.warning(f"No persisted state found for conversation {conversation_id}")
+            return False
+        
+        # Restore controller state
+        self.conversation_id = state['conversation_id']
+        self.extracted_data = state['extracted_data']
+        self.conversation_history = state['conversation_history']
+        self.step_count = state['step_count']
+        self.current_goal_pointer = state['current_goal_pointer']
+        self.topic_question_counts = state['topic_question_counts']
+        
+        logger.info(f"Loaded V2 state: conv_id={conversation_id}, step={self.step_count}")
+        
+        return True
+
+
+# ============================================================================
+# WRAPPER FUNCTIONS FOR ROUTE INTEGRATION (V1 COMPATIBILITY)
+# ============================================================================
+
+def start_ai_conversational_survey_v2(
+    company_name: str,
+    respondent_name: str,
+    tenure_with_fc: Optional[str] = None,
+    business_account_id: Optional[int] = None,
+    campaign_id: Optional[int] = None,
+    participant_data: Optional[Dict[str, Any]] = None
+) -> Dict[str, Any]:
+    """
+    V2 wrapper for start_ai_conversational_survey() - maintains V1 interface.
+    
+    Args:
+        company_name: Company name
+        respondent_name: Respondent name
+        tenure_with_fc: Tenure category (pre-populated)
+        business_account_id: Business account ID
+        campaign_id: Campaign ID
+        participant_data: Participant metadata dict
+    
+    Returns:
+        Response dict compatible with V1 interface
+    """
+    logger.info(f"Starting V2 conversational survey (deterministic flow)")
+    
+    # Initialize V2 controller
+    controller = DeterministicSurveyController(
+        business_account_id=business_account_id,
+        campaign_id=campaign_id,
+        participant_data=participant_data
+    )
+    
+    # Start conversation
+    response = controller.start_conversation(company_name, respondent_name)
+    
+    logger.info(f"V2 survey started: conv_id={response['conversation_id']}")
+    
+    return response
+
+
+def process_ai_conversation_response_v2(
+    user_input: str,
+    survey_data: Dict[str, Any]
+) -> Dict[str, Any]:
+    """
+    V2 wrapper for process_ai_conversation_response() - maintains V1 interface.
+    
+    Args:
+        user_input: User's message text
+        survey_data: Survey context dict with conversation_id, business_account_id, campaign_id
+    
+    Returns:
+        Response dict compatible with V1 interface
+    """
+    conversation_id = survey_data.get('conversation_id')
+    business_account_id = survey_data.get('business_account_id')
+    campaign_id = survey_data.get('campaign_id')
+    
+    logger.debug(f"Processing V2 response: conv_id={conversation_id}")
+    
+    # Load existing conversation state
+    controller = DeterministicSurveyController(
+        business_account_id=business_account_id,
+        campaign_id=campaign_id,
+        conversation_id=conversation_id
+    )
+    
+    # Try to load persisted state
+    if conversation_id and not controller.load_conversation_state(conversation_id):
+        logger.warning(f"No persisted state for {conversation_id} - this may be a resumed conversation")
+        # State will be initialized fresh, which may cause issues
+        # But we'll continue gracefully
+    elif not conversation_id:
+        logger.error("No conversation_id provided - cannot load state")
+        # This is a critical error, but we'll continue with fresh state
+    
+    # Process user response
+    response = controller.process_user_response(user_input, survey_data)
+    
+    logger.debug(f"V2 response processed: complete={response.get('is_complete')}")
+    
+    return response

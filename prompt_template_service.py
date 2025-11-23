@@ -279,9 +279,10 @@ class PromptTemplateService:
         # === HOT PATH: Extract frequently-accessed attributes as primitives ===
         # These are accessed 2+ times or critical for hybrid prompt mode
         
-        # Campaign hot path attributes (9 attributes - added industry, removed survey_goals)
+        # Campaign hot path attributes (10 attributes - added optional_topics for V2 deterministic flow)
         # Use _parse_json_list for list fields to handle JSON strings from SQLAlchemy
         self._campaign_prioritized_topics = _parse_json_list(campaign.prioritized_topics if campaign else None)
+        self._campaign_optional_topics = _parse_json_list(campaign.optional_topics if campaign else None)  # V2 enhancement
         self._campaign_product_description = campaign.product_description if campaign else None
         self._campaign_target_clients_description = campaign.target_clients_description if campaign else None
         self._campaign_max_questions = campaign.max_questions if campaign else None
@@ -860,7 +861,14 @@ RESPONSE FORMAT: Return only the next question or response. No system messages o
         return f"Thank you so much for taking the time to share your detailed feedback about {company_name}! Your insights are incredibly valuable and will help us improve our service delivery. Have a wonderful day!"
     
     def _build_prioritized_topics_with_fields(self) -> List[Dict[str, Any]]:
-        """Build prioritized topics with database field mappings for hybrid prompt architecture"""
+        """
+        Build prioritized topics with database field mappings for hybrid prompt architecture.
+        
+        V2 ENHANCEMENT (Nov 23, 2025): Now returns is_required metadata for deterministic flow.
+        - Topics in campaign.prioritized_topics = is_required=True (must-ask)
+        - Topics in campaign.optional_topics = is_required=False (best-effort)
+        - Default base topics = is_required based on position (first 2 are must-ask)
+        """
         company_name = self.get_company_name()
         
         # Define base topics with field mappings
@@ -876,6 +884,9 @@ RESPONSE FORMAT: Return only the next question or response. No system messages o
             {"topic": "Additional Feedback", "description": f"Any other comments about {company_name}", "fields": TOPIC_FIELD_MAP["Additional Feedback"]}
         ]
         
+        # V2 ENHANCEMENT: Get optional topics list from campaign (cached primitive)
+        campaign_optional_topics = self._campaign_optional_topics if not self.is_demo_mode else []
+        
         # Check campaign prioritized topics first (cached primitive)
         if not self.is_demo_mode and self._campaign_prioritized_topics:
             # Map custom topics to field mappings where possible
@@ -883,13 +894,46 @@ RESPONSE FORMAT: Return only the next question or response. No system messages o
             for topic_name in self._campaign_prioritized_topics[:10]:
                 # Try to find matching base topic for field mapping
                 matched = next((t for t in base_topics_map if topic_name.lower() in t["topic"].lower() or t["topic"].lower() in topic_name.lower()), None)
+                
+                # V2 ENHANCEMENT: Topics in prioritized_topics are REQUIRED (must-ask)
                 if matched:
-                    custom_topics.append({"topic": topic_name, "description": matched["description"], "fields": matched["fields"]})
+                    custom_topics.append({
+                        "topic": topic_name, 
+                        "description": matched["description"], 
+                        "fields": matched["fields"],
+                        "is_required": True  # Prioritized topics are must-ask
+                    })
                 else:
                     # Use generic mapping for unknown topics
-                    custom_topics.append({"topic": topic_name, "description": topic_name, "fields": ["improvement_feedback"]})
+                    custom_topics.append({
+                        "topic": topic_name, 
+                        "description": topic_name, 
+                        "fields": ["improvement_feedback"],
+                        "is_required": True  # Prioritized topics are must-ask
+                    })
             
-            # Merge with base topics
+            # Add optional topics if configured
+            if campaign_optional_topics:
+                for topic_name in campaign_optional_topics[:5]:  # Max 5 optional topics
+                    # Try to find matching base topic for field mapping
+                    matched = next((t for t in base_topics_map if topic_name.lower() in t["topic"].lower() or t["topic"].lower() in topic_name.lower()), None)
+                    
+                    if matched:
+                        custom_topics.append({
+                            "topic": topic_name,
+                            "description": matched["description"],
+                            "fields": matched["fields"],
+                            "is_required": False  # Optional topics are best-effort
+                        })
+                    else:
+                        custom_topics.append({
+                            "topic": topic_name,
+                            "description": topic_name,
+                            "fields": ["improvement_feedback"],
+                            "is_required": False  # Optional topics are best-effort
+                        })
+            
+            # Merge with base topics if needed to fill out list
             # CRITICAL FIX: Filter bi-directionally to prevent duplicates (e.g., "NPS" and "NPS Score")
             used_base_topics = [
                 t for t in base_topics_map 
@@ -898,9 +942,28 @@ RESPONSE FORMAT: Return only the next question or response. No system messages o
                     for ct in custom_topics
                 )
             ]
-            all_topics = custom_topics + used_base_topics[:10 - len(custom_topics)]
+            
+            # Fill remaining slots with base topics (mark as optional if we already have 2+ required topics)
+            remaining_slots = 10 - len(custom_topics)
+            has_enough_required = sum(1 for t in custom_topics if t.get("is_required", False)) >= 2
+            
+            for base_topic in used_base_topics[:remaining_slots]:
+                custom_topics.append({
+                    **base_topic,
+                    "is_required": not has_enough_required  # First 2 base topics are required, rest optional
+                })
+                if not has_enough_required and custom_topics[-1]["is_required"]:
+                    has_enough_required = sum(1 for t in custom_topics if t.get("is_required", False)) >= 2
+            
+            all_topics = custom_topics
         else:
-            all_topics = base_topics_map[:10]
+            # Demo mode or no custom topics - use base topics with first 2 as required
+            all_topics = []
+            for i, base_topic in enumerate(base_topics_map[:10]):
+                all_topics.append({
+                    **base_topic,
+                    "is_required": i < 2  # First 2 topics (Tenure, NPS) are must-ask
+                })
         
         # Add priority order
         for i, topic in enumerate(all_topics, 1):
