@@ -2915,10 +2915,14 @@ def start_conversation():
             participant = Participant.query.get(participant_id)
             if participant:
                 # Build participant_data dictionary with segmentation attributes
+                # FIX (Nov 23, 2025): Use participant_name/participant_company (token schema keys)
+                # to match finalization expectations
                 participant_data = {
-                    'name': participant.name,
+                    'participant_name': participant.name,          # Token schema key
+                    'participant_company': participant.company_name,  # Token schema key
+                    'name': participant.name,                      # Legacy fallback
                     'email': participant.email,
-                    'company_name': participant.company_name,
+                    'company_name': participant.company_name,      # Legacy fallback
                     'role': participant.role,
                     'region': participant.region,
                     'customer_tier': participant.customer_tier,

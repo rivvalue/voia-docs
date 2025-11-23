@@ -701,6 +701,12 @@ Return ONLY the question text, no JSON, no explanation."""
             req_label = "MUST-ASK" if g['is_required'] else "OPTIONAL"
             logger.debug(f"  - {req_label} P{g['priority']}: {g['topic']} ({len(g['fields'])} fields)")
         
+        # FIX (Nov 23, 2025): Apply role-based priority adjustments
+        # Participant role now influences question order within campaign priorities
+        from deterministic_helpers import apply_role_priority_adjustments
+        participant_role = self.participant_data.get('role')
+        goals = apply_role_priority_adjustments(goals, participant_role)
+        
         return goals
     
     def _load_prefilled_fields(self) -> Set[str]:

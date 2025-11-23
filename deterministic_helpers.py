@@ -399,6 +399,89 @@ def build_role_exclusions(participant_role: Optional[str]) -> Set[str]:
     return ROLE_EXCLUSIONS.get(participant_role, set())
 
 
+def apply_role_priority_adjustments(goals: List[Dict], participant_role: Optional[str]) -> List[Dict]:
+    """
+    Apply role-based priority adjustments to survey goals.
+    
+    FIX (Nov 23, 2025): Participant role now influences question priority order.
+    Different roles care about different aspects of the service/product:
+    - End Users: Care more about Product Quality, User Experience
+    - Team Leads: Care more about Support, Team collaboration features
+    - Managers/Directors/Executives: Maintain campaign priorities (strategic view)
+    
+    Args:
+        goals: List of goal dicts with 'topic', 'priority', 'is_required', etc.
+        participant_role: Role string ('End User', 'Team Lead', 'Manager', etc.)
+    
+    Returns:
+        New list of goals with adjusted priorities (sorted by new priority)
+    
+    Example:
+        goals = [
+            {'topic': 'NPS', 'priority': 1, ...},
+            {'topic': 'Product Quality', 'priority': 2, ...},
+            {'topic': 'Pricing Value', 'priority': 3, ...}
+        ]
+        
+        # For End User:
+        apply_role_priority_adjustments(goals, 'End User')
+        # Returns: [NPS (1), Product Quality (1.5 boosted), ...] 
+        # (Product Quality moved up in priority)
+    """
+    if not participant_role or participant_role in ['Manager', 'Director', 'Executive']:
+        # Strategic roles: maintain campaign priorities (business-driven order)
+        logger.debug(f"Role '{participant_role}': Using campaign priorities (no adjustments)")
+        return sorted(goals, key=lambda g: g.get('priority', 999))
+    
+    # Role-based priority adjustments (negative = boost priority, positive = lower priority)
+    ROLE_ADJUSTMENTS = {
+        'End User': {
+            'Product Quality': -0.5,      # Boost: End users care about product
+            'User Experience': -0.5,      # Boost: UX is critical for end users
+            'Support Quality': -0.3,      # Boost: They need help often
+            'Support Experience': -0.3,   # Boost: Similar to Support Quality
+            'Pricing Value': 999,         # Excluded (handled by build_role_exclusions)
+        },
+        'Team Lead': {
+            'Support Quality': -0.5,      # Boost: They interact with support for team
+            'Support Experience': -0.5,   # Boost: Team support matters
+            'Product Quality': -0.3,      # Boost: They guide team usage
+            'Pricing Value': 999,         # Excluded (handled by build_role_exclusions)
+        }
+    }
+    
+    adjustments = ROLE_ADJUSTMENTS.get(participant_role, {})
+    
+    if not adjustments:
+        logger.debug(f"Role '{participant_role}': No priority adjustments defined")
+        return sorted(goals, key=lambda g: g.get('priority', 999))
+    
+    # Apply adjustments to create new goal list with adjusted priorities
+    adjusted_goals = []
+    for goal in goals:
+        topic = goal.get('topic', '')
+        base_priority = goal.get('priority', 999)
+        adjustment = adjustments.get(topic, 0)
+        
+        # Create new goal dict with adjusted priority (don't mutate original)
+        adjusted_goal = goal.copy()
+        adjusted_goal['priority'] = base_priority + adjustment
+        adjusted_goal['original_priority'] = base_priority  # Track for debugging
+        
+        if adjustment != 0:
+            logger.debug(f"  Role adjustment: {topic} priority {base_priority} → {adjusted_goal['priority']} "
+                        f"(adjustment: {adjustment:+.1f})")
+        
+        adjusted_goals.append(adjusted_goal)
+    
+    # Sort by adjusted priority
+    adjusted_goals.sort(key=lambda g: g.get('priority', 999))
+    
+    logger.info(f"Applied role '{participant_role}' priority adjustments to {len(goals)} goals")
+    
+    return adjusted_goals
+
+
 def extract_prefilled_fields(participant_data: Dict) -> Set[str]:
     """
     Extract field names that are pre-populated from participant data.
