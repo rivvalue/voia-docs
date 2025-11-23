@@ -80,33 +80,46 @@ User → routes.py → DeterministicSurveyController.handle_user_message()
 
 **Purpose:** Deterministic check if survey should end
 
+**CRITICAL CHANGE (Nov 22, 2025):** Now distinguishes between **must-ask** and **optional** topics.
+
 **Signature:**
 ```python
 def all_goals_completed(
     goals: List[Dict],
     extracted_data: Dict,
     prefilled_fields: Set[str],
-    role_excluded_topics: Set[str]
+    role_excluded_topics: Set[str],
+    check_optional: bool = False  # NEW: Controls must-ask vs optional checking
 ) -> bool
 ```
 
-**Logic:**
+**Two-Tier Completion Logic:**
 1. Filter goals by role (exclude topics not relevant to participant role)
-2. For each remaining goal:
+2. Filter by `is_required` flag:
+   - If `check_optional=False` (default): Only check **must-ask** topics
+   - If `check_optional=True`: Check **all** topics (must-ask + optional)
+3. For each remaining goal:
    - Check if ALL fields are filled in `extracted_data` OR `prefilled_fields`
    - Return `False` if any field missing
-3. Return `True` only if all goals complete
+4. Return `True` only if all checked goals complete
+
+**Key Behavior:**
+- Survey can end when ALL **must-ask** topics are complete (optional can remain incomplete)
+- This prevents early-stop bugs on required data while allowing graceful end with partial optional data
 
 **Integration Points:**
 - `filter_goals_by_role()` from `prompt_template_service.py`
 - `TOPIC_FIELD_MAP` for field definitions
 - Prefilled fields from participant data (tenure, company name, etc.)
+- Campaign `survey_config.must_ask_topics` and `optional_topics` lists
 
 ---
 
 ### 4.2 Helper 2: `get_next_goal()`
 
-**Purpose:** Select next topic and identify missing fields
+**Purpose:** Select next topic and identify missing fields with **TWO-TIER PRIORITY**
+
+**CRITICAL CHANGE (Nov 22, 2025):** Must-ask topics ALWAYS come before optional topics.
 
 **Signature:**
 ```python
@@ -115,25 +128,42 @@ def get_next_goal(
     extracted_data: Dict,
     prefilled_fields: Set[str],
     current_goal_pointer: Optional[str],
-    allow_multi_turn: bool = True
+    allow_multi_turn: bool = True,
+    limit_optional_follow_ups: bool = True  # NEW: Conserve questions on optional topics
 ) -> Tuple[Optional[Dict], List[str], bool]
 ```
 
 **Returns:** `(next_goal, missing_fields, is_follow_up)`
 
-**Logic:**
-1. If `current_goal_pointer` is set AND `allow_multi_turn=True`:
+**Two-Tier Priority Logic:**
+1. **Multi-turn logic** (if `current_goal_pointer` set AND `allow_multi_turn=True`):
    - Check if current goal still has missing fields
-   - If yes, return (current_goal, missing_fields, is_follow_up=True)
-2. Otherwise, iterate goals by priority:
-   - Find first goal with missing fields (not in extracted_data or prefilled)
+   - If `is_required=True` OR `limit_optional_follow_ups=False`:
+     - Return (current_goal, missing_fields, is_follow_up=True)
+   - If `is_required=False` AND `limit_optional_follow_ups=True`:
+     - Accept partial data, move on (conserve questions for must-ask)
+
+2. **TIER 1 - Must-Ask Topics** (is_required=True):
+   - Iterate all must-ask topics by priority
+   - Find first goal with missing fields
    - Return (goal, missing_fields, is_follow_up=False)
-3. If no missing fields, return (None, [], False)
+
+3. **TIER 2 - Optional Topics** (is_required=False):
+   - **Only executed if ALL must-ask topics complete**
+   - Iterate all optional topics by priority
+   - Find first goal with missing fields
+   - Return (goal, missing_fields, is_follow_up=False)
+
+4. If no missing fields anywhere, return (None, [], False)
 
 **State Management:**
 - `current_goal_pointer`: Stored in session for multi-turn tracking
 - Cleared when moving to next goal
 - Persisted across page refreshes (session-based)
+
+**Edge Case Handling:**
+- Optional topics with partial data: Accept and move on (1 follow-up max)
+- Must-ask topics: Full multi-turn support until complete
 
 ---
 
@@ -344,6 +374,61 @@ Generate the next question:"""
     response = self._call_openai(prompt, model="gpt-4o")  # Premium model for quality
     return response.strip()
 ```
+
+### 6.3 Edge Case: Max Questions with Must-Ask Incomplete
+
+**CRITICAL EDGE CASE (Nov 22, 2025):** What happens if question limit is hit before must-ask complete?
+
+**Scenario:** Campaign has `max_questions=5`, but must-ask topics need 7 questions.
+
+**Two-Tier Question Management:**
+
+**Must-Ask Topics:**
+- **Cannot finalize if incomplete** - Survey has integrity requirements
+- **Recommended Solution:** Extend quota past `max_questions` for must-ask completion
+- **Alternative:** Return hard error and require admin intervention
+
+**Optional Topics:**
+- If limit hit during optional topic: **Gracefully end survey**
+- Save any partial optional data collected
+- Log: "Survey ended at question limit with optional topics incomplete"
+
+**Implementation (Recommended - Extend Quota):**
+```python
+def _check_completion_or_continue(self):
+    """Check if survey should end, respecting must-ask priority."""
+    
+    must_ask_complete = all_goals_completed(
+        self.goals,
+        self.extracted_data,
+        self.prefilled_fields,
+        check_optional=False  # Only check must-ask
+    )
+    
+    if self.step_count >= self.max_questions:
+        if not must_ask_complete:
+            # OVERRIDE: Must-ask incomplete - extend quota
+            logger.warning(
+                f"Extending quota past {self.max_questions} questions "
+                f"(must-ask topics incomplete)"
+            )
+            # Continue survey despite limit
+            return False  # Not complete, continue
+        else:
+            # Must-ask done, gracefully end
+            logger.info(f"Survey ended at question limit (must-ask complete)")
+            return True  # Complete
+    
+    # Standard check: all goals done (including optional if within limit)
+    return all_goals_completed(
+        self.goals,
+        self.extracted_data,
+        self.prefilled_fields,
+        check_optional=True  # Check all topics if within limit
+    )
+```
+
+**Key Principle:** Must-ask topics are non-negotiable. Optional topics are best-effort.
 
 ---
 
