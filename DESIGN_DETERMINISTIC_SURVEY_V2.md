@@ -117,9 +117,11 @@ def all_goals_completed(
 
 ### 4.2 Helper 2: `get_next_goal()`
 
-**Purpose:** Select next topic and identify missing fields with **TWO-TIER PRIORITY**
+**Purpose:** Select next topic and identify missing fields with **TWO-TIER PRIORITY** and **PER-TOPIC FOLLOW-UP LIMITS**
 
-**CRITICAL CHANGE (Nov 22, 2025):** Must-ask topics ALWAYS come before optional topics.
+**CRITICAL CHANGES:**
+- Nov 22, 2025: Must-ask topics ALWAYS come before optional topics
+- Nov 23, 2025: Added per-topic follow-up counter enforcement (backend-controlled)
 
 **Signature:**
 ```python
@@ -128,20 +130,26 @@ def get_next_goal(
     extracted_data: Dict,
     prefilled_fields: Set[str],
     current_goal_pointer: Optional[str],
+    topic_question_counts: Dict[str, int],  # NEW: Per-topic question counter
+    max_follow_up_per_topic: int = 2,       # NEW: Campaign-configured limit
     allow_multi_turn: bool = True,
-    limit_optional_follow_ups: bool = True  # NEW: Conserve questions on optional topics
+    limit_optional_follow_ups: bool = True  # Conserve questions on optional topics
 ) -> Tuple[Optional[Dict], List[str], bool]
 ```
 
 **Returns:** `(next_goal, missing_fields, is_follow_up)`
 
-**Two-Tier Priority Logic:**
+**Two-Tier Priority Logic with Follow-Up Enforcement:**
+
 1. **Multi-turn logic** (if `current_goal_pointer` set AND `allow_multi_turn=True`):
    - Check if current goal still has missing fields
-   - If `is_required=True` OR `limit_optional_follow_ups=False`:
-     - Return (current_goal, missing_fields, is_follow_up=True)
-   - If `is_required=False` AND `limit_optional_follow_ups=True`:
-     - Accept partial data, move on (conserve questions for must-ask)
+   - **NEW: Check per-topic follow-up limit**
+     - Calculate: `follow_ups_used = topic_question_counts.get(topic, 1) - 1`
+     - If `is_required=True` (must-ask): **Bypass limit** (unlimited follow-ups for completion)
+     - If `is_required=False` (optional) AND `follow_ups_used >= max_follow_up_per_topic`:
+       - Log: "Follow-up limit reached for optional topic"
+       - Move to next topic (accept partial data)
+     - Otherwise: Return (current_goal, missing_fields, is_follow_up=True)
 
 2. **TIER 1 - Must-Ask Topics** (is_required=True):
    - Iterate all must-ask topics by priority
@@ -158,12 +166,20 @@ def get_next_goal(
 
 **State Management:**
 - `current_goal_pointer`: Stored in session for multi-turn tracking
+- `topic_question_counts`: Dict tracking questions asked per topic (e.g., `{"Product Quality": 2}`)
 - Cleared when moving to next goal
 - Persisted across page refreshes (session-based)
 
+**Per-Topic Follow-Up Limit Rules:**
+- **Must-ask topics**: Unlimited follow-ups (bypass `max_follow_up_per_topic` limit)
+- **Optional topics**: Strictly enforce `max_follow_up_per_topic` limit
+- **Rationale**: Survey integrity requires must-ask completion; optional topics are best-effort
+- **Campaign setting**: `max_follow_up_per_topic` configured per campaign (default: 2)
+
 **Edge Case Handling:**
-- Optional topics with partial data: Accept and move on (1 follow-up max)
-- Must-ask topics: Full multi-turn support until complete
+- Optional topic hits limit with missing fields → Accept partial data, move on
+- Must-ask topic with many vague answers → Continue asking until complete (no limit)
+- All topics hit follow-up limits → Survey ends gracefully
 
 ---
 
@@ -190,10 +206,43 @@ class DeterministicSurveyController:
         self.step_count = 0
         
     def handle_user_message(self, user_message: str) -> Dict:
-        """Main orchestration method (replaces LLM flow control)"""
+        """Main orchestration method with per-topic follow-up enforcement"""
+        # 1) Extract data (NO needs_followup flag - backend decides flow)
+        new_fields = self._extract_with_ai(user_message)
+        self.extracted_data.update(new_fields)
+        self.step_count += 1
+        
+        # 2) Check global completion
+        if self._check_completion_or_continue():
+            return self._finish_survey()
+        
+        # 3) Get next goal (backend decides follow-up using counters)
+        next_goal, missing_fields, is_follow_up = get_next_goal(
+            goals=self.goals,
+            extracted_data=self.extracted_data,
+            prefilled_fields=self.prefilled_fields,
+            current_goal_pointer=self.current_goal_pointer,
+            topic_question_counts=self.topic_question_counts,  # NEW: Counter dict
+            max_follow_up_per_topic=self.campaign.max_follow_up_per_topic,  # NEW: Limit
+            allow_multi_turn=True
+        )
+        
+        if not next_goal:
+            return self._finish_survey()
+        
+        topic_name = next_goal["topic"]
+        
+        # 4) Generate question for chosen topic
+        question = self._generate_question_with_ai(next_goal, missing_fields, is_follow_up)
+        
+        # 5) Update state (increment counter, set pointer)
+        self.topic_question_counts[topic_name] = self.topic_question_counts.get(topic_name, 0) + 1
+        self.current_goal_pointer = topic_name
+        
+        return {"message": question, "is_complete": False, "topic": topic_name}
         
     def _extract_with_ai(self, user_message: str) -> Dict:
-        """Stub: Call LLM for pure extraction"""
+        """Stub: Call LLM for pure extraction (NO flow decisions)"""
         
     def _generate_question_with_ai(self, goal: Dict, missing_fields: List[str], is_follow_up: bool) -> str:
         """Stub: Call LLM to generate question for specific topic"""
@@ -237,22 +286,65 @@ Check: all_goals_completed() OR step_count >= max_questions?
     Return question to user (is_complete=False)
 ```
 
-### 5.2 Multi-Turn Same Topic Flow
+### 5.2 Multi-Turn Same Topic Flow (with Per-Topic Follow-Up Limits)
+
+**Scenario: Optional topic with max_follow_up_per_topic=2**
 
 ```
-User gives vague answer on "Product Quality"
+User gives vague answer on "Product Quality" (optional topic)
     ↓
 Extract returns: {"satisfaction_rating": 7} (missing elaboration)
+topic_question_counts = {"Product Quality": 1}  # First question
     ↓
-get_next_goal(current_goal_pointer="Product Quality")
+get_next_goal(current_goal_pointer="Product Quality", topic_question_counts)
     ↓
-Still missing fields: ["detailed_feedback"]
+Backend checks:
+  - Still missing fields: ["detailed_feedback"]
+  - Follow-ups used: 1 - 1 = 0 (under limit of 2)
+  - is_required=False (optional)
     ↓
 Returns: (same_goal, ["detailed_feedback"], is_follow_up=True)
     ↓
 Generate follow-up question: "Could you elaborate on why you gave 7/10?"
+Increment counter: topic_question_counts["Product Quality"] = 2
     ↓
-current_goal_pointer remains "Product Quality"
+User gives partial answer: "It's okay"
+Extract returns: {} (still missing elaboration)
+topic_question_counts = {"Product Quality": 2}
+    ↓
+get_next_goal(current_goal_pointer="Product Quality", topic_question_counts)
+    ↓
+Backend checks:
+  - Still missing fields: ["detailed_feedback"]
+  - Follow-ups used: 2 - 1 = 1 (under limit of 2)
+  - is_required=False (optional)
+    ↓
+Returns: (same_goal, ["detailed_feedback"], is_follow_up=True)
+    ↓
+Generate second follow-up: "Could you tell me more about what makes it 'okay'?"
+Increment counter: topic_question_counts["Product Quality"] = 3
+    ↓
+User says: "Not sure"
+Extract returns: {} (still missing)
+topic_question_counts = {"Product Quality": 3}
+    ↓
+get_next_goal(current_goal_pointer="Product Quality", topic_question_counts)
+    ↓
+Backend checks:
+  - Still missing fields: ["detailed_feedback"]
+  - Follow-ups used: 3 - 1 = 2 (REACHED LIMIT)
+  - is_required=False (optional)
+    ↓
+LIMIT EXCEEDED: Accept partial data, force move to next topic
+Returns: (next_topic_goal, missing_fields, is_follow_up=False)
+```
+
+**Must-Ask Topic Exception:**
+```
+Topic: "NPS Score" (must-ask, max_follow_up_per_topic=2)
+User gives vague answers 5 times → Backend continues asking
+Follow-up limit BYPASSED because is_required=True
+Survey cannot complete until must-ask fields collected
 ```
 
 ### 5.3 Early Data Capture Flow
@@ -560,23 +652,54 @@ def _check_completion_or_continue(self):
 
 ```python
 session['deterministic_survey_state'] = {
-    'extracted_data': {},           # Dict of collected fields
-    'conversation_history': [],     # List of {sender, message, timestamp}
-    'current_goal_pointer': None,   # Current topic for multi-turn
-    'step_count': 0,                # Number of questions asked
-    'prefilled_fields': {},         # From participant data
-    'last_activity': timestamp,     # For abandonment detection
-    'resume_offered': False         # Track if resume question shown
+    'extracted_data': {},              # Dict of collected fields
+    'conversation_history': [],        # List of {sender, message, timestamp}
+    'current_goal_pointer': None,      # Current topic for multi-turn
+    'step_count': 0,                   # Number of questions asked
+    'topic_question_counts': {},       # NEW: Per-topic question counter (e.g., {"Product Quality": 2})
+    'prefilled_fields': {},            # From participant data
+    'last_activity': timestamp,        # For abandonment detection (inactivity only)
+    'resume_offered': False            # Track if resume question shown
 }
 ```
 
-### 7.2 Abandonment Handling
+**Per-Topic Question Counter (`topic_question_counts`):**
+- **Purpose**: Track how many questions asked per topic to enforce `max_follow_up_per_topic` limit
+- **Format**: `{"Product Quality": 3, "Support Quality": 1, "Pricing": 2}`
+- **Incremented**: Every time a question is asked about a topic (initial + follow-ups)
+- **Used by**: `get_next_goal()` to determine if follow-up limit reached
+- **Must-ask exception**: Counter tracked but limit ignored for `is_required=True` topics
+- **Reset**: Never reset mid-survey (persists until survey completion or abandonment)
 
-**Detection:**
-- User returns after >30 minutes of inactivity
+### 7.2 Abandonment Handling and Termination Controls
+
+**IMPORTANT: Conversation Duration Setting REMOVED in V2**
+
+The legacy `max_conversation_duration` setting (total time limit for survey) is **NOT implemented in V2**.
+
+**V2 Termination Controls (Only Two):**
+
+1. **Question Count Limit** (`max_questions`):
+   - Hard cap on total questions asked
+   - Exception: Must-ask topics can extend past limit to ensure completion
+   - Configured per campaign
+
+2. **Inactivity Timeout** (Session abandonment):
+   - User returns after >30 minutes of inactivity
+   - Triggers resume-or-restart prompt
+   - Based on `last_activity` timestamp
+
+**Why Duration Removed:**
+- **Simpler**: Question count is more predictable and controllable
+- **Better UX**: User can take breaks without losing progress
+- **No added value**: Inactivity timeout already handles abandonment
+- **Less confusion**: One clear limit (questions) vs multiple overlapping limits
+
+**Abandonment Detection:**
+- User returns after >30 minutes of inactivity (NOT total duration)
 - `last_activity` timestamp check
 
-**Behavior:**
+**Abandonment Behavior:**
 ```python
 if session_exists and not session['resume_offered']:
     # Ask user: Resume or Restart?
@@ -593,7 +716,8 @@ if session_exists and not session['resume_offered']:
 
 **User chooses "Resume":**
 - Load existing state
-- Call `get_next_goal(current_goal_pointer)` to continue
+- Call `get_next_goal(current_goal_pointer, topic_question_counts)` to continue
+- Counters and state preserved across resume
 
 ---
 
