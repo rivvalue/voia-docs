@@ -1676,28 +1676,28 @@ def export_campaign_async(campaign_id):
         if not current_account:
             return jsonify({'error': 'Business account not found'}), 401
         
-        # Get campaign and verify access
+        # CRITICAL: Verify campaign ownership BEFORE queueing job (tenant isolation)
         campaign = Campaign.query.filter_by(
             id=campaign_id,
             business_account_id=current_account.id
         ).first()
         
         if not campaign:
+            logger.warning(f"Export attempt denied: Campaign {campaign_id} not found for account {current_account.id}")
             return jsonify({'error': 'Campaign not found'}), 404
         
-        # Create BulkOperationJob for export
-        job = BulkOperationJob(
-            job_id=str(uuid.uuid4()),
-            business_account_id=current_account.id,
-            user_id=session.get('business_user_id'),
-            operation_type='export_campaign',
-            operation_data=json.dumps({
-                'campaign_id': campaign_id,
-                'campaign_name': campaign.name
-            }),
-            status='pending',
-            progress=0
-        )
+        # Create BulkOperationJob for export (set fields after instantiation)
+        job = BulkOperationJob()
+        job.job_id = str(uuid.uuid4())
+        job.business_account_id = current_account.id
+        job.user_id = session.get('business_user_id')
+        job.operation_type = 'export_campaign'
+        job.operation_data = json.dumps({
+            'campaign_id': campaign_id,
+            'campaign_name': campaign.name
+        })
+        job.status = 'pending'
+        job.progress = 0
         
         db.session.add(job)
         db.session.commit()
@@ -1711,7 +1711,7 @@ def export_campaign_async(campaign_id):
         }
         task_queue.add_task('export_campaign', priority=1, task_data=task_data)
         
-        logger.info(f"Queued async campaign export for campaign {campaign_id} (job_id: {job.job_id})")
+        logger.info(f"Queued async campaign export for campaign {campaign_id} (job_id: {job.job_id}) - Owner: {current_account.id}")
         
         return jsonify({
             'job_id': job.job_id,
@@ -1729,7 +1729,7 @@ def export_campaign_async(campaign_id):
 @require_business_auth
 @require_permission('export_data')
 def download_campaign_export(campaign_id, job_id):
-    """Download completed campaign export file"""
+    """Download completed campaign export file with strict path validation"""
     try:
         from models import BulkOperationJob
         import os
@@ -1738,15 +1738,20 @@ def download_campaign_export(campaign_id, job_id):
         if not current_account:
             return jsonify({'error': 'Business account not found'}), 401
         
-        # Get and verify export job
+        # Get and verify export job with strict type checking
         job = BulkOperationJob.query.filter_by(
             job_id=job_id,
-            business_account_id=current_account.id,
-            operation_type='export_campaign'
+            business_account_id=current_account.id
         ).first()
         
         if not job:
+            logger.warning(f"Export download denied: Job {job_id} not found for account {current_account.id}")
             return jsonify({'error': 'Export job not found'}), 404
+        
+        # CRITICAL SECURITY: Verify job is actually an export (prevent other job types from being downloaded)
+        if job.operation_type != 'export_campaign':
+            logger.error(f"SECURITY: Attempt to download non-export job {job_id} (type: {job.operation_type})")
+            return jsonify({'error': 'Invalid job type'}), 403
         
         if job.status != 'completed':
             return jsonify({
@@ -1759,22 +1764,38 @@ def download_campaign_export(campaign_id, job_id):
         result_data = json.loads(job.result) if job.result else {}
         file_path = result_data.get('file_path')
         
-        if not file_path or not os.path.exists(file_path):
+        if not file_path:
+            return jsonify({'error': 'Export file path not found'}), 404
+        
+        # CRITICAL SECURITY: Validate file path to prevent directory traversal attacks
+        # Use realpath (not abspath) to resolve symlinks and prevent path substitution
+        export_base_dir = os.path.realpath(os.path.join('exports', 'campaigns'))
+        requested_file = os.path.realpath(file_path)
+        
+        # Check if requested file is actually within the export directory (after symlink resolution)
+        if not requested_file.startswith(export_base_dir + os.sep):
+            logger.error(f"SECURITY: Path traversal attempt detected! Requested: {file_path}, Resolved: {requested_file}, Base: {export_base_dir}")
+            return jsonify({'error': 'Invalid file path'}), 403
+        
+        # Verify file exists
+        if not os.path.exists(requested_file):
+            logger.warning(f"Export file missing: {requested_file}")
             return jsonify({'error': 'Export file not found'}), 404
         
-        # Verify campaign access
+        # Verify campaign access (double-check ownership)
         campaign = Campaign.query.filter_by(
             id=campaign_id,
             business_account_id=current_account.id
         ).first()
         
         if not campaign:
+            logger.warning(f"Export download denied: Campaign {campaign_id} not found for account {current_account.id}")
             return jsonify({'error': 'Campaign not found'}), 404
         
-        logger.info(f"Downloading export {job_id} for campaign {campaign_id}")
+        logger.info(f"Export download authorized: job={job_id}, campaign={campaign_id}, account={current_account.id}, file={requested_file}")
         
         return send_file(
-            file_path,
+            requested_file,
             mimetype='application/json',
             as_attachment=True,
             download_name=f"{campaign.name}_export.json"

@@ -1122,6 +1122,9 @@ class TaskQueue:
         
         Args:
             max_age_hours: Age threshold in hours (default: 48 hours for exports)
+        
+        Returns:
+            int: Number of jobs cleaned up
         """
         from models import BulkOperationJob
         from app import db
@@ -1137,25 +1140,41 @@ class TaskQueue:
             ).all()
             
             cleaned_files = 0
+            missing_files = 0
+            
             for job in old_export_jobs:
                 # Clean up export file if it exists in result
                 try:
                     result_data = json.loads(job.result) if job.result else {}
                     file_path = result_data.get('file_path')
                     
-                    if file_path and os.path.exists(file_path):
-                        os.remove(file_path)
-                        cleaned_files += 1
-                        logger.debug(f"Cleaned up export file: {file_path}")
+                    if file_path:
+                        # SECURITY: Validate path is within export directory before deletion
+                        # Use realpath to resolve symlinks and prevent path substitution
+                        export_base_dir = os.path.realpath(os.path.join('exports', 'campaigns'))
+                        file_absolute = os.path.realpath(file_path)
+                        
+                        if file_absolute.startswith(export_base_dir + os.sep):
+                            if os.path.exists(file_absolute):
+                                os.remove(file_absolute)
+                                cleaned_files += 1
+                                logger.debug(f"Cleaned up export file: {file_path}")
+                            else:
+                                missing_files += 1
+                                logger.debug(f"Export file already missing: {file_path}")
+                        else:
+                            logger.warning(f"Skipping file outside export directory: {file_path}")
+                    
                 except Exception as e:
                     logger.error(f"Error cleaning up export file for job {job.job_id}: {e}")
                 
-                # Delete job from database
+                # Delete job from database (removes completed jobs to prevent 404s on downloads)
+                # This is safer than leaving completed jobs with missing files
                 db.session.delete(job)
             
             if old_export_jobs:
                 db.session.commit()
-                logger.info(f"Cleaned up {len(old_export_jobs)} old export jobs ({cleaned_files} files removed)")
+                logger.info(f"Cleaned up {len(old_export_jobs)} old export jobs ({cleaned_files} files removed, {missing_files} already missing)")
             
             return len(old_export_jobs)
             
