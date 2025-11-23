@@ -95,3 +95,8 @@ externalPort = 8081
 
 [agent]
 integrations = ["python_openai==1.0.0", "styling_replit==1.0.0", "python_database==1.0.0", "python_log_in_with_replit==1.0.0"]
+
+[userenv]
+
+[userenv.shared]
+DETERMINISTIC_SURVEY_FLOW = "true"
