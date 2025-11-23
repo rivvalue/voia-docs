@@ -1661,12 +1661,141 @@ def individual_response(campaign_id, participant_id):
         return redirect(url_for('campaigns.campaign_responses', campaign_id=campaign_id))
 
 
-@campaign_bp.route('/api/campaigns/<int:campaign_id>/export')
+@campaign_bp.route('/api/campaigns/<int:campaign_id>/export', methods=['POST'])
 @require_business_auth
 @require_permission('export_data')
-def export_campaign_responses(campaign_id):
-    """Export campaign responses as JSON - Admin access required"""
+def export_campaign_async(campaign_id):
+    """Queue async campaign export job (unified pattern with bulk operations)"""
     try:
+        from models import BulkOperationJob
+        from task_queue import task_queue
+        import uuid
+        
+        current_account = get_current_business_account()
+        if not current_account:
+            return jsonify({'error': 'Business account not found'}), 401
+        
+        # Get campaign and verify access
+        campaign = Campaign.query.filter_by(
+            id=campaign_id,
+            business_account_id=current_account.id
+        ).first()
+        
+        if not campaign:
+            return jsonify({'error': 'Campaign not found'}), 404
+        
+        # Create BulkOperationJob for export
+        job = BulkOperationJob(
+            job_id=str(uuid.uuid4()),
+            business_account_id=current_account.id,
+            user_id=session.get('business_user_id'),
+            operation_type='export_campaign',
+            operation_data=json.dumps({
+                'campaign_id': campaign_id,
+                'campaign_name': campaign.name
+            }),
+            status='pending',
+            progress=0
+        )
+        
+        db.session.add(job)
+        db.session.commit()
+        
+        # Queue export task
+        task_data = {
+            'job_id': job.job_id,
+            'campaign_id': campaign_id,
+            'business_account_id': current_account.id,
+            'user_id': session.get('business_user_id')
+        }
+        task_queue.add_task('export_campaign', priority=1, task_data=task_data)
+        
+        logger.info(f"Queued async campaign export for campaign {campaign_id} (job_id: {job.job_id})")
+        
+        return jsonify({
+            'job_id': job.job_id,
+            'status': 'pending',
+            'message': 'Export job queued successfully'
+        }), 202
+        
+    except Exception as e:
+        logger.error(f"Error queuing campaign export for {campaign_id}: {e}")
+        db.session.rollback()
+        return jsonify({'error': 'Failed to queue export job'}), 500
+
+
+@campaign_bp.route('/api/campaigns/<int:campaign_id>/export/download/<job_id>', methods=['GET'])
+@require_business_auth
+@require_permission('export_data')
+def download_campaign_export(campaign_id, job_id):
+    """Download completed campaign export file"""
+    try:
+        from models import BulkOperationJob
+        import os
+        
+        current_account = get_current_business_account()
+        if not current_account:
+            return jsonify({'error': 'Business account not found'}), 401
+        
+        # Get and verify export job
+        job = BulkOperationJob.query.filter_by(
+            job_id=job_id,
+            business_account_id=current_account.id,
+            operation_type='export_campaign'
+        ).first()
+        
+        if not job:
+            return jsonify({'error': 'Export job not found'}), 404
+        
+        if job.status != 'completed':
+            return jsonify({
+                'error': 'Export not ready',
+                'status': job.status,
+                'progress': job.progress
+            }), 400
+        
+        # Get file path from result JSON
+        result_data = json.loads(job.result) if job.result else {}
+        file_path = result_data.get('file_path')
+        
+        if not file_path or not os.path.exists(file_path):
+            return jsonify({'error': 'Export file not found'}), 404
+        
+        # Verify campaign access
+        campaign = Campaign.query.filter_by(
+            id=campaign_id,
+            business_account_id=current_account.id
+        ).first()
+        
+        if not campaign:
+            return jsonify({'error': 'Campaign not found'}), 404
+        
+        logger.info(f"Downloading export {job_id} for campaign {campaign_id}")
+        
+        return send_file(
+            file_path,
+            mimetype='application/json',
+            as_attachment=True,
+            download_name=f"{campaign.name}_export.json"
+        )
+        
+    except Exception as e:
+        logger.error(f"Error downloading campaign export {job_id}: {e}")
+        return jsonify({'error': 'Failed to download export'}), 500
+
+
+@campaign_bp.route('/api/campaigns/<int:campaign_id>/export/legacy', methods=['GET'])
+@require_business_auth
+@require_permission('export_data')
+def export_campaign_responses_legacy(campaign_id):
+    """
+    DEPRECATED: Legacy synchronous export endpoint.
+    Use POST /api/campaigns/<id>/export for async exports with progress tracking.
+    This endpoint is kept for backwards compatibility only.
+    """
+    try:
+        logger.warning(f"DEPRECATED: Legacy synchronous export endpoint used for campaign {campaign_id}. Migrate to async export.")
+        
         current_account = get_current_business_account()
         if not current_account:
             return jsonify({'error': 'Business account not found'}), 401
