@@ -90,6 +90,7 @@ def save_deterministic_state(conversation_id: str, controller_state: Dict) -> bo
     - conversation_history → ActiveConversation.conversation_history (JSON)
     - step_count → ActiveConversation.step_count (int)
     - V2-specific fields → ActiveConversation.survey_data (JSON):
+      * controller_version (CRITICAL: enables V2 finalization routing)
       * current_goal_pointer
       * topic_question_counts
       * last_activity
@@ -111,7 +112,9 @@ def save_deterministic_state(conversation_id: str, controller_state: Dict) -> bo
         logger.debug(f"Saving V2 state for conversation {conversation_id}")
         
         # Build V2-specific survey_data payload (only V2 fields)
+        # FIX (Nov 23, 2025): Add controller_version for finalization routing
         v2_survey_data = {
+            'controller_version': 'v2_deterministic',  # CRITICAL: enables V2 finalization
             'current_goal_pointer': controller_state.get('current_goal_pointer'),
             'topic_question_counts': controller_state.get('topic_question_counts', {}),
             'last_activity': controller_state.get('last_activity', datetime.utcnow().isoformat()),
