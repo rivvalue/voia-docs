@@ -338,6 +338,55 @@ class DeterministicSurveyController:
             'controller_version': 'v2_deterministic'
         }
     
+    def _map_extracted_fields_to_db(self, extracted_data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Map LLM extraction field names to database column names.
+        
+        Handles:
+        - Field name translation (overall_satisfaction_rating → satisfaction_rating)
+        - Feature requests JSON serialization (array → JSON string)
+        - Rating range validation (0-10 scale enforcement)
+        - Both revised and original prompt field names for compatibility
+        
+        Args:
+            extracted_data: Raw extraction from LLM (with prompt field names)
+        
+        Returns:
+            Database-ready dict (with DB column names)
+        """
+        db_ready = {}
+        
+        for prompt_field, value in extracted_data.items():
+            if value is None or value == '':
+                continue  # Skip nulls/empties (sparse JSON)
+            
+            # Get database column name (or use prompt field if no mapping exists)
+            db_field = EXTRACTION_TO_DB_FIELD_MAP.get(prompt_field, prompt_field)
+            
+            # Special handling: feature_requests array → JSON string
+            if db_field == 'feature_requests' and isinstance(value, list):
+                db_ready[db_field] = json.dumps(value)
+                continue
+            
+            # Rating validation (ensure 0-10 range for integer ratings)
+            if db_field in ['nps_score', 'satisfaction_rating', 'pricing_rating', 
+                           'service_rating', 'product_value_rating', 'support_rating']:
+                if isinstance(value, (int, float)):
+                    # Clamp to valid range (0-10)
+                    validated_rating = max(0, min(10, int(round(value))))
+                    if validated_rating != value:
+                        logger.warning(f"Rating out of range: {prompt_field}={value}, clamped to {validated_rating}")
+                    db_ready[db_field] = validated_rating
+                else:
+                    logger.warning(f"Non-numeric rating ignored: {prompt_field}={value}")
+                continue
+            
+            # Default: use value as-is
+            db_ready[db_field] = value
+        
+        logger.debug(f"Field mapping: {len(extracted_data)} prompt fields → {len(db_ready)} DB fields")
+        return db_ready
+    
     def _extract_with_ai(self, user_message: str) -> Dict[str, Any]:
         """
         LLM Stub 1: Extract structured data from user response.
@@ -379,13 +428,18 @@ class DeterministicSurveyController:
             
             extracted_json = response.choices[0].message.content
             if extracted_json:
-                extracted_data = json.loads(extracted_json)
+                raw_extracted = json.loads(extracted_json)
             else:
-                extracted_data = {}
+                raw_extracted = {}
             
-            logger.debug(f"LLM extracted: {_mask_pii(extracted_data)}")
+            logger.debug(f"LLM extracted (raw): {_mask_pii(raw_extracted)}")
             
-            return extracted_data
+            # Map to database field names before storing
+            mapped_data = self._map_extracted_fields_to_db(raw_extracted)
+            
+            logger.debug(f"LLM extracted (mapped): {_mask_pii(mapped_data)}")
+            
+            return mapped_data
             
         except Exception as e:
             logger.error(f"Extraction error: {e}")
@@ -469,10 +523,9 @@ class DeterministicSurveyController:
         """
         Build LLM prompt for data extraction with static context blocks.
         
-        Static context provides understanding WITHOUT verbosity:
-        - Company name, product, industry (for context)
-        - Participant role (for pronoun resolution)
-        - Last 6 conversation turns (for context)
+        Feature flag: USE_REVISED_EXTRACTION_PROMPT controls which prompt version to use
+        - Revised (Nov 2025): Enhanced rating fields, explicit parsing rules, NPS/satisfaction separation
+        - Original: Legacy prompt for rollback safety
         
         Returns SPARSE JSON (only mentioned fields, no nulls).
         """
@@ -489,7 +542,96 @@ class DeterministicSurveyController:
             for msg in recent_history
         ])
         
-        # Build extraction prompt
+        # Use feature flag to select prompt version
+        if USE_REVISED_EXTRACTION_PROMPT:
+            return self._build_revised_extraction_prompt(user_message, company_name, product_description, industry, role, context_snippet)
+        else:
+            return self._build_original_extraction_prompt(user_message, company_name, product_description, industry, role, context_snippet)
+    
+    def _build_revised_extraction_prompt(self, user_message: str, company_name: str, product_description: str, industry: str, role: str, context_snippet: str) -> str:
+        """
+        REVISED extraction prompt (Nov 2025)
+        
+        Key improvements:
+        - Consolidated service/support into single service_rating field
+        - Clear NPS (recommendation) vs overall satisfaction separation
+        - Explicit rating parsing rules (7/10 → 7, no adjective guessing)
+        - Scale normalization instructions for 5-point → 10-point conversion
+        """
+        prompt = f"""Extract structured data from the user's response below.
+
+**STATIC CONTEXT (for understanding only, do NOT restate):**
+- Company: {company_name}
+- Product/Service: {product_description}
+- Industry: {industry}
+- Participant Role: {role}
+
+**RECENT CONVERSATION:**
+{context_snippet}
+
+**USER'S LATEST RESPONSE:**
+{user_message}
+
+**FIELDS YOU MAY FILL:**
+You may fill any of the following fields if the information is clearly present in the current response (or clearly implied from the response + context):
+
+- nps_score (0–10 integer; likelihood to recommend)
+- nps_reasoning (string; why that score)
+- overall_satisfaction_rating (1–10 integer; overall satisfaction, distinct from NPS)
+- detailed_feedback (string; general comments, problems, positives)
+- pricing_satisfaction (string; perception of price vs value, in text)
+- pricing_value_rating (1–10 integer; numeric rating of price/value fairness)
+- service_rating (1–10 integer; ALL service/support/account management/professional services)
+- product_appreciation_rating (1–10 integer; how much they like the product itself)
+- feature_requests (array of strings; concrete requested features or capabilities)
+
+**RATING RULES:**
+- Only fill a numeric rating field when the user gives an explicit number for that aspect
+  (e.g., "I'd give it 7", "7/10", "je dirais 8", "support is 4 out of 10").
+- Map the number to the correct field based on what the user is rating:
+  - overall / global satisfaction → overall_satisfaction_rating
+  - recommendation likelihood → nps_score
+  - service, support, account management, professional services → service_rating
+  - price, value for money, cost vs benefit → pricing_value_rating
+  - the product itself / tool / platform → product_appreciation_rating
+- Accept formats like:
+  - "7", "7/10", "7 sur 10", "4 out of 5"
+- If the scale is clearly 0–10 or 1–10, use the integer as-is.
+- If user gives X/5 or "X out of 5", convert to 10-point scale: (X / 5) * 10, rounded to nearest integer.
+  Example: "4 out of 5" → 8
+- If the scale is unclear or non-numeric, do NOT guess a rating.
+- Do NOT infer numeric ratings from adjectives alone ("good", "average", "excellent") without a number.
+
+**GENERAL EXTRACTION RULES:**
+1. Extract ONLY fields that are explicitly mentioned or clearly implied in the current response
+   (taking STATIC CONTEXT and RECENT CONVERSATION into account for pronouns like "it", "the tool", "the price").
+2. Capture feedback for topics even if they were not asked about yet
+   (e.g., if the user spontaneously comments on price or support, fill pricing_* or service_* fields).
+3. Return SPARSE JSON:
+   - Do NOT include fields that are not mentioned.
+   - Do NOT include null or empty values.
+4. feature_requests:
+   - If the user mentions specific features they want (e.g., "I wish it had X", "you should add Y"),
+     put each feature as a separate string in the feature_requests array.
+5. Do NOT generate questions.
+6. Do NOT assess survey completion or control flow.
+
+**OUTPUT FORMAT:**
+Return ONLY a single JSON object, like:
+{{
+  "field_name_1": value_1,
+  "field_name_2": value_2,
+  ...
+}}"""
+        
+        return prompt
+    
+    def _build_original_extraction_prompt(self, user_message: str, company_name: str, product_description: str, industry: str, role: str, context_snippet: str) -> str:
+        """
+        ORIGINAL extraction prompt (pre-Nov 2025)
+        
+        Kept for rollback safety. Set USE_REVISED_EXTRACTION_PROMPT=false to use this.
+        """
         prompt = f"""Extract structured data from the user's response below.
 
 **STATIC CONTEXT (for understanding only, do NOT restate):**
@@ -1034,17 +1176,19 @@ def finalize_ai_conversational_survey_v2(context: Dict[str, Any]) -> Dict[str, A
         'respondent_name': respondent_name,
         
         # Map extracted data to database fields (V1 compatibility)
+        # Note: As of Nov 2025, extracted_data already contains DB column names
+        # (mapped by _map_extracted_fields_to_db during extraction)
         'nps_score': extracted_data.get('nps_score'),
-        'nps_reasoning': extracted_data.get('nps_reasoning'),
-        # FIX (Nov 23, 2025): Database uses 'recommendation_reason' not 'nps_reasoning'
-        'recommendation_reason': extracted_data.get('nps_reasoning'),
-        'satisfaction_rating': extracted_data.get('satisfaction_rating'),
+        'recommendation_reason': extracted_data.get('recommendation_reason'),  # Already mapped from nps_reasoning
+        'satisfaction_rating': extracted_data.get('satisfaction_rating'),  # Already mapped from overall_satisfaction_rating
         'service_rating': extracted_data.get('service_rating'),
-        'product_value_rating': extracted_data.get('product_value_rating'),
-        'pricing_rating': extracted_data.get('pricing_rating'),
+        'product_value_rating': extracted_data.get('product_value_rating'),  # Already mapped from product_appreciation_rating
+        'pricing_rating': extracted_data.get('pricing_rating'),  # Already mapped from pricing_value_rating
         'support_rating': extracted_data.get('support_rating'),
-        'improvement_feedback': extracted_data.get('improvement_feedback'),
+        'improvement_feedback': extracted_data.get('improvement_feedback'),  # Already mapped from pricing_satisfaction
+        'general_feedback': extracted_data.get('general_feedback'),  # Already mapped from detailed_feedback
         'additional_comments': extracted_data.get('additional_comments'),
+        'feature_requests': extracted_data.get('feature_requests'),  # Already JSON-serialized if array
         'tenure_with_fc': extracted_data.get('tenure_with_fc')
     }
     
