@@ -484,6 +484,10 @@ def edit_draft_campaign(campaign_id):
         campaign.reminder_delay_days = reminder_delay_days
         campaign.language_code = language_code
         
+        # Ensure client_identifier is set (migration safety for old campaigns)
+        if not campaign.client_identifier:
+            campaign.client_identifier = current_account.name
+        
         # Custom email content
         use_custom_email_content = request.form.get('use_custom_email_content') == 'on'
         if campaign.use_custom_email_content != use_custom_email_content:
