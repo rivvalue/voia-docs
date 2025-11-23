@@ -19,7 +19,9 @@ logger = logging.getLogger(__name__)
 
 
 # V2 State Schema Constants
+# FIX (Nov 23, 2025): Added controller_version to schema for proper V2 routing
 V2_STATE_SCHEMA = {
+    'controller_version': 'v2_deterministic',  # CRITICAL: enables V2 finalization routing
     'current_goal_pointer': None,
     'topic_question_counts': {},
     'last_activity': None,
