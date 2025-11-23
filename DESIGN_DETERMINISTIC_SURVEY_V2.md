@@ -393,12 +393,27 @@ def _extract_with_ai(self, user_message: str) -> Dict:
     # Critical for understanding pronouns ("it", "they") and multi-turn clarifications
     conversation_context = self._format_conversation_history(last_n=6)
     
+    # Build static context block for semantic understanding
+    company_name = self.business_account.name
+    product_desc = self.campaign.product_description or self.business_account.product_description
+    industry = self.get_effective_industry()
+    participant_role = self.participant.role
+    campaign_goal = self.campaign.description or self.business_account.company_description
+    
     prompt = f"""You are a data extraction assistant for the VOÏA survey platform.
+
+STATIC CONTEXT (for understanding only, do NOT restate it):
+- Company: {company_name}
+- Product: {product_desc}
+- Industry: {industry}
+- Participant role: {participant_role}
+- Campaign goal: {campaign_goal}
 
 Your task:
 - Read the user's latest response.
 - Extract all clearly provided information relevant to the fields below.
 - Use the previous conversation context ONLY to interpret pronouns or references.
+- Use the static context ONLY to understand domain terminology and resolve ambiguity.
 - Return ONLY the fields that appear in the current user response (directly or through context).
 - Do NOT speculate or infer information not clearly stated.
 
@@ -414,6 +429,7 @@ RULES:
 - Only output fields for which the user clearly provided information.
 - If a field is not mentioned, DO NOT include it in the JSON output at all.
 - Do NOT output null values.
+- Do NOT restate the static context in your extractions.
 - Do NOT generate questions.
 - Do NOT perform survey flow logic.
 - Values must be short, semantic summaries (not long paragraphs).
@@ -421,7 +437,7 @@ RULES:
 
 Examples:
 
-1. Off-topic extraction:
+1. Off-topic extraction with context:
    User says: "It's still unstable and support never replies."
    Output: {{"product_quality_feedback": "unstable", "support_experience_feedback": "support slow to reply"}}
 
@@ -429,10 +445,16 @@ Examples:
    User says: "I'm not sure yet."
    Output: {{}}
 
-3. Pronoun resolution using context:
-   Context shows: Previous discussion about product "Saaspasse"
+3. Pronoun resolution using static + conversation context:
+   Static context: Product = "Saaspasse (SaaS for internal podcasts)"
+   Conversation context: Previous discussion about recording features
    User says: "It crashes frequently"
-   Output: {{"product_quality_feedback": "crashes frequently"}}
+   Output: {{"product_quality_feedback": "crashes frequently during recording"}}
+
+4. Industry-specific terminology preservation:
+   Static context: Industry = "Software", Product = "podcast production SaaS"
+   User says: "The encoding quality is poor"
+   Output: {{"product_quality_feedback": "poor audio encoding quality"}}
 """
     
     # Use configured model (from environment/business settings, NOT hardcoded)
@@ -440,6 +462,13 @@ Examples:
     response = self._call_openai(prompt, model=self.extraction_model)
     return json.loads(response)
 ```
+
+**Static Context Benefits:**
+- **Pronoun resolution**: "It crashes" → LLM knows "it" = actual product name from context
+- **Industry terminology**: LLM uses domain-specific terms (e.g., "throughput" for manufacturing)
+- **Role-appropriate extraction**: End users focus on UX, executives focus on ROI
+- **Off-topic smart capture**: User mentions pricing while discussing product → LLM captures both with proper context
+- **Sparse output**: "do NOT restate" instruction prevents LLM from echoing context back
 
 **Configuration Integration:**
 - `self.extraction_model` sourced from business account or environment config
@@ -490,6 +519,15 @@ def _generate_question_with_ai(
     # Needed to avoid repeating questions and maintain natural flow
     conversation_context = self._format_conversation_history(last_n=6)
     
+    # Build static context block for personalized question generation
+    company_name = self.business_account.name
+    product_desc = self.campaign.product_description or self.business_account.product_description
+    industry = self.get_effective_industry()
+    participant_role = self.participant.role
+    role_label = self._select_persona_template(self.participant)  # "Manager", "C-level executive", etc.
+    conversation_tone = self.campaign.conversation_tone or self.business_account.conversation_tone or "professional"
+    target_clients = self.campaign.target_clients_description or self.business_account.target_clients_description
+    
     follow_up_instruction = ""
     if is_follow_up:
         follow_up_instruction = """
@@ -498,14 +536,29 @@ The user's previous answer was incomplete or vague.
 Ask a clarifying question to get more details.
 """
     
-    prompt = f"""You are VOÏA, a professional survey assistant.
+    prompt = f"""You are VOÏA, an AI-powered customer feedback specialist conducting a survey for {company_name}.
 
-Language: {language}
-Current topic: {goal['topic']}
+STATIC CONTEXT (use to personalize questions):
+- Company: {company_name}
+- Product: {product_desc}
+- Industry: {industry}
+- Target clients: {target_clients}
+- Participant role: {role_label}
+- Conversation tone: {conversation_tone}
+
+CURRENT TOPIC: {goal['topic']}
+Industry-specific hints for this topic: {industry_hints}
 Fields to collect: {missing_fields}
-Industry context: {industry_hints}
+Language: {language}
 
 {follow_up_instruction}
+
+Your task:
+- Generate a natural, conversational question about {goal['topic']}
+- Use the static context to make the question specific and relevant (e.g., mention actual product name, not "the product")
+- Tailor the question to the participant's role ({role_label})
+- Use industry-appropriate terminology from the hints
+- Maintain {conversation_tone} tone
 
 Strict rules:
 - Ask EXACTLY ONE question in {language}
@@ -525,6 +578,13 @@ Generate the next question:"""
     response = self._call_openai(prompt, model=self.question_model)
     return response.strip()
 ```
+
+**Static Context Benefits:**
+- **Personalized questions**: "How satisfied are you with Saaspasse's podcast recording quality?" (not generic "the product")
+- **Role-appropriate depth**: C-level gets strategic questions, end users get UX questions
+- **Industry terminology**: Manufacturing gets "throughput" questions, healthcare gets "compliance" questions
+- **Tone consistency**: Professional vs casual based on business account settings
+- **Natural conversation**: Refers to actual product/company names for authenticity
 
 **Configuration Integration:**
 - `self.question_model` sourced from business account or environment config
