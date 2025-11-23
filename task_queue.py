@@ -154,8 +154,8 @@ class TaskQueue:
                     logger.error(f"Worker {worker_id} failed audit log task")
                     
             elif task_type == 'export_campaign':
-                # Process campaign export task
-                success = self._process_export_task(task_data, worker_id)
+                # Process campaign export task (unified async pattern using BulkOperationJob)
+                success = self._process_export_campaign_task(task_data, worker_id)
                 
                 if success:
                     campaign_id = task_data.get('campaign_id', 'unknown')
@@ -207,6 +207,151 @@ class TaskQueue:
                         
         except Exception as e:
             logger.error(f"Error processing task {task}: {e}")
+    
+    def _process_export_campaign_task(self, task_data, worker_id):
+        """Process campaign export using BulkOperationJob framework (unified async pattern)"""
+        from models import BulkOperationJob, Campaign, SurveyResponse
+        from notification_utils import notify
+        import os
+        
+        job_id = task_data.get('job_id')
+        campaign_id = task_data.get('campaign_id')
+        business_account_id = task_data.get('business_account_id')
+        user_id = task_data.get('user_id')
+        
+        if not all([job_id, campaign_id, business_account_id]):
+            logger.error(f"Export campaign task missing required data")
+            return False
+        
+        try:
+            # Get the job record
+            job = BulkOperationJob.query.filter_by(job_id=job_id).first()
+            if not job:
+                logger.error(f"BulkOperationJob {job_id} not found for export")
+                return False
+            
+            # Update job status to processing
+            job.status = 'processing'
+            job.started_at = datetime.utcnow()
+            job.progress = 10
+            db.session.commit()
+            
+            # Verify campaign access
+            campaign = Campaign.query.filter_by(
+                id=campaign_id,
+                business_account_id=business_account_id
+            ).first()
+            
+            if not campaign:
+                logger.error(f"Campaign {campaign_id} not found or access denied")
+                job.status = 'failed'
+                job.completed_at = datetime.utcnow()
+                job.result = json.dumps({'error': 'Campaign not found or access denied'})
+                db.session.commit()
+                return False
+            
+            job.progress = 20
+            db.session.commit()
+            
+            # Query all responses for this campaign
+            responses = SurveyResponse.query.filter_by(
+                campaign_id=campaign_id
+            ).all()
+            
+            logger.info(f"Export: Found {len(responses)} responses for campaign {campaign_id}")
+            job.progress = 40
+            db.session.commit()
+            
+            # Convert responses to dictionaries
+            data = []
+            for idx, response in enumerate(responses):
+                response_dict = response.to_dict()
+                response_dict['campaign_name'] = campaign.name
+                data.append(response_dict)
+                
+                # Update progress for large exports
+                if len(responses) > 100 and idx % 50 == 0:
+                    progress = 40 + int((idx / len(responses)) * 40)
+                    job.progress = min(progress, 80)
+                    db.session.commit()
+            
+            job.progress = 80
+            db.session.commit()
+            
+            # Create export file
+            export_filename = f"campaign_{campaign_id}_export_{job_id[:8]}.json"
+            export_dir = os.path.join('exports', 'campaigns')
+            os.makedirs(export_dir, exist_ok=True)
+            export_path = os.path.join(export_dir, export_filename)
+            
+            export_data = {
+                'export_info': {
+                    'campaign_id': campaign_id,
+                    'campaign_name': campaign.name,
+                    'business_account_id': business_account_id,
+                    'total_responses': len(responses),
+                    'exported_at': datetime.utcnow().isoformat(),
+                    'exported_by_user_id': user_id
+                },
+                'responses': data
+            }
+            
+            # Write to file
+            with open(export_path, 'w', encoding='utf-8') as f:
+                json.dump(export_data, f, indent=2, ensure_ascii=False)
+            
+            file_size = os.path.getsize(export_path)
+            
+            job.progress = 90
+            db.session.commit()
+            
+            # Mark job as completed with file path in result
+            job.status = 'completed'
+            job.completed_at = datetime.utcnow()
+            job.progress = 100
+            job.result = json.dumps({
+                'file_path': export_path,
+                'file_size': file_size,
+                'total_responses': len(responses),
+                'campaign_name': campaign.name
+            })
+            db.session.commit()
+            
+            # Send success notification
+            notify(
+                business_account_id=business_account_id,
+                user_id=user_id,
+                category='success',
+                message=f"Campaign '{campaign.name}' export completed ({len(responses)} responses)"
+            )
+            
+            logger.info(f"Campaign export completed: {export_path} ({file_size} bytes, {len(responses)} responses)")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Campaign export task error: {e}")
+            db.session.rollback()
+            
+            # Update job status
+            try:
+                job = BulkOperationJob.query.filter_by(job_id=job_id).first()
+                if job:
+                    job.status = 'failed'
+                    job.completed_at = datetime.utcnow()
+                    job.result = json.dumps({'error': str(e)})
+                    db.session.commit()
+                
+                # Send error notification
+                notify(
+                    business_account_id=business_account_id,
+                    user_id=user_id,
+                    category='error',
+                    message=f"Campaign export failed: {str(e)}"
+                )
+            except Exception as notify_error:
+                logger.error(f"Failed to send export error notification: {notify_error}")
+            
+            return False
     
     def _process_email_task(self, task_data, worker_id):
         """Process an email sending task with delivery tracking"""
