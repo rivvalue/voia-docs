@@ -1955,10 +1955,11 @@ Respond with ONLY the JSON object, no other text:"""
         ).filter(Campaign.start_date <= today).all()
         
         # Check for campaigns that need to be completed (active -> completed)
+        # FIX: Use <= instead of < to complete campaigns ON their end_date (at midnight)
         expired_campaigns = Campaign.query.filter_by(
             business_account_id=account_id,
             status='active'
-        ).filter(Campaign.end_date < today).all()
+        ).filter(Campaign.end_date <= today).all()
         
         # Log only when there are campaigns to process
         if ready_campaigns or expired_campaigns:
