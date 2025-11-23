@@ -29,6 +29,11 @@ class FeatureFlags:
         'ui_version_toggle': {
             'enabled': True,  # Allow users to manually toggle UI versions
             'description': 'Manual UI version switcher for testing'
+        },
+        'deterministic_survey_flow': {
+            'enabled': False,  # Master switch - controls if deterministic survey V2 is active
+            'rollout_percentage': 0,  # 0-100: percentage of surveys using deterministic flow
+            'description': 'Deterministic conversational survey controller (V2) - eliminates early-stop bugs'
         }
     }
     
@@ -40,6 +45,8 @@ class FeatureFlags:
         self.settings_hub_rollout = int(os.environ.get('SETTINGS_HUB_ROLLOUT_PERCENTAGE', '0'))
         self.toggle_enabled = os.environ.get('FEATURE_UI_TOGGLE', 'true').lower() == 'true'
         self.force_v2 = os.environ.get('FORCE_V2_FOR_BUSINESS_USERS', 'false').lower() == 'true'
+        self.deterministic_survey_enabled = os.environ.get('DETERMINISTIC_SURVEY_FLOW', 'false').lower() == 'true'
+        self.deterministic_survey_rollout = int(os.environ.get('DETERMINISTIC_SURVEY_ROLLOUT_PERCENTAGE', '0'))
         
         # Update FLAGS dict with runtime values from environment
         self.FLAGS['sidebar_navigation']['enabled'] = self.sidebar_enabled
@@ -47,11 +54,14 @@ class FeatureFlags:
         self.FLAGS['settings_hub_v2']['enabled'] = self.settings_hub_enabled
         self.FLAGS['settings_hub_v2']['rollout_percentage'] = self.settings_hub_rollout
         self.FLAGS['ui_version_toggle']['enabled'] = self.toggle_enabled
+        self.FLAGS['deterministic_survey_flow']['enabled'] = self.deterministic_survey_enabled
+        self.FLAGS['deterministic_survey_flow']['rollout_percentage'] = self.deterministic_survey_rollout
         
         logger.info(f"Feature Flags initialized - Sidebar: {self.sidebar_enabled}, "
                    f"Rollout: {self.rollout_percentage}%, Settings Hub v2: {self.settings_hub_enabled}, "
                    f"Settings Hub Rollout: {self.settings_hub_rollout}%, Toggle: {self.toggle_enabled}, "
-                   f"Force V2: {self.force_v2}")
+                   f"Force V2: {self.force_v2}, Deterministic Survey: {self.deterministic_survey_enabled}, "
+                   f"Deterministic Rollout: {self.deterministic_survey_rollout}%")
     
     def is_feature_enabled(self, feature_name):
         """Check if a feature flag is enabled (reads from updated FLAGS dict)"""
