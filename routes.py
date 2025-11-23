@@ -3050,8 +3050,23 @@ def finalize_conversation():
         survey_data['conversation_history'] = json.dumps(messages)
         
         # FEATURE FLAG: Deterministic Survey Flow V2
-        # Check if this conversation used V2 controller (stored in survey_data metadata)
-        controller_version = survey_data.get('controller_version', 'v1')
+        # FIX (Nov 23, 2025): Load controller_version from ActiveConversation if not in survey_data
+        # Frontend doesn't always send controller_version, so check database
+        from models import ActiveConversation
+        controller_version = survey_data.get('controller_version')
+        if not controller_version:
+            # Load from ActiveConversation if not provided
+            active_conv = ActiveConversation.query.filter_by(conversation_id=conversation_id).first()
+            if active_conv and active_conv.survey_data:
+                try:
+                    persisted_survey_data = json.loads(active_conv.survey_data)
+                    controller_version = persisted_survey_data.get('controller_version', 'v1')
+                    logger.debug(f"Loaded controller_version from ActiveConversation: {controller_version}")
+                except json.JSONDecodeError:
+                    controller_version = 'v1'
+            else:
+                controller_version = 'v1'
+        
         use_deterministic_v2 = (controller_version == 'v2_deterministic')
         
         # Convert conversational data to structured survey format
