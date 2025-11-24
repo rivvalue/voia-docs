@@ -2161,7 +2161,7 @@ Respond with ONLY the JSON object, no other text:"""
             'queue_size': self.task_queue.qsize(),
             'workers': len(self.workers),
             'running': self.running,
-            'last_scheduler_run': self.last_scheduler_run.isoformat() if self.last_scheduler_run else None,
+            'last_scheduler_run': self.last_scheduler_run.isoformat() + 'Z' if self.last_scheduler_run else None,
             'scheduler_interval': self.scheduler_interval
         }
 

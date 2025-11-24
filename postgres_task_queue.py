@@ -552,8 +552,8 @@ class PostgresTaskQueue:
                 'failed_last_hour': status_counts.get('failed', 0),
                 'workers': len(self.workers),
                 'running': self.running,
-                'last_scheduler_run': self.last_scheduler_run.isoformat() if self.last_scheduler_run else None,
-                'last_reconciliation_run': self.last_reconciliation_run.isoformat() if self.last_reconciliation_run else None,
+                'last_scheduler_run': self.last_scheduler_run.isoformat() + 'Z' if self.last_scheduler_run else None,
+                'last_reconciliation_run': self.last_reconciliation_run.isoformat() + 'Z' if self.last_reconciliation_run else None,
                 'scheduler_interval': self.scheduler_interval,
                 'reconciliation_interval': self.reconciliation_interval,
                 'queue_type': 'postgresql'
