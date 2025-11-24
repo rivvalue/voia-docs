@@ -1990,6 +1990,16 @@ def admin_panel():
         # OPTIMIZATION: Serialize all campaigns once without response_count to avoid N+1
         all_campaigns_data = [c.to_dict(response_count=0) for c in campaigns]
         
+        # Get scheduler stats and campaign counts for Settings Hub
+        from task_queue import task_queue
+        scheduler_stats = task_queue.get_stats()
+        campaign_counts = {
+            'draft': Campaign.query.filter_by(business_account_id=business_account.id, status='draft').count(),
+            'ready': Campaign.query.filter_by(business_account_id=business_account.id, status='ready').count(),
+            'active': Campaign.query.filter_by(business_account_id=business_account.id, status='active').count(),
+            'completed': Campaign.query.filter_by(business_account_id=business_account.id, status='completed').count()
+        }
+        
         # Build unified admin data for all account types
         admin_data = {
             'account_type': business_account.account_type,
@@ -2010,7 +2020,9 @@ def admin_panel():
                 }
             },
             'email_configured': email_service.is_configured(),
-            'license_info': license_info
+            'license_info': license_info,
+            'scheduler_stats': scheduler_stats,
+            'campaign_counts': campaign_counts
         }
         
         # Determine UI version (respects FORCE_V2_FOR_BUSINESS_USERS and SIDEBAR_ROLLOUT_PERCENTAGE)
