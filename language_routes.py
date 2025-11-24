@@ -12,6 +12,9 @@ def set_language(lang):
     """
     Set the user's language preference
     
+    For authenticated users: Saves to both session and database (persistent across devices)
+    For anonymous users: Saves to session only (current session only)
+    
     Args:
         lang: Language code ('en' or 'fr')
     
@@ -22,9 +25,26 @@ def set_language(lang):
     if lang not in ['en', 'fr']:
         lang = 'en'
     
-    # Store in session
+    # Store in session (for all users)
     session['language'] = lang
     session.permanent = True  # Make session persistent
+    
+    # For authenticated business users, also save to database (persistent across devices)
+    business_user_id = session.get('business_user_id')
+    if business_user_id:
+        try:
+            from models import BusinessAccountUser
+            from app import db
+            
+            user = BusinessAccountUser.query.get(business_user_id)
+            if user:
+                user.set_language_preference(lang)
+                db.session.commit()
+        except Exception as e:
+            # Log error but don't fail the language change - session language still works
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.warning(f"Could not save language preference to database for user {business_user_id}: {e}")
     
     # Refresh translations
     refresh()

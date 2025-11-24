@@ -102,11 +102,32 @@ app.config['BABEL_SUPPORTED_LOCALES'] = ['en', 'fr']
 app.config['BABEL_TRANSLATION_DIRECTORIES'] = 'translations'
 
 def get_locale():
-    """Determine the best locale to use for this request with fallback protection"""
+    """Determine the best locale to use for this request with fallback protection
+    
+    Priority order:
+    1. Database preference (authenticated business users only)
+    2. Session preference (explicitly selected)
+    3. Browser accept-language header
+    4. Default locale
+    """
     supported_locales = app.config.get('BABEL_SUPPORTED_LOCALES', ['en', 'fr'])
     default_locale = app.config.get('BABEL_DEFAULT_LOCALE', 'en')
     
-    # 1. Check if user explicitly selected a language (stored in session)
+    # 1. Check database preference for authenticated business users (persistent across devices)
+    business_user_id = session.get('business_user_id')
+    if business_user_id:
+        try:
+            from models import BusinessAccountUser
+            user = BusinessAccountUser.query.get(business_user_id)
+            if user:
+                db_lang = user.get_language_preference()
+                if db_lang and db_lang in supported_locales:
+                    return db_lang
+        except Exception as e:
+            # If database query fails, continue with fallback chain
+            logger.warning(f"Error loading user language preference: {e}")
+    
+    # 2. Check if user explicitly selected a language (stored in session)
     if 'language' in session:
         session_lang = session['language']
         # Validate session language is supported, otherwise fall back to default
@@ -117,7 +138,7 @@ def get_locale():
             logger.warning(f"Invalid session language '{session_lang}', falling back to '{default_locale}'")
             return default_locale
     
-    # 2. Try to guess the language from the user accept header
+    # 3. Try to guess the language from the user accept header
     best_match = request.accept_languages.best_match(supported_locales)
     return best_match if best_match else default_locale
 

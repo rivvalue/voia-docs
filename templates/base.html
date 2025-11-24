@@ -163,6 +163,25 @@
                             </a>
                             <div class="user-dropdown-divider"></div>
                             {% endif %}
+                            
+                            <!-- Language Preference -->
+                            <div class="user-dropdown-item-label px-3 py-2 text-muted small">{{ _('Language') }}</div>
+                            <a href="{{ url_for('language.set_language', lang='en') }}" class="user-dropdown-item">
+                                <i class="fas fa-globe"></i>
+                                <span>English</span>
+                                {% if session.get('language', 'en') == 'en' %}
+                                <i class="fas fa-check ms-auto text-success"></i>
+                                {% endif %}
+                            </a>
+                            <a href="{{ url_for('language.set_language', lang='fr') }}" class="user-dropdown-item">
+                                <i class="fas fa-globe"></i>
+                                <span>Français</span>
+                                {% if session.get('language', 'en') == 'fr' %}
+                                <i class="fas fa-check ms-auto text-success"></i>
+                                {% endif %}
+                            </a>
+                            <div class="user-dropdown-divider"></div>
+                            
                             <a href="{{ url_for('business_auth.logout') }}" class="user-dropdown-item">
                                 <i class="fas fa-sign-out-alt"></i>
                                 <span>{{ _('Logout') }}</span>
@@ -189,8 +208,10 @@
                     </div>
                     {% endif %}
                     
-                    <!-- Language toggle - always on the RIGHT -->
+                    <!-- Language toggle - visible for anonymous users only (authenticated users access via account menu) -->
+                    {% if not is_business_authenticated %}
                     {% include 'components/language_selector.html' %}
+                    {% endif %}
                     
                     {% if is_business_authenticated %}
                     <div class="collapse navbar-collapse" id="navbarNav">

@@ -1534,6 +1534,11 @@ def login():
         session['user_role'] = user.role
         session.permanent = True  # 7-day session lifetime for all users (configured in app.py)
         
+        # Load user's language preference into session (persistent across devices)
+        user_language = user.get_language_preference()
+        if user_language:
+            session['language'] = user_language
+        
         logger.info(f"Business account user {email} logged in successfully")
         flash(f'Welcome back, {user.get_full_name()}!', 'success')
         
