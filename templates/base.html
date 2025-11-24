@@ -75,9 +75,7 @@
                 <i class="fas fa-chevron-down submenu-toggle"></i>
             </div>
             <div class="sidebar-submenu" id="biSubmenu">
-                <a href="{{ url_for('dashboard') }}" class="sidebar-submenu-item" data-page="dashboard-overview">
-                    <span>{{ _('Overview') }}</span>
-                </a>
+                <!-- Overview removed - only for unauthenticated demo users -->
                 <a href="{{ url_for('executive_summary') }}" class="sidebar-submenu-item" data-page="executive-summary">
                     <span>{{ _('Executive Summary') }}</span>
                 </a>

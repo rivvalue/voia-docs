@@ -1407,7 +1407,13 @@ def public_survey_response(response_id):
 
 @app.route('/dashboard')
 def dashboard():
-    """Dashboard showing survey results and insights"""
+    """Dashboard showing survey results and insights (unauthenticated demo users only)"""
+    # Redirect authenticated users to Executive Summary
+    current_business_user = get_current_business_user()
+    if current_business_user is not None:
+        logger.info(f"Authenticated user {current_business_user.email} redirected from /dashboard to /executive-summary")
+        return redirect(url_for('executive_summary'))
+    
     # Store this page as the last BI page for back navigation
     session['last_bi_page'] = url_for('dashboard')
     
@@ -1423,19 +1429,12 @@ def dashboard():
     auth_token = session.get('auth_token')
     user_email = auth_email if (auth_token and auth_email) else None
     
-    # Check if user is authenticated as business user
-    current_business_user = get_current_business_user()
-    is_business_authenticated = current_business_user is not None
-    business_user_name = f"{current_business_user.first_name} {current_business_user.last_name}" if current_business_user else None
+    # This route is only for unauthenticated users (authenticated users redirected above)
+    is_business_authenticated = False
+    business_user_name = None
     
-    # Get branding context based on authentication
-    if is_business_authenticated and current_business_user:
-        # Authenticated business user - get their branding
-        business_account_id = current_business_user.business_account_id
-        branding_context = get_branding_context(business_account_id)
-    else:
-        # Trial/demo user - get demo branding (Archelo Group - ID 1)
-        branding_context = get_branding_context(business_account_id=1)
+    # Unauthenticated demo user - get demo branding (Archelo Group - ID 1)
+    branding_context = get_branding_context(business_account_id=1)
     
     return render_template('dashboard.html', 
                          company_nps_data=company_nps_data, 
