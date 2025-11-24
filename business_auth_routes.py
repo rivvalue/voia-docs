@@ -2013,11 +2013,12 @@ def admin_panel():
             'license_info': license_info
         }
         
-        # Check if Settings Hub v2 is enabled
+        # Determine UI version (respects FORCE_V2_FOR_BUSINESS_USERS and SIDEBAR_ROLLOUT_PERCENTAGE)
+        ui_version = feature_flags.get_ui_version(user_id=user_id)
         template_name = 'business_auth/admin_panel.html'
-        if feature_flags.is_feature_enabled('settings_hub_v2'):
+        if ui_version == 'v2':
             template_name = 'business_auth/admin_panel_v2.html'
-            logger.info(f"Settings Hub v2 enabled for user {current_business_user.email}")
+            logger.info(f"Admin panel v2 for user {current_business_user.email} (ui_version={ui_version})")
         
         return render_template(template_name,
                              business_account=business_account,
