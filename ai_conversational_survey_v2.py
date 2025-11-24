@@ -368,7 +368,7 @@ class DeterministicSurveyController:
         Handles:
         - Field name translation (overall_satisfaction_rating → satisfaction_rating)
         - Feature requests JSON serialization (array → JSON string)
-        - Rating range validation (0-10 scale enforcement)
+        - Rating range validation (NPS: 0-10, others: 0-5 scale enforcement)
         - Both revised and original prompt field names for compatibility
         
         Args:
@@ -683,16 +683,20 @@ Return ONLY a single JSON object, like:
 **EXTRACTION INSTRUCTIONS:**
 1. Extract ONLY fields that are explicitly mentioned or clearly implied
 2. Return SPARSE JSON (do NOT include null/empty fields)
-3. Use these field names if mentioned:
-   - nps_score (0-10 integer)
+3. Use these field names if mentioned (note the different scales):
+   - nps_score (0-10 integer; recommendation likelihood)
    - nps_reasoning (string)
-   - satisfaction_rating (1-10 integer)
+   - satisfaction_rating (0-5 integer; overall satisfaction)
+   - service_rating (0-5 integer; service/support quality)
+   - pricing_rating (0-5 integer; price/value rating)
+   - product_value_rating (0-5 integer; product quality)
+   - support_rating (0-5 integer; support quality)
    - detailed_feedback (string)
    - pricing_satisfaction (string)
-   - support_rating (1-10 integer)
    - feature_requests (array of strings)
    
-4. If user provides data for topics we haven't asked about yet, capture it anyway
+4. SCALE RULES: NPS uses 0-10, all other ratings use 0-5. Convert if needed.
+5. If user provides data for topics we haven't asked about yet, capture it anyway
 
 **OUTPUT FORMAT:**
 {{
