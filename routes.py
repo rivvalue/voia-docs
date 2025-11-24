@@ -3665,7 +3665,9 @@ def company_responses_page(company_name):
         campaign_id = request.args.get('campaign', type=int)
         if not campaign_id:
             flash('L’identifiant de la campagne est requis.', 'error')
-            return redirect(url_for('dashboard'))
+            # Redirect based on auth status
+            current_user_check = get_current_business_user()
+            return redirect(url_for('executive_summary') if current_user_check else url_for('dashboard'))
         
         # Check authentication and get campaign
         current_business_user = get_current_business_user()
@@ -3682,11 +3684,11 @@ def company_responses_page(company_name):
                 campaign = Campaign.query.filter_by(id=campaign_id, business_account_id=demo_account.id).first()
             else:
                 flash('Compte de démonstration non disponible.', 'error')
-                return redirect(url_for('dashboard'))
+                return redirect(url_for('dashboard'))  # Public users only reach here
         
         if not campaign:
             flash('Campagne introuvable ou inaccessible.', 'error')
-            return redirect(url_for('dashboard'))
+            return redirect(url_for('executive_summary') if current_business_user else url_for('dashboard'))
         
         # Check if user is authenticated as business user
         is_business_authenticated = current_business_user is not None
@@ -3726,7 +3728,9 @@ def company_responses_page(company_name):
     except Exception as e:
         logger.error(f"Error loading company responses page: {e}")
         flash('Erreur lors du chargement des réponses de l’entreprise.', 'error')
-        return redirect(url_for('dashboard'))
+        # Redirect based on authentication  
+        current_user_check = get_current_business_user()
+        return redirect(url_for('executive_summary') if current_user_check else url_for('dashboard'))
 
 @app.route('/admin/regenerate-survey-tokens', methods=['GET'])
 def regenerate_all_survey_tokens():
