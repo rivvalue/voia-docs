@@ -272,9 +272,10 @@
 {% endif %}
 
 <script>
-// Pass authentication status to JavaScript
+// Pass authentication status and localized strings to JavaScript
 window.isAuthenticated = {{ 'true' if authenticated else 'false' }};
 window.userEmail = '{{ email or '' }}';
+window.typingIndicatorText = "{{ _('VOÏA is typing...') }}";
 
 // Authentication status passed to JavaScript (server-side token invalidation now implemented)  
 console.log('Conversational survey loaded - Server-side token invalidation active');

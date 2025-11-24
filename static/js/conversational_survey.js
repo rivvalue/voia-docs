@@ -528,11 +528,15 @@ function showTypingIndicator() {
     const typingElement = document.createElement('div');
     typingElement.id = 'typingIndicator';
     typingElement.className = 'typing-indicator';
+    
+    // Use translated text from window context, fallback to English if not available
+    const typingText = window.typingIndicatorText || 'VOÏA is typing...';
+    
     typingElement.innerHTML = `
         <div class="spinner-border spinner-border-sm" role="status">
             <span class="visually-hidden">Loading...</span>
         </div>
-        VOÏA is typing...
+        ${typingText}
     `;
     
     chatMessages.appendChild(typingElement);
