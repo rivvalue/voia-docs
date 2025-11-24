@@ -101,7 +101,7 @@
 /* Notification Bell Button */
 .notification-bell {
     color: #6c757d !important;
-    font-size: 1.25rem;
+    font-size: 1.1rem;
     transition: all 0.2s ease;
     border-radius: 50%;
     width: 48px;
@@ -280,7 +280,7 @@
     .notification-bell {
         width: 44px;
         height: 44px;
-        font-size: 1.1rem;
+        font-size: 1rem;
     }
     
     .notification-header {
