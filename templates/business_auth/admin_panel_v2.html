@@ -540,6 +540,175 @@
     }
 }
 
+/* V2 Confirmation Modal Styles */
+.v2-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: modalFadeIn 0.2s ease-out;
+}
+
+.v2-modal-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.v2-modal-dialog {
+    position: relative;
+    background: var(--primary-white);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-xl);
+    max-width: 500px;
+    width: 90%;
+    margin: var(--spacing-xl);
+    animation: modalSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+.v2-modal-header {
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    padding: var(--spacing-xl);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+}
+
+.v2-modal-title {
+    font-family: var(--font-family-headings);
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--primary-white);
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.v2-modal-close {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: var(--primary-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.v2-modal-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+}
+
+.v2-modal-body {
+    padding: var(--spacing-xl);
+}
+
+.v2-modal-description {
+    font-size: var(--font-size-base);
+    color: var(--primary-black);
+    margin: 0 0 var(--spacing-lg) 0;
+    line-height: 1.6;
+}
+
+.v2-modal-warning {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    background: rgba(225, 58, 68, 0.1);
+    border-left: 4px solid var(--primary-red);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    color: var(--gray-dark);
+}
+
+.v2-modal-warning i {
+    color: var(--primary-red);
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.v2-modal-footer {
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border-top: 1px solid var(--light-gray);
+    display: flex;
+    gap: var(--spacing-sm);
+    justify-content: flex-end;
+    background: rgba(225, 58, 68, 0.02);
+}
+
+.v2-modal-footer .btn {
+    min-width: 120px;
+}
+
+/* Modal animations */
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Prevent body scroll when modal is open */
+body.modal-open {
+    overflow: hidden;
+}
+
+/* Mobile modal adjustments */
+@media (max-width: 767px) {
+    .v2-modal-dialog {
+        width: 95%;
+        margin: var(--spacing-md);
+    }
+    
+    .v2-modal-header {
+        padding: var(--spacing-lg);
+    }
+    
+    .v2-modal-body {
+        padding: var(--spacing-lg);
+    }
+    
+    .v2-modal-footer {
+        flex-direction: column;
+        padding: var(--spacing-md) var(--spacing-lg);
+    }
+    
+    .v2-modal-footer .btn {
+        width: 100%;
+    }
+}
+
 /* Accessibility */
 .settings-card-header:focus {
     outline: 3px solid var(--primary-red);
@@ -548,6 +717,11 @@
 
 .settings-card-header:focus:not(:focus-visible) {
     outline: none;
+}
+
+.v2-modal-close:focus {
+    outline: 2px solid var(--primary-white);
+    outline-offset: 2px;
 }
 </style>
 
@@ -896,7 +1070,7 @@
                                 </div>
                                 <div class="scheduler-status-info">
                                     <strong>{{ _('Last Run:') }}</strong>
-                                    <span id="scheduler-last-run">{{ admin_data.scheduler_stats.last_scheduler_run or _('Never') }}</span>
+                                    <span id="scheduler-last-run" data-utc-time="{{ admin_data.scheduler_stats.last_scheduler_run or '' }}">{{ _('Loading...') }}</span>
                                 </div>
                             </div>
                             
@@ -1061,6 +1235,38 @@
             </div>
         </div>
         {% endif %}
+    </div>
+    
+    <!-- V2 Confirmation Modal for Force Scheduler Run -->
+    <div id="schedulerConfirmModal" class="v2-modal-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="schedulerModalTitle" aria-describedby="schedulerModalDesc">
+        <div class="v2-modal-backdrop" onclick="hideSchedulerModal()"></div>
+        <div class="v2-modal-dialog">
+            <div class="v2-modal-header">
+                <h3 class="v2-modal-title" id="schedulerModalTitle">
+                    <i class="fas fa-exclamation-triangle me-2"></i>{{ _('Confirm Scheduler Run') }}
+                </h3>
+                <button class="v2-modal-close" onclick="hideSchedulerModal()" aria-label="{{ _('Close') }}">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="v2-modal-body">
+                <p id="schedulerModalDesc" class="v2-modal-description">
+                    {{ _('Are you sure you want to force a scheduler run? This will immediately process all campaigns and trigger automatic status transitions.') }}
+                </p>
+                <div class="v2-modal-warning">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <span>{{ _('This action cannot be undone. Campaign statuses may change based on start/end dates.') }}</span>
+                </div>
+            </div>
+            <div class="v2-modal-footer">
+                <button class="btn btn-outline-secondary" onclick="hideSchedulerModal()">
+                    <i class="fas fa-times me-1"></i>{{ _('Cancel') }}
+                </button>
+                <button class="btn btn-danger" onclick="confirmSchedulerRun()" id="confirmSchedulerBtn">
+                    <i class="fas fa-play me-1"></i>{{ _('Force Run') }}
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
@@ -1285,7 +1491,13 @@ function updateSchedulerUI(data) {
     // Update last run time
     const lastRun = document.getElementById('scheduler-last-run');
     if (lastRun) {
-        lastRun.textContent = scheduler.last_scheduler_run || '{{ _("Never") }}';
+        const utcTime = scheduler.last_scheduler_run;
+        if (utcTime && utcTime !== 'Never') {
+            lastRun.setAttribute('data-utc-time', utcTime);
+            lastRun.textContent = formatSchedulerDateTime(utcTime);
+        } else {
+            lastRun.textContent = '{{ _("Never") }}';
+        }
     }
     
     // Update campaign counts
@@ -1303,18 +1515,53 @@ function updateSchedulerUI(data) {
     }
 }
 
-// Campaign Scheduler - Force run
+// Campaign Scheduler - Show confirmation modal
 function forceSchedulerRun(e) {
     if (e) e.stopPropagation();
+    showSchedulerModal();
+}
+
+// V2 Modal - Show
+function showSchedulerModal() {
+    const modal = document.getElementById('schedulerConfirmModal');
+    const confirmBtn = document.getElementById('confirmSchedulerBtn');
     
-    if (!confirm('{{ _("Are you sure you want to force a scheduler run? This will immediately process all campaigns.") }}')) {
-        return;
+    // Reset button state
+    confirmBtn.disabled = false;
+    confirmBtn.innerHTML = '<i class="fas fa-play me-1"></i>{{ _("Force Run") }}';
+    
+    // Show modal
+    modal.style.display = 'flex';
+    document.body.classList.add('modal-open');
+    
+    // Focus on confirm button
+    setTimeout(() => confirmBtn.focus(), 100);
+    
+    // Store trigger element for focus restoration
+    modal.dataset.triggerElement = document.activeElement?.id || '';
+}
+
+// V2 Modal - Hide
+function hideSchedulerModal() {
+    const modal = document.getElementById('schedulerConfirmModal');
+    modal.style.display = 'none';
+    document.body.classList.remove('modal-open');
+    
+    // Restore focus to trigger element
+    const triggerId = modal.dataset.triggerElement;
+    if (triggerId) {
+        const trigger = document.getElementById(triggerId);
+        if (trigger) trigger.focus();
     }
+}
+
+// V2 Modal - Confirm scheduler run
+function confirmSchedulerRun() {
+    const confirmBtn = document.getElementById('confirmSchedulerBtn');
+    const originalText = confirmBtn.innerHTML;
     
-    const btn = event.currentTarget;
-    const originalText = btn.innerHTML;
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>{{ _("Running...") }}';
+    confirmBtn.disabled = true;
+    confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>{{ _("Running...") }}';
     
     fetch('/business/admin/scheduler/run', {
         method: 'POST',
@@ -1324,27 +1571,79 @@ function forceSchedulerRun(e) {
         }
     })
         .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-            return response.json();
+            return response.json().then(data => {
+                if (!response.ok) {
+                    throw new Error(data.error || `HTTP ${response.status}: ${response.statusText}`);
+                }
+                return data;
+            });
         })
         .then(data => {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-check me-1"></i>{{ _("Success") }}';
+            confirmBtn.innerHTML = '<i class="fas fa-check me-1"></i>{{ _("Success") }}';
+            console.log('Scheduler run result:', data);
             
-            // Refresh status after successful force run
+            // Close modal and refresh after success
             setTimeout(() => {
-                btn.innerHTML = originalText;
+                hideSchedulerModal();
                 refreshSchedulerStatus();
-            }, 2000);
+            }, 1500);
         })
         .catch(error => {
             console.error('Force run failed:', error);
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-times-circle me-1"></i>{{ _("Failed") }}';
-            setTimeout(() => { btn.innerHTML = originalText; }, 3000);
+            confirmBtn.disabled = false;
+            confirmBtn.innerHTML = '<i class="fas fa-times-circle me-1"></i>{{ _("Failed") }}';
+            
+            // Show error alert
+            alert('{{ _("Scheduler run failed:") }} ' + error.message);
+            
+            setTimeout(() => { 
+                confirmBtn.innerHTML = originalText;
+                confirmBtn.disabled = false;
+            }, 3000);
         });
 }
+
+// Format UTC datetime to local timezone (for scheduler last run)
+function formatSchedulerDateTime(utcString) {
+    if (!utcString || utcString === 'Never') return '{{ _("Never") }}';
+    
+    try {
+        const date = new Date(utcString);
+        return date.toLocaleString(undefined, {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+    } catch (e) {
+        console.error('Failed to format date:', utcString, e);
+        return utcString;
+    }
+}
+
+// Initialize scheduler last run time on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const lastRunEl = document.getElementById('scheduler-last-run');
+    if (lastRunEl) {
+        const utcTime = lastRunEl.getAttribute('data-utc-time');
+        if (utcTime && utcTime !== '') {
+            lastRunEl.textContent = formatSchedulerDateTime(utcTime);
+        } else {
+            lastRunEl.textContent = '{{ _("Never") }}';
+        }
+    }
+});
+
+// ESC key handler for modal
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        const modal = document.getElementById('schedulerConfirmModal');
+        if (modal && modal.style.display === 'flex') {
+            hideSchedulerModal();
+        }
+    }
+});
 </script>
 {% endblock %}
