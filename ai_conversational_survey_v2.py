@@ -604,28 +604,29 @@ You may fill any of the following fields if the information is clearly present i
 
 - nps_score (0–10 integer; likelihood to recommend)
 - nps_reasoning (string; why that score)
-- overall_satisfaction_rating (1–10 integer; overall satisfaction, distinct from NPS)
+- overall_satisfaction_rating (0–5 integer; overall satisfaction, distinct from NPS)
 - detailed_feedback (string; general comments, problems, positives)
 - pricing_satisfaction (string; perception of price vs value, in text)
-- pricing_value_rating (1–10 integer; numeric rating of price/value fairness)
-- service_rating (1–10 integer; ALL service/support/account management/professional services)
-- product_appreciation_rating (1–10 integer; how much they like the product itself)
+- pricing_value_rating (0–5 integer; numeric rating of price/value fairness)
+- service_rating (0–5 integer; ALL service/support/account management/professional services)
+- product_appreciation_rating (0–5 integer; how much they like the product itself)
 - feature_requests (array of strings; concrete requested features or capabilities)
 
 **RATING RULES:**
 - Only fill a numeric rating field when the user gives an explicit number for that aspect
-  (e.g., "I'd give it 7", "7/10", "je dirais 8", "support is 4 out of 10").
+  (e.g., "I'd give it 7", "7/10", "je dirais 8", "support is 4 out of 5").
 - Map the number to the correct field based on what the user is rating:
-  - overall / global satisfaction → overall_satisfaction_rating
-  - recommendation likelihood → nps_score
-  - service, support, account management, professional services → service_rating
-  - price, value for money, cost vs benefit → pricing_value_rating
-  - the product itself / tool / platform → product_appreciation_rating
-- Accept formats like:
-  - "7", "7/10", "7 sur 10", "4 out of 5"
-- If the scale is clearly 0–10 or 1–10, use the integer as-is.
-- If user gives X/5 or "X out of 5", convert to 10-point scale: (X / 5) * 10, rounded to nearest integer.
-  Example: "4 out of 5" → 8
+  - overall / global satisfaction → overall_satisfaction_rating (0-5 scale)
+  - recommendation likelihood → nps_score (0-10 scale)
+  - service, support, account management, professional services → service_rating (0-5 scale)
+  - price, value for money, cost vs benefit → pricing_value_rating (0-5 scale)
+  - the product itself / tool / platform → product_appreciation_rating (0-5 scale)
+- **SCALE HANDLING:**
+  - For NPS (recommendation): Use 0-10 scale. Accept "7", "7/10", "7 sur 10" as 7.
+  - For satisfaction/service/pricing/product: Use 0-5 scale. Accept "4", "4/5", "4 out of 5" as 4.
+  - If user gives rating on wrong scale, convert intelligently:
+    * "8/10 for satisfaction" → convert to 0-5 scale: round((8/10)*5) = 4
+    * "4 out of 5 for recommendation" → convert to 0-10 scale: (4/5)*10 = 8
 - If the scale is unclear or non-numeric, do NOT guess a rating.
 - Do NOT infer numeric ratings from adjectives alone ("good", "average", "excellent") without a number.
 
