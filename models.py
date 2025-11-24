@@ -1825,6 +1825,9 @@ class BusinessAccountUser(UserMixin, db.Model):
     onboarding_version = db.Column(db.Integer, nullable=True, default=1)
     onboarding_completed_at = db.Column(db.DateTime, nullable=True, index=True)
     
+    # User Preferences
+    language_preference = db.Column(db.String(10), nullable=True)  # 'en' or 'fr' - user's preferred language across all devices
+    
     # Timestamps
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -1931,6 +1934,20 @@ class BusinessAccountUser(UserMixin, db.Model):
     def update_last_login(self):
         """Update last login timestamp"""
         self.last_login_at = datetime.utcnow()
+    
+    def get_language_preference(self):
+        """Get user's language preference, returns 'en', 'fr', or None if not set"""
+        if self.language_preference and self.language_preference in ['en', 'fr']:
+            return self.language_preference
+        return None
+    
+    def set_language_preference(self, language):
+        """Set user's language preference (validates to 'en' or 'fr' only)"""
+        if language in ['en', 'fr']:
+            self.language_preference = language
+            self.updated_at = datetime.utcnow()
+            return True
+        return False
     
     @property
     def is_authenticated(self):
