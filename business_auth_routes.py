@@ -2532,10 +2532,14 @@ def force_scheduler_run():
                 })
             flash(message, 'success')
         else:
-            message = "Scheduler execution failed. Check server logs for details."
+            # Provide more helpful error message
+            message = "The scheduler is currently running or was recently executed. Please wait a moment and try again."
             if request.is_json:
-                return jsonify({'error': message}), 500
-            flash(message, 'error')
+                return jsonify({
+                    'error': message,
+                    'info': 'The scheduler uses locks to prevent concurrent execution. This ensures data consistency.'
+                }), 409  # 409 Conflict status code
+            flash(message, 'warning')
         
         return redirect(url_for('business_auth.admin_panel'))
         

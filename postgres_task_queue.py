@@ -647,27 +647,53 @@ class PostgresTaskQueue:
                 db.session.rollback()
     
     def force_scheduler_run(self):
-        """Force immediate scheduler run (for admin testing) with lock protection"""
+        """Force immediate scheduler run (for admin testing)
+        
+        Uses the same lock as automatic scheduler to prevent concurrent execution.
+        If scheduler is currently running, this will wait briefly then return false.
+        """
         logger.info("Force running PostgreSQL queue scheduler...")
         try:
             from task_queue import TaskQueue
+            from sqlalchemy import text
             temp_queue = TaskQueue()
             
             with app.app_context():
-                lock_acquired = temp_queue._acquire_scheduler_lock(123456)
+                # Use same lock ID (123456) as automatic scheduler to prevent concurrent runs
+                scheduler_lock_id = 123456
+                
+                # Try to acquire lock (non-blocking)
+                lock_acquired = temp_queue._acquire_scheduler_lock(scheduler_lock_id)
                 
                 if lock_acquired:
                     try:
+                        logger.info("Lock acquired - executing scheduler...")
                         temp_queue._run_campaign_scheduler()
                         self.last_scheduler_run = datetime.utcnow()
+                        logger.info("Forced scheduler run completed successfully")
                         return True
                     finally:
-                        temp_queue._release_scheduler_lock(123456)
+                        temp_queue._release_scheduler_lock(scheduler_lock_id)
                 else:
-                    logger.warning("Could not acquire scheduler lock for forced run")
+                    # Check if automatic scheduler is running by querying pg_locks
+                    result = db.session.execute(
+                        text("""
+                            SELECT COUNT(*) 
+                            FROM pg_locks 
+                            WHERE locktype = 'advisory' 
+                            AND objid = :lock_id
+                            AND granted = true
+                        """),
+                        {"lock_id": scheduler_lock_id}
+                    ).scalar()
+                    
+                    if result > 0:
+                        logger.info("Scheduler is currently running - forced run skipped")
+                    else:
+                        logger.warning("Could not acquire scheduler lock - reason unknown")
                     return False
         except Exception as e:
-            logger.error(f"Forced scheduler run failed: {e}")
+            logger.error(f"Forced scheduler run failed: {e}", exc_info=True)
             return False
     def recover_stale_tasks(self, stale_threshold_minutes=10):
         """
