@@ -391,14 +391,20 @@ class DeterministicSurveyController:
                 db_ready[db_field] = json.dumps(value)
                 continue
             
-            # Rating validation (ensure 0-10 range for integer ratings)
+            # Rating validation with scale-specific ranges
             if db_field in ['nps_score', 'satisfaction_rating', 'pricing_rating', 
                            'service_rating', 'product_value_rating', 'support_rating']:
                 if isinstance(value, (int, float)):
-                    # Clamp to valid range (0-10)
-                    validated_rating = max(0, min(10, int(round(value))))
+                    # NPS uses 0-10 scale, others use 0-5 scale
+                    if db_field == 'nps_score':
+                        max_value = 10
+                    else:
+                        max_value = 5
+                    
+                    # Clamp to valid range
+                    validated_rating = max(0, min(max_value, int(round(value))))
                     if validated_rating != value:
-                        logger.warning(f"Rating out of range: {prompt_field}={value}, clamped to {validated_rating}")
+                        logger.warning(f"Rating out of range: {prompt_field}={value}, clamped to {validated_rating} (scale: 0-{max_value})")
                     db_ready[db_field] = validated_rating
                 else:
                     logger.warning(f"Non-numeric rating ignored: {prompt_field}={value}")
