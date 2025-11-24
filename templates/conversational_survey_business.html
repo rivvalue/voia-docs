@@ -211,9 +211,10 @@
 
 {% block scripts %}
 <script>
-// Pass authentication status to JavaScript
+// Pass authentication status and localized strings to JavaScript
 window.isAuthenticated = {{ 'true' if authenticated else 'false' }};
 window.userEmail = '{{ email or '' }}';
+window.typingIndicatorText = "{{ _('VOÏA is typing...') }}";
 </script>
 <script src="{{ url_for('static', filename='js/conversational_survey.js') }}"></script>
 {% endblock %}
