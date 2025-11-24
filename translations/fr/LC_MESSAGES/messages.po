@@ -1237,6 +1237,10 @@ msgstr "Traitement de la réponse"
 msgid "VOÏA is processing your response..."
 msgstr "VOÏA traite votre réponse..."
 
+#: static/js/conversational_survey.js:535
+msgid "VOÏA is typing..."
+msgstr "VOÏA écrit..."
+
 #: templates/conversational_survey.html:208
 #: templates/conversational_survey_business.html:169
 msgid "Please wait while VOÏA analyzes your feedback"
