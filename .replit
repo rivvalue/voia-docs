@@ -100,3 +100,15 @@ integrations = ["python_openai==1.0.0", "styling_replit==1.0.0", "python_databas
 
 [userenv.shared]
 DETERMINISTIC_SURVEY_FLOW = "true"
+PERF_MONITORING = "true"
+ENABLE_WORKER_SCALING = "true"
+GUNICORN_WORKERS = "4"
+USE_ASYNC_WORKERS = "true"
+OPTIMIZE_DB_POOL = "true"
+USE_OPTIMIZED_QUERIES = "true"
+ENABLE_EAGER_LOADING = "true"
+ENABLE_COMPRESSION = "false"
+FEATURE_SETTINGS_HUB_V2 = "true"
+USE_REFACTORED_FRONTEND = "false"
+USE_OPTIMIZED_DASHBOARD = "true"
+ERROR_MONITORING_DEBUG = "true"
