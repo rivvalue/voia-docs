@@ -113,10 +113,10 @@ window.CampaignFormI18n = {
                 </div>
                 
                 <div class="mb-3">
-                    <label for="description" class="form-label">{{ _('Description') }}</label>
+                    <label for="description" class="form-label">{{ _('Description') }} <span class="text-danger">*</span></label>
                     <textarea class="form-control" id="description" name="description" rows="3" 
-                              placeholder={{ _('Optional description of campaign goals, focus areas, or target audience') }}></textarea>
-                    <div class="form-text">{{ _('Optional details about this campaign\'s purpose and scope') }}</div>
+                              placeholder="{{ _('Describe campaign goals, focus areas, or target audience') }}"></textarea>
+                    <div class="form-text">{{ _('Required to mark the campaign as Ready') }}</div>
                 </div>
                 
                 <div class="mb-3">
