@@ -172,15 +172,29 @@ class AuthConsistencyTests:
             'expected_failures': 0,
             'details': []
         }
+        self._business_id = None
+        self._user_id = None
+        self._campaign_id = None
     
     def setup(self):
-        """Set up test environment"""
-        with app.app_context():
-            self.business = self.fixtures.create_test_business()
-            self.user = self.fixtures.create_test_user(self.business)
-            self.fixtures.ensure_license(self.business)
-            self.campaign = self.fixtures.create_test_campaign(self.business)
-            return self.business, self.user, self.campaign
+        """Set up test environment - returns fresh objects within current app context"""
+        business = self.fixtures.create_test_business()
+        user = self.fixtures.create_test_user(business)
+        self.fixtures.ensure_license(business)
+        campaign = self.fixtures.create_test_campaign(business)
+        
+        self._business_id = business.id
+        self._user_id = user.id
+        self._campaign_id = campaign.id
+        
+        return business, user, campaign
+    
+    def get_fresh_objects(self):
+        """Get fresh objects from database within current context"""
+        business = BusinessAccount.query.get(self._business_id)
+        user = BusinessAccountUser.query.get(self._user_id)
+        campaign = Campaign.query.get(self._campaign_id) if self._campaign_id else None
+        return business, user, campaign
     
     def teardown(self):
         """Clean up test environment"""
@@ -203,6 +217,7 @@ class AuthConsistencyTests:
         
         with app.app_context():
             business, user, campaign = self.setup()
+            business, user, campaign = self.get_fresh_objects()
             valid_session = self.fixtures.create_valid_session(user)
             
             with app.test_client() as client:
@@ -242,6 +257,7 @@ class AuthConsistencyTests:
         
         with app.app_context():
             business, user, campaign = self.setup()
+            business, user, campaign = self.get_fresh_objects()
             valid_session = self.fixtures.create_valid_session(user)
             
             with app.test_client() as client:
@@ -295,6 +311,7 @@ class AuthConsistencyTests:
         
         with app.app_context():
             business, user, campaign = self.setup()
+            business, user, campaign = self.get_fresh_objects()
             expired_session = self.fixtures.create_expired_session(user)
             
             with app.test_client() as client:
@@ -331,6 +348,7 @@ class AuthConsistencyTests:
         
         with app.app_context():
             business, user, campaign = self.setup()
+            business, user, campaign = self.get_fresh_objects()
             inactive_session = self.fixtures.create_inactive_session(user)
             
             with app.test_client() as client:
@@ -367,6 +385,7 @@ class AuthConsistencyTests:
         
         with app.app_context():
             business, user, campaign = self.setup()
+            business, user, campaign = self.get_fresh_objects()
             fake_session_id = str(uuid.uuid4())
             
             with app.test_client() as client:
@@ -397,6 +416,48 @@ class AuthConsistencyTests:
                     else:
                         print(f"  ⚠️ {name}: HTTP {response.status_code}")
     
+    def test_scenario_6_soft_fallback_enabled(self):
+        """Scenario 6 (Phase B): With AUTH_SOFT_FALLBACK enabled, should show session expired page"""
+        print("\n=== Scenario 6: Soft Fallback Enabled (Phase B) ===")
+        
+        from feature_flags import feature_flags
+        
+        if not feature_flags.auth_soft_fallback_enabled:
+            print("  ⏭️ Skipped: AUTH_SOFT_FALLBACK flag is disabled")
+            return
+        
+        with app.app_context():
+            business, user, campaign = self.setup()
+            business, user, campaign = self.get_fresh_objects()
+            
+            with app.test_client() as client:
+                self._simulate_session(
+                    client, 
+                    user_id=user.id,
+                    business_account_id=business.id
+                )
+                
+                bi_routes = [
+                    ('/dashboard/executive-summary', 'Executive Summary (BI)'),
+                    ('/dashboard/campaign-insights', 'Campaign Insights (BI)'),
+                ]
+                
+                print("  BI Routes (Expected HTTP 401 with session expired page):")
+                for route, name in bi_routes:
+                    response = client.get(route, follow_redirects=False)
+                    if response.status_code == 401:
+                        if b'Session Expired' in response.data or b'session_expired' in response.data:
+                            print(f"    ✅ {name}: HTTP 401 with session expired page (SOFT FALLBACK WORKS)")
+                            self.results['passed'] += 1
+                        else:
+                            print(f"    ⚠️ {name}: HTTP 401 but unexpected content")
+                    elif response.status_code == 302:
+                        location = response.headers.get('Location', '')
+                        print(f"    ❌ {name}: Redirected to {location} (soft fallback not working)")
+                        self.results['failed'] += 1
+                    else:
+                        print(f"    ⚠️ {name}: HTTP {response.status_code}")
+    
     def run_all_tests(self):
         """Run all authentication consistency tests"""
         print("=" * 60)
@@ -410,6 +471,7 @@ class AuthConsistencyTests:
             self.test_scenario_3_expired_session()
             self.test_scenario_4_inactive_session()
             self.test_scenario_5_nonexistent_session_id()
+            self.test_scenario_6_soft_fallback_enabled()
         finally:
             self.teardown()
         
