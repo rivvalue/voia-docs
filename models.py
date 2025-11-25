@@ -190,11 +190,8 @@ class Campaign(db.Model):
     """Campaign model for tracking feedback collection periods"""
     __tablename__ = 'campaigns'
     __table_args__ = (
-        # Partial unique index to enforce single active campaign per business account
-        db.Index('idx_single_active_campaign_per_account', 
-                'business_account_id', 
-                unique=True, 
-                postgresql_where=db.text("status = 'active'")),
+        # Note: Single active campaign constraint now enforced by database trigger
+        # 'check_single_active_campaign' which respects BusinessAccount.allow_parallel_campaigns
         # Regular index for common queries
         db.Index('idx_campaign_business_status', 'business_account_id', 'status'),
         db.Index('idx_campaign_dates', 'start_date', 'end_date'),
@@ -821,6 +818,9 @@ class BusinessAccount(db.Model):
     license_expires_at = db.Column(db.DateTime, nullable=True, index=True)  # License expiration date
     license_status = db.Column(db.String(20), nullable=False, default='trial', index=True)  # trial, active, expired
     
+    # Concurrent Campaigns Setting (Platform Admin controlled)
+    allow_parallel_campaigns = db.Column(db.Boolean, nullable=False, default=False, index=True)  # Allow multiple active campaigns simultaneously
+    
     # Survey Customization Fields (Phase 1: VOÏA Customizable Implementation)
     # Company Profile for Survey Customization
     industry = db.Column(db.String(100), nullable=True, index=True)  # Healthcare, SaaS, Retail, etc.
@@ -861,6 +861,7 @@ class BusinessAccount(db.Model):
             'license_expires_at': self.license_expires_at.isoformat() if self.license_expires_at else None,
             'current_users_count': self.current_users_count,  # Use dynamic property instead of static counter
             'license_status': self.license_status,
+            'allow_parallel_campaigns': self.allow_parallel_campaigns,
             # Survey Customization Fields
             'industry': self.industry,
             'company_description': self.company_description,
