@@ -121,9 +121,17 @@ class ExecutiveReportGenerator:
     
     def _calculate_campaign_kpis(self, responses: List, campaign) -> Dict:
         """Calculate KPIs for current campaign"""
+        # Get participants invited count
+        total_participants = campaign.participants_count if campaign else 0
+        
+        # Count transcript-sourced responses
+        transcripts_count = sum(1 for r in responses if r.source_type == 'transcript') if responses else 0
+        
         if not responses:
             return {
                 'total_responses': 0,
+                'participants_invited': total_participants,
+                'transcripts_count': 0,
                 'nps_score': 0,
                 'response_rate': 0,
                 'sentiment_breakdown': {'positive': 0, 'neutral': 0, 'negative': 0},
@@ -165,11 +173,12 @@ class ExecutiveReportGenerator:
             sentiment_breakdown[sentiment] = (count / total_responses * 100) if total_responses > 0 else 0
         
         # Calculate actual participation rate from campaign participants
-        total_participants = campaign.participants_count
         response_rate = (total_responses / total_participants * 100) if total_participants > 0 else 0
         
         return {
             'total_responses': total_responses,
+            'participants_invited': total_participants,
+            'transcripts_count': transcripts_count,
             'nps_score': round(nps_score, 1),
             'response_rate': round(response_rate, 1),
             'sentiment_breakdown': sentiment_breakdown,
@@ -823,8 +832,16 @@ class ExecutiveReportGenerator:
                 <h2 class="section-title">📈 Campaign Overview</h2>
                 <div class="kpi-grid">
                     <div class="kpi-card">
+                        <div class="kpi-value">{{ current_kpis.participants_invited }}</div>
+                        <div class="kpi-label">Participants Invited</div>
+                    </div>
+                    <div class="kpi-card">
                         <div class="kpi-value">{{ current_kpis.total_responses }}</div>
-                        <div class="kpi-label">Total Responses</div>
+                        <div class="kpi-label">Responses Completed</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value">{{ current_kpis.transcripts_count }}</div>
+                        <div class="kpi-label">Transcripts Analyzed</div>
                     </div>
                     <div class="kpi-card">
                         <div class="kpi-value">{{ current_kpis.response_rate }}%</div>
