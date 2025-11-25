@@ -1,0 +1,27 @@
+{% extends "base_minimal.html" %}
+
+{% block title %}Session Expired - VOÏA{% endblock %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="card shadow-lg" style="max-width: 500px; width: 100%;">
+        <div class="card-body text-center p-5">
+            <div class="mb-4">
+                <i class="fas fa-clock text-warning" style="font-size: 4rem;"></i>
+            </div>
+            <h2 class="card-title mb-3">{{ _('Session Expired') }}</h2>
+            <p class="card-text text-muted mb-4">
+                {{ _('Your session has expired or is no longer valid. Please log in again to continue.') }}
+            </p>
+            <a href="{{ url_for('business_auth.login') }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-sign-in-alt me-2"></i>{{ _('Log In Again') }}
+            </a>
+            <div class="mt-4">
+                <small class="text-muted">
+                    {{ _('If you continue to experience issues, please contact support.') }}
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

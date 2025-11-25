@@ -1454,6 +1454,11 @@ def executive_summary():
     current_business_user = get_current_business_user()
     if not current_business_user:
         logger.error("executive_summary: current_business_user is None despite @require_business_auth")
+        # Phase B: Show clean session expired page instead of redirect
+        from feature_flags import feature_flags
+        if feature_flags.auth_soft_fallback_enabled:
+            logger.warning("AUTH_SOFT_FALLBACK: Showing session expired page for executive_summary")
+            return render_template('session_expired.html'), 401
         return redirect(url_for('business_auth.login'))
     
     business_user_name = f"{current_business_user.first_name} {current_business_user.last_name}"
@@ -1487,6 +1492,11 @@ def campaign_insights():
     current_business_user = get_current_business_user()
     if not current_business_user:
         logger.error("campaign_insights: current_business_user is None despite @require_business_auth")
+        # Phase B: Show clean session expired page instead of redirect
+        from feature_flags import feature_flags
+        if feature_flags.auth_soft_fallback_enabled:
+            logger.warning("AUTH_SOFT_FALLBACK: Showing session expired page for campaign_insights")
+            return render_template('session_expired.html'), 401
         return redirect(url_for('business_auth.login'))
     
     business_user_name = f"{current_business_user.first_name} {current_business_user.last_name}"
