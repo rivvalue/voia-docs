@@ -5953,12 +5953,12 @@ def generate_executive_report_manually(campaign_id):
         if campaign.status != 'completed':
             return jsonify({'error': 'Campaign must be completed to generate executive report'}), 400
         
-        # Check if user has admin permission
+        # Get current user for audit trail (all authenticated users can generate reports)
         business_user_id = session.get('business_user_id')
         from models import BusinessAccountUser
         user = BusinessAccountUser.query.get(business_user_id)
-        if not user or user.role != 'admin':
-            return jsonify({'error': 'Admin permission required'}), 403
+        if not user:
+            return jsonify({'error': 'User session invalid'}), 401
         
         # Queue executive report generation with lazy import to avoid circular imports
         from task_queue import task_queue
@@ -6005,12 +6005,12 @@ def regenerate_executive_report(campaign_id):
         if campaign.status != 'completed':
             return jsonify({'error': 'Campaign must be completed to regenerate executive report'}), 400
         
-        # Check if user has admin permission
+        # Get current user for audit trail (all authenticated users can regenerate reports)
         business_user_id = session.get('business_user_id')
         from models import BusinessAccountUser
         user = BusinessAccountUser.query.get(business_user_id)
-        if not user or user.role != 'admin':
-            return jsonify({'error': 'Admin permission required'}), 403
+        if not user:
+            return jsonify({'error': 'User session invalid'}), 401
         
         # Check if existing report exists
         from models import ExecutiveReport
