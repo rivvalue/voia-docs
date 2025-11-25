@@ -40,11 +40,11 @@ class FeatureFlags:
             'description': 'Authentication observability logging - Phase A auth fix'
         },
         'auth_soft_fallback': {
-            'enabled': False,  # Phase B: Graceful error handling in get_current_business_user
+            'enabled': True,  # Phase B: Graceful error handling in get_current_business_user
             'description': 'Soft fallback for auth failures - Phase B auth fix'
         },
         'auth_strict_validation': {
-            'enabled': False,  # Phase C: Align decorator with is_business_authenticated()
+            'enabled': True,  # Phase C: Align decorator with is_business_authenticated()
             'description': 'Strict session validation in decorators - Phase C auth fix'
         }
     }
@@ -62,8 +62,8 @@ class FeatureFlags:
         
         # Auth fix feature flags (Phases A, B, C)
         self.auth_observability_enabled = os.environ.get('AUTH_OBSERVABILITY', 'false').lower() == 'true'
-        self.auth_soft_fallback_enabled = os.environ.get('AUTH_SOFT_FALLBACK', 'false').lower() == 'true'
-        self.auth_strict_validation_enabled = os.environ.get('AUTH_STRICT_VALIDATION', 'false').lower() == 'true'
+        self.auth_soft_fallback_enabled = os.environ.get('AUTH_SOFT_FALLBACK', 'true').lower() == 'true'
+        self.auth_strict_validation_enabled = os.environ.get('AUTH_STRICT_VALIDATION', 'true').lower() == 'true'
         
         # Update FLAGS dict with runtime values from environment
         self.FLAGS['sidebar_navigation']['enabled'] = self.sidebar_enabled
