@@ -114,6 +114,65 @@ def require_business_auth(f):
             flash('Please log in to access this page.', 'error')
             return redirect(url_for('business_auth.login'))
         
+        # Phase C: Strict session validation when AUTH_STRICT_VALIDATION is enabled
+        from feature_flags import feature_flags
+        if feature_flags.auth_strict_validation_enabled:
+            # Require business_session_id to be present
+            if not business_session_id:
+                log_auth_event(
+                    event_type='auth_failed',
+                    details={'reason': 'strict_validation_missing_session_id'},
+                    user_id=business_user_id,
+                    route=request.path
+                )
+                logger.warning(f"AUTH_STRICT_VALIDATION: Missing session_id for user {business_user_id} on {request.path}")
+                if request.is_json:
+                    return jsonify({'error': 'Session expired'}), 401
+                flash('Your session has expired. Please log in again.', 'error')
+                session.clear()
+                return redirect(url_for('business_auth.login'))
+            
+            # Validate session exists in database and is active
+            user_session = UserSession.get_active_session(business_session_id)
+            if not user_session:
+                log_auth_event(
+                    event_type='auth_failed',
+                    details={'reason': 'strict_validation_invalid_session'},
+                    user_id=business_user_id,
+                    session_id=business_session_id,
+                    route=request.path
+                )
+                logger.warning(f"AUTH_STRICT_VALIDATION: Invalid session {business_session_id[:8]}... for user {business_user_id} on {request.path}")
+                if request.is_json:
+                    return jsonify({'error': 'Session expired'}), 401
+                flash('Your session has expired. Please log in again.', 'error')
+                session.clear()
+                return redirect(url_for('business_auth.login'))
+            
+            # Ensure session belongs to the claimed user
+            if user_session.user_id != business_user_id:
+                log_auth_event(
+                    event_type='auth_failed',
+                    details={'reason': 'strict_validation_user_mismatch', 'session_user': user_session.user_id, 'claimed_user': business_user_id},
+                    user_id=business_user_id,
+                    session_id=business_session_id,
+                    route=request.path
+                )
+                logger.error(f"AUTH_STRICT_VALIDATION: Session user mismatch! Session belongs to {user_session.user_id}, claimed by {business_user_id}")
+                if request.is_json:
+                    return jsonify({'error': 'Invalid session'}), 401
+                flash('Invalid session. Please log in again.', 'error')
+                session.clear()
+                return redirect(url_for('business_auth.login'))
+            
+            log_auth_event(
+                event_type='strict_validation_passed',
+                details={'session_valid': True},
+                user_id=business_user_id,
+                session_id=business_session_id,
+                route=request.path
+            )
+        
         # Get current business account
         current_account = get_current_business_account()
         if not current_account:
