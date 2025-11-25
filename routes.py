@@ -1,7 +1,7 @@
 from flask import render_template, request, jsonify, flash, redirect, url_for, g, session, send_file
 from app import app, db, cache
 # Models imported inside functions to avoid circular imports
-from models import SurveyResponse, Participant, CampaignParticipant, Campaign
+from models import SurveyResponse, Participant, CampaignParticipant, Campaign, BusinessAccount
 from data_storage import get_dashboard_data
 from sqlalchemy.orm import joinedload
 from sqlalchemy import desc, or_
@@ -2069,23 +2069,37 @@ def close_campaign(campaign_id):
 
 @app.route('/api/campaigns/active', methods=['GET'])
 def get_active_campaign():
-    """Get the currently active campaign"""
+    """Get the currently active campaign(s).
+    
+    Returns single campaign for backward compatibility.
+    When business_account_id is provided and account has parallel campaigns enabled,
+    also includes all_active_campaigns list.
+    """
     try:
         client_identifier = 'archelo_group'  # Current single-client setup
+        business_account_id = request.args.get('business_account_id', type=int)
         
+        # Get single active campaign (backward compatible)
         campaign = Campaign.get_active_campaign(client_identifier)
         
-        if campaign:
-            return jsonify({
-                'active_campaign': campaign.to_dict(),
-                'has_active_campaign': True
-            })
-        else:
-            return jsonify({
-                'active_campaign': None,
-                'has_active_campaign': False,
-                'message': 'No active campaign found'
-            })
+        response_data = {
+            'active_campaign': campaign.to_dict() if campaign else None,
+            'has_active_campaign': campaign is not None
+        }
+        
+        # If business_account_id provided, check for parallel campaigns support
+        if business_account_id:
+            account = BusinessAccount.query.get(business_account_id)
+            if account and account.allow_parallel_campaigns:
+                all_active = Campaign.get_active_campaigns(business_account_id)
+                response_data['all_active_campaigns'] = [c.to_dict() for c in all_active]
+                response_data['parallel_campaigns_enabled'] = True
+                response_data['active_campaign_count'] = len(all_active)
+        
+        if not campaign:
+            response_data['message'] = 'No active campaign found'
+            
+        return jsonify(response_data)
         
     except Exception as e:
         logger.error(f"Error getting active campaign: {e}")

@@ -734,15 +734,16 @@ def activate_campaign(campaign_id):
             flash(f'Campaign must be ready to activate. Current status: {campaign.status}', 'error')
             return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
         
-        # Enforce single active campaign constraint
-        existing_active = Campaign.query.filter_by(
-            business_account_id=current_account.id,
-            status='active'
-        ).first()
-        
-        if existing_active:
-            flash(f'Cannot activate campaign. Another campaign "{existing_active.name}" is already active. Only one campaign can be active at a time.', 'error')
-            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        # Enforce single active campaign constraint (unless parallel campaigns enabled)
+        if not current_account.allow_parallel_campaigns:
+            existing_active = Campaign.query.filter_by(
+                business_account_id=current_account.id,
+                status='active'
+            ).first()
+            
+            if existing_active:
+                flash(f'Cannot activate campaign. Another campaign "{existing_active.name}" is already active. Only one campaign can be active at a time.', 'error')
+                return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
         
         # Check date constraints using consistent date handling
         today = datetime.now().date()

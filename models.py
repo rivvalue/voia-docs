@@ -539,6 +539,44 @@ class Campaign(db.Model):
         ).first()
     
     @staticmethod
+    def get_active_campaigns(business_account_id):
+        """Get all currently active campaigns for a business account.
+        
+        This method supports accounts with allow_parallel_campaigns enabled,
+        returning all active campaigns rather than just one.
+        
+        Args:
+            business_account_id: The ID of the business account
+            
+        Returns:
+            List of active Campaign objects
+        """
+        today = date.today()
+        return Campaign.query.filter(
+            Campaign.business_account_id == business_account_id,
+            Campaign.status == 'active',
+            Campaign.start_date <= today,
+            Campaign.end_date >= today
+        ).order_by(Campaign.start_date).all()
+    
+    @staticmethod
+    def count_active_campaigns(business_account_id):
+        """Count active campaigns for a business account.
+        
+        Used for parallel campaigns enforcement and UI display.
+        
+        Args:
+            business_account_id: The ID of the business account
+            
+        Returns:
+            Integer count of active campaigns
+        """
+        return Campaign.query.filter(
+            Campaign.business_account_id == business_account_id,
+            Campaign.status == 'active'
+        ).count()
+    
+    @staticmethod
     def count_client_campaigns(client_identifier='archelo_group'):
         """Count total campaigns for a client"""
         return Campaign.query.filter(

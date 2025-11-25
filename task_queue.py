@@ -1979,8 +1979,17 @@ Respond with ONLY the JSON object, no other text:"""
         return changes_made
     
     def _process_campaign_activations(self, account_id, account_name, ready_campaigns, today):
-        """Process campaign activations with single active campaign constraint"""
+        """Process campaign activations with single active campaign constraint.
+        
+        Respects the BusinessAccount.allow_parallel_campaigns setting:
+        - If False (default): Only activate one campaign if no active campaigns exist
+        - If True: Activate all eligible ready campaigns
+        """
         changes_made = 0
+        
+        # Check if parallel campaigns are allowed for this business account
+        account = BusinessAccount.query.get(account_id)
+        allow_parallel = account.allow_parallel_campaigns if account else False
         
         # Check if there's already an active campaign for this business account
         existing_active = Campaign.query.filter_by(
@@ -1988,12 +1997,12 @@ Respond with ONLY the JSON object, no other text:"""
             status='active'
         ).first()
         
-        if existing_active:
+        if existing_active and not allow_parallel:
             logger.debug(f"Cannot activate campaigns for account {account_id} ({account_name}): "
-                        f"Campaign '{existing_active.name}' is already active")
+                        f"Campaign '{existing_active.name}' is already active (parallel campaigns disabled)")
             return changes_made
         
-        # Activate the earliest ready campaign that meets criteria
+        # Activate ready campaigns that meet criteria
         for campaign in sorted(ready_campaigns, key=lambda c: c.start_date):
             try:
                 # Double-check activation criteria
@@ -2055,8 +2064,10 @@ Respond with ONLY the JSON object, no other text:"""
                         logger.error(f"Failed to audit auto-activation of campaign {campaign.id}: {audit_error}")
                     
                     changes_made += 1
-                    # Only activate one campaign at a time
-                    break
+                    
+                    # Only activate one campaign at a time if parallel campaigns disabled
+                    if not allow_parallel:
+                        break
                     
             except Exception as e:
                 logger.error(f"Failed to activate campaign {campaign.id}: {e}")
