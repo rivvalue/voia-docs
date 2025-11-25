@@ -34,6 +34,18 @@ class FeatureFlags:
             'enabled': False,  # Master switch - controls if deterministic survey V2 is active
             'rollout_percentage': 0,  # 0-100: percentage of surveys using deterministic flow
             'description': 'Deterministic conversational survey controller (V2) - eliminates early-stop bugs'
+        },
+        'auth_observability': {
+            'enabled': False,  # Phase A: Enable auth flow logging for debugging
+            'description': 'Authentication observability logging - Phase A auth fix'
+        },
+        'auth_soft_fallback': {
+            'enabled': False,  # Phase B: Graceful error handling in get_current_business_user
+            'description': 'Soft fallback for auth failures - Phase B auth fix'
+        },
+        'auth_strict_validation': {
+            'enabled': False,  # Phase C: Align decorator with is_business_authenticated()
+            'description': 'Strict session validation in decorators - Phase C auth fix'
         }
     }
     
@@ -48,6 +60,11 @@ class FeatureFlags:
         self.deterministic_survey_enabled = os.environ.get('DETERMINISTIC_SURVEY_FLOW', 'false').lower() == 'true'
         self.deterministic_survey_rollout = int(os.environ.get('DETERMINISTIC_SURVEY_ROLLOUT_PERCENTAGE', '0'))
         
+        # Auth fix feature flags (Phases A, B, C)
+        self.auth_observability_enabled = os.environ.get('AUTH_OBSERVABILITY', 'false').lower() == 'true'
+        self.auth_soft_fallback_enabled = os.environ.get('AUTH_SOFT_FALLBACK', 'false').lower() == 'true'
+        self.auth_strict_validation_enabled = os.environ.get('AUTH_STRICT_VALIDATION', 'false').lower() == 'true'
+        
         # Update FLAGS dict with runtime values from environment
         self.FLAGS['sidebar_navigation']['enabled'] = self.sidebar_enabled
         self.FLAGS['sidebar_navigation']['rollout_percentage'] = self.rollout_percentage
@@ -56,12 +73,20 @@ class FeatureFlags:
         self.FLAGS['ui_version_toggle']['enabled'] = self.toggle_enabled
         self.FLAGS['deterministic_survey_flow']['enabled'] = self.deterministic_survey_enabled
         self.FLAGS['deterministic_survey_flow']['rollout_percentage'] = self.deterministic_survey_rollout
+        self.FLAGS['auth_observability']['enabled'] = self.auth_observability_enabled
+        self.FLAGS['auth_soft_fallback']['enabled'] = self.auth_soft_fallback_enabled
+        self.FLAGS['auth_strict_validation']['enabled'] = self.auth_strict_validation_enabled
         
         logger.info(f"Feature Flags initialized - Sidebar: {self.sidebar_enabled}, "
                    f"Rollout: {self.rollout_percentage}%, Settings Hub v2: {self.settings_hub_enabled}, "
                    f"Settings Hub Rollout: {self.settings_hub_rollout}%, Toggle: {self.toggle_enabled}, "
                    f"Force V2: {self.force_v2}, Deterministic Survey: {self.deterministic_survey_enabled}, "
                    f"Deterministic Rollout: {self.deterministic_survey_rollout}%")
+        
+        if self.auth_observability_enabled or self.auth_soft_fallback_enabled or self.auth_strict_validation_enabled:
+            logger.info(f"Auth Fix Flags - Observability: {self.auth_observability_enabled}, "
+                       f"Soft Fallback: {self.auth_soft_fallback_enabled}, "
+                       f"Strict Validation: {self.auth_strict_validation_enabled}")
     
     def is_feature_enabled(self, feature_name):
         """Check if a feature flag is enabled (reads from updated FLAGS dict)"""
@@ -202,3 +227,32 @@ def get_template_for_version(base_name):
         # Check if v2 template exists, otherwise fallback to v1
         return f"{base_name}_v2.html"
     return f"{base_name}.html"
+
+
+def log_auth_event(event_type, details=None, user_id=None, session_id=None, route=None):
+    """
+    Log authentication events when auth_observability flag is enabled.
+    
+    Phase A: Provides visibility into auth flow for debugging the consistency bug.
+    
+    Args:
+        event_type: Type of auth event (decorator_check, helper_check, session_validation, etc.)
+        details: Additional details about the event
+        user_id: Business user ID (if available)
+        session_id: Business session ID (if available)
+        route: Route being accessed
+    """
+    if not feature_flags.auth_observability_enabled:
+        return
+    
+    auth_logger = logging.getLogger('auth_observability')
+    
+    log_data = {
+        'event_type': event_type,
+        'user_id': user_id,
+        'session_id': session_id[:8] + '...' if session_id and len(session_id) > 8 else session_id,
+        'route': route,
+        'details': details
+    }
+    
+    auth_logger.info(f"AUTH_EVENT: {log_data}")

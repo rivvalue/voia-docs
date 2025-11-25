@@ -8,7 +8,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from models import BusinessAccountUser, UserSession, BusinessAccount, EmailConfiguration, EmailDelivery, LicenseHistory, db
 from rate_limiter import rate_limit
 from license_service import LicenseService
-from feature_flags import feature_flags
+from feature_flags import feature_flags, log_auth_event
 from audit_utils import queue_audit_log
 from flask_babel import gettext as _
 import logging
@@ -86,9 +86,29 @@ def require_business_auth(f):
     
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        # Check if user is authenticated
+        # Phase A observability: Log decorator entry
         business_user_id = session.get('business_user_id')
+        business_session_id = session.get('business_session_id')
+        
+        log_auth_event(
+            event_type='decorator_check',
+            details={
+                'decorator': 'require_business_auth',
+                'has_user_id': bool(business_user_id),
+                'has_session_id': bool(business_session_id)
+            },
+            user_id=business_user_id,
+            session_id=business_session_id,
+            route=request.path
+        )
+        
+        # Check if user is authenticated
         if not business_user_id:
+            log_auth_event(
+                event_type='auth_failed',
+                details={'reason': 'no_business_user_id'},
+                route=request.path
+            )
             if request.is_json:
                 return jsonify({'error': 'Business authentication required'}), 401
             flash('Please log in to access this page.', 'error')
@@ -97,6 +117,13 @@ def require_business_auth(f):
         # Get current business account
         current_account = get_current_business_account()
         if not current_account:
+            log_auth_event(
+                event_type='auth_failed',
+                details={'reason': 'no_business_account'},
+                user_id=business_user_id,
+                session_id=business_session_id,
+                route=request.path
+            )
             if request.is_json:
                 return jsonify({'error': 'Invalid session'}), 401
             flash('Invalid session. Please log in again.', 'error')
@@ -2321,14 +2348,50 @@ def is_business_authenticated():
     session_id = session.get('business_session_id')
     user_id = session.get('business_user_id')
     
+    # Phase A observability: Log the strict auth check
+    log_auth_event(
+        event_type='is_business_authenticated_check',
+        details={
+            'has_user_id': bool(user_id),
+            'has_session_id': bool(session_id)
+        },
+        user_id=user_id,
+        session_id=session_id,
+        route=request.path if request else None
+    )
+    
     if not session_id or not user_id:
+        log_auth_event(
+            event_type='is_business_authenticated_failed',
+            details={'reason': 'missing_session_or_user_id', 'missing_session_id': not session_id, 'missing_user_id': not user_id},
+            user_id=user_id,
+            route=request.path if request else None
+        )
         return False
     
     # Check session validity
     user_session = UserSession.get_active_session(session_id)
     if not user_session or user_session.user_id != user_id:
+        log_auth_event(
+            event_type='is_business_authenticated_failed',
+            details={
+                'reason': 'invalid_user_session',
+                'session_found': bool(user_session),
+                'user_id_match': user_session.user_id == user_id if user_session else False
+            },
+            user_id=user_id,
+            session_id=session_id,
+            route=request.path if request else None
+        )
         return False
     
+    log_auth_event(
+        event_type='is_business_authenticated_success',
+        details={'session_valid': True},
+        user_id=user_id,
+        session_id=session_id,
+        route=request.path if request else None
+    )
     return True
 
 
@@ -2336,11 +2399,34 @@ def is_business_authenticated():
 
 def get_current_business_user():
     """Get current authenticated business user"""
+    # Phase A observability: Log helper function entry
+    log_auth_event(
+        event_type='get_current_business_user_called',
+        details={'checking_is_business_authenticated': True},
+        user_id=session.get('business_user_id'),
+        session_id=session.get('business_session_id'),
+        route=request.path if request else None
+    )
+    
     if not is_business_authenticated():
+        log_auth_event(
+            event_type='get_current_business_user_failed',
+            details={'reason': 'is_business_authenticated_returned_false'},
+            user_id=session.get('business_user_id'),
+            route=request.path if request else None
+        )
         return None
     
     user_id = session.get('business_user_id')
-    return BusinessAccountUser.query.get(user_id)
+    user = BusinessAccountUser.query.get(user_id)
+    
+    log_auth_event(
+        event_type='get_current_business_user_success',
+        details={'user_found': bool(user)},
+        user_id=user_id,
+        route=request.path if request else None
+    )
+    return user
 
 
 
