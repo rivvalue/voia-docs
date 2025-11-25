@@ -1,8 +1,9 @@
 # Concurrent Campaigns Feature - Analysis & Implementation Plan
-**Document Version:** 2.0  
-**Date:** November 24, 2025  
+**Document Version:** 2.1  
+**Date:** November 25, 2025  
 **Status:** Ready for Implementation  
-**Architect Review:** ✅ Approved with Updated Risk Matrix
+**Architect Review:** ✅ Approved with Updated Risk Matrix  
+**Addendum:** Dashboard Audit + Downgrade Path Design Complete
 
 ---
 
@@ -843,26 +844,421 @@ Campaign.status in ('draft', 'ready', 'active', 'paused', 'completed')
 
 ---
 
+---
+
+# ADDENDUM: Dashboard Audit & Downgrade Path Design
+**Added:** November 25, 2025  
+**Purpose:** Address Gap 1 (Dashboard/Analytics Assumptions) and Gap 2 (Toggle Downgrade Path)
+
+---
+
+## Appendix D: Single-Active-Campaign Code Audit
+
+### Audit Scope
+Complete codebase analysis to identify all locations that assume only one active campaign exists per business account.
+
+### Audit Methodology
+- Searched for patterns: `get_active_campaign`, `active_campaign`, `existing_active`, `.first()` with active status filter
+- Reviewed all campaign-related API endpoints
+- Examined template rendering logic
+- Analyzed background scheduler behavior
+
+---
+
+### D.1: Code Locations Requiring Updates
+
+#### **CRITICAL: Must Fix Before Launch**
+
+| File | Line | Pattern | Issue | Fix Required |
+|------|------|---------|-------|--------------|
+| `models.py` | 534-542 | `get_active_campaign()` | Returns `.first()` - only one campaign | Update to return list or deprecate |
+| `campaign_routes.py` | 738-744 | `existing_active = ...filter_by(status='active').first()` | Blocks activation if any active exists | Check `allow_parallel_campaigns` flag |
+| `task_queue.py` | 1986-1994 | `existing_active = ...filter_by(status='active').first()` | Scheduler blocks auto-activation | Check `allow_parallel_campaigns` flag |
+| `task_queue.py` | 2058 | `break` after activating one campaign | Only activates one per scheduler run | Remove when parallel enabled |
+
+#### **MEDIUM: API Defaulting Logic**
+
+| File | Line | Pattern | Issue | Fix Required |
+|------|------|---------|-------|--------------|
+| `routes.py` | 878-880 | `active_campaign = Campaign.get_active_campaign()` | Demo survey uses single active | OK for demo (single tenant) |
+| `routes.py` | 1542-1548 | `active_campaign = ...filter_by(status='active').order_by(id.desc()).first()` | Dashboard data defaults to most recent active | ✅ Already uses `.order_by().first()` - safe pattern |
+| `routes.py` | 2070-2092 | `get_active_campaign()` API endpoint | Returns single campaign | Update to return list of active campaigns |
+| `routes.py` | 2155-2161 | `/api/company_nps` defaults | Uses `.order_by(id.desc()).first()` | ✅ Safe - selects most recent |
+| `routes.py` | 2369-2375 | `/api/tenure_nps` defaults | Uses `.order_by(id.desc()).first()` | ✅ Safe - selects most recent |
+
+#### **LOW: UI Display (Informational Only)**
+
+| File | Line | Pattern | Issue | Fix Required |
+|------|------|---------|-------|--------------|
+| `templates/business_auth/license_info.html` | 198-216 | `{% if active_campaign %}` | Shows single active campaign info | Update to show list or count |
+| `templates/business_auth/admin_panel.html` | 578 | `active_campaigns` count | Shows count (already handles multiple) | ✅ No change needed |
+| `templates/business_auth/platform_dashboard.html` | 362, 414 | `active_campaigns` metric | Shows count (already handles multiple) | ✅ No change needed |
+| `templates/dashboard.html` | 374-381 | `activeCampaignBanner` | Shows single campaign banner | Consider multi-campaign indicator |
+| `templates/campaign_insights.html` | 138-145 | `activeCampaignBanner` | Shows single campaign banner | Consider multi-campaign indicator |
+
+---
+
+### D.2: Safe Patterns Already in Use
+
+The following patterns are **already safe** for concurrent campaigns:
+
+1. **Campaign Filtering by ID**: Most API endpoints accept `campaign_id` parameter and filter by specific campaign
+2. **Order by DESC + First**: When defaulting, code uses `.order_by(Campaign.id.desc()).first()` which safely selects the most recent
+3. **Campaign List Pages**: Campaign list templates already display multiple campaigns
+4. **Count-Based Metrics**: Admin panels use `.count()` which handles multiple active campaigns
+
+---
+
+### D.3: Recommended Code Changes
+
+#### Change 1: Update `Campaign.get_active_campaign()` Method
+
+**Current (models.py:534-542):**
+```python
+@staticmethod
+def get_active_campaign(client_identifier='archelo_group'):
+    """Get the currently active campaign for a client"""
+    today = date.today()
+    return Campaign.query.filter(
+        Campaign.client_identifier == client_identifier,
+        Campaign.status == 'active',
+        Campaign.start_date <= today,
+        Campaign.end_date >= today
+    ).first()
+```
+
+**Proposed:**
+```python
+@staticmethod
+def get_active_campaigns(business_account_id: int) -> list:
+    """Get all currently active campaigns for a business account"""
+    today = date.today()
+    return Campaign.query.filter(
+        Campaign.business_account_id == business_account_id,
+        Campaign.status == 'active',
+        Campaign.start_date <= today,
+        Campaign.end_date >= today
+    ).order_by(Campaign.start_date.desc()).all()
+
+@staticmethod
+def get_primary_active_campaign(business_account_id: int):
+    """Get the most recent active campaign (for UI defaults)"""
+    campaigns = Campaign.get_active_campaigns(business_account_id)
+    return campaigns[0] if campaigns else None
+```
+
+#### Change 2: Update `campaign_routes.py` Activation Logic
+
+**Current (line 738-744):**
+```python
+existing_active = Campaign.query.filter_by(
+    business_account_id=current_account.id,
+    status='active'
+).first()
+
+if existing_active:
+    flash('Cannot activate campaign...', 'error')
+```
+
+**Proposed:**
+```python
+# Check parallel campaign setting
+if not current_account.allow_parallel_campaigns:
+    existing_active = Campaign.query.filter_by(
+        business_account_id=current_account.id,
+        status='active'
+    ).first()
+    
+    if existing_active:
+        flash('Cannot activate campaign...', 'error')
+        return redirect(...)
+```
+
+#### Change 3: Update `task_queue.py` Scheduler
+
+**Current (line 1986-1994):**
+```python
+existing_active = Campaign.query.filter_by(
+    business_account_id=account_id,
+    status='active'
+).first()
+
+if existing_active:
+    logger.debug(f"Cannot activate campaigns...")
+    return changes_made
+```
+
+**Proposed:**
+```python
+# Check parallel campaign setting for this account
+if not account.allow_parallel_campaigns:
+    existing_active = Campaign.query.filter_by(
+        business_account_id=account_id,
+        status='active'
+    ).first()
+    
+    if existing_active:
+        logger.debug(f"Cannot activate campaigns...")
+        return changes_made
+```
+
+#### Change 4: Update `/api/campaigns/active` Endpoint
+
+**Current (routes.py:2070-2092):**
+```python
+@app.route('/api/campaigns/active', methods=['GET'])
+def get_active_campaign():
+    campaign = Campaign.get_active_campaign(client_identifier)
+    return jsonify({'active_campaign': campaign.to_dict(), 'has_active_campaign': True})
+```
+
+**Proposed:**
+```python
+@app.route('/api/campaigns/active', methods=['GET'])
+def get_active_campaigns():
+    """Get all currently active campaigns"""
+    campaigns = Campaign.get_active_campaigns(business_account_id)
+    return jsonify({
+        'active_campaigns': [c.to_dict() for c in campaigns],
+        'active_campaign_count': len(campaigns),
+        'has_active_campaign': len(campaigns) > 0
+    })
+```
+
+#### Change 5: Update License Info Template
+
+**Current (license_info.html:198-216):**
+```html
+{% if active_campaign %}
+<div class="license-usage-card">
+    Active Campaign: {{ active_campaign.name }}
+</div>
+{% endif %}
+```
+
+**Proposed:**
+```html
+{% if active_campaigns %}
+<div class="license-usage-card">
+    <div class="license-usage-header">
+        <div class="license-usage-title">
+            <i class="fas fa-play-circle"></i>
+            Active Campaigns ({{ active_campaigns|length }})
+        </div>
+    </div>
+    {% for campaign in active_campaigns %}
+    <div class="active-campaign-item">
+        <strong>{{ campaign.name }}</strong>
+        <span class="text-muted">{{ campaign.days_remaining() }} days remaining</span>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+```
+
+---
+
+## Appendix E: Toggle Downgrade Path Design
+
+### E.1: Problem Statement
+
+**Scenario:** Platform admin enables parallel campaigns for an account, they activate 2+ campaigns, then admin tries to **disable** parallel campaigns.
+
+**Question:** What should happen?
+
+---
+
+### E.2: Design Options Analysis
+
+| Option | Behavior | Pros | Cons | Recommendation |
+|--------|----------|------|------|----------------|
+| **A: Block** | Prevent disabling until only 1 campaign active | Safest, no data issues, clear user action | Requires manual intervention | ✅ **RECOMMENDED** |
+| **B: Auto-Pause** | Automatically pause newest campaigns | Automated, no admin effort | Could disrupt active surveys, data loss risk | ❌ Too risky |
+| **C: Warning Only** | Allow disable, future activations blocked | Most flexible | Inconsistent state, confusing | ❌ Poor UX |
+| **D: Force Complete** | Complete all but one campaign | Clean resolution | Premature campaign completion | ❌ Data integrity risk |
+
+---
+
+### E.3: Recommended Approach: Block with Clear Messaging
+
+#### Implementation
+
+**Route Handler Update (business_auth_routes.py):**
+```python
+@business_auth.route('/admin/toggle-parallel-campaigns/<int:account_id>', methods=['POST'])
+@require_platform_admin
+def toggle_parallel_campaigns(account_id):
+    business_account = BusinessAccount.query.get_or_404(account_id)
+    enable = request.form.get('enable', 'false').lower() == 'true'
+    
+    # DOWNGRADE CHECK: Block disabling if multiple active campaigns exist
+    if not enable and business_account.allow_parallel_campaigns:
+        active_count = Campaign.query.filter_by(
+            business_account_id=account_id,
+            status='active'
+        ).count()
+        
+        if active_count > 1:
+            flash(
+                f'Cannot disable parallel campaigns. '
+                f'This account has {active_count} active campaigns. '
+                f'Please complete or pause campaigns until only 1 remains active.',
+                'error'
+            )
+            return redirect(url_for('business_auth.admin_licenses', account_id=account_id))
+    
+    # Proceed with toggle...
+    old_value = business_account.allow_parallel_campaigns
+    business_account.allow_parallel_campaigns = enable
+    
+    # Audit logging...
+    db.session.commit()
+    
+    flash(f'Parallel campaigns {"enabled" if enable else "disabled"} for {business_account.name}', 'success')
+    return redirect(url_for('business_auth.admin_licenses', account_id=account_id))
+```
+
+#### UI Enhancement
+
+**Admin Licenses Page (admin_licenses.html):**
+```html
+{% if business_account.allow_parallel_campaigns %}
+    {% set active_count = active_campaigns|length if active_campaigns else 0 %}
+    {% if active_count > 1 %}
+        <div class="alert alert-warning mt-2">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>{{ active_count }} campaigns currently active.</strong>
+            To disable parallel campaigns, complete or pause campaigns until only 1 remains.
+        </div>
+    {% endif %}
+    
+    <button type="submit" 
+            class="btn btn-warning"
+            {% if active_count > 1 %}disabled{% endif %}>
+        <i class="fas fa-ban me-2"></i>
+        Disable Parallel Campaigns
+    </button>
+{% else %}
+    <button type="submit" class="btn btn-success">
+        <i class="fas fa-check-circle me-2"></i>
+        Enable Parallel Campaigns
+    </button>
+{% endif %}
+```
+
+---
+
+### E.4: Validation Rules Summary
+
+| Action | Condition | Allowed | Error Message |
+|--------|-----------|---------|---------------|
+| Enable parallel | Any state | ✅ Yes | - |
+| Disable parallel | 0 active campaigns | ✅ Yes | - |
+| Disable parallel | 1 active campaign | ✅ Yes | - |
+| Disable parallel | 2+ active campaigns | ❌ No | "Complete or pause campaigns until only 1 remains" |
+
+---
+
+## Appendix F: Cache Invalidation Verification
+
+### F.1: Analysis Summary
+
+**Question:** Does the codebase cache the `allow_parallel_campaigns` value in a way that could cause stale decisions?
+
+### F.2: Investigation Results
+
+| Component | Caching Behavior | Risk Level | Action Required |
+|-----------|------------------|------------|-----------------|
+| **LicenseService** | No caching of `allow_parallel_campaigns` | ✅ None | No change needed |
+| **Campaign Scheduler** | Queries database fresh each run | ✅ None | No change needed |
+| **Flask-Caching** | Dashboard data cached, not license settings | ✅ None | No change needed |
+| **Session Data** | Not stored in session | ✅ None | No change needed |
+
+### F.3: Verification Code Audit
+
+**LicenseService.can_activate_campaign() (license_service.py):**
+```python
+def can_activate_campaign(business_account_id: int) -> bool:
+    # Each call queries BusinessAccount fresh from database
+    business_account = BusinessAccount.query.get(business_account_id)
+    # ... uses business_account.allow_parallel_campaigns directly
+```
+**Result:** ✅ No caching - fresh query each call
+
+**Task Queue Scheduler (task_queue.py):**
+```python
+def _process_account_campaigns(self, account, today):
+    # Account object passed from fresh query in parent loop
+    # ... checks account.allow_parallel_campaigns
+```
+**Result:** ✅ No caching - uses account from current query
+
+### F.4: Conclusion
+
+**No cache invalidation hooks needed.** The codebase queries the database directly for the `allow_parallel_campaigns` setting each time it's needed. Changes to the toggle take effect immediately.
+
+---
+
+## Appendix G: Updated Implementation Phases
+
+Based on the audit findings, the implementation phases are updated:
+
+### Phase 2A: Code Audit Fixes (NEW - 1-2 days)
+
+**Before database migration, update code to prepare for parallel campaigns:**
+
+1. ✅ Add `get_active_campaigns()` method to Campaign model
+2. ✅ Add `get_primary_active_campaign()` method for UI defaults
+3. ✅ Update `campaign_routes.py` activation logic to check flag
+4. ✅ Update `task_queue.py` scheduler to check flag
+5. ✅ Update `/api/campaigns/active` endpoint
+6. ✅ Update `license_info.html` template
+
+**Why before migration?** These code changes are backward-compatible. The flag will default to `False`, so existing behavior is preserved until we add the database column.
+
+### Phase 2B: Downgrade Path (NEW - 0.5 days)
+
+1. ✅ Add validation in `toggle_parallel_campaigns()` route
+2. ✅ Update admin UI with warning message and disabled state
+3. ✅ Add integration test for downgrade blocking
+
+---
+
 ## Document Changelog
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
 | 1.0 | Oct 30, 2025 | Architect | Initial implementation plan |
 | 2.0 | Nov 24, 2025 | Architect | Updated risk matrix, complexity assessment, validation of original plan |
+| 2.1 | Nov 25, 2025 | Architect | Added dashboard audit (Appendix D), downgrade path design (Appendix E), cache verification (Appendix F), updated phases |
 
 ---
 
 ## Approval & Sign-Off
 
 - [x] **Architect Review**: Approved (Nov 24, 2025)
+- [x] **Dashboard Audit**: Complete (Nov 25, 2025)
+- [x] **Downgrade Path Design**: Complete (Nov 25, 2025)
 - [ ] **Platform Owner**: Pending
 - [ ] **Engineering Lead**: Pending
 - [ ] **QA Lead**: Pending
 
 ---
 
+## Summary: Ready for Active Account Enablement
+
+✅ **Confirmed:** The concurrent campaigns feature can be safely enabled for existing active business accounts.
+
+**Prerequisites Addressed:**
+1. ✅ Dashboard/Analytics audit complete - 5 code changes identified
+2. ✅ Downgrade path designed - Block approach with clear messaging
+3. ✅ Cache invalidation verified - No action needed
+
+**Updated Complexity Score:** **7.5/10** (increased slightly due to additional code changes)
+
 **Next Steps:**
-1. Platform owner reviews and approves plan
-2. Create implementation tickets in task tracking system
-3. Schedule deployment window
-4. Begin Phase 0 (Preparation)
+1. Platform owner reviews and approves updated plan
+2. Begin Phase 2A: Code audit fixes (backward-compatible)
+3. Execute database migration (Phase 1)
+4. Implement downgrade path (Phase 2B)
+5. Testing and rollout (Phase 4)
