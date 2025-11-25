@@ -5023,6 +5023,13 @@ def admin_licenses():
                 BusinessAccountUser.email_verified == False
             ).first()
             
+            # Get active campaign count for parallel campaigns toggle validation
+            from models import Campaign
+            active_campaigns_count = Campaign.query.filter_by(
+                business_account_id=account.id,
+                status='active'
+            ).count()
+            
             account_data = {
                 'id': account.id,
                 'name': account.name,
@@ -5043,7 +5050,9 @@ def admin_licenses():
                 'total_invitations': license_info.get('total_invitations', 0),
                 'has_unactivated_admin': unactivated_admin is not None,
                 'unactivated_admin_id': unactivated_admin.id if unactivated_admin else None,
-                'unactivated_admin_email': unactivated_admin.email if unactivated_admin else None
+                'unactivated_admin_email': unactivated_admin.email if unactivated_admin else None,
+                'allow_parallel_campaigns': getattr(account, 'allow_parallel_campaigns', False),
+                'active_campaigns_count': active_campaigns_count
             }
             licenses_data.append(account_data)
         
@@ -5305,6 +5314,114 @@ def process_license_assignment():
     except Exception as e:
         logger.error(f"Error processing license assignment: {e}")
         flash('Failed to process license assignment. Please try again.', 'error')
+        return redirect(url_for('business_auth.admin_licenses'))
+
+
+@business_auth_bp.route('/admin/licenses/<int:business_id>/toggle-parallel-campaigns', methods=['POST'])
+@require_platform_admin
+def toggle_parallel_campaigns(business_id):
+    """Toggle allow_parallel_campaigns setting for a business account (Platform Admin Only)
+    
+    Implements downgrade protection: cannot disable parallel campaigns when 2+ campaigns are active.
+    This prevents data inconsistency where multiple active campaigns exist but parallel mode is off.
+    """
+    try:
+        from models import BusinessAccount, Campaign
+        
+        # Validate business account access (platform admin is allowed)
+        is_valid, business_account, message = validate_business_account_access(business_id, allow_platform_admin=True)
+        if not is_valid:
+            logger.warning(f"Unauthorized parallel campaigns toggle attempt: {message}")
+            if request.is_json:
+                return jsonify({'success': False, 'error': 'Access denied'}), 403
+            flash('Access denied. You cannot modify this business account.', 'error')
+            return redirect(url_for('business_auth.admin_licenses'))
+        
+        if not business_account:
+            if request.is_json:
+                return jsonify({'success': False, 'error': 'Business account not found'}), 404
+            flash('Business account not found.', 'error')
+            return redirect(url_for('business_auth.admin_licenses'))
+        
+        # Get current user for audit trail
+        current_user = BusinessAccountUser.query.get(session.get('business_user_id'))
+        if not current_user:
+            logger.error("Parallel campaigns toggle attempted without valid user session")
+            if request.is_json:
+                return jsonify({'success': False, 'error': 'Invalid session'}), 401
+            flash('Invalid user session. Please log in again.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        # Get current state
+        current_state = business_account.allow_parallel_campaigns
+        new_state = not current_state
+        
+        # DOWNGRADE PROTECTION: If disabling, check for 2+ active campaigns
+        if current_state and not new_state:
+            active_campaign_count = Campaign.query.filter_by(
+                business_account_id=business_id,
+                status='active'
+            ).count()
+            
+            if active_campaign_count >= 2:
+                error_msg = f'Cannot disable parallel campaigns: {active_campaign_count} campaigns are currently active. Complete or cancel campaigns until only 1 remains.'
+                logger.warning(f"Parallel campaigns downgrade blocked for business_id {business_id}: {active_campaign_count} active campaigns")
+                
+                if request.is_json:
+                    return jsonify({
+                        'success': False, 
+                        'error': error_msg,
+                        'active_campaign_count': active_campaign_count
+                    }), 409
+                flash(error_msg, 'error')
+                return redirect(url_for('business_auth.admin_licenses'))
+        
+        # Update the setting
+        business_account.allow_parallel_campaigns = new_state
+        db.session.commit()
+        
+        action = 'enabled' if new_state else 'disabled'
+        logger.info(f"Platform admin {current_user.email} {action} parallel campaigns for business_id {business_id} ({business_account.name})")
+        
+        # Audit log the change
+        try:
+            from models import AuditLog
+            audit_entry = AuditLog(
+                action='parallel_campaigns_toggle',
+                entity_type='business_account',
+                entity_id=business_id,
+                user_id=current_user.id,
+                user_email=current_user.email,
+                details=f"Parallel campaigns {action} for {business_account.name}",
+                metadata={
+                    'business_account_id': business_id,
+                    'business_account_name': business_account.name,
+                    'previous_state': current_state,
+                    'new_state': new_state,
+                    'admin_email': current_user.email
+                }
+            )
+            db.session.add(audit_entry)
+            db.session.commit()
+        except Exception as audit_error:
+            logger.error(f"Failed to audit parallel campaigns toggle: {audit_error}")
+        
+        if request.is_json:
+            return jsonify({
+                'success': True,
+                'new_state': new_state,
+                'message': f'Parallel campaigns {action}'
+            })
+        
+        flash(f'Parallel campaigns {action} for {business_account.name}.', 'success')
+        return redirect(url_for('business_auth.admin_licenses'))
+        
+    except Exception as e:
+        logger.error(f"Error toggling parallel campaigns for business_id {business_id}: {e}")
+        db.session.rollback()
+        if request.is_json:
+            return jsonify({'success': False, 'error': 'Internal server error'}), 500
+        flash('Failed to toggle parallel campaigns. Please try again.', 'error')
         return redirect(url_for('business_auth.admin_licenses'))
 
 
