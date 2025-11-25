@@ -5385,24 +5385,21 @@ def toggle_parallel_campaigns(business_id):
         
         # Audit log the change
         try:
-            from models import AuditLog
-            audit_entry = AuditLog(
-                action='parallel_campaigns_toggle',
-                entity_type='business_account',
-                entity_id=business_id,
-                user_id=current_user.id,
+            queue_audit_log(
+                business_account_id=business_id,
+                action_type='parallel_campaigns_toggle',
+                resource_type='business_account',
+                resource_id=business_id,
+                resource_name=business_account.name,
                 user_email=current_user.email,
-                details=f"Parallel campaigns {action} for {business_account.name}",
-                metadata={
-                    'business_account_id': business_id,
-                    'business_account_name': business_account.name,
+                user_name=getattr(current_user, 'get_full_name', lambda: current_user.email)(),
+                details={
                     'previous_state': current_state,
                     'new_state': new_state,
+                    'action': action,
                     'admin_email': current_user.email
                 }
             )
-            db.session.add(audit_entry)
-            db.session.commit()
         except Exception as audit_error:
             logger.error(f"Failed to audit parallel campaigns toggle: {audit_error}")
         
