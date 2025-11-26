@@ -2003,11 +2003,19 @@ class BusinessAccountUser(UserMixin, db.Model):
         return f"{self.first_name} {self.last_name}"
     
     def has_permission(self, permission):
-        """Check if user has specific permission"""
+        """Check if user has specific permission
+        
+        Roles (3 active):
+        - platform_admin: Full platform control, cross-tenant operations, license management
+        - admin: Full control within their business account
+        - manager: Day-to-day operations, cannot manage users or delete
+        
+        Deprecated roles (mapped to admin for backward compatibility):
+        - business_account_admin: Use 'admin' instead
+        """
         role_permissions = {
             'admin': ['view', 'create', 'edit', 'delete', 'manage_users', 'export_data', 'manage_participants'],
             'manager': ['view', 'create', 'edit', 'export_data', 'manage_participants'],
-            'viewer': ['view'],
             'platform_admin': ['view', 'create', 'edit', 'delete', 'manage_users', 'export_data', 'manage_participants', 'platform_admin', 'manage_licenses', 'cross_tenant_access']
         }
         

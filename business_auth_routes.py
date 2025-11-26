@@ -6066,12 +6066,12 @@ def upload_transcript(campaign_id):
         if not current_account:
             return jsonify({'error': 'Business account context not found'}), 401
         
-        # Check if user has admin permission
+        # Get current user for audit trail (all authenticated users can upload transcripts)
         business_user_id = session.get('business_user_id')
         from models import BusinessAccountUser
         user = BusinessAccountUser.query.get(business_user_id)
-        if not user or user.role != 'admin':
-            return jsonify({'error': 'Admin permission required'}), 403
+        if not user:
+            return jsonify({'error': 'User session invalid'}), 401
         
         # Verify campaign belongs to current business account
         from models import Campaign
