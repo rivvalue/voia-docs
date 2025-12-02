@@ -1627,8 +1627,8 @@ def login():
         except Exception as audit_error:
             logger.error(f"Failed to audit login for {email}: {audit_error}")
         
-        # Redirect to admin panel
-        return redirect(url_for('business_auth.admin_panel'))
+        # Redirect to campaigns list (main working area)
+        return redirect(url_for('campaigns.list_campaigns'))
         
     except Exception as e:
         logger.error(f"Business login error: {e}")
