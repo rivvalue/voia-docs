@@ -1549,20 +1549,6 @@ def process_account_activation(token):
 def login():
     """Business account login page and handler"""
     if request.method == 'GET':
-        # Clear non-authentication flash messages to prevent message leakage from other pages
-        # Only preserve authentication-related messages
-        auth_keywords = ['log in', 'login', 'session', 'authentication', 'password', 'account', 'suspended', 'active', 'token']
-        
-        # Get all flash messages
-        flashed_messages = get_flashed_messages(with_categories=True)
-        
-        # Filter and re-flash only authentication-related messages
-        for category, message in flashed_messages:
-            message_lower = message.lower()
-            if any(keyword in message_lower for keyword in auth_keywords):
-                flash(message, category)
-        
-        # Show login form
         return render_template('business_auth/login.html')
     
     # Handle login submission
