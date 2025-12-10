@@ -1079,11 +1079,15 @@ function deleteDraft() {
             <div class="modal-body">
                 <p><strong>{{ _('Are you sure you want to activate this campaign?') }}</strong></p>
                 <p>{{ _('When you activate this campaign:') }}</p>
-                <ul class="mb-0">
-                    <li>{{ _('Participants will be notified via email') }}</li>
-                    <li>{{ _('Response collection will begin immediately') }}</li>
+                <ul class="mb-3">
+                    <li>{{ _('The campaign will be ready to collect responses') }}</li>
+                    <li>{{ _('Participation tokens will be generated for all participants') }}</li>
                     <li>{{ _('The campaign will run until the end date') }}</li>
                 </ul>
+                <div class="alert alert-info mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>{{ _('Next step:') }}</strong> {{ _('After activation, use the "Send Email Invitations" button to notify participants.') }}
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
