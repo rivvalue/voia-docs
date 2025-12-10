@@ -7557,3 +7557,15 @@ msgstr "Réponses individuelles"
 msgid "Reminders"
 msgstr "Rappels"
 
+
+msgid "The campaign will be ready to collect responses"
+msgstr "La campagne sera prête à collecter des réponses"
+
+msgid "Participation tokens will be generated for all participants"
+msgstr "Des jetons de participation seront générés pour tous les participants"
+
+msgid "Next step:"
+msgstr "Prochaine étape :"
+
+msgid "After activation, use the \"Send Email Invitations\" button to notify participants."
+msgstr "Après l'activation, utilisez le bouton « Envoyer les invitations par e-mail » pour notifier les participants."
