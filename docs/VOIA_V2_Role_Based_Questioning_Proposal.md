@@ -1,8 +1,8 @@
 # VOÏA V2 Enhancement: Role-Based Questioning & Deflection Control
 
-**Document Version:** 1.0  
+**Document Version:** 1.1  
 **Date:** December 11, 2025  
-**Status:** Proposal for Team Review
+**Status:** Phases 1-4 Complete, Phases 5-7 Pending
 
 ---
 
@@ -676,9 +676,9 @@ This avoids complexity creep while giving clients the customization they're most
 | Phase | Status | Completed | Notes |
 |-------|--------|-----------|-------|
 | 1. Extended ROLE_METADATA | ✅ COMPLETE | Dec 11, 2025 | All 6 personas extended with new fields |
-| 2. Follow-up Depth Control | 🔄 IN PROGRESS | - | Feature flag implementation |
-| 3. Prompt Guidance Injection | ⏳ PENDING | - | - |
-| 4. Deflection Detection | ⏳ PENDING | - | - |
+| 2. Follow-up Depth Control | ✅ COMPLETE | Dec 11, 2025 | USE_PERSONA_FOLLOW_UP_DEPTH flag - C-level/VP: 1, Manager/Team Lead: 2, End User: 3 |
+| 3. Prompt Guidance Injection | ✅ COMPLETE | Dec 11, 2025 | USE_PERSONA_PROMPT_GUIDANCE flag - strategic/balanced/operational styles, bilingual EN/FR |
+| 4. Deflection Detection | ✅ COMPLETE | Dec 11, 2025 | USE_DEFLECTION_DETECTION flag - 6 types detected, graceful acknowledgments, analytics tracking |
 | 5. Topic Status Tracking | ⏳ PENDING | - | - |
 | 6. Database Schema | ⏳ PENDING | - | - |
 | 7. Analytics | ⏳ PENDING | - | - |
