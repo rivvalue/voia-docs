@@ -802,13 +802,13 @@ Also return: deflection_detected, deflection_type, deflection_reason
 - Test with normal responses (should return `deflection_detected: false`)
 - Monitor for false positives in staging
 
-### Phase 5: Topic Status Tracking
+### Phase 5: Topic Status Tracking ✅ COMPLETE (Dec 11, 2025)
 
 **What changes:**
 ```python
 # deterministic_helpers.py - state persistence
 # BEFORE: topic_question_counts = {"NPS": 2}
-# AFTER: topic_status = {"NPS": {"count": 2, "status": "completed", "deflection": null}}
+# AFTER: topic_status = {"NPS": {"question_count": 2, "status": "completed", "deflection": null}}
 
 # Backward compatible loading:
 def load_topic_status(state):
@@ -816,10 +816,16 @@ def load_topic_status(state):
         return state['topic_status']  # New format
     elif 'topic_question_counts' in state:
         # Migrate old format
-        return {topic: {"count": count, "status": "pending", "deflection": None}
+        return {topic: {"question_count": count, "status": "pending", "deflection": None}
                 for topic, count in state['topic_question_counts'].items()}
     return {}
 ```
+
+**Implementation Details:**
+- Helper functions in `deterministic_helpers.py`: `load_topic_status()`, `get_topic_question_counts()`, `update_topic_status()`, `get_completion_summary()`
+- Controller updated to use `topic_status` as primary data structure
+- Backward-compatible property `topic_question_counts` computes from `topic_status`
+- State persistence saves both formats during transition
 
 **Risk:** Medium. Must handle in-flight conversations during deployment.
 
@@ -832,28 +838,48 @@ def load_topic_status(state):
 - Loader handles both formats automatically
 - If issues, revert code → old format still works
 
-**Validation:**
-- Test with existing active_conversations data
-- Verify new conversations use new format
-- Verify old conversations still complete successfully
+**Validation:** ✅ All tests passed
+- Existing active_conversations data handled correctly
+- New conversations use new format
+- Old conversations still complete successfully
+- Deflected topics properly skipped (high question_count set)
 
-### Phase 6: Database Schema
+### Phase 6: Database Schema ✅ COMPLETE (Dec 11, 2025)
 
 **What changes:**
 ```sql
 ALTER TABLE survey_response ADD COLUMN deflection_summary TEXT;
 ```
 
+**Implementation Details:**
+- Migration: `migrations/add_deflection_summary.sql`
+- Helper function: `_build_deflection_summary()` in `ai_conversational_survey_v2.py`
+- Finalization: `finalize_ai_conversational_survey_v2()` includes deflection_summary
+- Persistence: Both update and create paths in `routes.py` save deflection_summary
+
+**Summary JSON Structure:**
+```json
+{
+  "total_topics": 3,
+  "completed": 1,
+  "skipped": 2,
+  "total_deflections": 2,
+  "deflections": [
+    {"topic": "Product", "type": "not_responsible", "reason": "Ask my team", "detected_at": "..."}
+  ]
+}
+```
+
 **Risk:** Low. New nullable column, no impact on existing data.
 
 **Backup plan:** Column exists but remains NULL for old responses. No harm.
 
-**Validation:**
-- Verify column added
-- Verify existing queries still work
-- Verify new responses populate the field
+**Validation:** ✅ All tests passed
+- Column added to database
+- Existing queries still work
+- New V2 responses populate the field automatically
 
-### Phase 7: Analytics
+### Phase 7: Analytics (OPTIONAL)
 
 **What changes:**
 - New read-only queries on `deflection_summary`
@@ -866,25 +892,16 @@ ALTER TABLE survey_response ADD COLUMN deflection_summary TEXT;
 ### Deployment Sequence
 
 ```
-Week 1: Foundation
-├─ Day 1-2: Phase 1 (ROLE_METADATA structure) - No flag needed
-├─ Day 3-4: Phase 2 (follow_up_depth) - Flag: OFF initially
-└─ Day 5: Phase 6 (DB column) - Migration
+✅ COMPLETED (Dec 11, 2025):
+├─ Phase 1: ROLE_METADATA structure - No flag needed
+├─ Phase 2: follow_up_depth - Flag: USE_PERSONA_FOLLOW_UP_DEPTH
+├─ Phase 3: prompt guidance - Flag: USE_PERSONA_PROMPT_GUIDANCE  
+├─ Phase 4: deflection detection - Flag: USE_DEFLECTION_DETECTION
+├─ Phase 5: topic_status tracking - Backward compatible
+└─ Phase 6: DB column deflection_summary - Migration complete
 
-Week 2: Core Features
-├─ Day 1-2: Phase 3 (prompt guidance) - Flag: OFF initially
-├─ Day 3-5: Phase 4 (deflection detection) - Flag: OFF initially
-└─ Internal testing with all flags ON in staging
-
-Week 3: State Management
-├─ Day 1-3: Phase 5 (topic_status) - Backward compatible
-├─ Day 4-5: Integration testing
-└─ Enable flags progressively in production
-
-Week 4: Analytics & Cleanup
-├─ Day 1-3: Phase 7 (analytics dashboards)
-├─ Day 4: Remove old topic_question_counts after drain
-└─ Day 5: Documentation & monitoring
+📋 OPTIONAL (Not scheduled):
+└─ Phase 7: Analytics dashboards - Read-only visualizations
 ```
 
 ### Feature Flag Summary
