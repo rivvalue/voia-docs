@@ -1404,6 +1404,134 @@ def process_ai_conversation_response_v2(
     return response
 
 
+def run_summary_extraction(conversation_history: List[Dict[str, Any]], campaign_language: str = 'en') -> Dict[str, Any]:
+    """
+    Run a summary extraction pass over the complete conversation to extract topic-specific feedback.
+    
+    Option B Implementation (Dec 11, 2025):
+    This function runs at finalization to extract detailed feedback fields that may have been
+    missed during incremental extraction. It uses the full conversation context for accuracy.
+    
+    Args:
+        conversation_history: Complete list of conversation messages
+        campaign_language: Language for extraction ('en' or 'fr')
+    
+    Returns:
+        Dict with extracted topic-specific feedback fields:
+        - product_quality_feedback
+        - support_experience_feedback
+        - service_rating_feedback
+        - user_experience_feedback
+    
+    Note: Logs confidence to console but does not persist metadata (minimal implementation).
+    """
+    if not conversation_history:
+        logger.warning("Summary extraction: No conversation history provided")
+        return {}
+    
+    # Build transcript from conversation history
+    transcript_lines = []
+    for i, msg in enumerate(conversation_history):
+        sender = msg.get('sender', 'Unknown')
+        message = msg.get('message', '')
+        # Only include user messages for extraction context, but show VOÏA questions for topic context
+        transcript_lines.append(f"[{i+1}] {sender}: {message}")
+    
+    transcript = "\n".join(transcript_lines)
+    
+    # Language-specific prompt
+    if campaign_language == 'fr':
+        extraction_instruction = """Extrayez les commentaires spécifiques par sujet des réponses de l'UTILISATEUR.
+Utilisez UNIQUEMENT des citations textuelles ou des paraphrases proches. N'inventez PAS de feedback.
+Si l'utilisateur n'a pas abordé un sujet, retournez null pour ce champ."""
+    else:
+        extraction_instruction = """Extract topic-specific feedback from the USER's responses.
+Use ONLY verbatim quotes or close paraphrases. Do NOT invent feedback.
+If the user never discussed a topic, return null for that field."""
+    
+    prompt = f"""You are extracting topic-specific feedback from a completed survey conversation.
+
+{extraction_instruction}
+
+CONVERSATION TRANSCRIPT:
+{transcript}
+
+RULES:
+1. ONLY extract what the user ACTUALLY said about each topic
+2. If the user deflected or said "I don't know" for a topic, return null
+3. Combine related statements if user discussed a topic across multiple messages
+4. Include confidence score (0.0-1.0) based on how clearly the user addressed the topic
+
+Return JSON with this EXACT structure:
+{{
+    "product_quality_feedback": {{
+        "value": "user's actual feedback about product quality/features/bugs" or null,
+        "confidence": 0.0-1.0
+    }},
+    "support_experience_feedback": {{
+        "value": "user's actual feedback about support/help experience" or null,
+        "confidence": 0.0-1.0
+    }},
+    "service_rating_feedback": {{
+        "value": "user's actual feedback about overall service quality" or null,
+        "confidence": 0.0-1.0
+    }},
+    "user_experience_feedback": {{
+        "value": "user's actual feedback about UX/usability/interface" or null,
+        "confidence": 0.0-1.0
+    }}
+}}"""
+
+    try:
+        client = OpenAI()
+        
+        # Use gpt-4o-mini for cost efficiency (this is a simple extraction task)
+        model = os.environ.get('AI_SUMMARY_EXTRACTION_MODEL', 'gpt-4o-mini')
+        
+        response = client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": "You are a precise data extraction assistant. Extract only what the user actually said."},
+                {"role": "user", "content": prompt}
+            ],
+            response_format={"type": "json_object"},
+            max_tokens=500,
+            temperature=0.1  # Low temperature for consistent extraction
+        )
+        
+        content = response.choices[0].message.content
+        if content:
+            result = json.loads(content)
+            
+            # Log confidence scores (minimal implementation - no DB persistence)
+            for field, data in result.items():
+                if isinstance(data, dict) and data.get('value'):
+                    confidence = data.get('confidence', 0)
+                    logger.info(f"Summary extraction: {field} = '{data['value'][:50]}...' (confidence: {confidence})")
+                else:
+                    logger.debug(f"Summary extraction: {field} = null")
+            
+            # Extract just the values for database fields
+            extracted = {}
+            for field in ['product_quality_feedback', 'support_experience_feedback', 
+                         'service_rating_feedback', 'user_experience_feedback']:
+                field_data = result.get(field, {})
+                if isinstance(field_data, dict):
+                    extracted[field] = field_data.get('value')
+                else:
+                    extracted[field] = field_data  # Handle case where LLM returns string directly
+            
+            logger.info(f"✅ Summary extraction complete: {sum(1 for v in extracted.values() if v)} fields extracted")
+            return extracted
+        else:
+            logger.warning("Summary extraction: Empty response from OpenAI")
+            return {}
+            
+    except Exception as e:
+        logger.error(f"❌ Summary extraction failed: {e}")
+        return {}
+
+
 def _build_deflection_summary(topic_status: Dict[str, Dict[str, Any]]) -> str:
     """
     Build JSON deflection summary from topic_status for database persistence.
