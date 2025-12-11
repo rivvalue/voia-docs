@@ -1,8 +1,8 @@
 # VOÏA V2 Enhancement: Role-Based Questioning & Deflection Control
 
-**Document Version:** 1.1  
+**Document Version:** 1.2  
 **Date:** December 11, 2025  
-**Status:** Phases 1-4 Complete, Phases 5-7 Pending
+**Status:** Phases 1-6 Complete, Phase 7 Pending
 
 ---
 
