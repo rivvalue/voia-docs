@@ -671,6 +671,18 @@ This avoids complexity creep while giving clients the customization they're most
 
 ## Appendix: Detailed Implementation Plan
 
+### Implementation Progress
+
+| Phase | Status | Completed | Notes |
+|-------|--------|-----------|-------|
+| 1. Extended ROLE_METADATA | ✅ COMPLETE | Dec 11, 2025 | All 6 personas extended with new fields |
+| 2. Follow-up Depth Control | 🔄 IN PROGRESS | - | Feature flag implementation |
+| 3. Prompt Guidance Injection | ⏳ PENDING | - | - |
+| 4. Deflection Detection | ⏳ PENDING | - | - |
+| 5. Topic Status Tracking | ⏳ PENDING | - | - |
+| 6. Database Schema | ⏳ PENDING | - | - |
+| 7. Analytics | ⏳ PENDING | - | - |
+
 ### Phase Overview
 
 | Phase | Scope | Risk Level | Rollback Complexity |

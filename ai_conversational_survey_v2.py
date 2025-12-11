@@ -48,7 +48,7 @@ from openai import OpenAI
 # VOÏA infrastructure
 from app import db
 from models import Campaign, Participant, BusinessAccount
-from prompt_template_service import PromptTemplateService
+from prompt_template_service import PromptTemplateService, ROLE_METADATA, _map_role_to_tier
 
 # V2-specific modules
 from deterministic_helpers import (
@@ -74,6 +74,12 @@ logger = logging.getLogger(__name__)
 # Feature flag for revised extraction prompt (Nov 2025)
 # Set USE_REVISED_EXTRACTION_PROMPT=false to rollback to original prompt
 USE_REVISED_EXTRACTION_PROMPT = os.environ.get('USE_REVISED_EXTRACTION_PROMPT', 'true').lower() == 'true'
+
+# Feature flag for persona-based follow-up depth (Dec 2025)
+# When enabled, follow-up depth is controlled per persona tier from ROLE_METADATA
+# Set USE_PERSONA_FOLLOW_UP_DEPTH=true to enable persona-specific follow-up limits
+# Rollback: Set USE_PERSONA_FOLLOW_UP_DEPTH=false to revert to campaign/default behavior
+USE_PERSONA_FOLLOW_UP_DEPTH = os.environ.get('USE_PERSONA_FOLLOW_UP_DEPTH', 'false').lower() == 'true'
 
 # Field mapping: Prompt field names → Database column names
 # Allows descriptive prompt fields while maintaining DB compatibility
@@ -190,8 +196,20 @@ class DeterministicSurveyController:
             self.participant_data.get('role')
         )
         
-        # Campaign limits
-        self.max_follow_up_per_topic = getattr(self.campaign, 'max_follow_up_per_topic', 2) if self.campaign else 2
+        # Campaign limits with persona-based follow-up depth (Dec 2025)
+        # When USE_PERSONA_FOLLOW_UP_DEPTH is enabled, use per-persona limits from ROLE_METADATA
+        # Otherwise, fall back to campaign setting or default of 2
+        if USE_PERSONA_FOLLOW_UP_DEPTH:
+            # Get persona tier from participant role
+            role_tier = _map_role_to_tier(self.participant_data.get('role'))
+            persona_config = ROLE_METADATA.get(role_tier, ROLE_METADATA['default'])
+            self.max_follow_up_per_topic = persona_config.get('follow_up_depth', 2)
+            self.persona_tier = role_tier  # Cache for later use
+            logger.info(f"Persona-based follow-up depth: role={self.participant_data.get('role')}, "
+                       f"tier={role_tier}, depth={self.max_follow_up_per_topic}")
+        else:
+            self.max_follow_up_per_topic = getattr(self.campaign, 'max_follow_up_per_topic', 2) if self.campaign else 2
+            self.persona_tier = None  # Not using persona-based control
         self.max_questions = self.template_service.get_template_info().get('max_questions', 15)
         
         # Track AI prompts for debugging
