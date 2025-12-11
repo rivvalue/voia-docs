@@ -42,6 +42,38 @@ def _parse_json_list(value: Any) -> Optional[List]:
     return None
 
 
+def _parse_json_dict(value: Any) -> Optional[Dict]:
+    """
+    Safely parse a value that should be a dict, handling JSON strings.
+    
+    SQLAlchemy may return JSON fields as strings that need parsing.
+    This helper ensures we always get a proper Python dict.
+    
+    Args:
+        value: Could be a dict, JSON string, or None
+        
+    Returns:
+        Parsed dict or None if invalid
+    """
+    if value is None:
+        return None
+    
+    # Already a dict - return copy to avoid mutation
+    if isinstance(value, dict):
+        return dict(value)
+    
+    # String - try to parse as JSON
+    if isinstance(value, str):
+        try:
+            parsed = json.loads(value)
+            if isinstance(parsed, dict):
+                return parsed
+        except (json.JSONDecodeError, TypeError):
+            pass
+    
+    return None
+
+
 # Topic-to-Field Mapping for AI Response Validation and Analytics
 # CRITICAL: Each topic MUST have unique fields to enable backend-controlled survey completion
 TOPIC_FIELD_MAP = {
@@ -482,6 +514,18 @@ class PromptTemplateService:
                 except (json.JSONDecodeError, TypeError):
                     pass
         
+        # Role prompt overrides (Dec 2025: 4-tier configuration)
+        # Parse JSON dict for role-specific prompt guidance overrides
+        self._ba_role_prompt_overrides = _parse_json_dict(
+            business_account.role_prompt_overrides if business_account and hasattr(business_account, 'role_prompt_overrides') else None
+        )
+        self._campaign_role_prompt_overrides = _parse_json_dict(
+            campaign.role_prompt_overrides if campaign and hasattr(campaign, 'role_prompt_overrides') else None
+        )
+        self._campaign_use_business_role_prompts = True
+        if campaign and hasattr(campaign, 'use_business_role_prompts'):
+            self._campaign_use_business_role_prompts = campaign.use_business_role_prompts if campaign.use_business_role_prompts is not None else True
+        
         # Determine demo mode based on extracted primitives
         self.is_demo_mode = not (
             (campaign and self._has_campaign_customization_from_primitives()) or 
@@ -634,6 +678,111 @@ class PromptTemplateService:
         
         # Merge custom hints with platform defaults (custom overrides platform)
         return merge_custom_hints(industry, self._ba_industry_topic_hints)
+    
+    def get_effective_role_prompt_guidance(self, role_tier: str, current_topic: Optional[str] = None, language: str = 'en') -> Optional[str]:
+        """Get effective role-specific prompt guidance with 4-tier resolution and topic awareness
+        
+        Resolution hierarchy (first match wins):
+        1. Campaign role_prompt_overrides (if use_business_role_prompts=False)
+        2. Business Account role_prompt_overrides
+        3. Platform defaults from PlatformSurveySettings (if use_role_prompt_overrides=True)
+        4. ROLE_METADATA hardcoded defaults (always available)
+        
+        Topic-aware structure (Dec 2025 - fixes the Manager+Pricing bug):
+        Override format supports both role-level and topic-level guidance:
+        {
+            "manager": {
+                "prompt_guidance": {"en": "...", "fr": "..."},  # Default for all topics
+                "topic_overrides": {
+                    "Pricing Value": {"en": "Focus on budget impact", "fr": "..."}  # Topic-specific
+                }
+            }
+        }
+        
+        Args:
+            role_tier: The participant's role tier (e.g., 'manager', 'c_level')
+            current_topic: Optional current survey topic for topic-aware guidance
+            language: Language code ('en' or 'fr')
+            
+        Returns:
+            Prompt guidance string or None if role tier not found
+        """
+        # Normalize role tier
+        role_tier = role_tier.lower() if role_tier else 'default'
+        lang_key = language.lower()[:2] if language else 'en'
+        
+        # Helper to extract guidance from override dict
+        def extract_guidance(overrides: Optional[Dict], tier: str, topic: Optional[str], lang: str) -> Optional[str]:
+            if not overrides or tier not in overrides:
+                return None
+            role_config = overrides.get(tier, {})
+            
+            # Check for topic-specific override first (the key fix for Manager+Pricing bug)
+            if topic and 'topic_overrides' in role_config:
+                topic_overrides = role_config.get('topic_overrides', {})
+                if topic in topic_overrides:
+                    topic_guidance = topic_overrides[topic]
+                    if isinstance(topic_guidance, dict):
+                        return topic_guidance.get(lang) or topic_guidance.get('en')
+                    elif isinstance(topic_guidance, str):
+                        return topic_guidance
+            
+            # Fall back to role-level default guidance
+            prompt_guidance = role_config.get('prompt_guidance', {})
+            if isinstance(prompt_guidance, dict):
+                return prompt_guidance.get(lang) or prompt_guidance.get('en')
+            elif isinstance(prompt_guidance, str):
+                return prompt_guidance
+            
+            return None
+        
+        # Tier 1: Campaign overrides (if campaign has its own overrides)
+        if self._campaign_role_prompt_overrides:
+            guidance = extract_guidance(self._campaign_role_prompt_overrides, role_tier, current_topic, lang_key)
+            if guidance:
+                return guidance
+        
+        # Tier 2: Business Account overrides (only if campaign inherits from BA)
+        # If use_business_role_prompts=False, skip to platform tier
+        if self._campaign_use_business_role_prompts and self._ba_role_prompt_overrides:
+            guidance = extract_guidance(self._ba_role_prompt_overrides, role_tier, current_topic, lang_key)
+            if guidance:
+                return guidance
+        
+        # Tier 3: Platform settings (cached for performance)
+        # Platform settings act as tenant-wide defaults when BA/campaign don't override
+        # Cache key based on singleton - only one platform settings row exists
+        try:
+            from models import PlatformSurveySettings
+            from flask import current_app
+            
+            # Use Flask's app context cache for platform settings (avoid repeated DB queries)
+            cache_key = '_platform_survey_settings_cache'
+            platform_settings = getattr(current_app, cache_key, None)
+            if platform_settings is None:
+                platform_settings = PlatformSurveySettings.query.first()
+                setattr(current_app, cache_key, platform_settings)
+            
+            if platform_settings and platform_settings.use_role_prompt_overrides and platform_settings.role_prompt_overrides:
+                platform_overrides = _parse_json_dict(platform_settings.role_prompt_overrides)
+                if platform_overrides:
+                    guidance = extract_guidance(platform_overrides, role_tier, current_topic, lang_key)
+                    if guidance:
+                        return guidance
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).debug(f"Platform settings not available: {e}")
+        
+        # Tier 4: ROLE_METADATA hardcoded defaults (always available)
+        role_metadata = ROLE_METADATA.get(role_tier, ROLE_METADATA.get('default'))
+        if role_metadata and 'prompt_guidance' in role_metadata:
+            prompt_guidance = role_metadata['prompt_guidance']
+            if isinstance(prompt_guidance, dict):
+                return prompt_guidance.get(lang_key) or prompt_guidance.get('en')
+            elif isinstance(prompt_guidance, str):
+                return prompt_guidance
+        
+        return None
     
     def get_max_questions(self) -> int:
         """Get maximum questions limit (HOT PATH - uses cached primitives)"""

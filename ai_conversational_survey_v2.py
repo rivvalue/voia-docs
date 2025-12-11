@@ -1133,19 +1133,33 @@ Return ONLY the JSON object, no explanation."""
 Ask a clarifying question to get more specific information about the missing fields."""
         
         # Persona-specific prompt guidance (Dec 2025)
+        # Uses 4-tier resolution: Campaign → Business Account → Platform → ROLE_METADATA defaults
+        # Topic-aware: Can provide different guidance for Manager+Pricing vs Manager+Product
         persona_guidance_block = ""
         if USE_PERSONA_PROMPT_GUIDANCE and self.persona_tier:
-            persona_config = ROLE_METADATA.get(self.persona_tier, ROLE_METADATA['default'])
-            prompt_guidance = persona_config.get('prompt_guidance', {})
-            # Get language-appropriate guidance (fallback to English)
             lang_code = self.language[:2] if self.language else 'en'
-            guidance_text = prompt_guidance.get(lang_code) or prompt_guidance.get('en', '')
+            
+            # Use the new 4-tier resolution helper with topic awareness (Dec 2025)
+            guidance_text = None
+            if self.prompt_template_service:
+                guidance_text = self.prompt_template_service.get_effective_role_prompt_guidance(
+                    role_tier=self.persona_tier,
+                    current_topic=topic_name,  # KEY FIX: Pass current topic for topic-aware guidance
+                    language=lang_code
+                )
+            
+            # Fallback to direct ROLE_METADATA access if no prompt_template_service
+            if not guidance_text:
+                persona_config = ROLE_METADATA.get(self.persona_tier, ROLE_METADATA['default'])
+                prompt_guidance = persona_config.get('prompt_guidance', {})
+                guidance_text = prompt_guidance.get(lang_code) or prompt_guidance.get('en', '')
+            
             if guidance_text:
                 persona_guidance_block = f"""
 **PERSONA-SPECIFIC INSTRUCTIONS:**
 {guidance_text.strip()}
 """
-                logger.debug(f"Injecting persona guidance for tier={self.persona_tier}, lang={lang_code}")
+                logger.debug(f"Injecting persona guidance for tier={self.persona_tier}, topic={topic_name}, lang={lang_code}")
         
         prompt = f"""Generate a natural, conversational question for the topic: {topic_name}
 
