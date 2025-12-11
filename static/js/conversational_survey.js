@@ -318,7 +318,17 @@ function sendMessage() {
         
         // Check if survey is complete
         if (data.is_complete) {
-            finalizeSurvey();
+            // Disable input to prevent further responses
+            const inputArea = document.getElementById('inputArea');
+            if (inputArea) {
+                inputArea.style.opacity = '0.5';
+                inputArea.style.pointerEvents = 'none';
+            }
+            
+            // Delay finalization so user can read the completion message (2.5 seconds)
+            setTimeout(() => {
+                finalizeSurvey();
+            }, 2500);
         }
         
     })
