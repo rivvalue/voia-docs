@@ -248,6 +248,12 @@ class Campaign(db.Model):
     use_business_controls = db.Column(db.Boolean, nullable=False, default=True)
     use_business_product_focus = db.Column(db.Boolean, nullable=False, default=True)
     
+    # Role-based prompt overrides (Dec 2025: 4-tier configuration)
+    # Campaign-specific overrides for persona questioning guidance
+    # Structure: {"manager": {"prompt_guidance": {"en": "...", "fr": "..."}, "question_templates": {...}}}
+    role_prompt_overrides = db.Column(db.JSON, nullable=True, default={})
+    use_business_role_prompts = db.Column(db.Boolean, nullable=False, default=True)  # Inherit from business account
+    
     # Campaign-specific email content customization (hybrid: campaign overrides → account defaults → hardcoded)
     use_custom_email_content = db.Column(db.Boolean, nullable=False, default=False)
     custom_subject_template = db.Column(db.String(500), nullable=True)
@@ -324,7 +330,10 @@ class Campaign(db.Model):
             # Inheritance flags for survey settings
             'use_business_topics': self.use_business_topics,
             'use_business_controls': self.use_business_controls,
-            'use_business_product_focus': self.use_business_product_focus
+            'use_business_product_focus': self.use_business_product_focus,
+            # Role prompt overrides (Dec 2025: 4-tier configuration)
+            'role_prompt_overrides': self.role_prompt_overrides or {},
+            'use_business_role_prompts': self.use_business_role_prompts
         }
         
         # OPTIMIZATION: Only include response_count if explicitly requested or pre-computed
@@ -877,6 +886,11 @@ class BusinessAccount(db.Model):
     # Industry-specific prompt verticalization (Phase 2: Topic Hints)
     industry_topic_hints = db.Column(db.JSON, nullable=True)  # Custom topic hints override platform defaults: {"Product Quality": "custom keywords"}
     
+    # Role-based prompt overrides (Dec 2025: 4-tier configuration)
+    # Overrides platform defaults for persona-specific questioning guidance
+    # Structure: {"manager": {"prompt_guidance": {"en": "...", "fr": "..."}, "question_templates": {...}}}
+    role_prompt_overrides = db.Column(db.JSON, nullable=True, default={})
+    
     # Survey Control Parameters
     max_questions = db.Column(db.Integer, nullable=True, default=8)  # Absolute hard stop (3-15 range)
     max_duration_seconds = db.Column(db.Integer, nullable=True, default=120)  # Time limit (60-300 range)
@@ -921,6 +935,8 @@ class BusinessAccount(db.Model):
             'custom_end_message': self.custom_end_message,
             'custom_system_prompt': self.custom_system_prompt,
             'prompt_template_version': self.prompt_template_version,
+            'industry_topic_hints': self.industry_topic_hints,
+            'role_prompt_overrides': self.role_prompt_overrides or {},
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }
@@ -1585,6 +1601,55 @@ class PlatformEmailSettings(db.Model):
             data['smtp_password'] = self.get_smtp_password()
         
         return data
+
+
+class PlatformSurveySettings(db.Model):
+    """Platform-wide survey configuration (single record for VOÏA platform)
+    
+    Dec 2025: Added for 4-tier role prompt override configuration.
+    Super-admins can set platform-wide defaults that all tenants inherit.
+    """
+    __tablename__ = 'platform_survey_settings'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    
+    # Role-based prompt overrides (platform-level defaults)
+    # Structure: {"manager": {"prompt_guidance": {"en": "...", "fr": "..."}, "question_templates": {...}}}
+    role_prompt_overrides = db.Column(db.JSON, nullable=True, default={})
+    
+    # Industry topic hints (platform-level defaults)
+    industry_topic_hints = db.Column(db.JSON, nullable=True, default={})
+    
+    # Feature flags for survey behavior
+    use_role_prompt_overrides = db.Column(db.Boolean, nullable=False, default=False)  # Enable 4-tier resolution
+    
+    # Metadata
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_by_user_id = db.Column(db.Integer, db.ForeignKey('business_account_users.id'), nullable=True)
+    
+    # Relationship
+    updated_by = db.relationship('BusinessAccountUser', foreign_keys=[updated_by_user_id])
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'role_prompt_overrides': self.role_prompt_overrides or {},
+            'industry_topic_hints': self.industry_topic_hints or {},
+            'use_role_prompt_overrides': self.use_role_prompt_overrides,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }
+    
+    @staticmethod
+    def get_instance():
+        """Get or create the singleton platform survey settings record"""
+        settings = PlatformSurveySettings.query.first()
+        if not settings:
+            settings = PlatformSurveySettings()
+            db.session.add(settings)
+            db.session.commit()
+        return settings
 
 
 class Participant(db.Model):
