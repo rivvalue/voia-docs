@@ -81,6 +81,12 @@ USE_REVISED_EXTRACTION_PROMPT = os.environ.get('USE_REVISED_EXTRACTION_PROMPT', 
 # Rollback: Set USE_PERSONA_FOLLOW_UP_DEPTH=false to revert to campaign/default behavior
 USE_PERSONA_FOLLOW_UP_DEPTH = os.environ.get('USE_PERSONA_FOLLOW_UP_DEPTH', 'false').lower() == 'true'
 
+# Feature flag for persona-based prompt guidance (Dec 2025)
+# When enabled, injects persona-specific questioning instructions into AI prompts
+# Set USE_PERSONA_PROMPT_GUIDANCE=true to enable persona-appropriate questioning styles
+# Rollback: Set USE_PERSONA_PROMPT_GUIDANCE=false to revert to generic questioning
+USE_PERSONA_PROMPT_GUIDANCE = os.environ.get('USE_PERSONA_PROMPT_GUIDANCE', 'false').lower() == 'true'
+
 # Field mapping: Prompt field names → Database column names
 # Allows descriptive prompt fields while maintaining DB compatibility
 EXTRACTION_TO_DB_FIELD_MAP = {
@@ -196,20 +202,20 @@ class DeterministicSurveyController:
             self.participant_data.get('role')
         )
         
+        # Always compute persona tier for use by multiple persona features (Dec 2025)
+        # persona_tier is needed by: USE_PERSONA_FOLLOW_UP_DEPTH, USE_PERSONA_PROMPT_GUIDANCE
+        self.persona_tier = _map_role_to_tier(self.participant_data.get('role'))
+        persona_config = ROLE_METADATA.get(self.persona_tier, ROLE_METADATA['default'])
+        
         # Campaign limits with persona-based follow-up depth (Dec 2025)
         # When USE_PERSONA_FOLLOW_UP_DEPTH is enabled, use per-persona limits from ROLE_METADATA
         # Otherwise, fall back to campaign setting or default of 2
         if USE_PERSONA_FOLLOW_UP_DEPTH:
-            # Get persona tier from participant role
-            role_tier = _map_role_to_tier(self.participant_data.get('role'))
-            persona_config = ROLE_METADATA.get(role_tier, ROLE_METADATA['default'])
             self.max_follow_up_per_topic = persona_config.get('follow_up_depth', 2)
-            self.persona_tier = role_tier  # Cache for later use
             logger.info(f"Persona-based follow-up depth: role={self.participant_data.get('role')}, "
-                       f"tier={role_tier}, depth={self.max_follow_up_per_topic}")
+                       f"tier={self.persona_tier}, depth={self.max_follow_up_per_topic}")
         else:
             self.max_follow_up_per_topic = getattr(self.campaign, 'max_follow_up_per_topic', 2) if self.campaign else 2
-            self.persona_tier = None  # Not using persona-based control
         self.max_questions = self.template_service.get_template_info().get('max_questions', 15)
         
         # Track AI prompts for debugging
@@ -765,6 +771,21 @@ Return ONLY the JSON object, no explanation."""
 **THIS IS A FOLLOW-UP QUESTION** - The user's previous answer was incomplete or vague.
 Ask a clarifying question to get more specific information about the missing fields."""
         
+        # Persona-specific prompt guidance (Dec 2025)
+        persona_guidance_block = ""
+        if USE_PERSONA_PROMPT_GUIDANCE and self.persona_tier:
+            persona_config = ROLE_METADATA.get(self.persona_tier, ROLE_METADATA['default'])
+            prompt_guidance = persona_config.get('prompt_guidance', {})
+            # Get language-appropriate guidance (fallback to English)
+            lang_code = self.language[:2] if self.language else 'en'
+            guidance_text = prompt_guidance.get(lang_code) or prompt_guidance.get('en', '')
+            if guidance_text:
+                persona_guidance_block = f"""
+**PERSONA-SPECIFIC INSTRUCTIONS:**
+{guidance_text.strip()}
+"""
+                logger.debug(f"Injecting persona guidance for tier={self.persona_tier}, lang={lang_code}")
+        
         prompt = f"""Generate a natural, conversational question for the topic: {topic_name}
 
 **STATIC CONTEXT (for understanding only, do NOT restate):**
@@ -773,6 +794,7 @@ Ask a clarifying question to get more specific information about the missing fie
 - Industry: {industry}
 - Participant Role: {role}
 - Conversation Tone: {conversation_tone}
+{persona_guidance_block}
 
 **RECENT CONVERSATION:**
 {context_snippet}
