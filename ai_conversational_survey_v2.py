@@ -886,25 +886,32 @@ Return ONLY a single JSON object, like:
         if USE_DEFLECTION_DETECTION:
             deflection_block = """
 
-**DEFLECTION DETECTION:**
-Analyze the user's response for deflection signals. Deflection means the user is avoiding answering the question.
+**DEFLECTION DETECTION (USE SPARINGLY):**
+Only detect deflection when the user is EXPLICITLY refusing or avoiding the question entirely.
 
-If deflection detected, ALSO include these fields in your JSON output:
+CRITICAL: Be VERY conservative. Most responses are NOT deflections.
+
+Deflection types (only use when user provides NO useful information AND explicitly avoids):
+- "not_responsible": User says they CANNOT answer and directs you elsewhere ("You need to ask IT", "I'm not the right person, talk to my manager")
+- "no_data": User explicitly states no experience ("I've never used that feature", "I'm too new to have an opinion")
+- "confidential": User explicitly refuses for privacy ("That's confidential", "I can't share that information")
+- "dont_understand": User asks for clarification ("What do you mean by that?", "Can you rephrase?")
+- "already_answered": User explicitly says they covered it ("I already told you", "Same answer as before")
+- "refuse": User explicitly refuses ("I prefer not to answer", "No comment", "Pass")
+
+**NOT DEFLECTIONS (do NOT flag these):**
+- Mentioning their team while still giving feedback ("My team handles the technical details, but overall we're satisfied")
+- Brief but substantive answers ("It works well", "8 out of 10")
+- Answers that reference others as context ("Our IT team uses it daily and they like it")
+- Partial answers with any useful information
+- Expressing uncertainty while still sharing perspective ("I'm not sure of the exact numbers, but it seems good")
+
+If deflection detected, ALSO include:
 - deflection_detected: true
-- deflection_type: one of ["not_responsible", "no_data", "confidential", "dont_understand", "already_answered", "refuse"]
-- deflection_reason: brief explanation (string)
+- deflection_type: one of the types above
+- deflection_reason: brief explanation
 
-Deflection types and signal phrases:
-- "not_responsible": User delegates to someone else ("ask my manager", "my team handles that", "IT is responsible", "my product owner knows")
-- "no_data": User lacks experience ("I haven't used that", "too new to comment", "don't have experience with that feature")
-- "confidential": Privacy/confidentiality concern ("can't share that", "internal only", "that's sensitive information")
-- "dont_understand": User needs clarification ("not sure what you mean", "can you clarify?", "I don't understand the question")
-- "already_answered": User feels they already covered this ("I told you already", "same as before", "already covered that")
-- "refuse": Explicit refusal to answer ("I'd rather not say", "no comment", "pass", "I prefer not to answer")
-
-If NO deflection detected, do NOT include deflection fields (keep sparse JSON).
-
-IMPORTANT: Only mark as deflection if the user is clearly avoiding the question. Normal brief answers are NOT deflections."""
+WHEN IN DOUBT, DO NOT FLAG AS DEFLECTION. Only flag when the user provides ZERO useful information AND explicitly avoids."""
             prompt += deflection_block
         
         return prompt
