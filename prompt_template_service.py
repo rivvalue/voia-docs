@@ -296,8 +296,10 @@ class PromptTemplateService:
         # === HOT PATH: Extract frequently-accessed attributes as primitives ===
         # These are accessed 2+ times or critical for hybrid prompt mode
         
-        # Campaign hot path attributes (10 attributes - added optional_topics for V2 deterministic flow)
+        # Campaign hot path attributes (12 attributes - added name, description for welcome message)
         # Use _parse_json_list for list fields to handle JSON strings from SQLAlchemy
+        self._campaign_name = campaign.name if campaign else None  # FIX (Dec 11, 2025): For campaign-aware welcome
+        self._campaign_description = campaign.description if campaign else None  # FIX (Dec 11, 2025): For campaign-aware welcome
         self._campaign_prioritized_topics = _parse_json_list(campaign.prioritized_topics if campaign else None)
         self._campaign_optional_topics = _parse_json_list(campaign.optional_topics if campaign else None)  # V2 enhancement
         self._campaign_product_description = campaign.product_description if campaign else None
@@ -543,7 +545,11 @@ class PromptTemplateService:
         return ROLE_METADATA.get(tier, ROLE_METADATA['default'])['label']
     
     def generate_welcome_message(self, respondent_name: str) -> str:
-        """Generate personalized welcome message with language support"""
+        """Generate personalized welcome message with language and campaign-awareness support
+        
+        FIX (Dec 11, 2025): Now uses campaign.description to customize survey purpose
+        instead of generic "what's working, what's not" messaging.
+        """
         company_name = self.get_company_name()
         product_name = self.get_product_name()
         campaign_language = self._campaign_language_code
@@ -557,15 +563,47 @@ class PromptTemplateService:
         if self._ba_company_description:
             company_description = f"\n\n{self._ba_company_description}"
         
+        # FIX (Dec 11, 2025): Use campaign description for survey purpose if available
+        # This makes the welcome message reflect the actual campaign intent
+        survey_purpose = self._get_campaign_aware_survey_purpose(product_name, campaign_language)
+        
         # LANGUAGE-AWARE: Generate message in campaign language
         if campaign_language == 'fr':
             # French welcome message
-            survey_purpose = f"Cette courte conversation nous aidera à comprendre ce qui fonctionne bien, ce qui pourrait être amélioré, et comment optimiser votre expérience avec {product_name}."
             return f"Bonjour {respondent_name}, nous aimerions connaître votre avis.{company_description}\n\n{survey_purpose}\n\nSur une échelle de 0 à 10, quelle est la probabilité que vous recommandiez {company_name} à un ami ou collègue?"
         else:
             # English welcome message (default)
-            survey_purpose = f"This short conversation will help us understand what's working, what's not, and how to improve your experience with {product_name}."
             return f"Hi {respondent_name}, we'd love to hear from you.{company_description}\n\n{survey_purpose}\n\nOn a scale of 0-10, how likely are you to recommend {company_name} to a friend or colleague?"
+    
+    def _get_campaign_aware_survey_purpose(self, product_name: str, language: str) -> str:
+        """Generate survey purpose statement based on campaign description
+        
+        FIX (Dec 11, 2025): Uses campaign.description to create a purpose statement
+        that reflects the campaign's actual intent (e.g., year-end appreciation,
+        product feedback, relationship review).
+        
+        Args:
+            product_name: Product/service name for fallback
+            language: Language code ('en', 'fr', etc.)
+        
+        Returns:
+            Survey purpose statement in the appropriate language
+        """
+        # Check if campaign has a meaningful description
+        if self._campaign_description and len(self._campaign_description.strip()) > 10:
+            campaign_desc = self._campaign_description.strip()
+            
+            # Generate purpose based on campaign description
+            if language == 'fr':
+                return f"Cette conversation s'inscrit dans le cadre de notre initiative : {campaign_desc}. Votre retour est précieux pour nous aider à mieux vous servir."
+            else:
+                return f"This conversation is part of our initiative: {campaign_desc}. Your feedback is valuable in helping us serve you better."
+        
+        # Fallback to generic purpose if no campaign description
+        if language == 'fr':
+            return f"Cette courte conversation nous aidera à comprendre ce qui fonctionne bien, ce qui pourrait être amélioré, et comment optimiser votre expérience avec {product_name}."
+        else:
+            return f"This short conversation will help us understand what's working, what's not, and how to improve your experience with {product_name}."
     
     def generate_system_prompt(self, extracted_data: Dict[str, Any], step_count: int, conversation_history: str, participant_data: Optional[Dict[str, Any]] = None) -> str:
         """Generate system prompt for OpenAI conversation with hybrid prompt support"""
