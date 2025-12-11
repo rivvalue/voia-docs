@@ -982,6 +982,8 @@ Return ONLY the question text, no JSON, no explanation."""
         V2 ENHANCEMENT (Nov 23, 2025): Now includes controller_version and is_complete
         for finalization route branching and completion state tracking.
         
+        FIX (Dec 11, 2025): Added ai_prompts_log for debugging prompt effectiveness.
+        
         Returns:
             State dict for session_state_utils
         """
@@ -999,7 +1001,8 @@ Return ONLY the question text, no JSON, no explanation."""
             'last_activity': datetime.utcnow().isoformat(),
             'resume_offered': False,
             'controller_version': 'v2_deterministic',  # V2 ENHANCEMENT: For finalization routing
-            'is_complete': self.is_complete  # V2 ENHANCEMENT: Completion state tracking
+            'is_complete': self.is_complete,  # V2 ENHANCEMENT: Completion state tracking
+            'ai_prompts_log': self.ai_prompts_log  # FIX: Persist prompts for debugging
         }
     
     def load_conversation_state(self, conversation_id: str) -> bool:
@@ -1025,6 +1028,7 @@ Return ONLY the question text, no JSON, no explanation."""
         self.step_count = state['step_count']
         self.current_goal_pointer = state['current_goal_pointer']
         self.topic_question_counts = state['topic_question_counts']
+        self.ai_prompts_log = state.get('ai_prompts_log', [])  # FIX: Restore prompts log
         
         logger.info(f"Loaded V2 state: conv_id={conversation_id}, step={self.step_count}")
         
@@ -1175,8 +1179,9 @@ def finalize_ai_conversational_survey_v2(context: Dict[str, Any]) -> Dict[str, A
     step_count = persisted_state.get('step_count', 0)
     topic_question_counts = persisted_state.get('topic_question_counts', {})
     is_complete = persisted_state.get('is_complete', False)
+    ai_prompts_log = persisted_state.get('ai_prompts_log', [])  # FIX (Dec 11, 2025): Extract prompts log
     
-    logger.info(f"V2 State loaded: {len(extracted_data)} fields, {step_count} steps, complete={is_complete}")
+    logger.info(f"V2 State loaded: {len(extracted_data)} fields, {step_count} steps, complete={is_complete}, prompts={len(ai_prompts_log)}")
     logger.debug(f"Topic question counts: {topic_question_counts}")
     
     # FIX (Nov 23, 2025): Map participant_data keys to database field names
@@ -1212,6 +1217,7 @@ def finalize_ai_conversational_survey_v2(context: Dict[str, Any]) -> Dict[str, A
         'topic_question_counts': topic_question_counts,
         'is_complete': is_complete,
         'controller_version': 'v2_deterministic',
+        'ai_prompts_log': json.dumps(ai_prompts_log) if ai_prompts_log else None,  # FIX (Dec 11, 2025): JSON serialize prompts for DB
         
         # FIX (Nov 23, 2025): Add required NOT NULL fields for database
         'company_name': company_name,
