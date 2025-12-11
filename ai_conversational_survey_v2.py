@@ -38,6 +38,7 @@ To re-enable the revised prompt:
 """
 
 import os
+import re
 import uuid
 import json
 import logging
@@ -1439,45 +1440,64 @@ def run_summary_extraction(conversation_history: List[Dict[str, Any]], campaign_
     
     transcript = "\n".join(transcript_lines)
     
-    # Language-specific prompt
+    # Language-specific prompt - CRITICAL: NO NUMERIC INFERENCE
     if campaign_language == 'fr':
-        extraction_instruction = """Extrayez les commentaires spécifiques par sujet des réponses de l'UTILISATEUR.
-Utilisez UNIQUEMENT des citations textuelles ou des paraphrases proches. N'inventez PAS de feedback.
-Si l'utilisateur n'a pas abordé un sujet, retournez null pour ce champ."""
+        extraction_instruction = """Extrayez les commentaires QUALITATIFS spécifiques par sujet des réponses de l'UTILISATEUR.
+
+RÈGLES CRITIQUES:
+- Utilisez UNIQUEMENT des citations textuelles ou des paraphrases proches
+- N'INVENTEZ PAS de feedback
+- NE CONVERTISSEZ JAMAIS un commentaire en note numérique
+- Si l'utilisateur n'a pas abordé un sujet, retournez null
+
+INTERDIT:
+- "c'est ok" → 3/5 (NON! Retournez "c'est ok" tel quel)
+- "très satisfait" → 9/10 (NON! Retournez "très satisfait" tel quel)
+- Ajouter des chiffres ou des échelles au texte de l'utilisateur"""
     else:
-        extraction_instruction = """Extract topic-specific feedback from the USER's responses.
-Use ONLY verbatim quotes or close paraphrases. Do NOT invent feedback.
-If the user never discussed a topic, return null for that field."""
+        extraction_instruction = """Extract QUALITATIVE topic-specific feedback from the USER's responses.
+
+CRITICAL RULES:
+- Use ONLY verbatim quotes or close paraphrases
+- Do NOT invent feedback
+- NEVER convert comments into numeric ratings
+- If the user never discussed a topic, return null
+
+FORBIDDEN:
+- "it's ok" → 3/5 (NO! Return "it's ok" as-is)
+- "very satisfied" → 9/10 (NO! Return "very satisfied" as-is)
+- Adding numbers or scales to user's text"""
     
-    prompt = f"""You are extracting topic-specific feedback from a completed survey conversation.
+    prompt = f"""You are extracting QUALITATIVE feedback from a completed survey conversation.
 
 {extraction_instruction}
 
 CONVERSATION TRANSCRIPT:
 {transcript}
 
-RULES:
-1. ONLY extract what the user ACTUALLY said about each topic
+EXTRACTION RULES:
+1. ONLY extract what the user ACTUALLY said about each topic (verbatim or close paraphrase)
 2. If the user deflected or said "I don't know" for a topic, return null
 3. Combine related statements if user discussed a topic across multiple messages
 4. Include confidence score (0.0-1.0) based on how clearly the user addressed the topic
+5. NEVER add numeric ratings, scores, or scales - this is QUALITATIVE extraction only
 
 Return JSON with this EXACT structure:
 {{
     "product_quality_feedback": {{
-        "value": "user's actual feedback about product quality/features/bugs" or null,
+        "value": "user's actual qualitative feedback about product quality/features/bugs" or null,
         "confidence": 0.0-1.0
     }},
     "support_experience_feedback": {{
-        "value": "user's actual feedback about support/help experience" or null,
+        "value": "user's actual qualitative feedback about support/help experience" or null,
         "confidence": 0.0-1.0
     }},
     "service_rating_feedback": {{
-        "value": "user's actual feedback about overall service quality" or null,
+        "value": "user's actual qualitative feedback about overall service quality" or null,
         "confidence": 0.0-1.0
     }},
     "user_experience_feedback": {{
-        "value": "user's actual feedback about UX/usability/interface" or null,
+        "value": "user's actual qualitative feedback about UX/usability/interface" or null,
         "confidence": 0.0-1.0
     }}
 }}"""
@@ -1511,15 +1531,26 @@ Return JSON with this EXACT structure:
                 else:
                     logger.debug(f"Summary extraction: {field} = null")
             
-            # Extract just the values for database fields
+            # Extract just the values for database fields with numeric guardrail
             extracted = {}
+            # Pattern to detect numeric ratings that should not be in qualitative feedback
+            numeric_rating_pattern = re.compile(r'\d+\s*/\s*\d+|\d+\s*out\s*of\s*\d+|\d+\s*sur\s*\d+|^\d+$')
+            
             for field in ['product_quality_feedback', 'support_experience_feedback', 
                          'service_rating_feedback', 'user_experience_feedback']:
                 field_data = result.get(field, {})
                 if isinstance(field_data, dict):
-                    extracted[field] = field_data.get('value')
+                    value = field_data.get('value')
                 else:
-                    extracted[field] = field_data  # Handle case where LLM returns string directly
+                    value = field_data  # Handle case where LLM returns string directly
+                
+                # GUARDRAIL: Drop values that appear to be numeric ratings (hallucination prevention)
+                if value and isinstance(value, str):
+                    if numeric_rating_pattern.search(value):
+                        logger.warning(f"⚠️ Numeric guardrail triggered for {field}: '{value}' - dropping value")
+                        value = None
+                
+                extracted[field] = value
             
             logger.info(f"✅ Summary extraction complete: {sum(1 for v in extracted.values() if v)} fields extracted")
             return extracted
