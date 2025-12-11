@@ -41,6 +41,7 @@ import os
 import re
 import uuid
 import json
+import random
 import logging
 from datetime import datetime
 from typing import Dict, Any, List, Optional, Set, Tuple
@@ -98,6 +99,72 @@ USE_PERSONA_PROMPT_GUIDANCE = os.environ.get('USE_PERSONA_PROMPT_GUIDANCE', 'fal
 # Set USE_DEFLECTION_DETECTION=true to enable intelligent deflection handling
 # Rollback: Set USE_DEFLECTION_DETECTION=false to revert to standard extraction
 USE_DEFLECTION_DETECTION = os.environ.get('USE_DEFLECTION_DETECTION', 'false').lower() == 'true'
+
+# Feature flag for topic transition phrases (Dec 2025)
+# When enabled, adds natural transition phrases when moving between topics
+# Set USE_TOPIC_TRANSITIONS=true to enable smooth topic transitions
+# Rollback: Set USE_TOPIC_TRANSITIONS=false to revert to direct questions
+USE_TOPIC_TRANSITIONS = os.environ.get('USE_TOPIC_TRANSITIONS', 'true').lower() == 'true'
+
+# ============================================================================
+# TOPIC TRANSITION TEMPLATES (Dec 2025)
+# ============================================================================
+# Bilingual templates for smooth transitions between survey topics.
+# Format: Generic transitions + topic-specific acknowledgments
+# Used when is_follow_up=False (moving to new topic, not clarifying same topic)
+
+TOPIC_TRANSITION_TEMPLATES = {
+    'en': {
+        # Generic transitions (randomly selected for variety)
+        'generic': [
+            "Thank you for sharing that.",
+            "I appreciate your feedback on this.",
+            "That's helpful to know.",
+            "Thank you for your thoughts.",
+        ],
+        # Topic-specific acknowledgments (used when leaving a topic)
+        'from_topic': {
+            'NPS': "Thank you for that recommendation insight.",
+            'Product Quality': "I appreciate your product feedback.",
+            'Pricing': "Thank you for sharing your thoughts on pricing.",
+            'Support': "Thanks for your feedback on support.",
+            'Service': "I appreciate your service feedback.",
+            'Experience': "Thank you for sharing your experience.",
+        },
+        # Connectors to next topic
+        'connectors': [
+            "Now, I'd like to ask about",
+            "Let's talk about",
+            "I'd also like to hear your thoughts on",
+            "Moving on,",
+        ]
+    },
+    'fr': {
+        # Generic transitions
+        'generic': [
+            "Merci pour ce partage.",
+            "J'apprécie votre retour sur ce point.",
+            "C'est utile à savoir.",
+            "Merci pour vos commentaires.",
+        ],
+        # Topic-specific acknowledgments
+        'from_topic': {
+            'NPS': "Merci pour cette perspective sur votre recommandation.",
+            'Product Quality': "J'apprécie votre retour sur le produit.",
+            'Pricing': "Merci pour vos réflexions sur la tarification.",
+            'Support': "Merci pour votre retour sur le support.",
+            'Service': "J'apprécie votre retour sur le service.",
+            'Experience': "Merci de partager votre expérience.",
+        },
+        # Connectors
+        'connectors': [
+            "Maintenant, j'aimerais vous poser une question sur",
+            "Parlons de",
+            "J'aimerais aussi connaître votre avis sur",
+            "Pour continuer,",
+        ]
+    }
+}
 
 # Field mapping: Prompt field names → Database column names
 # Allows descriptive prompt fields while maintaining DB compatibility
@@ -380,9 +447,23 @@ class DeterministicSurveyController:
             return self._finish_survey()
         
         topic_name = next_goal.get('topic', 'Unknown')
+        previous_topic = self.current_goal_pointer  # Capture before updating
         
         # STEP 4: Generate question for chosen topic (LLM generates question ONLY)
         question = self._generate_question_with_ai(next_goal, missing_fields, is_follow_up)
+        
+        # STEP 4b: Add topic transition if moving to new topic (Dec 2025)
+        # Only add transition when: not a follow-up AND there was a previous topic
+        transition = None
+        if not is_follow_up:
+            transition = self._generate_topic_transition(previous_topic, topic_name)
+        
+        # Combine transition + question if transition exists
+        if transition:
+            full_message = f"{transition}\n\n{question}"
+            logger.info(f"Topic transition added: '{previous_topic}' → '{topic_name}'")
+        else:
+            full_message = question
         
         # STEP 5: Update state (increment counter, set pointer)
         # CRITICAL: Increment counter AFTER question generated (before next turn)
@@ -392,13 +473,14 @@ class DeterministicSurveyController:
         
         logger.info(f"Topic '{topic_name}' question count: {self.topic_question_counts[topic_name]}")
         
-        # Add VOÏA question to conversation history
+        # Add VOÏA question to conversation history (store full message with transition)
         self.conversation_history.append({
             'sender': 'VOÏA',
-            'message': question,
+            'message': full_message,
             'timestamp': datetime.utcnow().isoformat(),
             'topic': topic_name,
-            'is_follow_up': is_follow_up
+            'is_follow_up': is_follow_up,
+            'has_transition': transition is not None
         })
         
         # Save state to database
@@ -408,7 +490,7 @@ class DeterministicSurveyController:
         progress = self._calculate_progress()
         
         return {
-            'message': question,
+            'message': full_message,
             'message_type': 'question',
             'step': f'step_{self.step_count}',
             'progress': progress,
@@ -568,6 +650,52 @@ class DeterministicSurveyController:
         
         lang_acks = acknowledgments.get(lang, acknowledgments['en'])
         return lang_acks.get(deflection_type, lang_acks['refuse'])
+    
+    def _generate_topic_transition(self, from_topic: Optional[str], to_topic: str) -> Optional[str]:
+        """
+        Generate a natural transition phrase when moving between topics (Dec 2025).
+        
+        Only generates transitions when:
+        - USE_TOPIC_TRANSITIONS feature flag is enabled
+        - There was a previous topic (from_topic is not None)
+        - We're moving to a different topic (not a follow-up)
+        
+        Args:
+            from_topic: Topic name we're leaving (or None if first question)
+            to_topic: Topic name we're moving to
+        
+        Returns:
+            Transition phrase string, or None if no transition needed
+        """
+        # Skip if feature disabled or no previous topic
+        if not USE_TOPIC_TRANSITIONS:
+            return None
+        if not from_topic:
+            return None  # First question - no transition needed
+        if from_topic == to_topic:
+            return None  # Follow-up on same topic - no transition
+        
+        lang = self.language[:2] if self.language else 'en'
+        templates = TOPIC_TRANSITION_TEMPLATES.get(lang, TOPIC_TRANSITION_TEMPLATES['en'])
+        
+        # Try topic-specific acknowledgment first, fallback to generic
+        from_topic_acks = templates.get('from_topic', {})
+        
+        # Normalize topic name for lookup (e.g., "Product Quality" matches "Product Quality")
+        acknowledgment = None
+        for topic_key, ack_text in from_topic_acks.items():
+            if topic_key.lower() in from_topic.lower() or from_topic.lower() in topic_key.lower():
+                acknowledgment = ack_text
+                break
+        
+        # Fallback to generic acknowledgment
+        if not acknowledgment:
+            generic_acks = templates.get('generic', ["Thank you for that."])
+            acknowledgment = random.choice(generic_acks)
+        
+        logger.debug(f"Topic transition: '{from_topic}' → '{to_topic}', ack='{acknowledgment}'")
+        
+        return acknowledgment
     
     def _map_extracted_fields_to_db(self, extracted_data: Dict[str, Any]) -> Dict[str, Any]:
         """
