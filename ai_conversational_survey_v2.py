@@ -1669,6 +1669,13 @@ def finalize_ai_conversational_survey_v2(context: Dict[str, Any]) -> Dict[str, A
             f"participant_data keys={list(participant_data.keys())}"
         )
     
+    # Option B (Dec 11, 2025): Run summary extraction for topic-specific feedback
+    # This extracts product_quality_feedback, support_experience_feedback, etc.
+    # using the full conversation context for accuracy
+    campaign_language = participant_data.get('language', 'en') or 'en'
+    summary_feedback = run_summary_extraction(conversation_history, campaign_language)
+    logger.info(f"Summary extraction returned {len(summary_feedback)} topic-specific fields")
+    
     # Return structured data for database persistence
     # Format matches V1 for database compatibility
     structured_data = {
@@ -1701,7 +1708,13 @@ def finalize_ai_conversational_survey_v2(context: Dict[str, Any]) -> Dict[str, A
         'tenure_with_fc': extracted_data.get('tenure_with_fc'),
         
         # Phase 6 (Dec 2025): Deflection summary for analytics
-        'deflection_summary': _build_deflection_summary(topic_status) if topic_status else None
+        'deflection_summary': _build_deflection_summary(topic_status) if topic_status else None,
+        
+        # Option B (Dec 11, 2025): Topic-specific feedback from summary extraction
+        'product_quality_feedback': summary_feedback.get('product_quality_feedback'),
+        'support_experience_feedback': summary_feedback.get('support_experience_feedback'),
+        'service_rating_feedback': summary_feedback.get('service_rating_feedback'),
+        'user_experience_feedback': summary_feedback.get('user_experience_feedback')
     }
     
     logger.info(f"✅ V2 finalization complete: {len(structured_data)} total fields, company={company_name}, respondent={respondent_name}")
