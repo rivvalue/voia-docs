@@ -592,4 +592,332 @@ The team considered a RAG (Retrieval-Augmented Generation) approach using pgvect
 
 ---
 
+## Appendix: Configurability Levels
+
+### Platform Level (Rivvalue controls, same for all)
+
+| Parameter | Rationale |
+|-----------|-----------|
+| Persona tier definitions | Core structure (`c_level`, `vp_director`, etc.) should be consistent |
+| Deflection types taxonomy | Standardized detection ensures consistent analytics |
+| Base `prompt_guidance` templates | Research-backed questioning strategies |
+| Default `follow_up_depth` per persona | Validated through research, rarely needs override |
+| Deflection response templates | Brand voice consistency |
+
+**Why platform-level:** These represent research-backed methodology. Changing them per client could dilute VOÏA's value proposition.
+
+### Business Account Level
+
+| Parameter | Rationale | UI Control |
+|-----------|-----------|------------|
+| `question_templates` | Clients may want their terminology ("our platform" vs "the product") | Template editor per topic/persona |
+| Industry-specific `prompt_guidance` additions | Healthcare vs SaaS vs Manufacturing have different contexts | Text field appended to base guidance |
+| `excluded_topics` overrides | Some clients may want to exclude topics globally | Topic checkboxes |
+| Custom deflection responses | Brand voice alignment | Text editor |
+
+### Campaign Level
+
+| Parameter | Rationale | UI Control |
+|-----------|-----------|------------|
+| `follow_up_depth` override | Short pulse surveys vs deep discovery | Slider (1-3) |
+| Topic priority order | Focus on specific areas for this campaign | Drag-and-drop list |
+| Per-campaign `question_templates` | A/B testing different phrasings | Template editor |
+| `accept_delegation` toggle | Some campaigns may want to push harder | Checkbox per persona |
+
+### Inheritance Model
+
+```
+PLATFORM (defaults)
+    │
+    ├── Business Account (overrides/extends)
+    │       │
+    │       └── Campaign (overrides/extends)
+    │
+    └── Final effective config = merge(platform, account, campaign)
+```
+
+**Merge rules:**
+- `question_templates`: Campaign > Account > Platform
+- `follow_up_depth`: Campaign > Account > Platform (if specified)
+- `prompt_guidance`: Platform + Account additions (concatenated)
+- `excluded_topics`: Union of all levels
+
+### Summary Table
+
+| Parameter | Platform | Business Account | Campaign |
+|-----------|:--------:|:----------------:|:--------:|
+| Persona tier definitions | ✓ | - | - |
+| Deflection type taxonomy | ✓ | - | - |
+| Base `prompt_guidance` | ✓ | Extend | - |
+| `question_templates` | ✓ (defaults) | ✓ | ✓ |
+| `follow_up_depth` | ✓ (defaults) | ✓ | ✓ |
+| `excluded_topics` | ✓ (defaults) | ✓ | ✓ |
+| `accept_delegation` | ✓ (defaults) | - | ✓ |
+| Topic priority order | - | - | ✓ |
+| Industry context | - | ✓ | - |
+| Deflection responses | ✓ (defaults) | ✓ | - |
+
+### Recommendation
+
+**Start minimal:**
+
+1. **Phase 1:** Platform-level only (fully controlled by Rivvalue)
+2. **Phase 2:** Add business account `question_templates` + industry context
+3. **Phase 3:** Add campaign-level `follow_up_depth` slider
+
+This avoids complexity creep while giving clients the customization they're most likely to request.
+
+---
+
+## Appendix: Detailed Implementation Plan
+
+### Phase Overview
+
+| Phase | Scope | Risk Level | Rollback Complexity |
+|-------|-------|------------|---------------------|
+| 1. Extended ROLE_METADATA | Data structure only | **Very Low** | Trivial |
+| 2. Follow-up Depth Control | Controller logic | **Low** | Feature flag |
+| 3. Prompt Guidance Injection | LLM prompts | **Low** | Feature flag |
+| 4. Deflection Detection | Extraction prompt | **Medium** | Feature flag |
+| 5. Topic Status Tracking | State persistence | **Medium** | Backward compatible |
+| 6. Database Schema | New column | **Low** | Column is optional |
+| 7. Analytics | Read-only queries | **Very Low** | N/A |
+
+### Phase 1: Extended ROLE_METADATA Structure
+
+**What changes:**
+```python
+# prompt_template_service.py
+ROLE_METADATA = {
+    'vp_director': {
+        'label': '...',
+        'excluded_topics': [],
+        # NEW FIELDS (additive only)
+        'questioning_style': 'strategic',
+        'follow_up_depth': 1,
+        'accept_delegation': True,
+        'prompt_guidance': {...},
+        'question_templates': {...}
+    }
+}
+```
+
+**Risk:** None. Adding new keys to existing dict doesn't affect current code.
+
+**Backup plan:** Delete the new keys. Zero code changes needed elsewhere.
+
+**Validation:** Existing tests pass. New fields are simply ignored until consumed.
+
+### Phase 2: Follow-up Depth Control
+
+**What changes:**
+```python
+# ai_conversational_survey_v2.py
+# BEFORE: hardcoded max_follow_up_per_topic = 3
+# AFTER: read from persona config with fallback
+
+max_depth = persona_config.get('follow_up_depth', 3)  # Fallback to current behavior
+```
+
+**Risk:** Low. Fallback ensures existing behavior if config missing.
+
+**Feature flag:**
+```python
+USE_PERSONA_FOLLOW_UP_DEPTH = os.environ.get('USE_PERSONA_FOLLOW_UP_DEPTH', 'false').lower() == 'true'
+
+if USE_PERSONA_FOLLOW_UP_DEPTH:
+    max_depth = persona_config.get('follow_up_depth', 3)
+else:
+    max_depth = 3  # Original behavior
+```
+
+**Backup plan:** Set `USE_PERSONA_FOLLOW_UP_DEPTH=false` → instant revert.
+
+**Validation:** 
+- Test with flag off: behavior unchanged
+- Test with flag on: verify depth limits work per persona
+
+### Phase 3: Prompt Guidance Injection
+
+**What changes:**
+```python
+# ai_conversational_survey_v2.py - _generate_question_with_ai()
+# BEFORE: generic system prompt
+# AFTER: append persona guidance to system prompt
+
+if USE_PERSONA_PROMPT_GUIDANCE:
+    guidance = persona_config.get('prompt_guidance', {}).get(language, '')
+    system_prompt += f"\n\nPERSONA GUIDANCE:\n{guidance}"
+```
+
+**Risk:** Low. Additive change to prompt. LLM may ignore guidance but won't break.
+
+**Feature flag:** `USE_PERSONA_PROMPT_GUIDANCE`
+
+**Backup plan:** Flag off → original prompts used.
+
+**Validation:**
+- Review generated questions manually for persona appropriateness
+- Compare question style: C-level vs end-user responses
+
+### Phase 4: Deflection Detection
+
+**What changes:**
+```python
+# ai_conversational_survey_v2.py - _extract_with_ai()
+# BEFORE: extraction prompt returns data fields only
+# AFTER: extraction prompt also returns deflection signals
+
+EXTRACTION_PROMPT += """
+DEFLECTION DETECTION:
+Also return: deflection_detected, deflection_type, deflection_reason
+"""
+```
+
+**Risk:** Medium. LLM could return unexpected values.
+
+**Mitigations:**
+1. Validate returned `deflection_type` against allowed list
+2. Default to `deflection_detected: false` if parsing fails
+3. Log all deflection detections for review
+
+**Feature flag:** `USE_DEFLECTION_DETECTION`
+
+**Backup plan:** Flag off → deflection fields ignored, original flow continues.
+
+**Validation:**
+- Test with known deflection phrases ("ask my team", "I don't use it")
+- Test with normal responses (should return `deflection_detected: false`)
+- Monitor for false positives in staging
+
+### Phase 5: Topic Status Tracking
+
+**What changes:**
+```python
+# deterministic_helpers.py - state persistence
+# BEFORE: topic_question_counts = {"NPS": 2}
+# AFTER: topic_status = {"NPS": {"count": 2, "status": "completed", "deflection": null}}
+
+# Backward compatible loading:
+def load_topic_status(state):
+    if 'topic_status' in state:
+        return state['topic_status']  # New format
+    elif 'topic_question_counts' in state:
+        # Migrate old format
+        return {topic: {"count": count, "status": "pending", "deflection": None}
+                for topic, count in state['topic_question_counts'].items()}
+    return {}
+```
+
+**Risk:** Medium. Must handle in-flight conversations during deployment.
+
+**Mitigations:**
+1. Backward-compatible loader (shown above)
+2. Write BOTH formats during transition period
+3. Remove old format after all active conversations complete
+
+**Backup plan:** 
+- Loader handles both formats automatically
+- If issues, revert code → old format still works
+
+**Validation:**
+- Test with existing active_conversations data
+- Verify new conversations use new format
+- Verify old conversations still complete successfully
+
+### Phase 6: Database Schema
+
+**What changes:**
+```sql
+ALTER TABLE survey_response ADD COLUMN deflection_summary TEXT;
+```
+
+**Risk:** Low. New nullable column, no impact on existing data.
+
+**Backup plan:** Column exists but remains NULL for old responses. No harm.
+
+**Validation:**
+- Verify column added
+- Verify existing queries still work
+- Verify new responses populate the field
+
+### Phase 7: Analytics
+
+**What changes:**
+- New read-only queries on `deflection_summary`
+- Dashboard visualizations
+
+**Risk:** Very Low. Read-only operations.
+
+**Backup plan:** Hide dashboard widgets if needed.
+
+### Deployment Sequence
+
+```
+Week 1: Foundation
+├─ Day 1-2: Phase 1 (ROLE_METADATA structure) - No flag needed
+├─ Day 3-4: Phase 2 (follow_up_depth) - Flag: OFF initially
+└─ Day 5: Phase 6 (DB column) - Migration
+
+Week 2: Core Features
+├─ Day 1-2: Phase 3 (prompt guidance) - Flag: OFF initially
+├─ Day 3-5: Phase 4 (deflection detection) - Flag: OFF initially
+└─ Internal testing with all flags ON in staging
+
+Week 3: State Management
+├─ Day 1-3: Phase 5 (topic_status) - Backward compatible
+├─ Day 4-5: Integration testing
+└─ Enable flags progressively in production
+
+Week 4: Analytics & Cleanup
+├─ Day 1-3: Phase 7 (analytics dashboards)
+├─ Day 4: Remove old topic_question_counts after drain
+└─ Day 5: Documentation & monitoring
+```
+
+### Feature Flag Summary
+
+| Flag | Default | Purpose |
+|------|---------|---------|
+| `USE_PERSONA_FOLLOW_UP_DEPTH` | false | Per-persona follow-up limits |
+| `USE_PERSONA_PROMPT_GUIDANCE` | false | Inject guidance into LLM prompts |
+| `USE_DEFLECTION_DETECTION` | false | Detect and track deflections |
+| `USE_QUESTION_TEMPLATES` | false | Use curated templates over LLM |
+
+**Rollback procedure:** Set any flag to `false` → immediate revert to V2 baseline behavior.
+
+### Monitoring Checklist
+
+| Metric | Alert Threshold | Action |
+|--------|-----------------|--------|
+| Survey completion rate | Drop >10% | Disable deflection detection |
+| Avg questions per session | Drop >30% | Review follow_up_depth settings |
+| LLM error rate | Increase >5% | Disable prompt guidance |
+| Extraction parse failures | Increase >2% | Disable deflection detection |
+
+### Risk Matrix
+
+| Risk | Probability | Impact | Mitigation |
+|------|-------------|--------|------------|
+| LLM ignores persona guidance | Medium | Low | Templates as fallback |
+| False positive deflection | Low | Medium | Conservative detection, review logs |
+| State migration breaks in-flight surveys | Low | High | Backward-compatible loader |
+| Performance degradation | Very Low | Medium | No extra API calls, in-memory config |
+| Rollback needed mid-deployment | Low | Low | Feature flags allow instant revert |
+
+### Implementation Assessment Summary
+
+**Overall Risk:** **LOW-MEDIUM**
+
+**Confidence Level:** High - because:
+1. All changes are additive (no removal of existing logic)
+2. Feature flags enable granular rollback
+3. Backward-compatible state handling
+4. No extra infrastructure dependencies
+5. No changes to existing database constraints
+
+**Recommendation:** Proceed with phased implementation. Enable features progressively in production with 24-48 hour monitoring between each flag activation.
+
+---
+
 **End of Proposal**
