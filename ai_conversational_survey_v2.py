@@ -1304,7 +1304,15 @@ Return ONLY the question text, no JSON, no explanation."""
         self.topic_status = load_topic_status(state)
         self.ai_prompts_log = state.get('ai_prompts_log', [])  # FIX: Restore prompts log
         
-        logger.info(f"Loaded V2 state: conv_id={conversation_id}, step={self.step_count}")
+        # FIX (Dec 11, 2025): Restore participant_data including role for persona features
+        self.participant_data = state.get('participant_data') or {}
+        
+        # Re-compute derived values that depend on participant_data
+        participant_role = self.participant_data.get('role')
+        self.persona_tier = _map_role_to_tier(participant_role)
+        self.role_excluded_topics = build_role_exclusions(participant_role)
+        
+        logger.info(f"Loaded V2 state: conv_id={conversation_id}, step={self.step_count}, role={participant_role}")
         
         return True
 
