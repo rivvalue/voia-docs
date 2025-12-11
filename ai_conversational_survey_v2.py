@@ -55,7 +55,11 @@ from deterministic_helpers import (
     all_goals_completed,
     get_next_goal,
     build_role_exclusions,
-    extract_prefilled_fields
+    extract_prefilled_fields,
+    load_topic_status,
+    get_topic_question_counts,
+    update_topic_status,
+    get_completion_summary
 )
 from session_state_utils import (
     initialize_deterministic_state,
@@ -198,7 +202,7 @@ class DeterministicSurveyController:
         self.extracted_data: Dict[str, Any] = {}
         self.conversation_history: List[Dict] = []
         self.current_goal_pointer: Optional[str] = None
-        self.topic_question_counts: Dict[str, int] = {}
+        self.topic_status: Dict[str, Dict[str, Any]] = {}  # Phase 5: Enhanced topic tracking
         self.step_count: int = 0
         self.is_complete: bool = False
         
@@ -232,6 +236,20 @@ class DeterministicSurveyController:
                    f"campaign={campaign_id}, goals={len(self.goals)}, "
                    f"prefilled={len(self.prefilled_fields)}")
     
+    @property
+    def topic_question_counts(self) -> Dict[str, int]:
+        """
+        Backward-compatible property that computes question counts from topic_status.
+        
+        Phase 5 (Dec 2025): topic_status is the primary data structure, but
+        topic_question_counts is preserved for backward compatibility with
+        existing code that uses the old format.
+        
+        Returns:
+            Dict of topic -> question_count (old format)
+        """
+        return get_topic_question_counts(self.topic_status)
+    
     def start_conversation(self, company_name: str, respondent_name: str) -> Dict[str, Any]:
         """
         Start new V2 conversational survey with deterministic flow.
@@ -257,7 +275,8 @@ class DeterministicSurveyController:
         self.extracted_data = state['extracted_data']
         self.conversation_history = state['conversation_history']
         self.current_goal_pointer = state['current_goal_pointer']
-        self.topic_question_counts = state['topic_question_counts']
+        # Phase 5: Initialize topic_status from state or empty dict
+        self.topic_status = load_topic_status(state)
         self.step_count = state['step_count']
         
         # FIX (Nov 23, 2025): Store company_name and respondent_name for finalization
@@ -366,7 +385,8 @@ class DeterministicSurveyController:
         
         # STEP 5: Update state (increment counter, set pointer)
         # CRITICAL: Increment counter AFTER question generated (before next turn)
-        self.topic_question_counts[topic_name] = self.topic_question_counts.get(topic_name, 0) + 1
+        # Phase 5: Use update_topic_status instead of direct assignment
+        update_topic_status(self.topic_status, topic_name, status='in_progress', increment_count=True)
         self.current_goal_pointer = topic_name
         
         logger.info(f"Topic '{topic_name}' question count: {self.topic_question_counts[topic_name]}")
@@ -440,9 +460,23 @@ class DeterministicSurveyController:
             'deflection_type': deflection_type
         })
         
-        # Mark current topic as having max questions (skip further follow-ups)
+        # Mark current topic as skipped with deflection info
+        # Phase 5: Use update_topic_status instead of direct assignment
         if current_topic:
-            self.topic_question_counts[current_topic] = self.max_follow_up_per_topic + 10  # Force skip
+            deflection_info = {
+                'type': deflection_type,
+                'reason': deflection_reason,
+                'detected_at': datetime.utcnow().isoformat()
+            }
+            update_topic_status(
+                self.topic_status, current_topic,
+                status='skipped',
+                deflection=deflection_info
+            )
+            # Also set high question count to force skip in get_next_goal
+            if current_topic not in self.topic_status:
+                self.topic_status[current_topic] = {'status': 'skipped', 'question_count': 0, 'deflection': None}
+            self.topic_status[current_topic]['question_count'] = self.max_follow_up_per_topic + 10
         
         # Check if survey should complete
         if self._should_complete_survey():
@@ -470,8 +504,8 @@ class DeterministicSurveyController:
         # Combine acknowledgment + next question
         combined_message = f"{acknowledgment}\n\n{question}"
         
-        # Update state
-        self.topic_question_counts[topic_name] = self.topic_question_counts.get(topic_name, 0) + 1
+        # Update state - Phase 5: Use update_topic_status instead of direct assignment
+        update_topic_status(self.topic_status, topic_name, status='in_progress', increment_count=True)
         self.current_goal_pointer = topic_name
         
         # Add question to history
@@ -1228,7 +1262,8 @@ Return ONLY the question text, no JSON, no explanation."""
             'conversation_history': self.conversation_history,
             'step_count': self.step_count,
             'current_goal_pointer': self.current_goal_pointer,
-            'topic_question_counts': self.topic_question_counts,
+            'topic_status': self.topic_status,  # Phase 5: Enhanced topic tracking
+            'topic_question_counts': self.topic_question_counts,  # Backward compatibility
             'last_activity': datetime.utcnow().isoformat(),
             'resume_offered': False,
             'controller_version': 'v2_deterministic',  # V2 ENHANCEMENT: For finalization routing
@@ -1258,7 +1293,8 @@ Return ONLY the question text, no JSON, no explanation."""
         self.conversation_history = state['conversation_history']
         self.step_count = state['step_count']
         self.current_goal_pointer = state['current_goal_pointer']
-        self.topic_question_counts = state['topic_question_counts']
+        # Phase 5: Load topic_status with backward compatibility
+        self.topic_status = load_topic_status(state)
         self.ai_prompts_log = state.get('ai_prompts_log', [])  # FIX: Restore prompts log
         
         logger.info(f"Loaded V2 state: conv_id={conversation_id}, step={self.step_count}")
