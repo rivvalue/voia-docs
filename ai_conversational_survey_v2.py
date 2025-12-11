@@ -87,6 +87,13 @@ USE_PERSONA_FOLLOW_UP_DEPTH = os.environ.get('USE_PERSONA_FOLLOW_UP_DEPTH', 'fal
 # Rollback: Set USE_PERSONA_PROMPT_GUIDANCE=false to revert to generic questioning
 USE_PERSONA_PROMPT_GUIDANCE = os.environ.get('USE_PERSONA_PROMPT_GUIDANCE', 'false').lower() == 'true'
 
+# Feature flag for deflection detection (Dec 2025)
+# When enabled, AI extraction detects 6 types of deflection signals in responses
+# Types: not_responsible, no_data, confidential, dont_understand, already_answered, refuse
+# Set USE_DEFLECTION_DETECTION=true to enable intelligent deflection handling
+# Rollback: Set USE_DEFLECTION_DETECTION=false to revert to standard extraction
+USE_DEFLECTION_DETECTION = os.environ.get('USE_DEFLECTION_DETECTION', 'false').lower() == 'true'
+
 # Field mapping: Prompt field names → Database column names
 # Allows descriptive prompt fields while maintaining DB compatibility
 EXTRACTION_TO_DB_FIELD_MAP = {
@@ -319,6 +326,12 @@ class DeterministicSurveyController:
         
         # STEP 1: Extract data (LLM performs extraction ONLY, no flow decisions)
         new_fields = self._extract_with_ai(user_input)
+        
+        # Handle deflection if detected (Dec 2025)
+        deflection = new_fields.pop('_deflection', None)
+        if deflection and USE_DEFLECTION_DETECTION:
+            return self._handle_deflection(deflection)
+        
         self.extracted_data.update(new_fields)
         
         logger.debug(f"Extracted {len(new_fields)} new fields: {list(new_fields.keys())}")
@@ -384,6 +397,142 @@ class DeterministicSurveyController:
             'extracted_data': self.extracted_data,
             'controller_version': 'v2_deterministic'
         }
+    
+    def _handle_deflection(self, deflection: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Handle detected deflection gracefully (Dec 2025).
+        
+        When a user deflects (avoids answering), this method:
+        1. Logs the deflection for analytics
+        2. Generates a graceful acknowledgment
+        3. Moves to the next topic
+        
+        Args:
+            deflection: Dict with deflection_type, deflection_reason
+        
+        Returns:
+            Response dict with acknowledgment and next question
+        """
+        deflection_type = deflection.get('deflection_type', 'refuse')
+        deflection_reason = deflection.get('deflection_reason', '')
+        current_topic = self.current_goal_pointer or 'Unknown'
+        
+        logger.info(f"Handling deflection: type={deflection_type}, topic={current_topic}, reason={deflection_reason}")
+        
+        # Track deflection for analytics (stored in extracted_data for now)
+        if '_deflections' not in self.extracted_data:
+            self.extracted_data['_deflections'] = []
+        self.extracted_data['_deflections'].append({
+            'topic': current_topic,
+            'type': deflection_type,
+            'reason': deflection_reason,
+            'detected_at': datetime.utcnow().isoformat()
+        })
+        
+        # Generate graceful acknowledgment based on deflection type
+        acknowledgment = self._generate_deflection_acknowledgment(deflection_type)
+        
+        # Add acknowledgment to conversation history
+        self.conversation_history.append({
+            'sender': 'VOÏA',
+            'message': acknowledgment,
+            'timestamp': datetime.utcnow().isoformat(),
+            'deflection_type': deflection_type
+        })
+        
+        # Mark current topic as having max questions (skip further follow-ups)
+        if current_topic:
+            self.topic_question_counts[current_topic] = self.max_follow_up_per_topic + 10  # Force skip
+        
+        # Check if survey should complete
+        if self._should_complete_survey():
+            return self._finish_survey()
+        
+        # Get next goal (will skip the deflected topic due to high question count)
+        next_goal, missing_fields, is_follow_up = get_next_goal(
+            goals=self.goals,
+            extracted_data=self.extracted_data,
+            prefilled_fields=self.prefilled_fields,
+            current_goal_pointer=self.current_goal_pointer,
+            topic_question_counts=self.topic_question_counts,
+            max_follow_up_per_topic=self.max_follow_up_per_topic,
+            allow_multi_turn=True,
+            role_excluded_topics=self.role_excluded_topics
+        )
+        
+        if not next_goal:
+            return self._finish_survey()
+        
+        # Generate next question
+        topic_name = next_goal.get('topic', 'Unknown')
+        question = self._generate_question_with_ai(next_goal, missing_fields, is_follow_up)
+        
+        # Combine acknowledgment + next question
+        combined_message = f"{acknowledgment}\n\n{question}"
+        
+        # Update state
+        self.topic_question_counts[topic_name] = self.topic_question_counts.get(topic_name, 0) + 1
+        self.current_goal_pointer = topic_name
+        
+        # Add question to history
+        self.conversation_history.append({
+            'sender': 'VOÏA',
+            'message': question,
+            'timestamp': datetime.utcnow().isoformat(),
+            'topic': topic_name
+        })
+        
+        # Save state
+        save_deterministic_state(self.conversation_id, self._get_state_dict())
+        
+        return {
+            'message': combined_message,
+            'message_type': 'question',
+            'step': f'step_{self.step_count}',
+            'progress': self._calculate_progress(),
+            'is_complete': False,
+            'topic': topic_name,
+            'deflection_handled': True,
+            'deflection_type': deflection_type,
+            'extracted_data': self.extracted_data,
+            'controller_version': 'v2_deterministic'
+        }
+    
+    def _generate_deflection_acknowledgment(self, deflection_type: str) -> str:
+        """
+        Generate graceful acknowledgment for different deflection types.
+        
+        Uses language-aware responses based on campaign language.
+        
+        Args:
+            deflection_type: One of the 6 deflection types
+        
+        Returns:
+            Graceful acknowledgment string
+        """
+        lang = self.language[:2] if self.language else 'en'
+        
+        acknowledgments = {
+            'en': {
+                'not_responsible': "I understand that's handled by someone else on your team. Let me move on to another topic.",
+                'no_data': "That's perfectly fine - I appreciate your honesty. Let's discuss something you have more experience with.",
+                'confidential': "I completely understand. We'll skip that and move to a different area.",
+                'dont_understand': "I apologize for the confusion. Let me ask about something else instead.",
+                'already_answered': "You're right, I apologize for the repetition. Let me move forward.",
+                'refuse': "No problem at all. Let's continue with a different topic."
+            },
+            'fr': {
+                'not_responsible': "Je comprends que cela est géré par quelqu'un d'autre dans votre équipe. Passons à un autre sujet.",
+                'no_data': "C'est tout à fait normal. Parlons de quelque chose que vous connaissez mieux.",
+                'confidential': "Je comprends parfaitement. Passons à un autre domaine.",
+                'dont_understand': "Je m'excuse pour la confusion. Permettez-moi de poser une autre question.",
+                'already_answered': "Vous avez raison, je m'excuse pour la répétition. Continuons.",
+                'refuse': "Pas de problème. Passons à un autre sujet."
+            }
+        }
+        
+        lang_acks = acknowledgments.get(lang, acknowledgments['en'])
+        return lang_acks.get(deflection_type, lang_acks['refuse'])
     
     def _map_extracted_fields_to_db(self, extracted_data: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -487,16 +636,33 @@ class DeterministicSurveyController:
             
             logger.debug(f"LLM extracted (raw): {_mask_pii(raw_extracted)}")
             
+            # Handle deflection detection if present (Dec 2025)
+            # Separate deflection fields from actual survey data
+            deflection_data = {}
+            if USE_DEFLECTION_DETECTION and raw_extracted.get('deflection_detected'):
+                deflection_data = {
+                    'deflection_detected': raw_extracted.pop('deflection_detected', False),
+                    'deflection_type': raw_extracted.pop('deflection_type', None),
+                    'deflection_reason': raw_extracted.pop('deflection_reason', None)
+                }
+                logger.info(f"Deflection detected: type={deflection_data.get('deflection_type')}, "
+                           f"reason={deflection_data.get('deflection_reason')}")
+            
             # Map to database field names ONLY if using revised prompt
             # This ensures rollback works correctly (old prompt = no mapping)
             if USE_REVISED_EXTRACTION_PROMPT:
                 mapped_data = self._map_extracted_fields_to_db(raw_extracted)
                 logger.debug(f"LLM extracted (mapped): {_mask_pii(mapped_data)}")
-                return mapped_data
             else:
                 # Original prompt returns data with DB column names already
+                mapped_data = raw_extracted
                 logger.debug(f"LLM extracted (original prompt, no mapping): {_mask_pii(raw_extracted)}")
-                return raw_extracted
+            
+            # Attach deflection data for caller to handle
+            if deflection_data.get('deflection_detected'):
+                mapped_data['_deflection'] = deflection_data
+            
+            return mapped_data
             
         except Exception as e:
             logger.error(f"Extraction error: {e}")
@@ -681,6 +847,31 @@ Return ONLY a single JSON object, like:
   "field_name_2": value_2,
   ...
 }}"""
+        
+        # Add deflection detection when feature flag is enabled (Dec 2025)
+        if USE_DEFLECTION_DETECTION:
+            deflection_block = """
+
+**DEFLECTION DETECTION:**
+Analyze the user's response for deflection signals. Deflection means the user is avoiding answering the question.
+
+If deflection detected, ALSO include these fields in your JSON output:
+- deflection_detected: true
+- deflection_type: one of ["not_responsible", "no_data", "confidential", "dont_understand", "already_answered", "refuse"]
+- deflection_reason: brief explanation (string)
+
+Deflection types and signal phrases:
+- "not_responsible": User delegates to someone else ("ask my manager", "my team handles that", "IT is responsible", "my product owner knows")
+- "no_data": User lacks experience ("I haven't used that", "too new to comment", "don't have experience with that feature")
+- "confidential": Privacy/confidentiality concern ("can't share that", "internal only", "that's sensitive information")
+- "dont_understand": User needs clarification ("not sure what you mean", "can you clarify?", "I don't understand the question")
+- "already_answered": User feels they already covered this ("I told you already", "same as before", "already covered that")
+- "refuse": Explicit refusal to answer ("I'd rather not say", "no comment", "pass", "I prefer not to answer")
+
+If NO deflection detected, do NOT include deflection fields (keep sparse JSON).
+
+IMPORTANT: Only mark as deflection if the user is clearly avoiding the question. Normal brief answers are NOT deflections."""
+            prompt += deflection_block
         
         return prompt
     
