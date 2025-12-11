@@ -115,12 +115,16 @@ def save_deterministic_state(conversation_id: str, controller_state: Dict) -> bo
         
         # Build V2-specific survey_data payload (only V2 fields)
         # FIX (Nov 23, 2025): Add controller_version for finalization routing
+        # FIX (Dec 11, 2025): Add ai_prompts_log for debugging/analytics
         v2_survey_data = {
             'controller_version': 'v2_deterministic',  # CRITICAL: enables V2 finalization
             'current_goal_pointer': controller_state.get('current_goal_pointer'),
             'topic_question_counts': controller_state.get('topic_question_counts', {}),
+            'topic_status': controller_state.get('topic_status', {}),  # Phase 5: Enhanced tracking
             'last_activity': controller_state.get('last_activity', datetime.utcnow().isoformat()),
-            'resume_offered': controller_state.get('resume_offered', False)
+            'resume_offered': controller_state.get('resume_offered', False),
+            'ai_prompts_log': controller_state.get('ai_prompts_log', []),  # FIX: Persist prompts
+            'is_complete': controller_state.get('is_complete', False)
         }
         
         # Check if conversation exists
