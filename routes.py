@@ -3028,6 +3028,7 @@ def finalize_conversation():
             # 🔧 CRITICAL FIX: Save conversation transcript
             existing_response.conversation_history = survey_data.get('conversation_history')
             existing_response.ai_prompts_log = structured_data.get('ai_prompts_log')  # 🔧 DEBUG: Save AI prompts for debugging
+            existing_response.deflection_summary = structured_data.get('deflection_summary')  # Phase 6: Save deflection analytics
             existing_response.source_type = 'conversational'
             # Update campaign if there's an active one, otherwise preserve existing
             if campaign_id:
@@ -3056,6 +3057,7 @@ def finalize_conversation():
                 additional_comments=structured_data.get('additional_comments'),
                 conversation_history=survey_data.get('conversation_history'),  # 🔧 CRITICAL FIX: Save conversation transcript
                 ai_prompts_log=structured_data.get('ai_prompts_log'),  # 🔧 DEBUG: Save AI prompts for debugging
+                deflection_summary=structured_data.get('deflection_summary'),  # Phase 6: Save deflection analytics
                 source_type='conversational',  # 🔧 CRITICAL FIX: Mark as conversational survey
                 campaign_id=campaign_id,
                 campaign_participant_id=association_id  # Link to campaign-participant association

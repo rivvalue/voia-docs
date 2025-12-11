@@ -1389,6 +1389,54 @@ def process_ai_conversation_response_v2(
     return response
 
 
+def _build_deflection_summary(topic_status: Dict[str, Dict[str, Any]]) -> str:
+    """
+    Build JSON deflection summary from topic_status for database persistence.
+    
+    Phase 6 (Dec 2025): Extracts deflection metadata from topic_status into a 
+    compact summary format suitable for analytics.
+    
+    Args:
+        topic_status: Topic status dict with deflection metadata
+    
+    Returns:
+        JSON string with deflection summary
+    """
+    import json
+    
+    if not topic_status:
+        return None
+    
+    deflections = []
+    completed_count = 0
+    skipped_count = 0
+    
+    for topic, info in topic_status.items():
+        status = info.get('status', 'pending')
+        
+        if status == 'completed':
+            completed_count += 1
+        elif status == 'skipped':
+            skipped_count += 1
+            if info.get('deflection'):
+                deflections.append({
+                    'topic': topic,
+                    'type': info['deflection'].get('type'),
+                    'reason': info['deflection'].get('reason'),
+                    'detected_at': info['deflection'].get('detected_at')
+                })
+    
+    summary = {
+        'total_topics': len(topic_status),
+        'completed': completed_count,
+        'skipped': skipped_count,
+        'total_deflections': len(deflections),
+        'deflections': deflections
+    }
+    
+    return json.dumps(summary)
+
+
 def finalize_ai_conversational_survey_v2(context: Dict[str, Any]) -> Dict[str, Any]:
     """
     V2-specific finalization for deterministic survey conversations.
@@ -1448,6 +1496,9 @@ def finalize_ai_conversational_survey_v2(context: Dict[str, Any]) -> Dict[str, A
     is_complete = persisted_state.get('is_complete', False)
     ai_prompts_log = persisted_state.get('ai_prompts_log', [])  # FIX (Dec 11, 2025): Extract prompts log
     
+    # Phase 6 (Dec 2025): Load topic_status for deflection summary
+    topic_status = persisted_state.get('topic_status', {})
+    
     logger.info(f"V2 State loaded: {len(extracted_data)} fields, {step_count} steps, complete={is_complete}, prompts={len(ai_prompts_log)}")
     logger.debug(f"Topic question counts: {topic_question_counts}")
     
@@ -1504,7 +1555,10 @@ def finalize_ai_conversational_survey_v2(context: Dict[str, Any]) -> Dict[str, A
         'general_feedback': extracted_data.get('general_feedback'),  # Already mapped from detailed_feedback
         'additional_comments': extracted_data.get('additional_comments'),
         'feature_requests': extracted_data.get('feature_requests'),  # Already JSON-serialized if array
-        'tenure_with_fc': extracted_data.get('tenure_with_fc')
+        'tenure_with_fc': extracted_data.get('tenure_with_fc'),
+        
+        # Phase 6 (Dec 2025): Deflection summary for analytics
+        'deflection_summary': _build_deflection_summary(topic_status) if topic_status else None
     }
     
     logger.info(f"✅ V2 finalization complete: {len(structured_data)} total fields, company={company_name}, respondent={respondent_name}")

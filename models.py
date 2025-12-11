@@ -70,6 +70,11 @@ class SurveyResponse(db.Model):
     # AI prompts debugging log (JSON array of all prompts sent to OpenAI during conversation)
     ai_prompts_log = db.Column(db.Text, nullable=True)  # For debugging language issues and prompt effectiveness
     
+    # Deflection summary (Phase 6, Dec 2025)
+    # JSON storing topic status with deflection metadata for analytics
+    # Structure: {"total_topics": N, "completed": N, "skipped": N, "deflections": [...]}
+    deflection_summary = db.Column(db.Text, nullable=True)
+    
     # Full-text search vector (automatically maintained by PostgreSQL trigger)
     conversation_search = db.Column(TSVECTOR, nullable=True)
     
@@ -136,6 +141,7 @@ class SurveyResponse(db.Model):
             'conversation_history': json.loads(self.conversation_history) if self.conversation_history else [],
             'source_type': self.source_type,
             'transcript_filename': self.transcript_filename,
+            'deflection_summary': json.loads(self.deflection_summary) if self.deflection_summary else None,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
             'analyzed_at': self.analyzed_at.isoformat() if self.analyzed_at else None
