@@ -7,13 +7,156 @@ removing AI decision-making from completion and topic selection.
 
 Created: November 22, 2025
 Updated: November 23, 2025 - Added per-topic follow-up limit enforcement
+Updated: December 11, 2025 - Added topic_status tracking (Phase 5)
 Feature Flag: DETERMINISTIC_SURVEY_FLOW
 """
 
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Dict, List, Optional, Set, Tuple, Any
+from datetime import datetime
 import logging
 
 logger = logging.getLogger(__name__)
+
+
+# =============================================================================
+# Topic Status Tracking (Phase 5 - Dec 2025)
+# =============================================================================
+
+def load_topic_status(state: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
+    """
+    Load topic_status with backward compatibility from old topic_question_counts format.
+    
+    Topic Status Schema:
+    {
+        "NPS": {
+            "status": "completed",        # completed | skipped | pending | in_progress
+            "question_count": 2,
+            "deflection": None
+        },
+        "Product Quality": {
+            "status": "skipped",
+            "question_count": 1,
+            "deflection": {
+                "type": "not_responsible",
+                "reason": "Delegates to product owner",
+                "detected_at": "2025-12-11T10:30:00Z"
+            }
+        }
+    }
+    
+    Args:
+        state: Persisted conversation state dict
+    
+    Returns:
+        Dict of topic -> status info (new format)
+    """
+    if 'topic_status' in state:
+        # New format - use directly
+        return state['topic_status']
+    elif 'topic_question_counts' in state:
+        # Migrate old format to new format
+        logger.debug("Migrating topic_question_counts to topic_status format")
+        return {
+            topic: {
+                "status": "pending",
+                "question_count": count,
+                "deflection": None
+            }
+            for topic, count in state['topic_question_counts'].items()
+        }
+    return {}
+
+
+def get_topic_question_counts(topic_status: Dict[str, Dict[str, Any]]) -> Dict[str, int]:
+    """
+    Extract question counts from topic_status for backward compatibility.
+    
+    This allows existing code using topic_question_counts to continue working
+    during the transition period.
+    
+    Args:
+        topic_status: New format topic status dict
+    
+    Returns:
+        Dict of topic -> question_count (old format)
+    """
+    return {
+        topic: info.get('question_count', 0)
+        for topic, info in topic_status.items()
+    }
+
+
+def update_topic_status(
+    topic_status: Dict[str, Dict[str, Any]],
+    topic: str,
+    status: Optional[str] = None,
+    increment_count: bool = False,
+    deflection: Optional[Dict[str, Any]] = None
+) -> Dict[str, Dict[str, Any]]:
+    """
+    Update topic status with new information.
+    
+    Args:
+        topic_status: Current topic status dict
+        topic: Topic name to update
+        status: New status (completed, skipped, pending, in_progress)
+        increment_count: If True, increment question_count by 1
+        deflection: Deflection info to record
+    
+    Returns:
+        Updated topic_status dict
+    """
+    if topic not in topic_status:
+        topic_status[topic] = {
+            "status": "pending",
+            "question_count": 0,
+            "deflection": None
+        }
+    
+    if status:
+        topic_status[topic]["status"] = status
+    
+    if increment_count:
+        topic_status[topic]["question_count"] = topic_status[topic].get("question_count", 0) + 1
+    
+    if deflection:
+        topic_status[topic]["deflection"] = deflection
+        topic_status[topic]["status"] = "skipped"
+    
+    return topic_status
+
+
+def get_completion_summary(topic_status: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
+    """
+    Generate a summary of topic completion for analytics.
+    
+    Args:
+        topic_status: Topic status dict
+    
+    Returns:
+        Summary dict with completion stats
+    """
+    total_topics = len(topic_status)
+    completed = sum(1 for t in topic_status.values() if t.get('status') == 'completed')
+    skipped = sum(1 for t in topic_status.values() if t.get('status') == 'skipped')
+    deflections = [
+        {
+            "topic": topic,
+            "type": info['deflection'].get('type'),
+            "reason": info['deflection'].get('reason')
+        }
+        for topic, info in topic_status.items()
+        if info.get('deflection')
+    ]
+    
+    return {
+        "total_topics": total_topics,
+        "completed": completed,
+        "skipped": skipped,
+        "completion_rate": completed / total_topics if total_topics > 0 else 0,
+        "total_deflections": len(deflections),
+        "deflections": deflections
+    }
 
 
 def all_goals_completed(
