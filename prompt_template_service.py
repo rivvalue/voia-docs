@@ -131,27 +131,170 @@ CRITICAL: "is_complete" MUST ALWAYS BE false
 ROLE_METADATA = {
     'c_level': {
         'label': 'C-level executive',
-        'excluded_topics': []  # All topics visible
+        'excluded_topics': [],
+        'questioning_style': 'strategic',
+        'follow_up_depth': 1,
+        'accept_delegation': True,
+        'prompt_guidance': {
+            'en': """For this C-level executive:
+- Focus on strategic impact, ROI, and business outcomes
+- Accept high-level answers without pressing for operational details
+- Do NOT ask about specific features, UI, or day-to-day workflows
+- If they delegate to their team, acknowledge positively and move on
+- Keep questions concise and respect their time""",
+            'fr': """Pour ce dirigeant C-level:
+- Concentrez-vous sur l'impact stratégique, le ROI et les résultats business
+- Acceptez les réponses de haut niveau sans insister sur les détails opérationnels
+- NE PAS poser de questions sur les fonctionnalités spécifiques ou les workflows
+- S'ils délèguent à leur équipe, reconnaissez-le positivement et passez à autre chose
+- Gardez les questions concises et respectez leur temps"""
+        },
+        'question_templates': {
+            'en': {
+                'NPS': "From a strategic perspective, how likely are you to recommend {company} to a fellow executive?",
+                'Product Quality': "How would you characterize the overall value {product} brings to your organization?",
+                'Support Quality': "How well has our partnership supported your strategic objectives?",
+                'Pricing Value': "Does our pricing model align with the value delivered to your business?"
+            },
+            'fr': {
+                'NPS': "D'un point de vue stratégique, recommanderiez-vous {company} à un collègue dirigeant?",
+                'Product Quality': "Comment évalueriez-vous la valeur globale que {product} apporte à votre organisation?",
+                'Support Quality': "Dans quelle mesure notre partenariat a-t-il soutenu vos objectifs stratégiques?",
+                'Pricing Value': "Notre modèle de tarification correspond-il à la valeur apportée à votre entreprise?"
+            }
+        }
     },
     'vp_director': {
         'label': 'VP/Director-level leader',
-        'excluded_topics': []  # All topics visible
+        'excluded_topics': [],
+        'questioning_style': 'strategic',
+        'follow_up_depth': 1,
+        'accept_delegation': True,
+        'prompt_guidance': {
+            'en': """For this VP/Director:
+- Ask about team-level impact and departmental outcomes
+- Balance strategic and tactical perspectives
+- Accept delegation to team members as valid input
+- Limit detailed probing - they oversee but may not use directly""",
+            'fr': """Pour ce VP/Directeur:
+- Posez des questions sur l'impact au niveau de l'équipe et les résultats du département
+- Équilibrez les perspectives stratégiques et tactiques
+- Acceptez la délégation aux membres de l'équipe comme réponse valide
+- Limitez les questions détaillées - ils supervisent mais n'utilisent pas directement"""
+        },
+        'question_templates': {
+            'en': {
+                'NPS': "Based on your team's experience, how likely are you to recommend {company}?",
+                'Product Quality': "How has {product} impacted your department's productivity?",
+                'Support Quality': "How would you rate our responsiveness to your team's needs?"
+            },
+            'fr': {
+                'NPS': "En vous basant sur l'expérience de votre équipe, recommanderiez-vous {company}?",
+                'Product Quality': "Comment {product} a-t-il impacté la productivité de votre département?",
+                'Support Quality': "Comment évalueriez-vous notre réactivité aux besoins de votre équipe?"
+            }
+        }
     },
     'manager': {
         'label': 'Manager',
-        'excluded_topics': []  # All topics visible
+        'excluded_topics': [],
+        'questioning_style': 'balanced',
+        'follow_up_depth': 2,
+        'accept_delegation': True,
+        'prompt_guidance': {
+            'en': """For this Manager:
+- Balance operational and strategic questions
+- Ask about team workflows and productivity
+- Can probe for some specific examples
+- Respect if they defer to technical team members""",
+            'fr': """Pour ce Manager:
+- Équilibrez les questions opérationnelles et stratégiques
+- Posez des questions sur les workflows d'équipe et la productivité
+- Vous pouvez demander des exemples spécifiques
+- Respectez s'ils délèguent aux membres techniques de l'équipe"""
+        },
+        'question_templates': {
+            'en': {
+                'NPS': "How likely are you to recommend {product} to peers in your role?",
+                'Product Quality': "How well does {product} support your team's daily workflows?"
+            },
+            'fr': {
+                'NPS': "Recommanderiez-vous {product} à des collègues dans votre rôle?",
+                'Product Quality': "Dans quelle mesure {product} supporte-t-il les workflows quotidiens de votre équipe?"
+            }
+        }
     },
     'team_lead': {
         'label': 'Team Lead/Supervisor',
-        'excluded_topics': ['Pricing Value']  # Limited pricing visibility
+        'excluded_topics': ['Pricing Value'],
+        'questioning_style': 'operational',
+        'follow_up_depth': 2,
+        'accept_delegation': False,
+        'prompt_guidance': {
+            'en': """For this Team Lead:
+- Ask about hands-on experience and team usage
+- Can probe for specific feature feedback
+- Expect direct answers about workflows""",
+            'fr': """Pour ce Chef d'équipe:
+- Posez des questions sur l'expérience pratique et l'utilisation par l'équipe
+- Vous pouvez demander des retours spécifiques sur les fonctionnalités
+- Attendez des réponses directes sur les workflows"""
+        },
+        'question_templates': {
+            'en': {
+                'NPS': "Based on your hands-on experience, how likely are you to recommend {product}?",
+                'Product Quality': "What aspects of {product} work well for your team's daily tasks?",
+                'Support Quality': "When your team has needed help, how responsive has support been?"
+            },
+            'fr': {
+                'NPS': "En vous basant sur votre expérience pratique, recommanderiez-vous {product}?",
+                'Product Quality': "Quels aspects de {product} fonctionnent bien pour les tâches quotidiennes de votre équipe?",
+                'Support Quality': "Quand votre équipe a eu besoin d'aide, quelle a été la réactivité du support?"
+            }
+        }
     },
     'end_user': {
         'label': 'End User',
-        'excluded_topics': ['Pricing Value']  # Limited pricing visibility
+        'excluded_topics': ['Pricing Value'],
+        'questioning_style': 'operational',
+        'follow_up_depth': 3,
+        'accept_delegation': False,
+        'prompt_guidance': {
+            'en': """For this End User:
+- Ask about day-to-day experience and specific features
+- Probe for concrete examples and pain points
+- Ask follow-up questions to understand workflows
+- Request specific feedback on usability""",
+            'fr': """Pour cet utilisateur final:
+- Posez des questions sur l'expérience quotidienne et les fonctionnalités spécifiques
+- Cherchez des exemples concrets et des points de friction
+- Posez des questions de suivi pour comprendre les workflows
+- Demandez des retours spécifiques sur l'utilisabilité"""
+        },
+        'question_templates': {
+            'en': {
+                'NPS': "Based on your daily experience, how likely are you to recommend {product}?",
+                'Product Quality': "What features do you use most, and how well do they work for you?",
+                'Support Quality': "When you've needed help, how responsive has our support been?"
+            },
+            'fr': {
+                'NPS': "En vous basant sur votre expérience quotidienne, recommanderiez-vous {product}?",
+                'Product Quality': "Quelles fonctionnalités utilisez-vous le plus, et comment fonctionnent-elles pour vous?",
+                'Support Quality': "Quand vous avez eu besoin d'aide, quelle a été la réactivité de notre support?"
+            }
+        }
     },
     'default': {
         'label': 'Participant',
-        'excluded_topics': []  # No exclusions - safe fallback shows all campaign topics
+        'excluded_topics': [],
+        'questioning_style': 'balanced',
+        'follow_up_depth': 2,
+        'accept_delegation': True,
+        'prompt_guidance': {
+            'en': "Ask balanced questions appropriate for a general participant.",
+            'fr': "Posez des questions équilibrées appropriées pour un participant général."
+        },
+        'question_templates': {}
     }
 }
 
