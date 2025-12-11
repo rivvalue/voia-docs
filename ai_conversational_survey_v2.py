@@ -461,7 +461,7 @@ class DeterministicSurveyController:
         })
         
         # Mark current topic as skipped with deflection info
-        # Phase 5: Use update_topic_status instead of direct assignment
+        # Phase 5: Use update_topic_status and set high question count to force skip
         if current_topic:
             deflection_info = {
                 'type': deflection_type,
@@ -473,10 +473,10 @@ class DeterministicSurveyController:
                 status='skipped',
                 deflection=deflection_info
             )
-            # Also set high question count to force skip in get_next_goal
-            if current_topic not in self.topic_status:
-                self.topic_status[current_topic] = {'status': 'skipped', 'question_count': 0, 'deflection': None}
+            # CRITICAL: Set question_count high to force skip in get_next_goal
+            # This must be done AFTER update_topic_status creates the entry
             self.topic_status[current_topic]['question_count'] = self.max_follow_up_per_topic + 10
+            logger.debug(f"Deflected topic '{current_topic}' set to question_count={self.topic_status[current_topic]['question_count']}")
         
         # Check if survey should complete
         if self._should_complete_survey():
