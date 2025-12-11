@@ -773,10 +773,10 @@ class DeterministicSurveyController:
         logger.debug(f"Calling LLM for extraction (no flow decisions)")
         
         try:
-            # Log prompt for debugging
+            # Log full prompt for debugging (Dec 11, 2025: removed 500-char truncation)
             self.ai_prompts_log.append({
                 'type': 'extraction',
-                'prompt': extraction_prompt[:500],  # Truncate for logging
+                'prompt': extraction_prompt,
                 'timestamp': datetime.utcnow().isoformat()
             })
             
@@ -859,12 +859,12 @@ class DeterministicSurveyController:
         logger.debug(f"Calling LLM for question generation on topic '{topic_name}' (follow-up: {is_follow_up})")
         
         try:
-            # Log prompt for debugging
+            # Log full prompt for debugging (Dec 11, 2025: removed 500-char truncation)
             self.ai_prompts_log.append({
                 'type': 'question_generation',
                 'topic': topic_name,
                 'is_follow_up': is_follow_up,
-                'prompt': question_prompt[:500],  # Truncate for logging
+                'prompt': question_prompt,
                 'timestamp': datetime.utcnow().isoformat()
             })
             
