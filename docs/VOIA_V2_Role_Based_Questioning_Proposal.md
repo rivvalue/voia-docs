@@ -679,9 +679,9 @@ This avoids complexity creep while giving clients the customization they're most
 | 2. Follow-up Depth Control | ✅ COMPLETE | Dec 11, 2025 | USE_PERSONA_FOLLOW_UP_DEPTH flag - C-level/VP: 1, Manager/Team Lead: 2, End User: 3 |
 | 3. Prompt Guidance Injection | ✅ COMPLETE | Dec 11, 2025 | USE_PERSONA_PROMPT_GUIDANCE flag - strategic/balanced/operational styles, bilingual EN/FR |
 | 4. Deflection Detection | ✅ COMPLETE | Dec 11, 2025 | USE_DEFLECTION_DETECTION flag - 6 types detected, graceful acknowledgments, analytics tracking |
-| 5. Topic Status Tracking | ⏳ PENDING | - | - |
-| 6. Database Schema | ⏳ PENDING | - | - |
-| 7. Analytics | ⏳ PENDING | - | - |
+| 5. Topic Status Tracking | ✅ COMPLETE | Dec 11, 2025 | topic_status dict with status/question_count/deflection per topic, backward-compatible migration |
+| 6. Database Schema | ✅ COMPLETE | Dec 11, 2025 | deflection_summary TEXT column in survey_response, JSON analytics summary |
+| 7. Analytics | 📋 OPTIONAL | - | Dashboard visualizations - not scheduled |
 
 ### Phase Overview
 
