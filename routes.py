@@ -3029,6 +3029,11 @@ def finalize_conversation():
             existing_response.conversation_history = survey_data.get('conversation_history')
             existing_response.ai_prompts_log = structured_data.get('ai_prompts_log')  # 🔧 DEBUG: Save AI prompts for debugging
             existing_response.deflection_summary = structured_data.get('deflection_summary')  # Phase 6: Save deflection analytics
+            # Option B (Dec 11, 2025): Topic-specific feedback from summary extraction
+            existing_response.product_quality_feedback = structured_data.get('product_quality_feedback')
+            existing_response.support_experience_feedback = structured_data.get('support_experience_feedback')
+            existing_response.service_rating_feedback = structured_data.get('service_rating_feedback')
+            existing_response.user_experience_feedback = structured_data.get('user_experience_feedback')
             existing_response.source_type = 'conversational'
             # Update campaign if there's an active one, otherwise preserve existing
             if campaign_id:
@@ -3058,6 +3063,11 @@ def finalize_conversation():
                 conversation_history=survey_data.get('conversation_history'),  # 🔧 CRITICAL FIX: Save conversation transcript
                 ai_prompts_log=structured_data.get('ai_prompts_log'),  # 🔧 DEBUG: Save AI prompts for debugging
                 deflection_summary=structured_data.get('deflection_summary'),  # Phase 6: Save deflection analytics
+                # Option B (Dec 11, 2025): Topic-specific feedback from summary extraction
+                product_quality_feedback=structured_data.get('product_quality_feedback'),
+                support_experience_feedback=structured_data.get('support_experience_feedback'),
+                service_rating_feedback=structured_data.get('service_rating_feedback'),
+                user_experience_feedback=structured_data.get('user_experience_feedback'),
                 source_type='conversational',  # 🔧 CRITICAL FIX: Mark as conversational survey
                 campaign_id=campaign_id,
                 campaign_participant_id=association_id  # Link to campaign-participant association
