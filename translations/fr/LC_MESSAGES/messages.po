@@ -7712,3 +7712,9 @@ msgstr "Échec du chargement de la configuration des indications d'industrie."
 
 msgid "Failed to load role prompt configuration."
 msgstr "Échec du chargement de la configuration des prompts de rôle."
+
+msgid "English"
+msgstr "Anglais"
+
+msgid "French"
+msgstr "Français"
