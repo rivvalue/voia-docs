@@ -1189,6 +1189,7 @@ Ask a clarifying question to get more specific information about the missing fie
 4. Keep it concise (1-2 sentences max)
 5. Do NOT repeat information user already provided
 6. Do NOT mention "fields" or technical terms
+7. IMPORTANT: For NPS/recommendation topics, the score is the respondent's OWN personal rating - NOT a team score. Ask about THEIR reasons for giving that score.
 
 **OUTPUT:**
 Return ONLY the question text, no JSON, no explanation."""
