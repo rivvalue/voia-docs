@@ -7569,3 +7569,146 @@ msgstr "Prochaine étape :"
 
 msgid "After activation, use the \"Send Email Invitations\" button to notify participants."
 msgstr "Après l'activation, utilisez le bouton « Envoyer les invitations par e-mail » pour notifier les participants."
+
+# ===============================================
+# Onboarding - Industry Hints & Role Prompts
+# Added: December 2025
+# ===============================================
+
+msgid "Industry Context"
+msgstr "Contexte de l'industrie"
+
+msgid "Industry Context Configuration"
+msgstr "Configuration du contexte de l'industrie"
+
+msgid "Review and customize how the AI understands your industry to ask more relevant questions"
+msgstr "Examinez et personnalisez comment l'IA comprend votre industrie pour poser des questions plus pertinentes"
+
+msgid "Using Platform Defaults"
+msgstr "Utilisation des paramètres par défaut"
+
+msgid "Configuration Required"
+msgstr "Configuration requise"
+
+msgid "About Industry Context"
+msgstr "À propos du contexte de l'industrie"
+
+msgid "How Industry Context Works:"
+msgstr "Comment fonctionne le contexte de l'industrie :"
+
+msgid "These hints help the AI ask questions relevant to your specific industry"
+msgstr "Ces indications aident l'IA à poser des questions pertinentes pour votre secteur d'activité"
+
+msgid "For example, a Manufacturing company might focus on \"product quality, defect rates, production efficiency\""
+msgstr "Par exemple, une entreprise manufacturière pourrait se concentrer sur « qualité du produit, taux de défauts, efficacité de production »"
+
+msgid "A SaaS company might focus on \"user experience, onboarding, feature requests\""
+msgstr "Une entreprise SaaS pourrait se concentrer sur « expérience utilisateur, intégration, demandes de fonctionnalités »"
+
+msgid "You can accept the platform defaults or customize them for your needs"
+msgstr "Vous pouvez accepter les paramètres par défaut ou les personnaliser selon vos besoins"
+
+msgid "Your Industry"
+msgstr "Votre industrie"
+
+msgid "(Set in your account settings)"
+msgstr "(Défini dans les paramètres de votre compte)"
+
+msgid "Platform Default Hints for Your Industry"
+msgstr "Indications par défaut de la plateforme pour votre industrie"
+
+msgid "These keywords help the AI focus on relevant topics during surveys:"
+msgstr "Ces mots-clés aident l'IA à se concentrer sur les sujets pertinents lors des enquêtes :"
+
+msgid "Survey Topic"
+msgstr "Sujet de l'enquête"
+
+msgid "Focus Keywords"
+msgstr "Mots-clés de focus"
+
+msgid "No platform defaults found for your industry. General defaults will be used."
+msgstr "Aucun paramètre par défaut trouvé pour votre industrie. Les paramètres généraux seront utilisés."
+
+msgid "Complete This Step"
+msgstr "Terminer cette étape"
+
+msgid "Accept Platform Defaults"
+msgstr "Accepter les paramètres par défaut"
+
+msgid "Use the recommended industry hints shown above. You can customize them later if needed."
+msgstr "Utilisez les indications d'industrie recommandées ci-dessus. Vous pourrez les personnaliser plus tard si nécessaire."
+
+msgid "Accept Defaults"
+msgstr "Accepter les paramètres"
+
+msgid "Customize (Advanced)"
+msgstr "Personnaliser (Avancé)"
+
+msgid "Contact your administrator to set up custom industry hints for your specific needs."
+msgstr "Contactez votre administrateur pour configurer des indications d'industrie personnalisées selon vos besoins."
+
+msgid "Coming Soon"
+msgstr "Bientôt disponible"
+
+msgid "Back to Onboarding"
+msgstr "Retour à l'intégration"
+
+msgid "Persona Configuration"
+msgstr "Configuration des personas"
+
+msgid "Review how the AI adapts its questioning style for different participant roles"
+msgstr "Examinez comment l'IA adapte son style de questionnement pour différents rôles de participants"
+
+msgid "About Persona Configuration"
+msgstr "À propos de la configuration des personas"
+
+msgid "How Persona Configuration Works:"
+msgstr "Comment fonctionne la configuration des personas :"
+
+msgid "The AI adapts its questioning style based on the participant's role"
+msgstr "L'IA adapte son style de questionnement en fonction du rôle du participant"
+
+msgid "Executives receive strategic, high-level questions"
+msgstr "Les dirigeants reçoivent des questions stratégiques de haut niveau"
+
+msgid "Managers get questions about team dynamics and operational challenges"
+msgstr "Les gestionnaires reçoivent des questions sur la dynamique d'équipe et les défis opérationnels"
+
+msgid "Team members receive questions focused on their daily experience"
+msgstr "Les membres de l'équipe reçoivent des questions axées sur leur expérience quotidienne"
+
+msgid "This ensures more relevant and insightful feedback from each participant"
+msgstr "Cela garantit des retours plus pertinents et perspicaces de chaque participant"
+
+msgid "Available Personas"
+msgstr "Personas disponibles"
+
+msgid "The AI recognizes these participant roles and adjusts its approach accordingly:"
+msgstr "L'IA reconnaît ces rôles de participants et ajuste son approche en conséquence :"
+
+msgid "Language Support"
+msgstr "Support linguistique"
+
+msgid "The AI automatically adapts its language based on participant preference."
+msgstr "L'IA adapte automatiquement sa langue en fonction de la préférence du participant."
+
+msgid "Use the recommended persona configurations. They work well for most organizations."
+msgstr "Utilisez les configurations de persona recommandées. Elles fonctionnent bien pour la plupart des organisations."
+
+msgid "Contact your administrator to set up custom persona prompts for your organization."
+msgstr "Contactez votre administrateur pour configurer des prompts de persona personnalisés pour votre organisation."
+
+msgid "Platform default industry hints accepted successfully."
+msgstr "Les indications d'industrie par défaut de la plateforme ont été acceptées avec succès."
+
+msgid "Platform default role prompts accepted successfully."
+msgstr "Les prompts de rôle par défaut de la plateforme ont été acceptés avec succès."
+
+msgid "Failed to accept defaults."
+msgstr "Échec de l'acceptation des paramètres par défaut."
+
+msgid "Failed to load industry hints configuration."
+msgstr "Échec du chargement de la configuration des indications d'industrie."
+
+msgid "Failed to load role prompt configuration."
+msgstr "Échec du chargement de la configuration des prompts de rôle."
