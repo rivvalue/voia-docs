@@ -3931,7 +3931,7 @@ def role_prompt_config():
         ]
         
         # Get existing platform overrides
-        platform_overrides = platform_settings.role_prompt_defaults or {}
+        platform_overrides = platform_settings.role_prompt_overrides or {}
         
         return render_template('business_auth/role_prompt_config.html',
                              roles=ROLE_METADATA,
@@ -4031,7 +4031,7 @@ def save_role_prompt_config():
                 del role_overrides[role_key]
         
         # Save to platform settings
-        platform_settings.role_prompt_defaults = role_overrides
+        platform_settings.role_prompt_overrides = role_overrides
         db.session.commit()
         
         # Clear cache
