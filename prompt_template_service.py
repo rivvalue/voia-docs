@@ -711,21 +711,67 @@ class PromptTemplateService:
         role_tier = role_tier.lower() if role_tier else 'default'
         lang_key = language.lower()[:2] if language else 'en'
         
+        # Topic name normalization map (handles UI naming variations)
+        # Maps user-friendly names to internal topic names
+        TOPIC_NAME_VARIANTS = {
+            'NPS Score': 'NPS',
+            'nps_score': 'NPS',
+            'NPS': 'NPS',
+            'Service Rating': 'Professional Services Quality',
+            'Product Quality': 'Product Quality',
+            'Support Quality': 'Support Quality',
+            'Pricing Value': 'Pricing Value',
+        }
+        
+        def normalize_topic(topic_name: Optional[str]) -> list:
+            """Return list of topic variants to check (original + normalized + reverse mappings)"""
+            if not topic_name:
+                return []
+            variants = [topic_name]
+            # Add normalized version
+            if topic_name in TOPIC_NAME_VARIANTS:
+                normalized = TOPIC_NAME_VARIANTS[topic_name]
+                if normalized not in variants:
+                    variants.append(normalized)
+            # Add reverse mappings (internal name -> UI variants)
+            for ui_name, internal_name in TOPIC_NAME_VARIANTS.items():
+                if internal_name == topic_name and ui_name not in variants:
+                    variants.append(ui_name)
+            return variants
+        
         # Helper to extract guidance from override dict
         def extract_guidance(overrides: Optional[Dict], tier: str, topic: Optional[str], lang: str) -> Optional[str]:
             if not overrides or tier not in overrides:
                 return None
             role_config = overrides.get(tier, {})
             
+            # Get all topic name variants to check
+            topic_variants = normalize_topic(topic)
+            
             # Check for topic-specific override first (the key fix for Manager+Pricing bug)
-            if topic and 'topic_overrides' in role_config:
+            # Structure 1 (new): role_config.topic_overrides.{topic}
+            if topic_variants and 'topic_overrides' in role_config:
                 topic_overrides = role_config.get('topic_overrides', {})
-                if topic in topic_overrides:
-                    topic_guidance = topic_overrides[topic]
-                    if isinstance(topic_guidance, dict):
-                        return topic_guidance.get(lang) or topic_guidance.get('en')
-                    elif isinstance(topic_guidance, str):
-                        return topic_guidance
+                for topic_variant in topic_variants:
+                    if topic_variant in topic_overrides:
+                        topic_guidance = topic_overrides[topic_variant]
+                        if isinstance(topic_guidance, dict):
+                            return topic_guidance.get(lang) or topic_guidance.get('en')
+                        elif isinstance(topic_guidance, str):
+                            return topic_guidance
+            
+            # Structure 2 (legacy/flat): role_config.{topic} directly under role
+            # This handles current BA/Campaign configurations where topics are stored flat
+            if topic_variants:
+                for topic_variant in topic_variants:
+                    if topic_variant in role_config and topic_variant not in ('prompt_guidance', 'topic_overrides'):
+                        topic_guidance = role_config.get(topic_variant, {})
+                        if isinstance(topic_guidance, dict):
+                            result = topic_guidance.get(lang) or topic_guidance.get('en')
+                            if result:
+                                return result
+                        elif isinstance(topic_guidance, str):
+                            return topic_guidance
             
             # Fall back to role-level default guidance
             prompt_guidance = role_config.get('prompt_guidance', {})
