@@ -1141,8 +1141,8 @@ Ask a clarifying question to get more specific information about the missing fie
             
             # Use the new 4-tier resolution helper with topic awareness (Dec 2025)
             guidance_text = None
-            if self.prompt_template_service:
-                guidance_text = self.prompt_template_service.get_effective_role_prompt_guidance(
+            if self.template_service:
+                guidance_text = self.template_service.get_effective_role_prompt_guidance(
                     role_tier=self.persona_tier,
                     current_topic=topic_name,  # KEY FIX: Pass current topic for topic-aware guidance
                     language=lang_code
