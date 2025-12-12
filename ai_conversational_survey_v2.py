@@ -916,8 +916,16 @@ class DeterministicSurveyController:
         Returns SPARSE JSON (only mentioned fields, no nulls).
         """
         # Get static context from campaign/participant
-        company_name = self.participant_data.get('company_name', 'the company')
-        product_description = getattr(self.campaign, 'product_description', 'our services')
+        client_company = self.participant_data.get('company_name', 'the company')
+        vendor_name = getattr(self.business_account, 'name', None) or 'our company'
+        
+        # Product description: Campaign → Business Account fallback
+        product_description = getattr(self.campaign, 'product_description', None)
+        if not product_description:
+            product_description = getattr(self.business_account, 'product_description', None)
+        if not product_description:
+            product_description = 'our services'
+        
         industry = self.participant_data.get('client_industry', 'your industry')
         role = self.participant_data.get('role', 'team member')
         
@@ -930,11 +938,11 @@ class DeterministicSurveyController:
         
         # Use feature flag to select prompt version
         if USE_REVISED_EXTRACTION_PROMPT:
-            return self._build_revised_extraction_prompt(user_message, company_name, product_description, industry, role, context_snippet)
+            return self._build_revised_extraction_prompt(user_message, client_company, vendor_name, product_description, industry, role, context_snippet)
         else:
-            return self._build_original_extraction_prompt(user_message, company_name, product_description, industry, role, context_snippet)
+            return self._build_original_extraction_prompt(user_message, client_company, vendor_name, product_description, industry, role, context_snippet)
     
-    def _build_revised_extraction_prompt(self, user_message: str, company_name: str, product_description: str, industry: str, role: str, context_snippet: str) -> str:
+    def _build_revised_extraction_prompt(self, user_message: str, client_company: str, vendor_name: str, product_description: str, industry: str, role: str, context_snippet: str) -> str:
         """
         REVISED extraction prompt (Nov 2025)
         
@@ -947,10 +955,11 @@ class DeterministicSurveyController:
         prompt = f"""Extract structured data from the user's response below.
 
 **STATIC CONTEXT (for understanding only, do NOT restate):**
-- Company: {company_name}
+- Vendor Being Evaluated: {vendor_name}
 - Product/Service: {product_description}
-- Industry: {industry}
-- Participant Role: {role}
+- Client Company (Respondent's Employer): {client_company}
+- Client Industry: {industry}
+- Respondent Role: {role}
 
 **RECENT CONVERSATION:**
 {context_snippet}
@@ -1045,7 +1054,7 @@ WHEN IN DOUBT, DO NOT FLAG AS DEFLECTION. Only flag when the user provides ZERO 
         
         return prompt
     
-    def _build_original_extraction_prompt(self, user_message: str, company_name: str, product_description: str, industry: str, role: str, context_snippet: str) -> str:
+    def _build_original_extraction_prompt(self, user_message: str, client_company: str, vendor_name: str, product_description: str, industry: str, role: str, context_snippet: str) -> str:
         """
         ORIGINAL extraction prompt (pre-Nov 2025)
         
@@ -1054,10 +1063,11 @@ WHEN IN DOUBT, DO NOT FLAG AS DEFLECTION. Only flag when the user provides ZERO 
         prompt = f"""Extract structured data from the user's response below.
 
 **STATIC CONTEXT (for understanding only, do NOT restate):**
-- Company: {company_name}
+- Vendor Being Evaluated: {vendor_name}
 - Product/Service: {product_description}
-- Industry: {industry}
-- Participant Role: {role}
+- Client Company (Respondent's Employer): {client_company}
+- Client Industry: {industry}
+- Respondent Role: {role}
 
 **RECENT CONVERSATION:**
 {context_snippet}
@@ -1109,8 +1119,16 @@ Return ONLY the JSON object, no explanation."""
         topic_name = goal.get('topic', 'Unknown')
         
         # Get static context
-        company_name = self.participant_data.get('company_name', 'the company')
-        product_description = getattr(self.campaign, 'product_description', 'our services')
+        client_company = self.participant_data.get('company_name', 'the company')
+        vendor_name = getattr(self.business_account, 'name', None) or 'our company'
+        
+        # Product description: Campaign → Business Account fallback
+        product_description = getattr(self.campaign, 'product_description', None)
+        if not product_description:
+            product_description = getattr(self.business_account, 'product_description', None)
+        if not product_description:
+            product_description = 'our services'
+        
         industry = self.participant_data.get('client_industry', 'your industry')
         role = self.participant_data.get('role', 'team member')
         
@@ -1164,10 +1182,11 @@ Ask a clarifying question to get more specific information about the missing fie
         prompt = f"""Generate a natural, conversational question for the topic: {topic_name}
 
 **STATIC CONTEXT (for understanding only, do NOT restate):**
-- Company: {company_name}
+- Vendor Being Evaluated: {vendor_name}
 - Product/Service: {product_description}
-- Industry: {industry}
-- Participant Role: {role}
+- Client Company (Respondent's Employer): {client_company}
+- Client Industry: {industry}
+- Respondent Role: {role}
 - Conversation Tone: {conversation_tone}
 {persona_guidance_block}
 
