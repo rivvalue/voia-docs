@@ -43,6 +43,22 @@ class OnboardingFlowManager:
             target_link='/business/admin/brand-config',
             required=False
         ),
+        'industry_hints': OnboardingStep(
+            step_id='industry_hints',
+            name='Industry Context',
+            description='Configure industry-specific context to help the AI ask more relevant questions',
+            target_link='/business/admin/industry-hints',
+            required=True,
+            validation_method='validate_industry_hints'
+        ),
+        'role_prompts': OnboardingStep(
+            step_id='role_prompts',
+            name='Persona Configuration',
+            description='Customize how the AI adapts questions for different participant roles',
+            target_link='/business/admin/role-prompts',
+            required=True,
+            validation_method='validate_role_prompts'
+        ),
         'users': OnboardingStep(
             step_id='users',
             name='Team Members',
@@ -55,12 +71,12 @@ class OnboardingFlowManager:
     # License-specific flow configurations
     ONBOARDING_FLOWS = {
         'core': {
-            'steps': ['smtp', 'brand', 'users'],
+            'steps': ['smtp', 'brand', 'industry_hints', 'role_prompts', 'users'],
             'mandatory': True,
             'description': 'Essential setup for Core license holders'
         },
         'plus': {
-            'steps': ['smtp', 'brand', 'users'],
+            'steps': ['smtp', 'brand', 'industry_hints', 'role_prompts', 'users'],
             'mandatory': True,
             'description': 'Enhanced setup for Plus license holders'
         },
@@ -70,7 +86,7 @@ class OnboardingFlowManager:
             'description': 'Pro license holders have optional onboarding'
         },
         'trial': {
-            'steps': ['smtp', 'brand', 'users'],
+            'steps': ['smtp', 'brand', 'industry_hints', 'role_prompts', 'users'],
             'mandatory': True,
             'description': 'Trial setup to explore VOÏA features'
         }
@@ -273,6 +289,84 @@ class OnboardingValidation:
         except Exception as e:
             logger.error(f"User creation validation error: {e}")
             return False, "Failed to validate team setup"
+    
+    @staticmethod
+    def validate_industry_hints(user, form_data):
+        """Validate industry hints configuration step"""
+        try:
+            from models import BusinessAccount
+            
+            business_account = BusinessAccount.query.get(user.business_account_id)
+            if not business_account:
+                return False, "Business account not found"
+            
+            # Check if user explicitly accepted defaults
+            if form_data.get('accept_defaults') == '1':
+                # Store confirmation flag
+                if not business_account.industry_topic_hints:
+                    business_account.industry_topic_hints = {}
+                business_account.industry_topic_hints['_defaults_accepted'] = True
+                return True, "Platform default industry hints accepted"
+            
+            # Check if custom hints have been configured
+            if business_account.industry_topic_hints:
+                # Has some configuration (either custom or accepted defaults)
+                if business_account.industry_topic_hints.get('_defaults_accepted'):
+                    return True, "Using platform default industry hints"
+                # Has custom configuration
+                return True, "Industry hints configured"
+            
+            # No configuration yet - allow skip with confirmation
+            if form_data.get('skip_step') == '1':
+                if not business_account.industry_topic_hints:
+                    business_account.industry_topic_hints = {}
+                business_account.industry_topic_hints['_defaults_accepted'] = True
+                return True, "Step skipped - using platform defaults"
+            
+            return False, "Please configure industry hints or accept platform defaults"
+            
+        except Exception as e:
+            logger.error(f"Industry hints validation error: {e}")
+            return False, "Failed to validate industry hints configuration"
+    
+    @staticmethod
+    def validate_role_prompts(user, form_data):
+        """Validate role-based prompt configuration step"""
+        try:
+            from models import BusinessAccount
+            
+            business_account = BusinessAccount.query.get(user.business_account_id)
+            if not business_account:
+                return False, "Business account not found"
+            
+            # Check if user explicitly accepted defaults
+            if form_data.get('accept_defaults') == '1':
+                # Store confirmation flag
+                if not business_account.role_prompt_overrides:
+                    business_account.role_prompt_overrides = {}
+                business_account.role_prompt_overrides['_defaults_accepted'] = True
+                return True, "Platform default role prompts accepted"
+            
+            # Check if custom prompts have been configured
+            if business_account.role_prompt_overrides:
+                # Has some configuration
+                if business_account.role_prompt_overrides.get('_defaults_accepted'):
+                    return True, "Using platform default role prompts"
+                # Has custom configuration
+                return True, "Role prompts configured"
+            
+            # No configuration yet - allow skip with confirmation
+            if form_data.get('skip_step') == '1':
+                if not business_account.role_prompt_overrides:
+                    business_account.role_prompt_overrides = {}
+                business_account.role_prompt_overrides['_defaults_accepted'] = True
+                return True, "Step skipped - using platform defaults"
+            
+            return False, "Please configure role prompts or accept platform defaults"
+            
+        except Exception as e:
+            logger.error(f"Role prompts validation error: {e}")
+            return False, "Failed to validate role prompts configuration"
     
     @classmethod
     def get_validator(cls, validation_method: str) -> Optional[Callable]:
