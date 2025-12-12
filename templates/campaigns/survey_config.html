@@ -614,7 +614,7 @@
                 </div>
             </div>
 
-            <!-- Role Prompt Guidance Section (Advanced - with inheritance) -->
+            <!-- Role Prompt Guidance Section (Advanced - Enhanced UI matching Platform design) -->
             {% set use_business_role_prompts = campaign.use_business_role_prompts if campaign.use_business_role_prompts is defined else True %}
             <input type="hidden" name="use_business_role_prompts" id="use_business_role_prompts_hidden" value="{{ 'true' if use_business_role_prompts else 'false' }}">
             
@@ -629,81 +629,147 @@
                 </p>
                 
                 <div id="rolePromptContent" style="display: none;">
+                    <!-- 4-Tier Hierarchy Info -->
+                    <div class="alert alert-info mb-4">
+                        <p class="mb-2"><strong><i class="fas fa-layer-group me-2"></i>{{ _('4-Tier Hierarchy:') }}</strong></p>
+                        <ul class="mb-0 small">
+                            <li><strong>Campaign (This level)</strong> → <strong>Business Account</strong> → <strong>Platform</strong> → <strong>ROLE_METADATA defaults</strong></li>
+                            <li>{{ _('Your overrides here apply only to this campaign.') }}</li>
+                            <li>{{ _('Platform/Business defaults shown below as reference.') }}</li>
+                        </ul>
+                    </div>
+                    
                     <!-- Inheritance Toggle -->
-                    <div class="form-check form-switch mb-3">
+                    <div class="form-check form-switch mb-3 p-3" style="background: rgba(0, 123, 255, 0.05); border-radius: var(--radius-md); border: 1px solid var(--light-gray);">
                         <input class="form-check-input" type="checkbox" id="role-prompts-toggle"
                                {{ 'checked' if use_business_role_prompts else '' }}
                                {% if is_readonly %}disabled{% endif %}
                                onchange="toggleRolePromptInheritance()">
                         <label class="form-check-label fw-bold" for="role-prompts-toggle">
-                            Use business account defaults
+                            <i class="fas fa-link me-2"></i>{{ _('Use business account defaults') }}
                         </label>
+                        <p class="text-muted small mb-0 mt-1">{{ _('When enabled, this campaign inherits role prompt guidance from the business account level.') }}</p>
                     </div>
                     
                     <!-- Inherited Content -->
                     <div id="role-prompts-inherited" class="{{ 'd-none' if not use_business_role_prompts else '' }}">
-                        <div class="alert alert-info mb-0">
-                            <i class="fas fa-link me-2"></i>
-                            <strong>{{ _('Inheriting from business account:') }}</strong> 
-                            {{ _('This campaign uses the role prompt guidance configured at the business account level.') }}
+                        <div class="alert alert-success mb-0">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <strong>{{ _('Inheriting from business account') }}</strong>
                             {% if business_defaults and business_defaults.role_overrides %}
                             <p class="mb-0 mt-2 small">
-                                {{ business_defaults.role_overrides|length }} role override(s) configured at business level.
+                                <i class="fas fa-building me-1"></i>{{ business_defaults.role_overrides|length }} {{ _('role override(s) configured at business level.') }}
                             </p>
                             {% else %}
-                            <p class="mb-0 mt-2 small">{{ _('No custom overrides - using platform defaults.') }}</p>
+                            <p class="mb-0 mt-2 small">{{ _('No custom overrides at business level - using platform defaults.') }}</p>
                             {% endif %}
                         </div>
                     </div>
                     
-                    <!-- Custom Content -->
+                    <!-- Custom Content with Collapsible Role Cards -->
                     <div id="role-prompts-custom" class="{{ 'd-none' if use_business_role_prompts else '' }}">
-                        <div class="alert alert-warning mb-3">
+                        <div class="alert alert-warning mb-4">
                             <i class="fas fa-edit me-2"></i>
                             <strong>{{ _('Campaign-specific overrides') }}</strong>: 
-                            {{ _('These settings will override business account defaults for this campaign only.') }}
+                            {{ _('These settings override business account defaults for this campaign only.') }}
                         </div>
                         
                         {% if role_options %}
-                        <!-- Role Selector -->
-                        <div class="mb-3">
-                            <label class="form-label" for="campaign_role_select">{{ _('Select Role to Configure') }}</label>
-                            <select class="form-control" id="campaign_role_select" onchange="showCampaignRolePanel()" {% if is_readonly %}disabled{% endif %}>
-                                <option value="">{{ _('-- Select a role --') }}</option>
-                                {% for role_key, role_data in role_options.items() %}
-                                <option value="{{ role_key }}">{{ role_data.label }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        
-                        <!-- Role Panels -->
+                        <!-- Role Cards (Platform-style collapsible design) -->
                         {% for role_key, role_data in role_options.items() %}
-                        <div id="campaign_role_panel_{{ role_key }}" class="campaign-role-panel" style="display: none; border: 1px solid var(--medium-gray); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1rem; background: var(--primary-white);">
-                            <h6 class="mb-3"><i class="fas fa-user-circle me-2"></i>{{ role_data.label }}</h6>
-                            
-                            <div id="campaign_overrides_{{ role_key }}">
-                                {% set existing = (campaign.role_prompt_overrides or {}).get(role_key, {}) %}
-                                {% for topic, guidance in existing.items() %}
-                                <div class="topic-override-row mb-2" id="camp_override_{{ role_key }}_{{ loop.index0 }}" style="border: 1px solid var(--light-gray); padding: 0.75rem; border-radius: var(--radius-md); background: rgba(245,245,245,0.5);">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <select class="form-select form-select-sm" style="width: 180px;" name="camp_{{ role_key }}_topic_{{ loop.index0 }}" {% if is_readonly %}disabled{% endif %}>
-                                            {% for t in topic_options %}
-                                            <option value="{{ t }}" {{ 'selected' if t == topic else '' }}>{{ t }}</option>
-                                            {% endfor %}
-                                        </select>
-                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeCampOverride('{{ role_key }}', {{ loop.index0 }})" {% if is_readonly %}disabled{% endif %}>
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                    <textarea class="form-control form-control-sm mb-1" name="camp_{{ role_key }}_guidance_en_{{ loop.index0 }}" rows="2" placeholder="English guidance..." {% if is_readonly %}disabled{% endif %}>{{ guidance.get('en', '') }}</textarea>
-                                    <textarea class="form-control form-control-sm" name="camp_{{ role_key }}_guidance_fr_{{ loop.index0 }}" rows="2" placeholder="French guidance..." {% if is_readonly %}disabled{% endif %}>{{ guidance.get('fr', '') }}</textarea>
-                                </div>
-                                {% endfor %}
+                        <div class="camp-role-card" style="background: var(--primary-white); border-radius: var(--radius-lg); border: 1px solid var(--light-gray); margin-bottom: var(--spacing-lg); overflow: hidden;">
+                            <div class="camp-role-card-header" onclick="toggleCampRole('{{ role_key }}')" 
+                                 style="padding: var(--spacing-md); background: rgba(255, 193, 7, 0.08); border-bottom: 1px solid var(--light-gray); cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                                <h6 style="font-weight: 600; color: var(--primary-black); margin: 0; display: flex; align-items: center; gap: var(--spacing-sm);">
+                                    <i class="fas fa-user-circle"></i>
+                                    {{ role_data.label }}
+                                    {% set camp_overrides = (campaign.role_prompt_overrides or {}).get(role_key, {}) %}
+                                    {% if camp_overrides %}
+                                    <span class="badge bg-warning text-dark" style="font-size: 10px;">{{ camp_overrides|length }} override(s)</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary" style="font-size: 10px;">{{ _('Inherited') }}</span>
+                                    {% endif %}
+                                </h6>
+                                <i class="fas fa-chevron-down" id="camp-chevron-{{ role_key }}" style="transition: transform 0.3s; font-size: 12px;"></i>
                             </div>
-                            
-                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="addCampTopicOverride('{{ role_key }}')" {% if is_readonly %}disabled{% endif %}>
-                                <i class="fas fa-plus me-1"></i>{{ _('Add Topic Override') }}
-                            </button>
+                            <div class="camp-role-card-body" id="camp-body-{{ role_key }}" style="padding: var(--spacing-md); display: none;">
+                                
+                                <!-- Platform/ROLE_METADATA Defaults Preview -->
+                                <div class="mb-3 p-3" style="background: rgba(108, 117, 125, 0.08); border-radius: var(--radius-md); border-left: 4px solid var(--secondary);">
+                                    <label class="form-label fw-bold small text-secondary mb-2">
+                                        <i class="fas fa-globe me-1"></i>{{ _('Platform Default Guidance (Reference)') }}
+                                    </label>
+                                    <div class="camp-lang-tabs mb-2" style="display: flex; gap: 4px;">
+                                        <button type="button" class="camp-lang-tab" onclick="showCampLang('{{ role_key }}', 'default', 'en', event)" 
+                                                style="padding: 3px 10px; border: 1px solid var(--medium-gray); border-radius: var(--radius-md); background: var(--primary-black); color: white; font-size: 11px; cursor: pointer;">EN</button>
+                                        <button type="button" class="camp-lang-tab" onclick="showCampLang('{{ role_key }}', 'default', 'fr', event)"
+                                                style="padding: 3px 10px; border: 1px solid var(--medium-gray); border-radius: var(--radius-md); background: var(--primary-white); font-size: 11px; cursor: pointer;">FR</button>
+                                    </div>
+                                    <div id="camp-{{ role_key }}-default-en">
+                                        <pre style="background: #f8f9fa; padding: 10px; border-radius: 4px; font-size: 11px; white-space: pre-wrap; margin: 0; max-height: 120px; overflow-y: auto;">{{ role_data.prompt_guidance.en if role_data.prompt_guidance else 'No default guidance defined.' }}</pre>
+                                    </div>
+                                    <div id="camp-{{ role_key }}-default-fr" style="display: none;">
+                                        <pre style="background: #f8f9fa; padding: 10px; border-radius: 4px; font-size: 11px; white-space: pre-wrap; margin: 0; max-height: 120px; overflow-y: auto;">{{ role_data.prompt_guidance.fr if role_data.prompt_guidance else 'Aucune guidance par défaut définie.' }}</pre>
+                                    </div>
+                                    {% if platform_overrides.get(role_key) %}
+                                    <div class="mt-2 small text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>{{ _('Platform has %(count)d topic override(s).', count=platform_overrides[role_key]|length) }}
+                                    </div>
+                                    {% endif %}
+                                    {% if business_defaults and business_defaults.role_overrides and business_defaults.role_overrides.get(role_key) %}
+                                    <div class="mt-1 small text-primary">
+                                        <i class="fas fa-building me-1"></i>{{ _('Business account has %(count)d topic override(s).', count=business_defaults.role_overrides[role_key]|length) }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Campaign Topic Overrides -->
+                                <div class="mb-2">
+                                    <label class="form-label fw-bold small">
+                                        <i class="fas fa-bullhorn me-1"></i>{{ _('Campaign-Specific Overrides') }}
+                                    </label>
+                                    
+                                    <div id="campaign_overrides_{{ role_key }}">
+                                        {% set existing = (campaign.role_prompt_overrides or {}).get(role_key, {}) %}
+                                        {% for topic, guidance in existing.items() %}
+                                        <div class="topic-override-row mb-2" id="camp_override_{{ role_key }}_{{ loop.index0 }}" 
+                                             style="border: 1px solid var(--light-gray); padding: 0.75rem; border-radius: var(--radius-md); background: rgba(245,245,245,0.5);">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <select class="form-select form-select-sm" style="width: 180px;" name="camp_{{ role_key }}_topic_{{ loop.index0 }}" {% if is_readonly %}disabled{% endif %}>
+                                                    {% for t in topic_options %}
+                                                    <option value="{{ t }}" {{ 'selected' if t == topic else '' }}>{{ t }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeCampOverride('{{ role_key }}', {{ loop.index0 }})" {% if is_readonly %}disabled{% endif %}>
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                            <div class="camp-lang-tabs mb-2" style="display: flex; gap: 4px;">
+                                                <button type="button" class="camp-lang-tab" onclick="showCampLang('{{ role_key }}', '{{ loop.index0 }}', 'en', event)"
+                                                        style="padding: 3px 10px; border: 1px solid var(--medium-gray); border-radius: var(--radius-md); background: var(--primary-black); color: white; font-size: 11px; cursor: pointer;">EN</button>
+                                                <button type="button" class="camp-lang-tab" onclick="showCampLang('{{ role_key }}', '{{ loop.index0 }}', 'fr', event)"
+                                                        style="padding: 3px 10px; border: 1px solid var(--medium-gray); border-radius: var(--radius-md); background: var(--primary-white); font-size: 11px; cursor: pointer;">FR</button>
+                                            </div>
+                                            <div id="camp-{{ role_key }}-{{ loop.index0 }}-en">
+                                                <textarea class="form-control form-control-sm" name="camp_{{ role_key }}_guidance_en_{{ loop.index0 }}" rows="2" 
+                                                          placeholder="{{ _('English guidance...') }}" style="font-family: monospace; font-size: 12px;" {% if is_readonly %}disabled{% endif %}>{{ guidance.get('en', '') }}</textarea>
+                                            </div>
+                                            <div id="camp-{{ role_key }}-{{ loop.index0 }}-fr" style="display: none;">
+                                                <textarea class="form-control form-control-sm" name="camp_{{ role_key }}_guidance_fr_{{ loop.index0 }}" rows="2" 
+                                                          placeholder="{{ _('French guidance...') }}" style="font-family: monospace; font-size: 12px;" {% if is_readonly %}disabled{% endif %}>{{ guidance.get('fr', '') }}</textarea>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    
+                                    {% if not is_readonly %}
+                                    <button type="button" class="btn btn-outline-warning btn-sm" onclick="addCampTopicOverride('{{ role_key }}')" 
+                                            style="border: 2px dashed var(--medium-gray); background: transparent; padding: 6px 12px; width: 100%;">
+                                        <i class="fas fa-plus me-1"></i>{{ _('Add Topic Override') }}
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </div>
                         </div>
                         {% endfor %}
                         {% else %}
@@ -1054,17 +1120,40 @@ function toggleRolePromptInheritance() {
     }
 }
 
-function showCampaignRolePanel() {
-    const select = document.getElementById('campaign_role_select');
-    const selectedRole = select.value;
+// Toggle individual role card (new collapsible design)
+function toggleCampRole(roleKey) {
+    const body = document.getElementById('camp-body-' + roleKey);
+    const chevron = document.getElementById('camp-chevron-' + roleKey);
+    if (body.style.display === 'none') {
+        body.style.display = 'block';
+        chevron.style.transform = 'rotate(180deg)';
+    } else {
+        body.style.display = 'none';
+        chevron.style.transform = 'rotate(0deg)';
+    }
+}
+
+// Language tab switching for campaign UI
+function showCampLang(roleKey, idx, lang, event) {
+    const enDiv = document.getElementById('camp-' + roleKey + '-' + idx + '-en');
+    const frDiv = document.getElementById('camp-' + roleKey + '-' + idx + '-fr');
     
-    document.querySelectorAll('.campaign-role-panel').forEach(panel => {
-        panel.style.display = 'none';
+    // Update tab styling
+    const tabs = event.target.parentElement.querySelectorAll('.camp-lang-tab');
+    tabs.forEach(t => {
+        t.style.background = 'var(--primary-white)';
+        t.style.color = 'inherit';
     });
+    event.target.style.background = 'var(--primary-black)';
+    event.target.style.color = 'white';
     
-    if (selectedRole) {
-        const panel = document.getElementById('campaign_role_panel_' + selectedRole);
-        if (panel) panel.style.display = 'block';
+    // Show/hide content
+    if (lang === 'en') {
+        if (enDiv) enDiv.style.display = 'block';
+        if (frDiv) frDiv.style.display = 'none';
+    } else {
+        if (enDiv) enDiv.style.display = 'none';
+        if (frDiv) frDiv.style.display = 'block';
     }
 }
 
@@ -1077,6 +1166,7 @@ campOverrideCounters['{{ role_key }}'] = {{ ((campaign.role_prompt_overrides or 
 
 const campTopicOptions = {{ topic_options|tojson if topic_options else '[]' }};
 
+// Add topic override for campaign (enhanced with lang tabs)
 function addCampTopicOverride(roleKey) {
     const container = document.getElementById('campaign_overrides_' + roleKey);
     if (!container) return;
@@ -1087,7 +1177,8 @@ function addCampTopicOverride(roleKey) {
     let topicOptions = campTopicOptions.map(t => `<option value="${t}">${t}</option>`).join('');
     
     const html = `
-        <div class="topic-override-row mb-2" id="camp_override_${roleKey}_${idx}" style="border: 1px solid var(--light-gray); padding: 0.75rem; border-radius: var(--radius-md); background: rgba(245,245,245,0.5);">
+        <div class="topic-override-row mb-2" id="camp_override_${roleKey}_${idx}" 
+             style="border: 1px solid var(--light-gray); padding: 0.75rem; border-radius: var(--radius-md); background: rgba(245,245,245,0.5);">
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <select class="form-select form-select-sm" style="width: 180px;" name="camp_${roleKey}_topic_${idx}">
                     ${topicOptions}
@@ -1096,8 +1187,20 @@ function addCampTopicOverride(roleKey) {
                     <i class="fas fa-trash"></i>
                 </button>
             </div>
-            <textarea class="form-control form-control-sm mb-1" name="camp_${roleKey}_guidance_en_${idx}" rows="2" placeholder="English guidance..."></textarea>
-            <textarea class="form-control form-control-sm" name="camp_${roleKey}_guidance_fr_${idx}" rows="2" placeholder="French guidance..."></textarea>
+            <div class="camp-lang-tabs mb-2" style="display: flex; gap: 4px;">
+                <button type="button" class="camp-lang-tab" onclick="showCampLang('${roleKey}', '${idx}', 'en', event)"
+                        style="padding: 3px 10px; border: 1px solid var(--medium-gray); border-radius: var(--radius-md); background: var(--primary-black); color: white; font-size: 11px; cursor: pointer;">EN</button>
+                <button type="button" class="camp-lang-tab" onclick="showCampLang('${roleKey}', '${idx}', 'fr', event)"
+                        style="padding: 3px 10px; border: 1px solid var(--medium-gray); border-radius: var(--radius-md); background: var(--primary-white); font-size: 11px; cursor: pointer;">FR</button>
+            </div>
+            <div id="camp-${roleKey}-${idx}-en">
+                <textarea class="form-control form-control-sm" name="camp_${roleKey}_guidance_en_${idx}" rows="2" 
+                          placeholder="English guidance..." style="font-family: monospace; font-size: 12px;"></textarea>
+            </div>
+            <div id="camp-${roleKey}-${idx}-fr" style="display: none;">
+                <textarea class="form-control form-control-sm" name="camp_${roleKey}_guidance_fr_${idx}" rows="2" 
+                          placeholder="French guidance..." style="font-family: monospace; font-size: 12px;"></textarea>
+            </div>
         </div>
     `;
     

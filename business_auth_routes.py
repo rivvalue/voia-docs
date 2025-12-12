@@ -4830,9 +4830,15 @@ def survey_config():
             'Satisfaction', 'Improvement Suggestions'
         ]
         
-        # Role options for role prompt overrides (simplified for UI)
+        # Role options for role prompt overrides (full data for UI with defaults)
         from prompt_template_service import ROLE_METADATA
-        role_options = {k: {'label': v.get('label', k)} for k, v in ROLE_METADATA.items()}
+        from models import PlatformSurveySettings
+        
+        # Get platform-level overrides for display as examples
+        platform_settings = PlatformSurveySettings.query.first()
+        platform_overrides = {}
+        if platform_settings:
+            platform_overrides = platform_settings.role_prompt_overrides or {}
         
         return render_template('business_auth/survey_config.html',
                              business_account=current_account,
@@ -4840,7 +4846,8 @@ def survey_config():
                              industry_topic_hints_json=json.dumps(INDUSTRY_TOPIC_HINTS),
                              tone_options=tone_options,
                              topic_options=topic_options,
-                             role_options=role_options,
+                             role_options=ROLE_METADATA,
+                             platform_overrides=platform_overrides,
                              ENABLE_PROMPT_PREVIEW=os.getenv('ENABLE_PROMPT_PREVIEW') == 'true')
     
     except Exception as e:

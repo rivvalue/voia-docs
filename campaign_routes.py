@@ -1256,9 +1256,15 @@ def survey_config(campaign_id):
             'role_overrides': current_account.role_prompt_overrides or {}
         }
         
-        # Role options for role prompt overrides
+        # Role options for role prompt overrides (full data with defaults)
         from prompt_template_service import ROLE_METADATA
-        role_options = {k: {'label': v.get('label', k)} for k, v in ROLE_METADATA.items()}
+        from models import PlatformSurveySettings
+        
+        # Get platform-level overrides for display as examples
+        platform_settings = PlatformSurveySettings.query.first()
+        platform_overrides = {}
+        if platform_settings:
+            platform_overrides = platform_settings.role_prompt_overrides or {}
         
         # Topic options for dropdown
         topic_options = [
@@ -1274,7 +1280,8 @@ def survey_config(campaign_id):
                              business_defaults=business_defaults,
                              available_industries=get_available_industries(),
                              industry_topic_hints_json=json.dumps(INDUSTRY_TOPIC_HINTS),
-                             role_options=role_options,
+                             role_options=ROLE_METADATA,
+                             platform_overrides=platform_overrides,
                              topic_options=topic_options,
                              ENABLE_PROMPT_PREVIEW=os.getenv('ENABLE_PROMPT_PREVIEW') == 'true')
         
