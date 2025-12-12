@@ -3904,6 +3904,162 @@ def merge_custom_hints(industry, custom_hints):
         return redirect(url_for('business_auth.industry_hints_config'))
 
 
+# ==== ROLE PROMPT GUIDANCE CONFIGURATION (Platform Admin Only) ====
+
+@business_auth_bp.route('/admin/role-prompt-config')
+@require_business_auth
+@require_platform_admin
+def role_prompt_config():
+    """Role prompt guidance configuration page (Platform Admin Only)"""
+    try:
+        from prompt_template_service import ROLE_METADATA
+        from models import PlatformSurveySettings
+        
+        current_user = BusinessAccountUser.query.get(session.get('business_user_id'))
+        
+        # Get or create platform settings
+        platform_settings = PlatformSurveySettings.query.first()
+        if not platform_settings:
+            platform_settings = PlatformSurveySettings(use_role_prompt_overrides=False)
+            db.session.add(platform_settings)
+            db.session.commit()
+        
+        # Available topics for dropdown
+        available_topics = [
+            'Product Quality', 'Support Quality', 'Pricing Value', 
+            'Relationship & Communication', 'Innovation & Future'
+        ]
+        
+        # Get existing platform overrides
+        platform_overrides = platform_settings.role_prompt_defaults or {}
+        
+        return render_template('business_auth/role_prompt_config.html',
+                             roles=ROLE_METADATA,
+                             platform_settings=platform_settings,
+                             platform_overrides=platform_overrides,
+                             available_topics=available_topics,
+                             current_user=current_user)
+    
+    except Exception as e:
+        logger.error(f"Error loading role prompt configuration: {e}")
+        flash('Failed to load role prompt configuration.', 'error')
+        return redirect(url_for('business_auth.admin_panel'))
+
+
+@business_auth_bp.route('/admin/role-prompt-config/toggle', methods=['POST'])
+@require_business_auth
+@require_platform_admin
+def toggle_role_prompt_overrides():
+    """Toggle the role prompt override feature (Platform Admin Only)"""
+    try:
+        from models import PlatformSurveySettings
+        
+        platform_settings = PlatformSurveySettings.query.first()
+        if not platform_settings:
+            platform_settings = PlatformSurveySettings()
+            db.session.add(platform_settings)
+        
+        # Toggle based on checkbox state
+        new_state = request.form.get('use_role_prompt_overrides') == 'on'
+        platform_settings.use_role_prompt_overrides = new_state
+        db.session.commit()
+        
+        # Clear any cached settings
+        from app import cache
+        cache.delete('platform_survey_settings')
+        
+        status = 'enabled' if new_state else 'disabled'
+        flash(f'Role prompt override system {status}.', 'success')
+        return redirect(url_for('business_auth.role_prompt_config'))
+    
+    except Exception as e:
+        logger.error(f"Error toggling role prompt overrides: {e}")
+        flash('Failed to update setting.', 'error')
+        return redirect(url_for('business_auth.role_prompt_config'))
+
+
+@business_auth_bp.route('/admin/role-prompt-config/save', methods=['POST'])
+@require_business_auth
+@require_platform_admin
+def save_role_prompt_config():
+    """Save role prompt guidance configuration (Platform Admin Only)"""
+    try:
+        from prompt_template_service import ROLE_METADATA
+        from models import PlatformSurveySettings
+        
+        current_user = BusinessAccountUser.query.get(session.get('business_user_id'))
+        if not current_user:
+            flash('User session invalid.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        platform_settings = PlatformSurveySettings.query.first()
+        if not platform_settings:
+            platform_settings = PlatformSurveySettings()
+            db.session.add(platform_settings)
+        
+        # Parse form data for each role
+        role_overrides = {}
+        
+        for role_key in ROLE_METADATA.keys():
+            role_overrides[role_key] = {}
+            
+            # Find all topic overrides for this role
+            idx = 0
+            while True:
+                topic_key = f'{role_key}_topic_{idx}'
+                en_key = f'{role_key}_guidance_en_{idx}'
+                fr_key = f'{role_key}_guidance_fr_{idx}'
+                
+                topic = request.form.get(topic_key)
+                if not topic:
+                    break
+                
+                en_guidance = request.form.get(en_key, '').strip()
+                fr_guidance = request.form.get(fr_key, '').strip()
+                
+                # Only add if at least one language has content
+                if en_guidance or fr_guidance:
+                    role_overrides[role_key][topic] = {
+                        'en': en_guidance,
+                        'fr': fr_guidance
+                    }
+                
+                idx += 1
+            
+            # Remove empty role entries
+            if not role_overrides[role_key]:
+                del role_overrides[role_key]
+        
+        # Save to platform settings
+        platform_settings.role_prompt_defaults = role_overrides
+        db.session.commit()
+        
+        # Clear cache
+        from app import cache
+        cache.delete('platform_survey_settings')
+        
+        # Audit log
+        queue_audit_log(
+            business_account_id=current_user.business_account_id,
+            action_type='role_prompt_config_update',
+            resource_type='platform_config',
+            resource_id=None,
+            user_name=current_user.get_full_name(),
+            details={
+                'roles_configured': list(role_overrides.keys()),
+                'total_overrides': sum(len(v) for v in role_overrides.values())
+            }
+        )
+        
+        flash('Role prompt guidance configuration saved successfully.', 'success')
+        return redirect(url_for('business_auth.role_prompt_config'))
+    
+    except Exception as e:
+        logger.error(f"Error saving role prompt configuration: {e}")
+        flash(f'Failed to save configuration: {str(e)}', 'error')
+        return redirect(url_for('business_auth.role_prompt_config'))
+
+
 # ==== EMAIL DELIVERY CONFIGURATION ROUTES (Business Account) ====
 
 def _get_email_delivery_data(business_account_id):
@@ -4674,12 +4830,17 @@ def survey_config():
             'Satisfaction', 'Improvement Suggestions'
         ]
         
+        # Role options for role prompt overrides (simplified for UI)
+        from prompt_template_service import ROLE_METADATA
+        role_options = {k: {'label': v.get('label', k)} for k, v in ROLE_METADATA.items()}
+        
         return render_template('business_auth/survey_config.html',
                              business_account=current_account,
                              available_industries=available_industries,
                              industry_topic_hints_json=json.dumps(INDUSTRY_TOPIC_HINTS),
                              tone_options=tone_options,
                              topic_options=topic_options,
+                             role_options=role_options,
                              ENABLE_PROMPT_PREVIEW=os.getenv('ENABLE_PROMPT_PREVIEW') == 'true')
     
     except Exception as e:
@@ -4774,6 +4935,43 @@ def save_survey_config():
         # JSON fields
         current_account.prioritized_topics = prioritized_topics if prioritized_topics else None
         current_account.optional_topics = optional_topics if optional_topics else None
+        
+        # Parse and save role prompt overrides (advanced feature)
+        from prompt_template_service import ROLE_METADATA
+        role_overrides = {}
+        
+        for role_key in ROLE_METADATA.keys():
+            role_overrides[role_key] = {}
+            
+            # Find all topic overrides for this role (using ba_ prefix for business account)
+            idx = 0
+            while True:
+                topic_key = f'ba_{role_key}_topic_{idx}'
+                en_key = f'ba_{role_key}_guidance_en_{idx}'
+                fr_key = f'ba_{role_key}_guidance_fr_{idx}'
+                
+                topic = request.form.get(topic_key)
+                if not topic:
+                    break
+                
+                en_guidance = request.form.get(en_key, '').strip()
+                fr_guidance = request.form.get(fr_key, '').strip()
+                
+                # Only add if at least one language has content
+                if en_guidance or fr_guidance:
+                    role_overrides[role_key][topic] = {
+                        'en': en_guidance,
+                        'fr': fr_guidance
+                    }
+                
+                idx += 1
+            
+            # Remove empty role entries
+            if not role_overrides[role_key]:
+                del role_overrides[role_key]
+        
+        # Save role overrides if any exist
+        current_account.role_prompt_overrides = role_overrides if role_overrides else None
         
         # Capture AFTER values for audit trail
         after_values = {

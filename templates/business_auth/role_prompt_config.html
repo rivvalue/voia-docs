@@ -1,0 +1,353 @@
+{% extends "base.html" %}
+
+{% block title %}Role Prompt Guidance - VOÏA{% endblock %}
+
+{% block page_class %}page-role-prompt-config{% endblock %}
+
+{% block content %}
+{# Breadcrumb Navigation #}
+{% set breadcrumb_items = [
+    {'label': 'Settings', 'url': url_for('business_auth.admin_panel')},
+    {'label': 'Role Prompt Guidance', 'current': true}
+] %}
+{% include 'components/breadcrumb.html' %}
+
+<style>
+.role-card {
+    background: var(--primary-white);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--light-gray);
+    margin-bottom: var(--spacing-lg);
+    overflow: hidden;
+}
+.role-card-header {
+    padding: var(--spacing-lg);
+    background: rgba(225, 58, 68, 0.05);
+    border-bottom: 1px solid var(--light-gray);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.role-card-header:hover {
+    background: rgba(225, 58, 68, 0.1);
+}
+.role-card-title {
+    font-weight: 600;
+    color: var(--primary-black);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+.role-card-body {
+    padding: var(--spacing-lg);
+    display: none;
+}
+.role-card-body.show {
+    display: block;
+}
+.topic-override-row {
+    border: 1px solid var(--light-gray);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    background: rgba(245, 245, 245, 0.5);
+}
+.lang-tabs {
+    display: flex;
+    gap: var(--spacing-xs);
+    margin-bottom: var(--spacing-sm);
+}
+.lang-tab {
+    padding: var(--spacing-xs) var(--spacing-md);
+    border: 1px solid var(--medium-gray);
+    border-radius: var(--radius-md);
+    background: var(--primary-white);
+    cursor: pointer;
+    font-size: var(--font-size-sm);
+}
+.lang-tab.active {
+    background: var(--primary-red);
+    color: var(--primary-white);
+    border-color: var(--primary-red);
+}
+.guidance-textarea {
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 13px;
+    width: 100%;
+    min-height: 120px;
+    border: 1px solid var(--medium-gray);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+}
+.add-topic-btn {
+    border: 2px dashed var(--medium-gray);
+    background: transparent;
+    padding: var(--spacing-md);
+    width: 100%;
+    border-radius: var(--radius-md);
+    color: var(--gray-dark);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.add-topic-btn:hover {
+    border-color: var(--primary-red);
+    color: var(--primary-red);
+}
+.default-badge {
+    font-size: var(--font-size-xs);
+    padding: 2px 8px;
+    background: var(--light-gray);
+    border-radius: var(--radius-full);
+    color: var(--gray-dark);
+}
+.override-badge {
+    font-size: var(--font-size-xs);
+    padding: 2px 8px;
+    background: rgba(225, 58, 68, 0.1);
+    border-radius: var(--radius-full);
+    color: var(--primary-red);
+}
+</style>
+
+<div class="settings-hub-container">
+    <!-- Header -->
+    <div class="settings-hub-header">
+        <div class="settings-hub-header-content">
+            <h1 class="settings-hub-title">
+                <i class="fas fa-user-tie me-2" aria-hidden="true"></i>
+                Role Prompt Guidance
+            </h1>
+            <p class="settings-hub-subtitle">Configure platform-wide persona-specific questioning guidance for conversational surveys</p>
+        </div>
+    </div>
+
+    <!-- Platform Admin Badge -->
+    <div class="mb-4">
+        <span class="badge bg-danger" style="font-size: 14px; padding: 8px 16px;">
+            <i class="fas fa-shield-alt me-2"></i>Platform Administrator Only
+        </span>
+    </div>
+
+    <!-- Info Box -->
+    <div class="settings-card mb-4">
+        <h3 class="settings-section-title">
+            <i class="fas fa-info-circle text-primary me-2"></i>
+            About Role Prompt Guidance
+        </h3>
+        <div class="alert alert-info mb-0">
+            <p class="mb-2"><strong>How Role Guidance Works:</strong></p>
+            <ul class="mb-0">
+                <li><strong>4-Tier Hierarchy:</strong> Campaign → Business Account → Platform → ROLE_METADATA defaults</li>
+                <li><strong>Topic-Aware:</strong> Different guidance can be set per role+topic combination (e.g., Manager+Pricing vs Manager+Product)</li>
+                <li>Platform defaults apply to all accounts unless they configure their own overrides</li>
+                <li>This page configures the <strong>Platform tier</strong> (third level in hierarchy)</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Feature Toggle -->
+    <div class="settings-card mb-4">
+        <h3 class="settings-section-title">
+            <i class="fas fa-toggle-on me-2"></i>
+            Feature Status
+        </h3>
+        <form method="POST" action="{{ url_for('business_auth.toggle_role_prompt_overrides') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <div class="d-flex align-items-center gap-3">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="useRolePromptOverrides" 
+                           name="use_role_prompt_overrides" 
+                           {{ 'checked' if platform_settings.use_role_prompt_overrides else '' }}
+                           onchange="this.form.submit()">
+                    <label class="form-check-label fw-bold" for="useRolePromptOverrides">
+                        Enable Role Prompt Override System
+                    </label>
+                </div>
+                <span class="badge {{ 'bg-success' if platform_settings.use_role_prompt_overrides else 'bg-secondary' }}">
+                    {{ 'Active' if platform_settings.use_role_prompt_overrides else 'Inactive' }}
+                </span>
+            </div>
+            <p class="text-muted mt-2 mb-0">
+                <i class="fas fa-info-circle me-1"></i>
+                When disabled, the system uses built-in ROLE_METADATA defaults only.
+            </p>
+        </form>
+    </div>
+
+    <!-- Configuration Form -->
+    <form method="POST" action="{{ url_for('business_auth.save_role_prompt_config') }}" id="rolePromptForm">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        
+        <!-- Role Cards -->
+        {% for role_key, role_data in roles.items() %}
+        <div class="role-card">
+            <div class="role-card-header" onclick="toggleRoleCard('{{ role_key }}')">
+                <h4 class="role-card-title">
+                    <i class="fas fa-user-circle"></i>
+                    {{ role_data.label }}
+                    {% if platform_overrides.get(role_key) %}
+                    <span class="override-badge">{{ platform_overrides[role_key]|length }} override(s)</span>
+                    {% else %}
+                    <span class="default-badge">Using defaults</span>
+                    {% endif %}
+                </h4>
+                <i class="fas fa-chevron-down" id="chevron-{{ role_key }}"></i>
+            </div>
+            <div class="role-card-body" id="body-{{ role_key }}">
+                <!-- Current Default Guidance -->
+                <div class="mb-4">
+                    <label class="form-label fw-bold">
+                        <i class="fas fa-file-alt me-1"></i>
+                        Default Guidance (from ROLE_METADATA)
+                    </label>
+                    <div class="lang-tabs">
+                        <button type="button" class="lang-tab active" onclick="showLang('{{ role_key }}', 'default', 'en')">EN</button>
+                        <button type="button" class="lang-tab" onclick="showLang('{{ role_key }}', 'default', 'fr')">FR</button>
+                    </div>
+                    <div id="{{ role_key }}-default-en" class="lang-content">
+                        <pre class="guidance-textarea" style="background: #f8f9fa; cursor: default;" readonly>{{ role_data.prompt_guidance.en }}</pre>
+                    </div>
+                    <div id="{{ role_key }}-default-fr" class="lang-content" style="display: none;">
+                        <pre class="guidance-textarea" style="background: #f8f9fa; cursor: default;" readonly>{{ role_data.prompt_guidance.fr }}</pre>
+                    </div>
+                </div>
+                
+                <!-- Topic-Specific Overrides -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">
+                        <i class="fas fa-layer-group me-1"></i>
+                        Topic-Specific Overrides (Platform Level)
+                    </label>
+                    <p class="text-muted small mb-3">
+                        Add custom guidance for specific topics. Leave empty to use the default guidance above.
+                    </p>
+                    
+                    <div id="overrides-{{ role_key }}">
+                        {% for topic, guidance in (platform_overrides.get(role_key) or {}).items() %}
+                        <div class="topic-override-row" id="override-{{ role_key }}-{{ loop.index0 }}">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <select class="form-select form-select-sm" style="width: 200px;" 
+                                        name="{{ role_key }}_topic_{{ loop.index0 }}">
+                                    {% for t in available_topics %}
+                                    <option value="{{ t }}" {{ 'selected' if t == topic else '' }}>{{ t }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button type="button" class="btn btn-sm btn-outline-danger" 
+                                        onclick="removeOverride('{{ role_key }}', {{ loop.index0 }})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                            <div class="lang-tabs">
+                                <button type="button" class="lang-tab active" onclick="showLang('{{ role_key }}', '{{ loop.index0 }}', 'en')">EN</button>
+                                <button type="button" class="lang-tab" onclick="showLang('{{ role_key }}', '{{ loop.index0 }}', 'fr')">FR</button>
+                            </div>
+                            <div id="{{ role_key }}-{{ loop.index0 }}-en">
+                                <textarea class="guidance-textarea" name="{{ role_key }}_guidance_en_{{ loop.index0 }}" 
+                                          placeholder="English guidance for this role+topic...">{{ guidance.get('en', '') }}</textarea>
+                            </div>
+                            <div id="{{ role_key }}-{{ loop.index0 }}-fr" style="display: none;">
+                                <textarea class="guidance-textarea" name="{{ role_key }}_guidance_fr_{{ loop.index0 }}" 
+                                          placeholder="French guidance for this role+topic...">{{ guidance.get('fr', '') }}</textarea>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <button type="button" class="add-topic-btn" onclick="addTopicOverride('{{ role_key }}')">
+                        <i class="fas fa-plus me-2"></i>Add Topic Override
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- Action Buttons -->
+        <div class="settings-card mt-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="{{ url_for('business_auth.admin_panel') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Settings
+                </a>
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-save me-2"></i>Save Configuration
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+const availableTopics = {{ available_topics|tojson }};
+let overrideCounters = {};
+
+{% for role_key in roles.keys() %}
+overrideCounters['{{ role_key }}'] = {{ (platform_overrides.get(role_key) or {})|length }};
+{% endfor %}
+
+function toggleRoleCard(roleKey) {
+    const body = document.getElementById('body-' + roleKey);
+    const chevron = document.getElementById('chevron-' + roleKey);
+    body.classList.toggle('show');
+    chevron.style.transform = body.classList.contains('show') ? 'rotate(180deg)' : 'rotate(0deg)';
+}
+
+function showLang(roleKey, idx, lang) {
+    const enDiv = document.getElementById(roleKey + '-' + idx + '-en');
+    const frDiv = document.getElementById(roleKey + '-' + idx + '-fr');
+    const tabs = event.target.parentElement.querySelectorAll('.lang-tab');
+    
+    tabs.forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    if (lang === 'en') {
+        enDiv.style.display = 'block';
+        frDiv.style.display = 'none';
+    } else {
+        enDiv.style.display = 'none';
+        frDiv.style.display = 'block';
+    }
+}
+
+function addTopicOverride(roleKey) {
+    const container = document.getElementById('overrides-' + roleKey);
+    const idx = overrideCounters[roleKey]++;
+    
+    let topicOptions = availableTopics.map(t => `<option value="${t}">${t}</option>`).join('');
+    
+    const html = `
+        <div class="topic-override-row" id="override-${roleKey}-${idx}">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <select class="form-select form-select-sm" style="width: 200px;" 
+                        name="${roleKey}_topic_${idx}">
+                    ${topicOptions}
+                </select>
+                <button type="button" class="btn btn-sm btn-outline-danger" 
+                        onclick="removeOverride('${roleKey}', ${idx})">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+            <div class="lang-tabs">
+                <button type="button" class="lang-tab active" onclick="showLang('${roleKey}', '${idx}', 'en')">EN</button>
+                <button type="button" class="lang-tab" onclick="showLang('${roleKey}', '${idx}', 'fr')">FR</button>
+            </div>
+            <div id="${roleKey}-${idx}-en">
+                <textarea class="guidance-textarea" name="${roleKey}_guidance_en_${idx}" 
+                          placeholder="English guidance for this role+topic..."></textarea>
+            </div>
+            <div id="${roleKey}-${idx}-fr" style="display: none;">
+                <textarea class="guidance-textarea" name="${roleKey}_guidance_fr_${idx}" 
+                          placeholder="French guidance for this role+topic..."></textarea>
+            </div>
+        </div>
+    `;
+    
+    container.insertAdjacentHTML('beforeend', html);
+}
+
+function removeOverride(roleKey, idx) {
+    const row = document.getElementById('override-' + roleKey + '-' + idx);
+    if (row) row.remove();
+}
+</script>
+{% endblock %}

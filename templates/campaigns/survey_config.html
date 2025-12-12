@@ -614,6 +614,107 @@
                 </div>
             </div>
 
+            <!-- Role Prompt Guidance Section (Advanced - with inheritance) -->
+            {% set use_business_role_prompts = campaign.use_business_role_prompts if campaign.use_business_role_prompts is defined else True %}
+            <input type="hidden" name="use_business_role_prompts" id="use_business_role_prompts_hidden" value="{{ 'true' if use_business_role_prompts else 'false' }}">
+            
+            <div class="form-section advanced-section" style="border: 2px dashed var(--medium-gray); background: rgba(189, 189, 189, 0.05);">
+                <h3 class="section-title advanced-toggle" onclick="toggleRolePromptSection()" style="cursor: pointer;">
+                    <i class="fas fa-user-tie"></i>{{ _('Role-Based Questioning Guidance') }}
+                    <span class="badge bg-secondary ms-2">{{ _('Advanced') }}</span>
+                    <i class="fas fa-chevron-down ms-auto" id="rolePromptChevron" style="transition: transform 0.3s;"></i>
+                </h3>
+                <p class="section-description">
+                    {{ _('Customize how VOÏA adapts questions for different participant roles (C-level, Manager, etc.)') }}
+                </p>
+                
+                <div id="rolePromptContent" style="display: none;">
+                    <!-- Inheritance Toggle -->
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="role-prompts-toggle"
+                               {{ 'checked' if use_business_role_prompts else '' }}
+                               {% if is_readonly %}disabled{% endif %}
+                               onchange="toggleRolePromptInheritance()">
+                        <label class="form-check-label fw-bold" for="role-prompts-toggle">
+                            Use business account defaults
+                        </label>
+                    </div>
+                    
+                    <!-- Inherited Content -->
+                    <div id="role-prompts-inherited" class="{{ 'd-none' if not use_business_role_prompts else '' }}">
+                        <div class="alert alert-info mb-0">
+                            <i class="fas fa-link me-2"></i>
+                            <strong>{{ _('Inheriting from business account:') }}</strong> 
+                            {{ _('This campaign uses the role prompt guidance configured at the business account level.') }}
+                            {% if business_defaults and business_defaults.role_overrides %}
+                            <p class="mb-0 mt-2 small">
+                                {{ business_defaults.role_overrides|length }} role override(s) configured at business level.
+                            </p>
+                            {% else %}
+                            <p class="mb-0 mt-2 small">{{ _('No custom overrides - using platform defaults.') }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Custom Content -->
+                    <div id="role-prompts-custom" class="{{ 'd-none' if use_business_role_prompts else '' }}">
+                        <div class="alert alert-warning mb-3">
+                            <i class="fas fa-edit me-2"></i>
+                            <strong>{{ _('Campaign-specific overrides') }}</strong>: 
+                            {{ _('These settings will override business account defaults for this campaign only.') }}
+                        </div>
+                        
+                        {% if role_options %}
+                        <!-- Role Selector -->
+                        <div class="mb-3">
+                            <label class="form-label" for="campaign_role_select">{{ _('Select Role to Configure') }}</label>
+                            <select class="form-control" id="campaign_role_select" onchange="showCampaignRolePanel()" {% if is_readonly %}disabled{% endif %}>
+                                <option value="">{{ _('-- Select a role --') }}</option>
+                                {% for role_key, role_data in role_options.items() %}
+                                <option value="{{ role_key }}">{{ role_data.label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <!-- Role Panels -->
+                        {% for role_key, role_data in role_options.items() %}
+                        <div id="campaign_role_panel_{{ role_key }}" class="campaign-role-panel" style="display: none; border: 1px solid var(--medium-gray); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1rem; background: var(--primary-white);">
+                            <h6 class="mb-3"><i class="fas fa-user-circle me-2"></i>{{ role_data.label }}</h6>
+                            
+                            <div id="campaign_overrides_{{ role_key }}">
+                                {% set existing = (campaign.role_prompt_overrides or {}).get(role_key, {}) %}
+                                {% for topic, guidance in existing.items() %}
+                                <div class="topic-override-row mb-2" id="camp_override_{{ role_key }}_{{ loop.index0 }}" style="border: 1px solid var(--light-gray); padding: 0.75rem; border-radius: var(--radius-md); background: rgba(245,245,245,0.5);">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <select class="form-select form-select-sm" style="width: 180px;" name="camp_{{ role_key }}_topic_{{ loop.index0 }}" {% if is_readonly %}disabled{% endif %}>
+                                            {% for t in topic_options %}
+                                            <option value="{{ t }}" {{ 'selected' if t == topic else '' }}>{{ t }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeCampOverride('{{ role_key }}', {{ loop.index0 }})" {% if is_readonly %}disabled{% endif %}>
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                    <textarea class="form-control form-control-sm mb-1" name="camp_{{ role_key }}_guidance_en_{{ loop.index0 }}" rows="2" placeholder="English guidance..." {% if is_readonly %}disabled{% endif %}>{{ guidance.get('en', '') }}</textarea>
+                                    <textarea class="form-control form-control-sm" name="camp_{{ role_key }}_guidance_fr_{{ loop.index0 }}" rows="2" placeholder="French guidance..." {% if is_readonly %}disabled{% endif %}>{{ guidance.get('fr', '') }}</textarea>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="addCampTopicOverride('{{ role_key }}')" {% if is_readonly %}disabled{% endif %}>
+                                <i class="fas fa-plus me-1"></i>{{ _('Add Topic Override') }}
+                            </button>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="alert alert-secondary">
+                            <i class="fas fa-info-circle me-2"></i>{{ _('Role options not available.') }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
             <!-- Advanced Customization Section -->
             <div class="form-section advanced-section">
                 <h3 class="section-title advanced-toggle" onclick="toggleAdvanced()">
@@ -922,6 +1023,91 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+// Role Prompt Guidance Functions
+function toggleRolePromptSection() {
+    const content = document.getElementById('rolePromptContent');
+    const chevron = document.getElementById('rolePromptChevron');
+    if (content.style.display === 'none') {
+        content.style.display = 'block';
+        chevron.style.transform = 'rotate(180deg)';
+    } else {
+        content.style.display = 'none';
+        chevron.style.transform = 'rotate(0deg)';
+    }
+}
+
+function toggleRolePromptInheritance() {
+    const toggle = document.getElementById('role-prompts-toggle');
+    const inherited = document.getElementById('role-prompts-inherited');
+    const custom = document.getElementById('role-prompts-custom');
+    const hidden = document.getElementById('use_business_role_prompts_hidden');
+    
+    if (toggle.checked) {
+        inherited.classList.remove('d-none');
+        custom.classList.add('d-none');
+        hidden.value = 'true';
+    } else {
+        inherited.classList.add('d-none');
+        custom.classList.remove('d-none');
+        hidden.value = 'false';
+    }
+}
+
+function showCampaignRolePanel() {
+    const select = document.getElementById('campaign_role_select');
+    const selectedRole = select.value;
+    
+    document.querySelectorAll('.campaign-role-panel').forEach(panel => {
+        panel.style.display = 'none';
+    });
+    
+    if (selectedRole) {
+        const panel = document.getElementById('campaign_role_panel_' + selectedRole);
+        if (panel) panel.style.display = 'block';
+    }
+}
+
+const campOverrideCounters = {};
+{% if role_options %}
+{% for role_key in role_options.keys() %}
+campOverrideCounters['{{ role_key }}'] = {{ ((campaign.role_prompt_overrides or {}).get(role_key, {})|length) or 0 }};
+{% endfor %}
+{% endif %}
+
+const campTopicOptions = {{ topic_options|tojson if topic_options else '[]' }};
+
+function addCampTopicOverride(roleKey) {
+    const container = document.getElementById('campaign_overrides_' + roleKey);
+    if (!container) return;
+    
+    const idx = campOverrideCounters[roleKey] || 0;
+    campOverrideCounters[roleKey] = idx + 1;
+    
+    let topicOptions = campTopicOptions.map(t => `<option value="${t}">${t}</option>`).join('');
+    
+    const html = `
+        <div class="topic-override-row mb-2" id="camp_override_${roleKey}_${idx}" style="border: 1px solid var(--light-gray); padding: 0.75rem; border-radius: var(--radius-md); background: rgba(245,245,245,0.5);">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <select class="form-select form-select-sm" style="width: 180px;" name="camp_${roleKey}_topic_${idx}">
+                    ${topicOptions}
+                </select>
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeCampOverride('${roleKey}', ${idx})">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+            <textarea class="form-control form-control-sm mb-1" name="camp_${roleKey}_guidance_en_${idx}" rows="2" placeholder="English guidance..."></textarea>
+            <textarea class="form-control form-control-sm" name="camp_${roleKey}_guidance_fr_${idx}" rows="2" placeholder="French guidance..."></textarea>
+        </div>
+    `;
+    
+    container.insertAdjacentHTML('beforeend', html);
+}
+
+function removeCampOverride(roleKey, idx) {
+    const row = document.getElementById('camp_override_' + roleKey + '_' + idx);
+    if (row) row.remove();
+}
 </script>
 
 {{ inheritance_scripts() }}

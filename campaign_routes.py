@@ -1252,8 +1252,20 @@ def survey_config(campaign_id):
             'product_focus': {
                 'product_description': current_account.product_description or '',
                 'target_clients_description': current_account.target_clients_description or ''
-            }
+            },
+            'role_overrides': current_account.role_prompt_overrides or {}
         }
+        
+        # Role options for role prompt overrides
+        from prompt_template_service import ROLE_METADATA
+        role_options = {k: {'label': v.get('label', k)} for k, v in ROLE_METADATA.items()}
+        
+        # Topic options for dropdown
+        topic_options = [
+            'Product Quality', 'Support Experience', 'Service Rating', 
+            'NPS Score', 'Pricing Value', 'User Experience',
+            'Satisfaction', 'Improvement Suggestions'
+        ]
         
         # Allow viewing for all statuses - template handles read-only mode for active/completed
         return render_template('campaigns/survey_config.html',
@@ -1262,6 +1274,8 @@ def survey_config(campaign_id):
                              business_defaults=business_defaults,
                              available_industries=get_available_industries(),
                              industry_topic_hints_json=json.dumps(INDUSTRY_TOPIC_HINTS),
+                             role_options=role_options,
+                             topic_options=topic_options,
                              ENABLE_PROMPT_PREVIEW=os.getenv('ENABLE_PROMPT_PREVIEW') == 'true')
         
     except Exception as e:
@@ -1362,6 +1376,50 @@ def save_survey_config(campaign_id):
         campaign.custom_end_message = request.form.get('custom_end_message', '').strip() or None
         campaign.custom_system_prompt = request.form.get('custom_system_prompt', '').strip() or None
         
+        # Role Prompt Guidance section - with inheritance
+        campaign.use_business_role_prompts = request.form.get('use_business_role_prompts') == 'true'
+        
+        if campaign.use_business_role_prompts:
+            # Reset overrides when inheriting
+            campaign.role_prompt_overrides = None
+        else:
+            # Parse and save campaign-specific role prompt overrides
+            from prompt_template_service import ROLE_METADATA
+            role_overrides = {}
+            
+            for role_key in ROLE_METADATA.keys():
+                role_overrides[role_key] = {}
+                
+                # Find all topic overrides for this role (using camp_ prefix for campaign)
+                idx = 0
+                while True:
+                    topic_key = f'camp_{role_key}_topic_{idx}'
+                    en_key = f'camp_{role_key}_guidance_en_{idx}'
+                    fr_key = f'camp_{role_key}_guidance_fr_{idx}'
+                    
+                    topic = request.form.get(topic_key)
+                    if not topic:
+                        break
+                    
+                    en_guidance = request.form.get(en_key, '').strip()
+                    fr_guidance = request.form.get(fr_key, '').strip()
+                    
+                    # Only add if at least one language has content
+                    if en_guidance or fr_guidance:
+                        role_overrides[role_key][topic] = {
+                            'en': en_guidance,
+                            'fr': fr_guidance
+                        }
+                    
+                    idx += 1
+                
+                # Remove empty role entries
+                if not role_overrides[role_key]:
+                    del role_overrides[role_key]
+            
+            # Save role overrides if any exist
+            campaign.role_prompt_overrides = role_overrides if role_overrides else None
+        
         # Save changes
         db.session.commit()
         
@@ -1381,7 +1439,9 @@ def save_survey_config(campaign_id):
                     'max_duration_seconds': campaign.max_duration_seconds,
                     'prioritized_topics_count': len(campaign.prioritized_topics) if campaign.prioritized_topics else 0,
                     'has_custom_end_message': bool(campaign.custom_end_message),
-                    'has_custom_system_prompt': bool(campaign.custom_system_prompt)
+                    'has_custom_system_prompt': bool(campaign.custom_system_prompt),
+                    'use_business_role_prompts': campaign.use_business_role_prompts,
+                    'has_role_prompt_overrides': bool(campaign.role_prompt_overrides)
                 }
             )
         except Exception as audit_error:

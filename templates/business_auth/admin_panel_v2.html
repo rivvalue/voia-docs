@@ -1194,6 +1194,22 @@ body.modal-open {
                         </a>
                     </div>
 
+                    <!-- Role Prompt Guidance -->
+                    <div class="settings-item">
+                        <div class="settings-item-header">
+                            <div class="settings-item-icon">
+                                <i class="fas fa-user-tie"></i>
+                            </div>
+                            <div class="settings-item-info">
+                                <h4 class="settings-item-title">Role Prompt Guidance</h4>
+                                <p class="settings-item-desc">Configure persona-specific questioning guidance for conversational surveys (C-level, Manager, etc.)</p>
+                            </div>
+                        </div>
+                        <a href="{{ url_for('business_auth.role_prompt_config') }}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-cog me-1"></i>Configure
+                        </a>
+                    </div>
+
                     <!-- {{ _('Platform Admin Users') }} -->
                     <div class="settings-item">
                         <div class="settings-item-header">

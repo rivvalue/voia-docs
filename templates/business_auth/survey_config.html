@@ -349,6 +349,82 @@
             {% endif %}
         </div>
 
+        <!-- Role Prompt Guidance (Advanced) -->
+        <div class="survey-config-form-section" style="border: 2px dashed var(--medium-gray); background: rgba(245, 245, 245, 0.5);">
+            <h3 class="survey-config-section-title" onclick="toggleRoleGuidance()" style="cursor: pointer;">
+                <i class="fas fa-user-tie" aria-hidden="true"></i>
+                {{ _('Role-Based Questioning Guidance') }}
+                <span class="badge bg-secondary ms-2">{{ _('Advanced') }}</span>
+                <i class="fas fa-chevron-down ms-auto" id="roleGuidanceChevron" style="transition: transform 0.3s;"></i>
+            </h3>
+            <p class="survey-config-section-subtitle">{{ _('Customize how VOÏA adapts questions for different participant roles (optional)') }}</p>
+            
+            <div id="roleGuidanceContent" style="display: none;">
+                <div class="alert alert-info mb-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>{{ _('How it works:') }}</strong> {{ _('Override platform defaults for specific role+topic combinations. For example, customize how VOÏA questions Managers about Pricing.') }}
+                </div>
+                
+                {% if role_options %}
+                <div class="row">
+                    <div class="col-12">
+                        <!-- Role Selector -->
+                        <div class="survey-config-form-group mb-3">
+                            <label class="survey-config-form-label" for="role_override_select">{{ _('Select Role to Configure') }}</label>
+                            <select class="survey-config-form-control" id="role_override_select" onchange="showRoleOverrides()">
+                                <option value="">{{ _('-- Select a role --') }}</option>
+                                {% for role_key, role_data in role_options.items() %}
+                                <option value="{{ role_key }}">{{ role_data.label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <!-- Dynamic Role Override Panels -->
+                        {% for role_key, role_data in role_options.items() %}
+                        <div id="role_panel_{{ role_key }}" class="role-override-panel" style="display: none; border: 1px solid var(--light-gray); border-radius: var(--radius-md); padding: var(--spacing-lg); margin-bottom: var(--spacing-md); background: var(--primary-white);">
+                            <h5 class="mb-3"><i class="fas fa-user-circle me-2"></i>{{ role_data.label }}</h5>
+                            
+                            <div id="overrides_{{ role_key }}">
+                                {% set existing_overrides = (business_account.role_prompt_overrides or {}).get(role_key, {}) %}
+                                {% for topic, guidance in existing_overrides.items() %}
+                                <div class="topic-override-row mb-3" id="ba_override_{{ role_key }}_{{ loop.index0 }}" style="border: 1px solid var(--light-gray); border-radius: var(--radius-md); padding: var(--spacing-md); background: rgba(245, 245, 245, 0.5);">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <select class="form-select form-select-sm" style="width: 200px;" name="ba_{{ role_key }}_topic_{{ loop.index0 }}">
+                                            {% for t in topic_options %}
+                                            <option value="{{ t }}" {{ 'selected' if t == topic else '' }}>{{ t }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeBAOverride('{{ role_key }}', {{ loop.index0 }})">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="form-label small">English Guidance</label>
+                                        <textarea class="form-control" name="ba_{{ role_key }}_guidance_en_{{ loop.index0 }}" rows="3" placeholder="English guidance...">{{ guidance.get('en', '') }}</textarea>
+                                    </div>
+                                    <div>
+                                        <label class="form-label small">French Guidance</label>
+                                        <textarea class="form-control" name="ba_{{ role_key }}_guidance_fr_{{ loop.index0 }}" rows="3" placeholder="French guidance...">{{ guidance.get('fr', '') }}</textarea>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="addBATopicOverride('{{ role_key }}')">
+                                <i class="fas fa-plus me-1"></i>{{ _('Add Topic Override') }}
+                            </button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% else %}
+                <div class="alert alert-secondary">
+                    <i class="fas fa-info-circle me-2"></i>{{ _('Role options not available. Contact platform administrator.') }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
         <!-- Action Buttons -->
         <div class="survey-config-form-section">
             <div class="survey-config-actions-row">
@@ -612,5 +688,87 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Role Guidance Toggle
+function toggleRoleGuidance() {
+    const content = document.getElementById('roleGuidanceContent');
+    const chevron = document.getElementById('roleGuidanceChevron');
+    if (content.style.display === 'none') {
+        content.style.display = 'block';
+        chevron.style.transform = 'rotate(180deg)';
+    } else {
+        content.style.display = 'none';
+        chevron.style.transform = 'rotate(0deg)';
+    }
+}
+
+// Show role override panel
+function showRoleOverrides() {
+    const select = document.getElementById('role_override_select');
+    const selectedRole = select.value;
+    
+    // Hide all panels
+    document.querySelectorAll('.role-override-panel').forEach(panel => {
+        panel.style.display = 'none';
+    });
+    
+    // Show selected panel
+    if (selectedRole) {
+        const panel = document.getElementById('role_panel_' + selectedRole);
+        if (panel) {
+            panel.style.display = 'block';
+        }
+    }
+}
+
+// Track override counters per role
+const baOverrideCounters = {};
+{% if role_options %}
+{% for role_key in role_options.keys() %}
+baOverrideCounters['{{ role_key }}'] = {{ ((business_account.role_prompt_overrides or {}).get(role_key, {})|length) or 0 }};
+{% endfor %}
+{% endif %}
+
+const baTopicOptions = {{ topic_options|tojson if topic_options else '[]' }};
+
+// Add topic override for business account
+function addBATopicOverride(roleKey) {
+    const container = document.getElementById('overrides_' + roleKey);
+    if (!container) return;
+    
+    const idx = baOverrideCounters[roleKey] || 0;
+    baOverrideCounters[roleKey] = idx + 1;
+    
+    let topicOptions = baTopicOptions.map(t => `<option value="${t}">${t}</option>`).join('');
+    
+    const html = `
+        <div class="topic-override-row mb-3" id="ba_override_${roleKey}_${idx}" style="border: 1px solid var(--light-gray); border-radius: var(--radius-md); padding: var(--spacing-md); background: rgba(245, 245, 245, 0.5);">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <select class="form-select form-select-sm" style="width: 200px;" name="ba_${roleKey}_topic_${idx}">
+                    ${topicOptions}
+                </select>
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeBAOverride('${roleKey}', ${idx})">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+            <div class="mb-2">
+                <label class="form-label small">English Guidance</label>
+                <textarea class="form-control" name="ba_${roleKey}_guidance_en_${idx}" rows="3" placeholder="English guidance..."></textarea>
+            </div>
+            <div>
+                <label class="form-label small">French Guidance</label>
+                <textarea class="form-control" name="ba_${roleKey}_guidance_fr_${idx}" rows="3" placeholder="French guidance..."></textarea>
+            </div>
+        </div>
+    `;
+    
+    container.insertAdjacentHTML('beforeend', html);
+}
+
+// Remove topic override
+function removeBAOverride(roleKey, idx) {
+    const row = document.getElementById('ba_override_' + roleKey + '_' + idx);
+    if (row) row.remove();
+}
 </script>
 {% endblock %}
