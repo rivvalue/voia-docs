@@ -4060,6 +4060,187 @@ def save_role_prompt_config():
         return redirect(url_for('business_auth.role_prompt_config'))
 
 
+# ==== BUSINESS ACCOUNT LEVEL ONBOARDING CONFIGURATION ROUTES ====
+
+@business_auth_bp.route('/admin/account-industry-hints')
+@require_business_auth
+def account_industry_hints():
+    """Business Account level industry hints configuration (for onboarding)"""
+    try:
+        current_user = BusinessAccountUser.query.get(session.get('business_user_id'))
+        if not current_user:
+            flash(_('Authentication required.'), 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        business_account = BusinessAccount.query.get(current_user.business_account_id)
+        if not business_account:
+            flash(_('Business account not found.'), 'error')
+            return redirect(url_for('business_auth.admin_panel'))
+        
+        # Load platform defaults
+        import industry_topic_hints_config
+        platform_hints = industry_topic_hints_config.INDUSTRY_TOPIC_HINTS
+        
+        # Get account's industry
+        account_industry = business_account.industry or 'General'
+        
+        # Get platform hints for this industry
+        industry_hints = platform_hints.get(account_industry, platform_hints.get('General', {}))
+        
+        # Get account-level overrides
+        account_overrides = business_account.industry_topic_hints or {}
+        defaults_accepted = account_overrides.get('_defaults_accepted', False)
+        
+        # Check onboarding status
+        onboarding_mode = request.args.get('onboarding') == '1'
+        
+        return render_template('business_auth/onboarding/industry_hints.html',
+                             current_user=current_user,
+                             business_account=business_account,
+                             account_industry=account_industry,
+                             platform_hints=industry_hints,
+                             account_overrides=account_overrides,
+                             defaults_accepted=defaults_accepted,
+                             onboarding_mode=onboarding_mode,
+                             available_industries=list(platform_hints.keys()))
+    
+    except Exception as e:
+        logger.error(f"Error loading account industry hints: {e}")
+        flash(_('Failed to load industry hints configuration.'), 'error')
+        return redirect(url_for('business_auth.admin_panel'))
+
+
+@business_auth_bp.route('/admin/account-industry-hints/accept-defaults', methods=['POST'])
+@require_business_auth
+def accept_industry_hints_defaults():
+    """Accept platform defaults for industry hints"""
+    try:
+        current_user = BusinessAccountUser.query.get(session.get('business_user_id'))
+        if not current_user:
+            return redirect(url_for('business_auth.login'))
+        
+        business_account = BusinessAccount.query.get(current_user.business_account_id)
+        if not business_account:
+            flash(_('Business account not found.'), 'error')
+            return redirect(url_for('business_auth.admin_panel'))
+        
+        # Set defaults accepted flag
+        if not business_account.industry_topic_hints:
+            business_account.industry_topic_hints = {}
+        business_account.industry_topic_hints['_defaults_accepted'] = True
+        db.session.commit()
+        
+        # Audit log
+        queue_audit_log(
+            business_account_id=business_account.id,
+            action_type='industry_hints_defaults_accepted',
+            resource_type='business_account',
+            resource_id=business_account.id,
+            user_name=current_user.get_full_name(),
+            details={'industry': business_account.industry}
+        )
+        
+        flash(_('Platform default industry hints accepted successfully.'), 'success')
+        
+        # Check if coming from onboarding
+        if request.form.get('onboarding') == '1':
+            return redirect(url_for('business_auth.onboarding_progress'))
+        
+        return redirect(url_for('business_auth.account_industry_hints'))
+    
+    except Exception as e:
+        logger.error(f"Error accepting industry hints defaults: {e}")
+        flash(_('Failed to accept defaults.'), 'error')
+        return redirect(url_for('business_auth.account_industry_hints'))
+
+
+@business_auth_bp.route('/admin/account-role-prompts')
+@require_business_auth
+def account_role_prompts():
+    """Business Account level role prompt configuration (for onboarding)"""
+    try:
+        current_user = BusinessAccountUser.query.get(session.get('business_user_id'))
+        if not current_user:
+            flash(_('Authentication required.'), 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        business_account = BusinessAccount.query.get(current_user.business_account_id)
+        if not business_account:
+            flash(_('Business account not found.'), 'error')
+            return redirect(url_for('business_auth.admin_panel'))
+        
+        # Load platform defaults from ROLE_METADATA
+        from ai_conversational_survey_v2 import ROLE_METADATA
+        
+        # Get account-level overrides
+        account_overrides = business_account.role_prompt_overrides or {}
+        defaults_accepted = account_overrides.get('_defaults_accepted', False)
+        
+        # Check onboarding status
+        onboarding_mode = request.args.get('onboarding') == '1'
+        
+        # Available topics for override configuration
+        available_topics = ['NPS', 'Product', 'Service', 'Pricing', 'Competition', 'Relationship']
+        
+        return render_template('business_auth/onboarding/role_prompts.html',
+                             current_user=current_user,
+                             business_account=business_account,
+                             roles=ROLE_METADATA,
+                             account_overrides=account_overrides,
+                             defaults_accepted=defaults_accepted,
+                             onboarding_mode=onboarding_mode,
+                             available_topics=available_topics)
+    
+    except Exception as e:
+        logger.error(f"Error loading account role prompts: {e}")
+        flash(_('Failed to load role prompt configuration.'), 'error')
+        return redirect(url_for('business_auth.admin_panel'))
+
+
+@business_auth_bp.route('/admin/account-role-prompts/accept-defaults', methods=['POST'])
+@require_business_auth
+def accept_role_prompts_defaults():
+    """Accept platform defaults for role prompts"""
+    try:
+        current_user = BusinessAccountUser.query.get(session.get('business_user_id'))
+        if not current_user:
+            return redirect(url_for('business_auth.login'))
+        
+        business_account = BusinessAccount.query.get(current_user.business_account_id)
+        if not business_account:
+            flash(_('Business account not found.'), 'error')
+            return redirect(url_for('business_auth.admin_panel'))
+        
+        # Set defaults accepted flag
+        if not business_account.role_prompt_overrides:
+            business_account.role_prompt_overrides = {}
+        business_account.role_prompt_overrides['_defaults_accepted'] = True
+        db.session.commit()
+        
+        # Audit log
+        queue_audit_log(
+            business_account_id=business_account.id,
+            action_type='role_prompts_defaults_accepted',
+            resource_type='business_account',
+            resource_id=business_account.id,
+            user_name=current_user.get_full_name(),
+            details={}
+        )
+        
+        flash(_('Platform default role prompts accepted successfully.'), 'success')
+        
+        # Check if coming from onboarding
+        if request.form.get('onboarding') == '1':
+            return redirect(url_for('business_auth.onboarding_progress'))
+        
+        return redirect(url_for('business_auth.account_role_prompts'))
+    
+    except Exception as e:
+        logger.error(f"Error accepting role prompts defaults: {e}")
+        flash(_('Failed to accept defaults.'), 'error')
+        return redirect(url_for('business_auth.account_role_prompts'))
+
+
 # ==== EMAIL DELIVERY CONFIGURATION ROUTES (Business Account) ====
 
 def _get_email_delivery_data(business_account_id):

@@ -47,7 +47,7 @@ class OnboardingFlowManager:
             step_id='industry_hints',
             name='Industry Context',
             description='Configure industry-specific context to help the AI ask more relevant questions',
-            target_link='/business/admin/industry-hints',
+            target_link='/business/admin/account-industry-hints?onboarding=1',
             required=True,
             validation_method='validate_industry_hints'
         ),
@@ -55,7 +55,7 @@ class OnboardingFlowManager:
             step_id='role_prompts',
             name='Persona Configuration',
             description='Customize how the AI adapts questions for different participant roles',
-            target_link='/business/admin/role-prompts',
+            target_link='/business/admin/account-role-prompts?onboarding=1',
             required=True,
             validation_method='validate_role_prompts'
         ),

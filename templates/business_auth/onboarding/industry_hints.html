@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Industry Context') }} - VOÏA{% endblock %}
+
+{% block page_class %}page-onboarding-industry-hints{% endblock %}
+
+{% block content %}
+{# Breadcrumb Navigation #}
+{% set breadcrumb_items = [
+    {'label': _('Settings'), 'url': url_for('business_auth.admin_panel')},
+    {'label': _('Onboarding'), 'url': url_for('business_auth.onboarding_progress')},
+    {'label': _('Industry Context'), 'current': true}
+] %}
+{% include 'components/breadcrumb.html' %}
+
+<div class="settings-hub-container">
+    <!-- Header -->
+    <div class="settings-hub-header">
+        <div class="settings-hub-header-content">
+            <h1 class="settings-hub-title">
+                <i class="fas fa-industry me-2" aria-hidden="true"></i>
+                {{ _('Industry Context Configuration') }}
+            </h1>
+            <p class="settings-hub-subtitle">{{ _('Review and customize how the AI understands your industry to ask more relevant questions') }}</p>
+        </div>
+    </div>
+
+    <!-- Status Badge -->
+    <div class="mb-4">
+        {% if defaults_accepted %}
+        <span class="badge bg-success" style="font-size: 14px; padding: 8px 16px;">
+            <i class="fas fa-check-circle me-2"></i>{{ _('Using Platform Defaults') }}
+        </span>
+        {% elif account_overrides and account_overrides|length > 1 %}
+        <span class="badge bg-primary" style="font-size: 14px; padding: 8px 16px;">
+            <i class="fas fa-edit me-2"></i>{{ _('Customized') }}
+        </span>
+        {% else %}
+        <span class="badge bg-warning text-dark" style="font-size: 14px; padding: 8px 16px;">
+            <i class="fas fa-exclamation-circle me-2"></i>{{ _('Configuration Required') }}
+        </span>
+        {% endif %}
+    </div>
+
+    <!-- Info Box -->
+    <div class="settings-card mb-4">
+        <h3 class="settings-section-title">
+            <i class="fas fa-info-circle text-primary me-2"></i>
+            {{ _('About Industry Context') }}
+        </h3>
+        <div class="alert alert-info mb-0">
+            <p class="mb-2"><strong>{{ _('How Industry Context Works:') }}</strong></p>
+            <ul class="mb-0">
+                <li>{{ _('These hints help the AI ask questions relevant to your specific industry') }}</li>
+                <li>{{ _('For example, a Manufacturing company might focus on "product quality, defect rates, production efficiency"') }}</li>
+                <li>{{ _('A SaaS company might focus on "user experience, onboarding, feature requests"') }}</li>
+                <li>{{ _('You can accept the platform defaults or customize them for your needs') }}</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Current Industry -->
+    <div class="settings-card mb-4">
+        <h3 class="settings-section-title">
+            <i class="fas fa-building me-2"></i>
+            {{ _('Your Industry') }}
+        </h3>
+        <div class="d-flex align-items-center gap-3">
+            <span class="badge bg-secondary" style="font-size: 16px; padding: 10px 20px;">
+                {{ account_industry }}
+            </span>
+            <span class="text-muted">{{ _('(Set in your account settings)') }}</span>
+        </div>
+    </div>
+
+    <!-- Platform Defaults Preview -->
+    <div class="settings-card mb-4">
+        <h3 class="settings-section-title">
+            <i class="fas fa-list me-2"></i>
+            {{ _('Platform Default Hints for Your Industry') }}
+        </h3>
+        <p class="text-muted mb-3">{{ _('These keywords help the AI focus on relevant topics during surveys:') }}</p>
+        
+        {% if platform_hints %}
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 25%;">{{ _('Survey Topic') }}</th>
+                        <th>{{ _('Focus Keywords') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for topic, hints in platform_hints.items() %}
+                    <tr>
+                        <td><strong>{{ topic }}</strong></td>
+                        <td>{{ hints }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            {{ _('No platform defaults found for your industry. General defaults will be used.') }}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="settings-card">
+        <h3 class="settings-section-title mb-4">
+            <i class="fas fa-check-circle me-2"></i>
+            {{ _('Complete This Step') }}
+        </h3>
+        
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <div class="card h-100 border-success">
+                    <div class="card-body text-center">
+                        <i class="fas fa-thumbs-up fa-3x text-success mb-3"></i>
+                        <h5>{{ _('Accept Platform Defaults') }}</h5>
+                        <p class="text-muted">{{ _('Use the recommended industry hints shown above. You can customize them later if needed.') }}</p>
+                        <form method="POST" action="{{ url_for('business_auth.accept_industry_hints_defaults') }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            <input type="hidden" name="onboarding" value="{{ '1' if onboarding_mode else '0' }}"/>
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-check me-2"></i>{{ _('Accept Defaults') }}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-edit fa-3x text-primary mb-3"></i>
+                        <h5>{{ _('Customize (Advanced)') }}</h5>
+                        <p class="text-muted">{{ _('Contact your administrator to set up custom industry hints for your specific needs.') }}</p>
+                        <button type="button" class="btn btn-outline-primary btn-lg" disabled>
+                            <i class="fas fa-cog me-2"></i>{{ _('Coming Soon') }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {% if onboarding_mode %}
+        <hr class="my-4">
+        <div class="text-center">
+            <a href="{{ url_for('business_auth.onboarding_progress') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>{{ _('Back to Onboarding') }}
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
