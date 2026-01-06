@@ -42,6 +42,18 @@ class LLMModel(Enum):
     GPT_4O_MINI = "gpt-4o-mini"
     CLAUDE_SONNET = "claude-sonnet-4-5"
     CLAUDE_HAIKU = "claude-haiku-4-5"
+    CLAUDE_HAIKU_35 = "claude-3-5-haiku-latest"
+    CLAUDE_OPUS = "claude-opus-4-5"
+
+
+VALID_MODELS = {
+    "openai": ["gpt-4o", "gpt-4o-mini", "gpt-4-turbo", "gpt-3.5-turbo"],
+    "anthropic": [
+        "claude-sonnet-4-5", "claude-3-5-sonnet-latest",
+        "claude-haiku-4-5", "claude-3-5-haiku-latest",
+        "claude-opus-4-5", "claude-3-opus-latest"
+    ]
+}
 
 
 @dataclass
@@ -76,11 +88,26 @@ class LLMResponse:
 
 @dataclass
 class LLMConfig:
-    """Configuration for LLM Gateway."""
+    """
+    Configuration for LLM Gateway.
+    
+    Environment Variables:
+        DEFAULT_LLM_PROVIDER: Provider to use (openai, anthropic). Default: openai
+        CLAUDE_ENABLED: Allow Claude provider selection. Default: false
+        DEFAULT_OPENAI_MODEL: Default OpenAI model. Default: gpt-4o-mini
+        DEFAULT_CLAUDE_MODEL: Default Claude model. Default: claude-sonnet-4-5
+        DEFAULT_OPENAI_PREMIUM_MODEL: Premium OpenAI model for escalations. Default: gpt-4o
+        DEFAULT_CLAUDE_PREMIUM_MODEL: Premium Claude model for escalations. Default: claude-opus-4-5
+        PROVIDER_FAILOVER_ORDER: Comma-separated failover order. Default: openai
+    """
     default_provider: LLMProvider = LLMProvider.OPENAI
     claude_enabled: bool = False
     failover_order: List[LLMProvider] = field(default_factory=lambda: [LLMProvider.OPENAI])
     model_mapping: Dict[str, str] = field(default_factory=dict)
+    default_openai_model: str = "gpt-4o-mini"
+    default_claude_model: str = "claude-sonnet-4-5"
+    default_openai_premium_model: str = "gpt-4o"
+    default_claude_premium_model: str = "claude-opus-4-5"
     
     @classmethod
     def from_environment(cls) -> 'LLMConfig':
@@ -104,11 +131,42 @@ class LLMConfig:
         if not failover_order:
             failover_order = [LLMProvider.OPENAI]
         
+        default_openai_model = os.environ.get('DEFAULT_OPENAI_MODEL', 'gpt-4o-mini')
+        default_claude_model = os.environ.get('DEFAULT_CLAUDE_MODEL', 'claude-sonnet-4-5')
+        default_openai_premium_model = os.environ.get('DEFAULT_OPENAI_PREMIUM_MODEL', 'gpt-4o')
+        default_claude_premium_model = os.environ.get('DEFAULT_CLAUDE_PREMIUM_MODEL', 'claude-opus-4-5')
+        
+        if default_openai_model not in VALID_MODELS['openai']:
+            logger.warning(f"Invalid DEFAULT_OPENAI_MODEL '{default_openai_model}', using gpt-4o-mini")
+            default_openai_model = "gpt-4o-mini"
+        
+        if default_claude_model not in VALID_MODELS['anthropic']:
+            logger.warning(f"Invalid DEFAULT_CLAUDE_MODEL '{default_claude_model}', using claude-sonnet-4-5")
+            default_claude_model = "claude-sonnet-4-5"
+        
         return cls(
             default_provider=default_provider,
             claude_enabled=claude_enabled,
-            failover_order=failover_order
+            failover_order=failover_order,
+            default_openai_model=default_openai_model,
+            default_claude_model=default_claude_model,
+            default_openai_premium_model=default_openai_premium_model,
+            default_claude_premium_model=default_claude_premium_model
         )
+    
+    def get_default_model(self, provider: Optional[LLMProvider] = None) -> str:
+        """Get default model for the specified or default provider."""
+        provider = provider or self.default_provider
+        if provider == LLMProvider.ANTHROPIC:
+            return self.default_claude_model
+        return self.default_openai_model
+    
+    def get_premium_model(self, provider: Optional[LLMProvider] = None) -> str:
+        """Get premium model for escalations."""
+        provider = provider or self.default_provider
+        if provider == LLMProvider.ANTHROPIC:
+            return self.default_claude_premium_model
+        return self.default_openai_premium_model
 
 
 class LLMAdapter(ABC):
