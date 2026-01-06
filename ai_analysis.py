@@ -2,17 +2,104 @@ import json
 import os
 import csv
 from datetime import datetime
+from typing import Optional
 from openai import OpenAI
 from textblob import TextBlob
 from app import db
 from models import SurveyResponse
 import logging
 
+# LLM Gateway (provider-agnostic abstraction layer)
+from llm_gateway import (
+    LLMGateway, LLMRequest, LLMMessage, LLMResponse,
+    is_gateway_enabled, get_gateway
+)
+
 logger = logging.getLogger(__name__)
 
-# Initialize OpenAI client
+# Initialize OpenAI client (fallback when gateway disabled)
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 openai_client = OpenAI(api_key=OPENAI_API_KEY) if OPENAI_API_KEY else None
+
+# LLM Gateway singleton (initialized lazily)
+_llm_gateway: Optional[LLMGateway] = None
+
+def _get_analysis_gateway() -> Optional[LLMGateway]:
+    """Get or initialize the LLM gateway for analysis operations."""
+    global _llm_gateway
+    if _llm_gateway is None and is_gateway_enabled():
+        _llm_gateway = get_gateway()
+    return _llm_gateway if is_gateway_enabled() else None
+
+def _call_llm_for_analysis(
+    system_prompt: str,
+    user_prompt: str,
+    model: str = "gpt-4o-mini",
+    temperature: float = 0.3,
+    json_mode: bool = True,
+    max_tokens: Optional[int] = 1500,
+    business_account_id: Optional[int] = None
+) -> str:
+    """
+    Unified LLM call for analysis operations with gateway support.
+    
+    Routes calls through LLM Gateway when enabled, falls back to direct
+    OpenAI when gateway is disabled or unavailable.
+    
+    Args:
+        system_prompt: System message for LLM
+        user_prompt: User message for LLM
+        model: Model to use (default: gpt-4o-mini)
+        temperature: Temperature setting (default: 0.3)
+        json_mode: Whether to request JSON response format
+        max_tokens: Optional max tokens limit
+        business_account_id: Optional business account ID for tenant-specific config
+    
+    Returns:
+        LLM response content as string
+    """
+    gateway = _get_analysis_gateway()
+    
+    if gateway:
+        # Use LLM Gateway (provider-agnostic path)
+        request = LLMRequest(
+            messages=[
+                LLMMessage(role="system", content=system_prompt),
+                LLMMessage(role="user", content=user_prompt)
+            ],
+            model=model,
+            temperature=temperature,
+            json_mode=json_mode,
+            max_tokens=max_tokens
+        )
+        
+        response = gateway.chat_completion(
+            request,
+            business_account_id=business_account_id
+        )
+        return response.content
+    else:
+        # Direct OpenAI path (production-proven, default)
+        if not openai_client:
+            raise ValueError("OpenAI client not available")
+        
+        api_params = {
+            "model": model,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ],
+            "temperature": temperature
+        }
+        
+        if json_mode:
+            api_params["response_format"] = {"type": "json_object"}
+        
+        if max_tokens:
+            api_params["max_tokens"] = max_tokens
+        
+        response = openai_client.chat.completions.create(**api_params)
+        return response.choices[0].message.content or ""
 
 def analyze_survey_response(response_id):
     """Perform comprehensive AI analysis on a survey response with consolidated OpenAI call"""
@@ -32,11 +119,13 @@ def analyze_survey_response(response_id):
         
         combined_text = " ".join(text_content)
         
-        # Perform consolidated AI analysis (single OpenAI call instead of 5)
-        if combined_text.strip() and openai_client:
+        # Perform consolidated AI analysis (gateway or direct OpenAI)
+        # Check for either gateway availability or OpenAI client
+        llm_available = openai_client is not None or _get_analysis_gateway() is not None
+        if combined_text.strip() and llm_available:
             analysis_results = perform_consolidated_ai_analysis(response, combined_text)
         else:
-            # Fallback for empty text or no OpenAI client
+            # Fallback for empty text or no LLM provider available
             analysis_results = perform_fallback_analysis(response, combined_text)
         
         # Calculate growth factor based on NPS (no OpenAI call needed)
@@ -154,29 +243,26 @@ Return ONLY valid JSON in this exact format:
   "reasoning": "3-4 sentence explanation of analysis logic"
 }}"""
 
-        # Single OpenAI API call for all analysis
+        # Single LLM API call for all analysis (gateway or direct OpenAI)
         # Model selection via environment variable for cost optimization
         analysis_model = os.environ.get('AI_ANALYSIS_MODEL', 'gpt-4o-mini')
+        system_prompt = "You are a comprehensive customer feedback analysis expert. Analyze feedback and provide structured analysis covering sentiment, themes, churn risk, growth opportunities, and account risk factors. Always return valid JSON."
         
-        ai_response = openai_client.chat.completions.create(
+        # Get business account ID for tenant-specific config if available
+        business_account_id = getattr(response, 'business_account_id', None)
+        
+        ai_content = _call_llm_for_analysis(
+            system_prompt=system_prompt,
+            user_prompt=consolidated_prompt,
             model=analysis_model,
-            messages=[
-                {
-                    "role": "system",
-                    "content": "You are a comprehensive customer feedback analysis expert. Analyze feedback and provide structured analysis covering sentiment, themes, churn risk, growth opportunities, and account risk factors. Always return valid JSON."
-                },
-                {
-                    "role": "user", 
-                    "content": consolidated_prompt
-                }
-            ],
-            response_format={"type": "json_object"},
+            temperature=0.3,
+            json_mode=True,
             max_tokens=1500,
-            temperature=0.3
+            business_account_id=business_account_id
         )
         
         # Parse the consolidated response
-        result = json.loads(ai_response.choices[0].message.content)
+        result = json.loads(ai_content)
         
         # Add rule-based enhancements to AI analysis
         result = enhance_analysis_with_rules(result, response, combined_text)
