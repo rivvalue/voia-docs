@@ -47,6 +47,12 @@ from datetime import datetime
 from typing import Dict, Any, List, Optional, Set, Tuple
 from openai import OpenAI
 
+# LLM Gateway (provider-agnostic abstraction layer)
+from llm_gateway import (
+    LLMGateway, LLMRequest, LLMMessage, LLMResponse,
+    is_gateway_enabled, get_gateway
+)
+
 # VOÏA infrastructure
 from app import db
 from models import Campaign, Participant, BusinessAccount
@@ -223,7 +229,8 @@ class DeterministicSurveyController:
         business_account_id: Optional[int] = None,
         campaign_id: Optional[int] = None,
         participant_data: Optional[Dict[str, Any]] = None,
-        conversation_id: Optional[str] = None
+        conversation_id: Optional[str] = None,
+        llm_gateway: Optional[LLMGateway] = None
     ):
         """
         Initialize V2 controller with deterministic flow control.
@@ -233,8 +240,13 @@ class DeterministicSurveyController:
             campaign_id: Campaign ID for survey configuration
             participant_data: Participant metadata (role, tenure, etc.)
             conversation_id: Optional conversation ID for resume functionality
+            llm_gateway: Optional LLM gateway for provider abstraction (uses OpenAI directly if None)
         """
-        # OpenAI client for LLM stubs
+        # LLM Gateway for provider-agnostic AI calls (Step 1: backward compatible)
+        self.use_gateway = is_gateway_enabled() and llm_gateway is not None
+        self.llm_gateway = llm_gateway
+        
+        # OpenAI client for LLM stubs (fallback when gateway disabled)
         self.openai_client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
         
         # Store IDs
@@ -317,6 +329,71 @@ class DeterministicSurveyController:
             Dict of topic -> question_count (old format)
         """
         return get_topic_question_counts(self.topic_status)
+    
+    def _call_llm(
+        self,
+        system_prompt: str,
+        user_prompt: str,
+        model: str = "gpt-4o-mini",
+        temperature: float = 0.7,
+        json_mode: bool = False,
+        max_tokens: Optional[int] = None
+    ) -> str:
+        """
+        Unified LLM call method with gateway support.
+        
+        Routes calls through LLM Gateway when enabled, falls back to direct
+        OpenAI when gateway is disabled or unavailable.
+        
+        Args:
+            system_prompt: System message for LLM
+            user_prompt: User message for LLM
+            model: Model to use (default: gpt-4o-mini)
+            temperature: Temperature setting (default: 0.7)
+            json_mode: Whether to request JSON response format
+            max_tokens: Optional max tokens limit
+        
+        Returns:
+            LLM response content as string
+        """
+        if self.use_gateway and self.llm_gateway:
+            # Use LLM Gateway (provider-agnostic path)
+            request = LLMRequest(
+                messages=[
+                    LLMMessage(role="system", content=system_prompt),
+                    LLMMessage(role="user", content=user_prompt)
+                ],
+                model=model,
+                temperature=temperature,
+                json_mode=json_mode,
+                max_tokens=max_tokens
+            )
+            
+            response = self.llm_gateway.chat_completion(
+                request,
+                business_account_id=self.business_account_id,
+                campaign_id=self.campaign_id
+            )
+            return response.content
+        else:
+            # Direct OpenAI path (production-proven, default)
+            api_params = {
+                "model": model,
+                "messages": [
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt}
+                ],
+                "temperature": temperature
+            }
+            
+            if json_mode:
+                api_params["response_format"] = {"type": "json_object"}
+            
+            if max_tokens:
+                api_params["max_tokens"] = max_tokens
+            
+            response = self.openai_client.chat.completions.create(**api_params)
+            return response.choices[0].message.content or ""
     
     def start_conversation(self, company_name: str, respondent_name: str) -> Dict[str, Any]:
         """
@@ -780,18 +857,16 @@ class DeterministicSurveyController:
                 'timestamp': datetime.utcnow().isoformat()
             })
             
-            # Call OpenAI for extraction
-            response = self.openai_client.chat.completions.create(
-                model="gpt-4o-mini",  # Use cost-optimized model for extraction
-                messages=[
-                    {"role": "system", "content": "You are a data extraction assistant. Extract structured data from user responses. Return ONLY mentioned fields (sparse JSON, no nulls)."},
-                    {"role": "user", "content": extraction_prompt}
-                ],
-                temperature=0.0,  # Deterministic extraction
-                response_format={"type": "json_object"}
-            )
+            # Call LLM for extraction (gateway or direct OpenAI)
+            system_prompt = "You are a data extraction assistant. Extract structured data from user responses. Return ONLY mentioned fields (sparse JSON, no nulls)."
             
-            extracted_json = response.choices[0].message.content
+            extracted_json = self._call_llm(
+                system_prompt=system_prompt,
+                user_prompt=extraction_prompt,
+                model="gpt-4o-mini",
+                temperature=0.0,
+                json_mode=True
+            )
             if extracted_json:
                 raw_extracted = json.loads(extracted_json)
             else:
@@ -883,17 +958,14 @@ class DeterministicSurveyController:
             
             system_prompt = f"You are a conversational survey assistant. Generate natural, engaging questions for the specified topic.{language_instruction}"
             
-            # Call OpenAI for question generation
-            response = self.openai_client.chat.completions.create(
-                model="gpt-4o-mini",  # Use cost-optimized model
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": question_prompt}
-                ],
-                temperature=0.7  # Allow some creativity in phrasing
+            # Call LLM for question generation (gateway or direct OpenAI)
+            question_content = self._call_llm(
+                system_prompt=system_prompt,
+                user_prompt=question_prompt,
+                model="gpt-4o-mini",
+                temperature=0.7
             )
             
-            question_content = response.choices[0].message.content
             question = question_content.strip() if question_content else self._fallback_question(topic_name, is_follow_up)
             
             logger.debug(f"LLM generated question: {_mask_pii(question)}")

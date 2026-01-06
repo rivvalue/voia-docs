@@ -195,7 +195,10 @@ class OpenAIAdapter(LLMAdapter):
             api_params["response_format"] = {"type": "json_object"}
         
         try:
-            response = self.client.chat.completions.create(**api_params)
+            client = self.client
+            if client is None:
+                raise RuntimeError("OpenAI client not initialized")
+            response = client.chat.completions.create(**api_params)
             
             end_time = datetime.utcnow()
             latency_ms = (end_time - start_time).total_seconds() * 1000
@@ -243,7 +246,10 @@ class OpenAIAdapter(LLMAdapter):
             api_params["max_tokens"] = request.max_tokens
         
         try:
-            response = self.client.chat.completions.create(**api_params)
+            client = self.client
+            if client is None:
+                raise RuntimeError("OpenAI client not initialized")
+            response = client.chat.completions.create(**api_params)
             
             for chunk in response:
                 if chunk.choices and chunk.choices[0].delta.content:
