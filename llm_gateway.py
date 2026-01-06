@@ -19,6 +19,7 @@ Feature Flags:
 
 import os
 import json
+import time
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
@@ -330,12 +331,15 @@ class AnthropicAdapter(LLMAdapter):
         system_content = None
         
         for msg in request.messages:
-            if msg.get("role") == "system":
-                system_content = msg.get("content", "")
+            role = msg.role if hasattr(msg, 'role') else msg.get("role", "user")
+            content = msg.content if hasattr(msg, 'content') else msg.get("content", "")
+            
+            if role == "system":
+                system_content = content
             else:
                 messages.append({
-                    "role": msg.get("role", "user"),
-                    "content": msg.get("content", "")
+                    "role": role,
+                    "content": content
                 })
         
         api_params = {
@@ -405,12 +409,15 @@ class AnthropicAdapter(LLMAdapter):
         system_content = None
         
         for msg in request.messages:
-            if msg.get("role") == "system":
-                system_content = msg.get("content", "")
+            role = msg.role if hasattr(msg, 'role') else msg.get("role", "user")
+            content = msg.content if hasattr(msg, 'content') else msg.get("content", "")
+            
+            if role == "system":
+                system_content = content
             else:
                 messages.append({
-                    "role": msg.get("role", "user"),
-                    "content": msg.get("content", "")
+                    "role": role,
+                    "content": content
                 })
         
         api_params = {

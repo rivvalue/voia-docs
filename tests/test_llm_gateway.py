@@ -308,3 +308,171 @@ class TestThreadSafety:
         gateway2 = LLMGateway()
         
         assert gateway1 is not gateway2
+
+
+class TestAnthropicAdapter:
+    """Test Anthropic (Claude) adapter functionality."""
+    
+    def test_anthropic_adapter_provider_property(self, monkeypatch):
+        """AnthropicAdapter should return correct provider."""
+        monkeypatch.setenv('AI_INTEGRATIONS_ANTHROPIC_API_KEY', 'test-key')
+        monkeypatch.setenv('AI_INTEGRATIONS_ANTHROPIC_BASE_URL', 'https://test.com')
+        
+        from llm_gateway import AnthropicAdapter, LLMProvider
+        
+        adapter = AnthropicAdapter()
+        assert adapter.provider == LLMProvider.ANTHROPIC
+    
+    def test_anthropic_adapter_is_available_with_config(self, monkeypatch):
+        """AnthropicAdapter should be available when AI Integrations configured."""
+        monkeypatch.setenv('AI_INTEGRATIONS_ANTHROPIC_API_KEY', 'test-key')
+        monkeypatch.setenv('AI_INTEGRATIONS_ANTHROPIC_BASE_URL', 'https://test.com')
+        
+        from llm_gateway import AnthropicAdapter
+        
+        adapter = AnthropicAdapter()
+        assert adapter.is_available() is True
+    
+    def test_anthropic_adapter_not_available_without_config(self, monkeypatch):
+        """AnthropicAdapter should not be available without configuration."""
+        monkeypatch.delenv('AI_INTEGRATIONS_ANTHROPIC_API_KEY', raising=False)
+        monkeypatch.delenv('AI_INTEGRATIONS_ANTHROPIC_BASE_URL', raising=False)
+        
+        from llm_gateway import AnthropicAdapter
+        
+        adapter = AnthropicAdapter()
+        assert adapter.is_available() is False
+    
+    @patch('anthropic.Anthropic')
+    def test_anthropic_adapter_chat_completion(self, mock_anthropic_class, monkeypatch):
+        """AnthropicAdapter.chat_completion should return LLMResponse."""
+        monkeypatch.setenv('AI_INTEGRATIONS_ANTHROPIC_API_KEY', 'test-key')
+        monkeypatch.setenv('AI_INTEGRATIONS_ANTHROPIC_BASE_URL', 'https://test.com')
+        
+        mock_client = MagicMock()
+        mock_response = MagicMock()
+        mock_response.content = [MagicMock(text='Claude response')]
+        mock_response.usage.input_tokens = 10
+        mock_response.usage.output_tokens = 20
+        mock_client.messages.create.return_value = mock_response
+        mock_anthropic_class.return_value = mock_client
+        
+        from llm_gateway import AnthropicAdapter, LLMRequest, LLMMessage
+        
+        adapter = AnthropicAdapter()
+        request = LLMRequest(
+            messages=[LLMMessage(role="user", content="Hello Claude")],
+            model="claude-sonnet-4-5"
+        )
+        
+        response = adapter.chat_completion(request)
+        
+        assert response.content == 'Claude response'
+        assert response.provider == 'anthropic'
+        assert response.model == 'claude-sonnet-4-5'
+        assert response.usage['prompt_tokens'] == 10
+        assert response.usage['completion_tokens'] == 20
+    
+    @patch('anthropic.Anthropic')
+    def test_anthropic_adapter_handles_system_message(self, mock_anthropic_class, monkeypatch):
+        """AnthropicAdapter should extract system message from messages."""
+        monkeypatch.setenv('AI_INTEGRATIONS_ANTHROPIC_API_KEY', 'test-key')
+        monkeypatch.setenv('AI_INTEGRATIONS_ANTHROPIC_BASE_URL', 'https://test.com')
+        
+        mock_client = MagicMock()
+        mock_response = MagicMock()
+        mock_response.content = [MagicMock(text='Response')]
+        mock_response.usage.input_tokens = 5
+        mock_response.usage.output_tokens = 10
+        mock_client.messages.create.return_value = mock_response
+        mock_anthropic_class.return_value = mock_client
+        
+        from llm_gateway import AnthropicAdapter, LLMRequest, LLMMessage
+        
+        adapter = AnthropicAdapter()
+        request = LLMRequest(
+            messages=[
+                LLMMessage(role="system", content="You are helpful"),
+                LLMMessage(role="user", content="Hello")
+            ]
+        )
+        
+        adapter.chat_completion(request)
+        
+        call_kwargs = mock_client.messages.create.call_args[1]
+        assert call_kwargs.get('system') == 'You are helpful'
+        assert len([m for m in call_kwargs['messages'] if m['role'] == 'system']) == 0
+    
+    def test_anthropic_adapter_count_tokens(self, monkeypatch):
+        """AnthropicAdapter.count_tokens should estimate tokens."""
+        monkeypatch.setenv('AI_INTEGRATIONS_ANTHROPIC_API_KEY', 'test-key')
+        monkeypatch.setenv('AI_INTEGRATIONS_ANTHROPIC_BASE_URL', 'https://test.com')
+        
+        from llm_gateway import AnthropicAdapter
+        
+        adapter = AnthropicAdapter()
+        text = "This is a test message"
+        
+        token_count = adapter.count_tokens(text)
+        assert token_count == len(text) // 4
+
+
+class TestGatewayClaudeRouting:
+    """Test gateway routing to Claude when enabled."""
+    
+    @patch('anthropic.Anthropic')
+    def test_gateway_routes_to_claude_when_enabled(self, mock_anthropic_class, monkeypatch):
+        """Gateway should route to Claude when CLAUDE_ENABLED=true."""
+        monkeypatch.setenv('OPENAI_API_KEY', 'openai-key')
+        monkeypatch.setenv('CLAUDE_ENABLED', 'true')
+        monkeypatch.setenv('AI_INTEGRATIONS_ANTHROPIC_API_KEY', 'anthropic-key')
+        monkeypatch.setenv('AI_INTEGRATIONS_ANTHROPIC_BASE_URL', 'https://test.com')
+        
+        mock_client = MagicMock()
+        mock_response = MagicMock()
+        mock_response.content = [MagicMock(text='Claude says hi')]
+        mock_response.usage.input_tokens = 10
+        mock_response.usage.output_tokens = 15
+        mock_client.messages.create.return_value = mock_response
+        mock_anthropic_class.return_value = mock_client
+        
+        from llm_gateway import LLMGateway, LLMRequest, LLMMessage, LLMProvider
+        
+        gateway = LLMGateway()
+        request = LLMRequest(
+            messages=[LLMMessage(role="user", content="Hello")]
+        )
+        
+        response = gateway.chat_completion(request, provider_override=LLMProvider.ANTHROPIC)
+        
+        assert response.provider == 'anthropic'
+        assert response.content == 'Claude says hi'
+    
+    @patch('openai.OpenAI')
+    def test_gateway_falls_back_to_openai_when_claude_disabled(self, mock_openai_class, monkeypatch):
+        """Gateway should fall back to OpenAI when Claude disabled."""
+        monkeypatch.setenv('OPENAI_API_KEY', 'openai-key')
+        monkeypatch.setenv('CLAUDE_ENABLED', 'false')
+        monkeypatch.delenv('AI_INTEGRATIONS_ANTHROPIC_API_KEY', raising=False)
+        
+        mock_client = MagicMock()
+        mock_response = MagicMock()
+        mock_response.choices = [MagicMock()]
+        mock_response.choices[0].message.content = 'OpenAI fallback'
+        mock_response.model = "gpt-4o-mini"
+        mock_response.usage.prompt_tokens = 10
+        mock_response.usage.completion_tokens = 5
+        mock_response.usage.total_tokens = 15
+        mock_client.chat.completions.create.return_value = mock_response
+        mock_openai_class.return_value = mock_client
+        
+        from llm_gateway import LLMGateway, LLMRequest, LLMMessage, LLMProvider
+        
+        gateway = LLMGateway()
+        request = LLMRequest(
+            messages=[LLMMessage(role="user", content="Hello")]
+        )
+        
+        response = gateway.chat_completion(request, provider_override=LLMProvider.ANTHROPIC)
+        
+        assert response.provider == 'openai'
