@@ -37,4 +37,6 @@ dependencies = [
     "mkdocs-material>=9.6.23",
     "pytest>=9.0.2",
     "pytest-mock>=3.15.1",
+    "anthropic>=0.75.0",
+    "tenacity>=9.1.2",
 ]
