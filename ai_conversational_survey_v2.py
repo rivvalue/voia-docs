@@ -49,7 +49,7 @@ from openai import OpenAI
 
 # LLM Gateway (provider-agnostic abstraction layer)
 from llm_gateway import (
-    LLMGateway, LLMRequest, LLMMessage, LLMResponse,
+    LLMGateway, LLMRequest, LLMMessage, LLMResponse, LLMConfig,
     is_gateway_enabled, get_gateway
 )
 
@@ -1751,7 +1751,6 @@ Return JSON with this EXACT structure:
         gateway = get_gateway() if is_gateway_enabled() else None
         
         if gateway:
-            from llm_gateway import LLMRequest, LLMMessage, LLMConfig
             llm_config = LLMConfig.from_environment()
             model = llm_config.get_default_model()
             
