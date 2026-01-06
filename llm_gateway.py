@@ -155,18 +155,30 @@ class LLMConfig:
         )
     
     def get_default_model(self, provider: Optional[LLMProvider] = None) -> str:
-        """Get default model for the specified or default provider."""
+        """Get default model for the specified or default provider.
+        
+        Respects CLAUDE_ENABLED flag - returns OpenAI model if Claude is disabled
+        even when Anthropic provider is specified.
+        """
         provider = provider or self.default_provider
-        if provider == LLMProvider.ANTHROPIC:
+        if provider == LLMProvider.ANTHROPIC and self.claude_enabled:
             return self.default_claude_model
         return self.default_openai_model
     
     def get_premium_model(self, provider: Optional[LLMProvider] = None) -> str:
-        """Get premium model for escalations."""
+        """Get premium model for escalations.
+        
+        Respects CLAUDE_ENABLED flag - returns OpenAI model if Claude is disabled
+        even when Anthropic provider is specified.
+        """
         provider = provider or self.default_provider
-        if provider == LLMProvider.ANTHROPIC:
+        if provider == LLMProvider.ANTHROPIC and self.claude_enabled:
             return self.default_claude_premium_model
         return self.default_openai_premium_model
+    
+    def get_openai_model(self, premium: bool = False) -> str:
+        """Get OpenAI model directly (for code using OpenAI SDK)."""
+        return self.default_openai_premium_model if premium else self.default_openai_model
 
 
 class LLMAdapter(ABC):

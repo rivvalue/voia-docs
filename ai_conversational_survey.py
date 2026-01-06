@@ -8,6 +8,7 @@ from datetime import datetime
 from typing import Dict, Any, List, Optional
 from openai import OpenAI
 from prompt_template_service import PromptTemplateService
+from llm_gateway import LLMConfig
 
 # Configure logger with PII masking
 logger = logging.getLogger(__name__)
@@ -333,8 +334,10 @@ CRITICAL RULES:
 - Keep is_complete=false. Backend controls survey completion, not you.
 {language_instruction}"""
 
-            # Model selection via environment variable
-            conversation_model = os.environ.get('AI_CONVERSATION_MODEL', 'gpt-4o')
+            # Model selection via LLMConfig for unified configuration
+            # Uses OpenAI directly, so always get OpenAI model
+            llm_config = LLMConfig.from_environment()
+            conversation_model = llm_config.get_openai_model(premium=True)
             
             # Log the full prompt for debugging
             self.ai_prompts_log.append({
@@ -471,8 +474,10 @@ Only include fields that are clearly present in the response. If a field is not 
 
 IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), return null for those fields to prevent overwrites."""
 
-            # Model selection via environment variable for cost optimization
-            conversation_model = os.environ.get('AI_CONVERSATION_MODEL', 'gpt-4o')
+            # Model selection via LLMConfig for unified configuration
+            # Uses OpenAI directly, so always get OpenAI model
+            llm_config = LLMConfig.from_environment()
+            conversation_model = llm_config.get_openai_model(premium=True)
             
             response = self.openai_client.chat.completions.create(
                 model=conversation_model,
@@ -1173,8 +1178,10 @@ RESPONSE FORMAT - Return JSON:
                 'user_input': user_input[:100]  # Truncate for privacy
             })
 
-            # Model selection via environment variable for cost optimization
-            conversation_model = os.environ.get('AI_CONVERSATION_MODEL', 'gpt-4o')
+            # Model selection via LLMConfig for unified configuration
+            # Uses OpenAI directly, so always get OpenAI model
+            llm_config = LLMConfig.from_environment()
+            conversation_model = llm_config.get_openai_model(premium=True)
             
             # CRITICAL: Use system/user message structure for proper language enforcement
             response = self.openai_client.chat.completions.create(

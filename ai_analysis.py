@@ -11,7 +11,7 @@ import logging
 
 # LLM Gateway (provider-agnostic abstraction layer)
 from llm_gateway import (
-    LLMGateway, LLMRequest, LLMMessage, LLMResponse,
+    LLMGateway, LLMRequest, LLMMessage, LLMResponse, LLMConfig,
     is_gateway_enabled, get_gateway
 )
 
@@ -244,8 +244,9 @@ Return ONLY valid JSON in this exact format:
 }}"""
 
         # Single LLM API call for all analysis (gateway or direct OpenAI)
-        # Model selection via environment variable for cost optimization
-        analysis_model = os.environ.get('AI_ANALYSIS_MODEL', 'gpt-4o-mini')
+        # Model selection via LLMConfig for unified configuration
+        llm_config = LLMConfig.from_environment()
+        analysis_model = llm_config.get_default_model()
         system_prompt = "You are a comprehensive customer feedback analysis expert. Analyze feedback and provide structured analysis covering sentiment, themes, churn risk, growth opportunities, and account risk factors. Always return valid JSON."
         
         # Get business account ID for tenant-specific config if available
