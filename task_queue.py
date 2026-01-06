@@ -14,6 +14,19 @@ from email_service import email_service
 
 logger = logging.getLogger(__name__)
 
+# LLM Gateway support for transcript analysis
+def _get_transcript_gateway():
+    """Get LLM gateway for transcript analysis if enabled"""
+    try:
+        from llm_gateway import LLMGateway, is_gateway_enabled
+        if is_gateway_enabled():
+            return LLMGateway()
+    except ImportError:
+        logger.debug("LLM gateway not available, using direct OpenAI")
+    except Exception as e:
+        logger.warning(f"Failed to initialize LLM gateway for transcripts: {e}")
+    return None
+
 class TaskQueue:
     """Simple in-memory task queue for processing AI analysis tasks with campaign scheduler"""
     
@@ -1570,14 +1583,10 @@ class TaskQueue:
             return False
     
     def _analyze_transcript_with_ai(self, transcript_content, participant_name, participant_company):
-        """Use OpenAI to analyze transcript and extract survey response data"""
+        """Use LLM gateway (or direct OpenAI fallback) to analyze transcript and extract survey response data"""
         try:
-            import openai
-            from openai import OpenAI
             import os
             import json
-            
-            client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
             
             # Create specialized prompt for transcript analysis
             prompt = f"""You are VOÏA (Voice of Client), an AI assistant specialized in analyzing customer feedback transcripts. 
@@ -1612,18 +1621,30 @@ Extract the following information and respond with a valid JSON object:
 
 Respond with ONLY the JSON object, no other text:"""
 
-            response = client.chat.completions.create(
-                model="gpt-4o",
-                messages=[{
-                    "role": "user",
-                    "content": prompt
-                }],
-                temperature=0.1,
-                max_tokens=2000
-            )
-            
-            # Parse the AI response
-            ai_response = response.choices[0].message.content.strip()
+            # Try gateway first, fallback to direct OpenAI
+            gateway = _get_transcript_gateway()
+            if gateway:
+                from llm_gateway import LLMRequest, LLMMessage
+                request = LLMRequest(
+                    messages=[LLMMessage(role="user", content=prompt)],
+                    model="gpt-4o",
+                    temperature=0.1,
+                    max_tokens=2000
+                )
+                response = gateway.chat_completion(request)
+                ai_response = response.content.strip() if response.content else ""
+                logger.debug("Transcript analysis using LLM gateway")
+            else:
+                from openai import OpenAI
+                client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
+                response = client.chat.completions.create(
+                    model="gpt-4o",
+                    messages=[{"role": "user", "content": prompt}],
+                    temperature=0.1,
+                    max_tokens=2000
+                )
+                ai_response = response.choices[0].message.content.strip()
+                logger.debug("Transcript analysis using direct OpenAI")
             
             # Strip markdown code blocks if present (OpenAI sometimes wraps JSON in ```json...```)
             if ai_response.startswith('```'):
@@ -1639,12 +1660,12 @@ Respond with ONLY the JSON object, no other text:"""
             try:
                 analysis_data = json.loads(ai_response)
             except json.JSONDecodeError as e:
-                logger.error(f"Invalid JSON response from OpenAI: {ai_response[:200]}...")
+                logger.error(f"Invalid JSON response from LLM: {ai_response[:200]}...")
                 logger.error(f"JSON decode error: {e}")
                 return None
             
             # Convert analysis data to match SurveyResponse schema
-            # Note: OpenAI returns fields with capital letters and spaces (e.g., "NPS Score")
+            # Note: LLM returns fields with capital letters and spaces (e.g., "NPS Score")
             # We normalize sentiment_label to lowercase for consistency with regular surveys
             sentiment_label_raw = analysis_data.get('Sentiment Label', 'Neutral')
             sentiment_label = sentiment_label_raw.lower() if sentiment_label_raw else 'neutral'
