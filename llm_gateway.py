@@ -279,32 +279,165 @@ class OpenAIAdapter(LLMAdapter):
 
 class AnthropicAdapter(LLMAdapter):
     """
-    Anthropic (Claude) adapter - placeholder for future implementation.
+    Anthropic (Claude) adapter using Replit AI Integrations.
     
-    This adapter will be implemented in Step 2 of the migration plan.
-    Currently returns NotImplementedError to ensure it's not used prematurely.
+    Uses Replit's managed Anthropic access (no external API key required).
+    Supports claude-sonnet-4-5 (balanced), claude-opus-4-5 (complex), claude-haiku-4-5 (fast).
     """
     
     def __init__(self):
-        """Initialize Anthropic client placeholder."""
+        """Initialize Anthropic client using Replit AI Integrations."""
         self._client = None
-        self._api_key = os.environ.get('ANTHROPIC_API_KEY')
+        self._api_key = os.environ.get('AI_INTEGRATIONS_ANTHROPIC_API_KEY')
+        self._base_url = os.environ.get('AI_INTEGRATIONS_ANTHROPIC_BASE_URL')
+    
+    @property
+    def client(self):
+        """Lazy-load Anthropic client."""
+        if self._client is None and self.is_available():
+            try:
+                from anthropic import Anthropic
+                self._client = Anthropic(
+                    api_key=self._api_key,
+                    base_url=self._base_url
+                )
+            except ImportError:
+                logger.error("anthropic package not installed")
+                return None
+            except Exception as e:
+                logger.error(f"Failed to initialize Anthropic client: {e}")
+                return None
+        return self._client
     
     @property
     def provider(self) -> LLMProvider:
         return LLMProvider.ANTHROPIC
     
     def is_available(self) -> bool:
-        """Check if Anthropic API key is configured."""
-        return bool(self._api_key)
+        """Check if Anthropic via Replit AI Integrations is configured."""
+        return bool(self._api_key and self._base_url)
     
     def chat_completion(self, request: LLMRequest) -> LLMResponse:
-        """Placeholder - to be implemented in Step 2."""
-        raise NotImplementedError("Anthropic adapter not yet implemented. Set CLAUDE_ENABLED=false.")
+        """Execute chat completion via Anthropic Claude API."""
+        if not self.is_available():
+            raise RuntimeError("Anthropic adapter not available - missing AI Integrations config")
+        
+        start_time = time.time()
+        
+        model = request.model or "claude-sonnet-4-5"
+        
+        messages = []
+        system_content = None
+        
+        for msg in request.messages:
+            if msg.get("role") == "system":
+                system_content = msg.get("content", "")
+            else:
+                messages.append({
+                    "role": msg.get("role", "user"),
+                    "content": msg.get("content", "")
+                })
+        
+        api_params = {
+            "model": model,
+            "max_tokens": request.max_tokens or 8192,
+            "messages": messages
+        }
+        
+        if system_content:
+            api_params["system"] = system_content
+        
+        if request.temperature is not None:
+            api_params["temperature"] = request.temperature
+        
+        try:
+            client = self.client
+            if client is None:
+                raise RuntimeError("Anthropic client not initialized")
+            
+            response = client.messages.create(**api_params)
+            
+            latency_ms = (time.time() - start_time) * 1000
+            
+            content = ""
+            if response.content and len(response.content) > 0:
+                content = response.content[0].text
+            
+            usage = {}
+            if hasattr(response, 'usage') and response.usage:
+                usage = {
+                    "prompt_tokens": response.usage.input_tokens,
+                    "completion_tokens": response.usage.output_tokens,
+                    "total_tokens": response.usage.input_tokens + response.usage.output_tokens
+                }
+            
+            logger.info(
+                f"LLM_CALL provider=anthropic model={model} "
+                f"tokens_in={usage.get('prompt_tokens', 0)} "
+                f"tokens_out={usage.get('completion_tokens', 0)} "
+                f"latency_ms={latency_ms:.0f} status=success"
+            )
+            
+            return LLMResponse(
+                content=content,
+                model=model,
+                provider="anthropic",
+                usage=usage,
+                latency_ms=latency_ms,
+                raw_response=response
+            )
+            
+        except Exception as e:
+            logger.error(
+                f"LLM_CALL provider=anthropic model={model} "
+                f"status=error error_type={type(e).__name__} error_msg={str(e)[:100]}"
+            )
+            raise
     
     def stream_chat(self, request: LLMRequest) -> Iterator[str]:
-        """Placeholder - to be implemented in Step 2."""
-        raise NotImplementedError("Anthropic adapter not yet implemented. Set CLAUDE_ENABLED=false.")
+        """Execute streaming chat completion via Anthropic Claude API."""
+        if not self.is_available():
+            raise RuntimeError("Anthropic adapter not available - missing AI Integrations config")
+        
+        model = request.model or "claude-sonnet-4-5"
+        
+        messages = []
+        system_content = None
+        
+        for msg in request.messages:
+            if msg.get("role") == "system":
+                system_content = msg.get("content", "")
+            else:
+                messages.append({
+                    "role": msg.get("role", "user"),
+                    "content": msg.get("content", "")
+                })
+        
+        api_params = {
+            "model": model,
+            "max_tokens": request.max_tokens or 8192,
+            "messages": messages,
+            "stream": True
+        }
+        
+        if system_content:
+            api_params["system"] = system_content
+        
+        if request.temperature is not None:
+            api_params["temperature"] = request.temperature
+        
+        try:
+            client = self.client
+            if client is None:
+                raise RuntimeError("Anthropic client not initialized")
+            
+            with client.messages.stream(**api_params) as stream:
+                for text in stream.text_stream:
+                    yield text
+                    
+        except Exception as e:
+            logger.error(f"Anthropic streaming error: {e}")
+            raise
     
     def count_tokens(self, text: str, model: str = "claude-sonnet-4-5") -> int:
         """Estimate token count for text."""
