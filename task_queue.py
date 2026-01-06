@@ -15,17 +15,50 @@ from email_service import email_service
 logger = logging.getLogger(__name__)
 
 # LLM Gateway support for transcript analysis
+# Cached gateway instance per worker process (avoids repeated construction)
+_cached_transcript_gateway = None
+_gateway_cache_checked = False
+
 def _get_transcript_gateway():
-    """Get LLM gateway for transcript analysis if enabled"""
+    """Get cached LLM gateway for transcript analysis if enabled.
+    
+    Uses module-level caching to avoid repeated gateway construction
+    within the same worker process. Thread-safe as each worker process
+    has its own memory space.
+    
+    Retry behavior: Only caches when gateway is successfully created or
+    explicitly disabled. Transient failures allow retry on next call.
+    """
+    global _cached_transcript_gateway, _gateway_cache_checked
+    
+    # Return cached instance if already successfully initialized
+    if _cached_transcript_gateway is not None:
+        return _cached_transcript_gateway
+    
+    # Skip repeated checks if gateway is disabled (not due to error)
+    if _gateway_cache_checked:
+        return None
+    
     try:
         from llm_gateway import LLMGateway, is_gateway_enabled
         if is_gateway_enabled():
-            return LLMGateway()
+            _cached_transcript_gateway = LLMGateway()
+            logger.info("LLM gateway initialized and cached for transcript analysis")
+            return _cached_transcript_gateway
+        else:
+            # Gateway explicitly disabled - don't retry
+            _gateway_cache_checked = True
+            logger.debug("LLM gateway disabled, will use direct OpenAI for transcripts")
+            return None
     except ImportError:
+        # Module not available - don't retry
+        _gateway_cache_checked = True
         logger.debug("LLM gateway not available, using direct OpenAI")
+        return None
     except Exception as e:
+        # Transient error - allow retry on next call
         logger.warning(f"Failed to initialize LLM gateway for transcripts: {e}")
-    return None
+        return None
 
 class TaskQueue:
     """Simple in-memory task queue for processing AI analysis tasks with campaign scheduler"""

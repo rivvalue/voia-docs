@@ -213,7 +213,12 @@ class OpenAIAdapter(LLMAdapter):
                     "total_tokens": response.usage.total_tokens
                 }
             
-            logger.debug(f"OpenAI completion: model={request.model}, tokens={usage.get('total_tokens', 'N/A')}, latency={latency_ms:.0f}ms")
+            logger.info(
+                f"LLM_CALL provider=openai model={request.model} "
+                f"tokens_in={usage.get('prompt_tokens', 0)} "
+                f"tokens_out={usage.get('completion_tokens', 0)} "
+                f"latency_ms={latency_ms:.0f} status=success"
+            )
             
             return LLMResponse(
                 content=content,
@@ -225,7 +230,10 @@ class OpenAIAdapter(LLMAdapter):
             )
             
         except Exception as e:
-            logger.error(f"OpenAI API error: {e}")
+            logger.error(
+                f"LLM_CALL provider=openai model={request.model} "
+                f"status=error error_type={type(e).__name__} error_msg={str(e)[:100]}"
+            )
             raise
     
     def stream_chat(self, request: LLMRequest) -> Iterator[str]:
@@ -399,7 +407,10 @@ class LLMGateway:
         """
         adapter = self._get_adapter(provider_override, business_account_id, campaign_id)
         
-        logger.debug(f"LLM Gateway: routing to {adapter.provider.value}, model={request.model}")
+        logger.debug(
+            f"LLM_GATEWAY_ROUTE provider={adapter.provider.value} model={request.model} "
+            f"json_mode={request.json_mode} stream={request.stream}"
+        )
         
         return adapter.chat_completion(request)
     
@@ -413,7 +424,9 @@ class LLMGateway:
         """Execute streaming chat completion through appropriate adapter."""
         adapter = self._get_adapter(provider_override, business_account_id, campaign_id)
         
-        logger.debug(f"LLM Gateway: streaming via {adapter.provider.value}, model={request.model}")
+        logger.debug(
+            f"LLM_GATEWAY_STREAM provider={adapter.provider.value} model={request.model}"
+        )
         
         return adapter.stream_chat(request)
     
