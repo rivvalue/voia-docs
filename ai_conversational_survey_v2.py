@@ -1580,11 +1580,15 @@ def start_ai_conversational_survey_v2(
     """
     logger.info(f"Starting V2 conversational survey (deterministic flow)")
     
+    # Get LLM gateway if enabled (Jan 2026 - multi-provider support)
+    llm_gateway = get_gateway() if is_gateway_enabled() else None
+    
     # Initialize V2 controller
     controller = DeterministicSurveyController(
         business_account_id=business_account_id,
         campaign_id=campaign_id,
-        participant_data=participant_data
+        participant_data=participant_data,
+        llm_gateway=llm_gateway
     )
     
     # Start conversation
@@ -1615,11 +1619,15 @@ def process_ai_conversation_response_v2(
     
     logger.debug(f"Processing V2 response: conv_id={conversation_id}")
     
+    # Get LLM gateway if enabled (Jan 2026 - multi-provider support)
+    llm_gateway = get_gateway() if is_gateway_enabled() else None
+    
     # Load existing conversation state
     controller = DeterministicSurveyController(
         business_account_id=business_account_id,
         campaign_id=campaign_id,
-        conversation_id=conversation_id
+        conversation_id=conversation_id,
+        llm_gateway=llm_gateway
     )
     
     # Try to load persisted state
@@ -1737,23 +1745,45 @@ Return JSON with this EXACT structure:
 }}"""
 
     try:
-        client = OpenAI()
+        system_prompt = "You are a precise data extraction assistant. Extract only what the user actually said."
         
-        # Use gpt-4o-mini for cost efficiency (this is a simple extraction task)
-        model = os.environ.get('AI_SUMMARY_EXTRACTION_MODEL', 'gpt-4o-mini')
+        # Use LLM Gateway if enabled (Jan 2026 - multi-provider support)
+        gateway = get_gateway() if is_gateway_enabled() else None
         
-        response = client.chat.completions.create(
-            model=model,
-            messages=[
-                {"role": "system", "content": "You are a precise data extraction assistant. Extract only what the user actually said."},
-                {"role": "user", "content": prompt}
-            ],
-            response_format={"type": "json_object"},
-            max_tokens=500,
-            temperature=0.1  # Low temperature for consistent extraction
-        )
-        
-        content = response.choices[0].message.content
+        if gateway:
+            from llm_gateway import LLMRequest, LLMMessage, LLMConfig
+            llm_config = LLMConfig.from_environment()
+            model = llm_config.get_default_model()
+            
+            request = LLMRequest(
+                messages=[
+                    LLMMessage(role="system", content=system_prompt),
+                    LLMMessage(role="user", content=prompt)
+                ],
+                model=model,
+                temperature=0.1,
+                json_mode=True,
+                max_tokens=500
+            )
+            
+            llm_response = gateway.chat_completion(request)
+            content = llm_response.content
+        else:
+            # Fallback to direct OpenAI
+            client = OpenAI()
+            model = os.environ.get('AI_SUMMARY_EXTRACTION_MODEL', 'gpt-4o-mini')
+            
+            response = client.chat.completions.create(
+                model=model,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": prompt}
+                ],
+                response_format={"type": "json_object"},
+                max_tokens=500,
+                temperature=0.1
+            )
+            content = response.choices[0].message.content
         if content:
             result = json.loads(content)
             
