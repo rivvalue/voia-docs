@@ -431,3 +431,8 @@ def get_gateway() -> LLMGateway:
 def is_gateway_enabled() -> bool:
     """Check if LLM Gateway is enabled via feature flag."""
     return os.environ.get('LLM_GATEWAY_ENABLED', 'true').lower() == 'true'
+
+
+def is_claude_enabled() -> bool:
+    """Check if Claude/Anthropic provider is enabled via feature flag."""
+    return os.environ.get('CLAUDE_ENABLED', 'false').lower() == 'true'
