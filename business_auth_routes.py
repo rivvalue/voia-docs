@@ -2532,10 +2532,6 @@ def init_rivvalue_admin_user():
         # Log that admin user was created (without exposing password)
         logger.info(f"SECURITY: Admin user {admin_email} created with secure temporary password. Use admin panel to reset password.")
         
-        # Store password securely in environment or secure storage for admin access
-        # For development: password should be retrieved through secure admin interface
-        print(f"\n=== ADMIN USER CREATED ===\nEmail: {admin_email}\nTemporary Password: {temp_password}\nPlease change immediately via admin panel!\n==========================\n")
-        
         db.session.add(admin_user)
         db.session.commit()
         
