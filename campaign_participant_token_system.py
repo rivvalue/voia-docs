@@ -98,8 +98,6 @@ def create_campaign_participant_token(association_id):
 def verify_campaign_participant_token(jwt_token):
     """Verify a campaign-participant JWT token and return association data"""
     try:
-        logger.info(f"JWT Verification started for token: {jwt_token[:50]}...")
-        
         if not jwt_token:
             logger.warning("JWT Verification failed: No token provided")
             return {'valid': False, 'error': 'No token provided'}
