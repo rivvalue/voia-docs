@@ -532,12 +532,26 @@
                 </div>
             </div>
         {% else %}
-            <!-- Empty State -->
-            <div class="alert alert-warning">
+            <!-- Empty State - No Participants Yet -->
+            <div class="alert alert-warning mb-3">
                 <i class="fas fa-exclamation-triangle me-2"></i>
                 <strong>No Participants:</strong> Add participants to this campaign before marking it as ready.
-                <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" class="btn btn-sm btn-primary ms-2">
-                    <i class="fas fa-user-plus me-1"></i>Add Participants
+            </div>
+            
+            <!-- Actions available without participants -->
+            <div class="participant-summary-actions">
+                <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" 
+                   class="btn btn-primary">
+                    <i class="fas fa-user-plus me-2"></i>Add Participants
+                </a>
+                <a href="{{ url_for('campaigns.survey_config', campaign_id=campaign.id) }}" 
+                   class="btn btn-secondary">
+                    <i class="fas fa-cog me-2"></i>Survey Settings
+                    {% if campaign.has_campaign_customization %}
+                    <span class="badge bg-success ms-1">
+                        <i class="fas fa-check"></i>
+                    </span>
+                    {% endif %}
                 </a>
             </div>
         {% endif %}
