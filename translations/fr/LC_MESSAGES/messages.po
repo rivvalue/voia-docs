@@ -765,7 +765,11 @@ msgstr "Réponses"
 msgid "Recent Survey Responses"
 msgstr "Aucune réponse récente"
 
-#: templates/campaign_insights.html:603 templates/dashboard.html:839
+#: templates/campaign_insights.html:600
+msgid "Tenure"
+msgstr "Ancienneté"
+
+#: templates/dashboard.html:839
 msgid "Tenure with FC inc"
 msgstr "Ancienneté avec FC inc"
 
