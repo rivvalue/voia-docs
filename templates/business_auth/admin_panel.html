@@ -448,7 +448,7 @@
                                         <i class="fas fa-paint-brush me-2 text-primary"></i>Brand Settings
                                     </a>
                                 </li>
-                                {% if business_account.account_type in ['customer', 'demo'] %}
+                                {% if business_account.account_type in ['customer', 'demo', 'platform_owner'] %}
                                 <li>
                                     <a class="dropdown-item" href="{{ url_for('business_auth.survey_config') }}" title="{{ _('Customize survey experience and conversation settings') }}">
                                         <i class="fas fa-cog me-2 text-primary"></i>Survey Customization
