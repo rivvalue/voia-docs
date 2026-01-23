@@ -330,6 +330,58 @@ class DeterministicSurveyController:
         """
         return get_topic_question_counts(self.topic_status)
     
+    def _safe_parse_json(self, text: str) -> dict:
+        """
+        Safely parse JSON from LLM response, handling common formatting issues.
+        
+        Claude and other LLMs may wrap JSON in markdown code fences or include
+        explanatory text. This method extracts and parses the JSON robustly.
+        
+        Args:
+            text: Raw LLM response text that should contain JSON
+            
+        Returns:
+            Parsed dict, or empty dict if parsing fails
+        """
+        import re
+        
+        if not text or not text.strip():
+            logger.warning("Empty response from LLM, cannot parse JSON")
+            return {}
+        
+        text = text.strip()
+        
+        # Try direct parse first (happy path)
+        try:
+            return json.loads(text)
+        except json.JSONDecodeError:
+            pass
+        
+        # Try removing markdown code fences
+        # Match ```json ... ``` or ``` ... ```
+        code_fence_pattern = r'```(?:json)?\s*([\s\S]*?)\s*```'
+        matches = re.findall(code_fence_pattern, text)
+        if matches:
+            for match in matches:
+                try:
+                    return json.loads(match.strip())
+                except json.JSONDecodeError:
+                    continue
+        
+        # Try finding first { and last } to extract JSON object
+        first_brace = text.find('{')
+        last_brace = text.rfind('}')
+        if first_brace != -1 and last_brace > first_brace:
+            json_candidate = text[first_brace:last_brace + 1]
+            try:
+                return json.loads(json_candidate)
+            except json.JSONDecodeError:
+                pass
+        
+        # Log the raw response for debugging
+        logger.warning(f"Failed to parse JSON from LLM response. Raw (first 500 chars): {text[:500]}")
+        return {}
+    
     def _call_llm(
         self,
         system_prompt: str,
@@ -868,7 +920,7 @@ class DeterministicSurveyController:
                 json_mode=True
             )
             if extracted_json:
-                raw_extracted = json.loads(extracted_json)
+                raw_extracted = self._safe_parse_json(extracted_json)
             else:
                 raw_extracted = {}
             
@@ -1784,7 +1836,36 @@ Return JSON with this EXACT structure:
             )
             content = response.choices[0].message.content
         if content:
-            result = json.loads(content)
+            # Robust JSON parsing for Claude/Anthropic responses
+            try:
+                result = json.loads(content)
+            except json.JSONDecodeError:
+                # Try to extract JSON from code fences or mixed text
+                code_fence_pattern = r'```(?:json)?\s*([\s\S]*?)\s*```'
+                matches = re.findall(code_fence_pattern, content)
+                if matches:
+                    for match in matches:
+                        try:
+                            result = json.loads(match.strip())
+                            break
+                        except json.JSONDecodeError:
+                            continue
+                    else:
+                        # Try extracting JSON object from text
+                        first_brace = content.find('{')
+                        last_brace = content.rfind('}')
+                        if first_brace != -1 and last_brace > first_brace:
+                            result = json.loads(content[first_brace:last_brace + 1])
+                        else:
+                            raise
+                else:
+                    # Try extracting JSON object from text
+                    first_brace = content.find('{')
+                    last_brace = content.rfind('}')
+                    if first_brace != -1 and last_brace > first_brace:
+                        result = json.loads(content[first_brace:last_brace + 1])
+                    else:
+                        raise
             
             # Log confidence scores (minimal implementation - no DB persistence)
             for field, data in result.items():

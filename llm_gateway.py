@@ -412,6 +412,16 @@ class AnthropicAdapter(LLMAdapter):
                     "content": content
                 })
         
+        if request.json_mode:
+            json_instruction = "\n\nIMPORTANT: You MUST respond with valid JSON only. No markdown, no code fences, no explanatory text - just the raw JSON object."
+            if system_content:
+                system_content = system_content + json_instruction
+            else:
+                system_content = "You are a helpful assistant." + json_instruction
+            
+            if messages and messages[-1]["role"] == "user":
+                messages[-1]["content"] = messages[-1]["content"] + "\n\nRespond with valid JSON only."
+        
         api_params = {
             "model": model,
             "max_tokens": request.max_tokens or 8192,

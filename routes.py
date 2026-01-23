@@ -2974,6 +2974,18 @@ def finalize_conversation():
             logger.debug(f"Finalizing V1 conversation: {conversation_id}")
             structured_data = finalize_ai_conversational_survey(survey_data)
         
+        # GUARD: Validate required fields to prevent NotNullViolation
+        # If NPS score extraction failed (Claude parsing issues), log and fail gracefully
+        if structured_data.get('nps_score') is None:
+            logger.error(f"❌ Missing required field: nps_score is None. Extraction may have failed.")
+            logger.info(f"Available fields in structured_data: {list(structured_data.keys())}")
+            # Return error to user instead of crashing with DB constraint violation
+            return jsonify({
+                'error': 'Survey data extraction incomplete - NPS score missing. Please try again.',
+                'missing_field': 'nps_score',
+                'hint': 'If this persists, please contact support.'
+            }), 422
+        
         # Get campaign and association data from session (new system)
         association_id = session.get('association_id')
         campaign_id = session.get('campaign_id')
