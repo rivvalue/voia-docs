@@ -25,7 +25,8 @@ V2_STATE_SCHEMA = {
     'current_goal_pointer': None,
     'topic_question_counts': {},
     'last_activity': None,
-    'resume_offered': False
+    'resume_offered': False,
+    'final_feedback_asked': False  # Jan 2026: Final feedback step
 }
 
 
@@ -124,7 +125,8 @@ def save_deterministic_state(conversation_id: str, controller_state: Dict) -> bo
             'last_activity': controller_state.get('last_activity', datetime.utcnow().isoformat()),
             'resume_offered': controller_state.get('resume_offered', False),
             'ai_prompts_log': controller_state.get('ai_prompts_log', []),  # FIX: Persist prompts
-            'is_complete': controller_state.get('is_complete', False)
+            'is_complete': controller_state.get('is_complete', False),
+            'final_feedback_asked': controller_state.get('final_feedback_asked', False)  # Jan 2026: Final feedback step
         }
         
         # Check if conversation exists
