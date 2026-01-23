@@ -163,6 +163,20 @@ function setupEventListeners() {
 function startConversation() {
     console.log('startConversation called');
     
+    // FIX: Clear any previous conversation data to prevent transcript accumulation
+    // This ensures abandoned conversations don't merge with new ones
+    conversationState.messages = [];
+    conversationState.conversationId = null;
+    conversationState.currentStep = 'setup';
+    conversationState.surveyData = {};
+    sessionStorage.removeItem('voiaConversation');
+    
+    // Clear the chat UI as well
+    const chatArea = document.getElementById('chatArea');
+    if (chatArea) {
+        chatArea.innerHTML = '';
+    }
+    
     const companyName = document.getElementById('companyName').value.trim();
     const respondentName = document.getElementById('respondentName').value.trim();
     const respondentEmail = document.getElementById('respondentEmail').value.trim();
