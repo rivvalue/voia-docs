@@ -312,6 +312,9 @@ class DeterministicSurveyController:
         # Track AI prompts for debugging
         self.ai_prompts_log = []
         
+        # Final feedback step (Jan 2026): Ask for additional comments before closing
+        self.final_feedback_asked = False
+        
         logger.info(f"V2 Controller initialized: conv_id={self.conversation_id}, "
                    f"campaign={campaign_id}, goals={len(self.goals)}, "
                    f"prefilled={len(self.prefilled_fields)}")
@@ -540,6 +543,11 @@ class DeterministicSurveyController:
         logger.info(f"V2 Step {self.step_count}: Processing user response")
         logger.debug(f"User input: {_mask_pii(user_input)}")
         
+        # Jan 2026: Handle final feedback response
+        # SAFETY: Verify last AI message was actually the final feedback prompt
+        if self.final_feedback_asked and self._is_awaiting_final_feedback():
+            return self._handle_final_feedback_response(user_input)
+        
         # STEP 1: Extract data (LLM performs extraction ONLY, no flow decisions)
         new_fields = self._extract_with_ai(user_input)
         
@@ -556,6 +564,10 @@ class DeterministicSurveyController:
         # STEP 2: Check backend-controlled completion criteria
         # CRITICAL: Backend decides, NOT LLM
         if self._should_complete_survey():
+            # Jan 2026: Ask for final feedback before closing
+            if not self.final_feedback_asked:
+                logger.info(f"✅ All topics complete - asking for final feedback before closing")
+                return self._ask_final_feedback()
             logger.info(f"✅ BACKEND COMPLETION: Survey ended by V2 controller at step {self.step_count}")
             return self._finish_survey()
         
@@ -572,6 +584,10 @@ class DeterministicSurveyController:
         )
         
         if not next_goal:
+            # Jan 2026: Ask for final feedback before closing
+            if not self.final_feedback_asked:
+                logger.info(f"No more goals - asking for final feedback before closing")
+                return self._ask_final_feedback()
             logger.info("No more goals - survey complete")
             return self._finish_survey()
         
@@ -692,6 +708,9 @@ class DeterministicSurveyController:
         
         # Check if survey should complete
         if self._should_complete_survey():
+            # Jan 2026: Ask for final feedback before closing
+            if not self.final_feedback_asked:
+                return self._ask_final_feedback()
             return self._finish_survey()
         
         # Get next goal (will skip the deflected topic due to high question count)
@@ -707,6 +726,9 @@ class DeterministicSurveyController:
         )
         
         if not next_goal:
+            # Jan 2026: Ask for final feedback before closing
+            if not self.final_feedback_asked:
+                return self._ask_final_feedback()
             return self._finish_survey()
         
         # Generate next question
@@ -1411,6 +1433,108 @@ Return ONLY the question text, no JSON, no explanation."""
             'controller_version': 'v2_deterministic'
         }
     
+    def _ask_final_feedback(self) -> Dict[str, Any]:
+        """
+        Ask for any additional feedback before closing the survey (Jan 2026).
+        
+        This gives participants a chance to share anything not covered by
+        the structured topics. Response is stored in additional_comments.
+        
+        Returns:
+            Response dict with final feedback prompt
+        """
+        # Mark that we've asked for final feedback
+        self.final_feedback_asked = True
+        
+        # Generate bilingual prompt based on campaign language
+        if self.language and self.language.lower().startswith('fr'):
+            prompt = "Avant de conclure, y a-t-il autre chose que vous aimeriez partager avec nous ? (Vous pouvez simplement répondre 'non' si vous n'avez rien à ajouter)"
+        else:
+            prompt = "Before we wrap up, is there anything else you'd like to share with us? (You can simply say 'no' if you have nothing to add)"
+        
+        # Add to conversation history
+        self.conversation_history.append({
+            'sender': 'VOÏA',
+            'message': prompt,
+            'timestamp': datetime.utcnow().isoformat()
+        })
+        
+        # Save state with final_feedback_asked=True
+        save_deterministic_state(self.conversation_id, self._get_state_dict())
+        
+        logger.info("Final feedback prompt sent")
+        
+        return {
+            'message': prompt,
+            'message_type': 'final_feedback',
+            'step': 'final_feedback',
+            'progress': 95,
+            'is_complete': False,
+            'extracted_data': self.extracted_data,
+            'controller_version': 'v2_deterministic'
+        }
+    
+    def _handle_final_feedback_response(self, user_input: str) -> Dict[str, Any]:
+        """
+        Handle user response to final feedback prompt (Jan 2026).
+        
+        Detects skip responses and stores non-skip feedback in additional_comments.
+        Then completes the survey.
+        
+        Args:
+            user_input: User's response to final feedback prompt
+            
+        Returns:
+            Completion response dict
+        """
+        # Detect skip responses (EN and FR)
+        # Use exact match for short responses to avoid false positives
+        # (e.g., "I have no issues but..." should NOT be treated as skip)
+        exact_skip_patterns = {
+            'no', 'non', 'nope', 'nothing', 'rien', 'n/a', 'na', 'nah',
+            'no thanks', 'non merci', 'not really', 'pas vraiment',
+            'nothing else', 'rien d\'autre', 'that\'s all', 'c\'est tout',
+            'that is all', 'nothing more', 'rien de plus', 'no comment',
+            'pas de commentaire', 'none', 'aucun'
+        }
+        
+        user_input_lower = user_input.lower().strip()
+        # Exact match for skip detection (avoid substring matching)
+        is_skip = user_input_lower in exact_skip_patterns or len(user_input_lower) < 3
+        
+        if is_skip:
+            logger.info("Final feedback skipped by user")
+        else:
+            # Store the additional feedback
+            self.extracted_data['additional_comments'] = user_input
+            logger.info(f"Final feedback captured: {len(user_input)} chars")
+        
+        # Complete the survey
+        return self._finish_survey()
+    
+    def _is_awaiting_final_feedback(self) -> bool:
+        """
+        Verify that the last AI message was the final feedback prompt (Jan 2026).
+        
+        This safety check prevents mis-routing responses if final_feedback_asked
+        was restored from a partial state but the prompt wasn't actually delivered.
+        
+        Returns:
+            True if we're genuinely awaiting final feedback response
+        """
+        if not self.conversation_history:
+            return False
+        
+        # Find the last AI message
+        for msg in reversed(self.conversation_history):
+            if msg.get('sender') == 'VOÏA':
+                # Check if it contains our final feedback prompt signature
+                message = msg.get('message', '')
+                # EN: "Before we wrap up" or FR: "Avant de conclure"
+                return 'before we wrap up' in message.lower() or 'avant de conclure' in message.lower()
+        
+        return False
+    
     def _build_filtered_goals(self) -> List[Dict]:
         """
         Build goal list with role-based and industry-based filtering.
@@ -1562,7 +1686,8 @@ Return ONLY the question text, no JSON, no explanation."""
             'resume_offered': False,
             'controller_version': 'v2_deterministic',  # V2 ENHANCEMENT: For finalization routing
             'is_complete': self.is_complete,  # V2 ENHANCEMENT: Completion state tracking
-            'ai_prompts_log': self.ai_prompts_log  # FIX: Persist prompts for debugging
+            'ai_prompts_log': self.ai_prompts_log,  # FIX: Persist prompts for debugging
+            'final_feedback_asked': self.final_feedback_asked  # Jan 2026: Final feedback step
         }
     
     def load_conversation_state(self, conversation_id: str) -> bool:
@@ -1590,6 +1715,7 @@ Return ONLY the question text, no JSON, no explanation."""
         # Phase 5: Load topic_status with backward compatibility
         self.topic_status = load_topic_status(state)
         self.ai_prompts_log = state.get('ai_prompts_log', [])  # FIX: Restore prompts log
+        self.final_feedback_asked = state.get('final_feedback_asked', False)  # Jan 2026: Final feedback step
         
         # FIX (Dec 11, 2025): Restore participant_data including role for persona features
         self.participant_data = state.get('participant_data') or {}
