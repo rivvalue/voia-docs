@@ -108,8 +108,22 @@ def analyze_survey_response(response_id):
         if not response:
             raise ValueError(f"Survey response {response_id} not found")
         
-        # Collect all text for analysis
+        # Collect all text for analysis (legacy + topic-specific fields)
         text_content = []
+        # Topic-specific feedback fields (Jan 2026)
+        if response.product_quality_feedback:
+            text_content.append(response.product_quality_feedback)
+        if response.service_rating_feedback:
+            text_content.append(response.service_rating_feedback)
+        if response.support_experience_feedback:
+            text_content.append(response.support_experience_feedback)
+        if response.user_experience_feedback:
+            text_content.append(response.user_experience_feedback)
+        if response.feature_requests:
+            text_content.append(response.feature_requests)
+        if response.general_feedback:
+            text_content.append(response.general_feedback)
+        # Legacy feedback fields
         if response.improvement_feedback:
             text_content.append(response.improvement_feedback)
         if response.recommendation_reason:
