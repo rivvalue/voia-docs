@@ -4783,29 +4783,36 @@ def license_info():
         # Add business account object to the context
         license_data['business_account'] = business_account
         
-        # Get active campaign information for display
+        # Get all active campaigns information for display (supports parallel campaigns)
         try:
             from models import Campaign, CampaignParticipant
-            active_campaign = Campaign.query.filter(
+            active_campaigns = Campaign.query.filter(
                 Campaign.business_account_id == business_account.id,
                 Campaign.status == 'active'
-            ).first()
+            ).order_by(Campaign.start_date.desc()).all()
             
-            active_participants = 0
-            if active_campaign:
-                active_participants = CampaignParticipant.query.filter_by(
-                    campaign_id=active_campaign.id
+            # Calculate participants for each campaign and total
+            campaigns_with_participants = []
+            total_active_participants = 0
+            for campaign in active_campaigns:
+                participant_count = CampaignParticipant.query.filter_by(
+                    campaign_id=campaign.id
                 ).count()
+                campaigns_with_participants.append({
+                    'campaign': campaign,
+                    'participants': participant_count
+                })
+                total_active_participants += participant_count
                 
             license_data.update({
-                'active_campaign': active_campaign,
-                'active_participants': active_participants
+                'active_campaigns': campaigns_with_participants,
+                'total_active_participants': total_active_participants
             })
         except Exception as e:
             logger.warning(f"Could not fetch active campaign participants: {e}")
             license_data.update({
-                'active_campaign': None,
-                'active_participants': 0
+                'active_campaigns': [],
+                'total_active_participants': 0
             })
         
         return render_template('business_auth/license_info.html', **license_data)

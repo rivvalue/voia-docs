@@ -194,22 +194,25 @@
             </div>
         </div>
 
-        <!-- Active Campaign Info -->
-        {% if active_campaign %}
+        <!-- Active Campaigns Info (supports multiple parallel campaigns) -->
+        {% if active_campaigns %}
         <div class="row mt-3">
             <div class="col-md-12">
                 <div class="license-usage-card">
                     <div class="license-usage-header">
                         <div class="license-usage-title">
                             <i class="fas fa-play-circle" aria-hidden="true"></i>
-                            Active Campaign: {{ active_campaign.name }}
+                            Active Campaigns ({{ active_campaigns|length }})
                         </div>
-                        <div class="license-usage-count">{{ active_participants }} participants</div>
+                        <div class="license-usage-count">{{ total_active_participants }} total participants</div>
                     </div>
-                    <div class="license-progress-text">
-                        Campaign running from {{ active_campaign.start_date.strftime('%b %d') }} to {{ active_campaign.end_date.strftime('%b %d, %Y') }}
-                        <br>{{ active_campaign.days_remaining() }} days remaining
+                    {% for item in active_campaigns %}
+                    <div class="license-progress-text {% if not loop.first %}mt-3 pt-3 border-top{% endif %}">
+                        <strong>{{ item.campaign.name }}</strong> - {{ item.participants }} participants
+                        <br>
+                        <small>Running from {{ item.campaign.start_date.strftime('%b %d') }} to {{ item.campaign.end_date.strftime('%b %d, %Y') }} ({{ item.campaign.days_remaining() }} days remaining)</small>
                     </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
