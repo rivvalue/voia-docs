@@ -596,6 +596,34 @@ class LLMGateway:
         
         return adapter
     
+    def _translate_model_for_provider(self, model: str, provider: LLMProvider) -> str:
+        """
+        Translate model name to the appropriate model for the target provider.
+        
+        This ensures that when routing to Anthropic, we use Claude models instead of OpenAI models.
+        """
+        openai_models = VALID_MODELS['openai']
+        anthropic_models = VALID_MODELS['anthropic']
+        
+        if provider == LLMProvider.ANTHROPIC:
+            if model in openai_models:
+                if model in ['gpt-4o', 'gpt-4-turbo']:
+                    translated = self.config.default_claude_premium_model
+                else:
+                    translated = self.config.default_claude_model
+                logger.debug(f"Model translation: {model} → {translated} (for Anthropic)")
+                return translated
+        elif provider == LLMProvider.OPENAI:
+            if model in anthropic_models:
+                if 'opus' in model:
+                    translated = self.config.default_openai_premium_model
+                else:
+                    translated = self.config.default_openai_model
+                logger.debug(f"Model translation: {model} → {translated} (for OpenAI)")
+                return translated
+        
+        return model
+    
     def chat_completion(
         self,
         request: LLMRequest,
@@ -617,6 +645,18 @@ class LLMGateway:
         """
         adapter = self._get_adapter(provider_override, business_account_id, campaign_id)
         
+        translated_model = self._translate_model_for_provider(request.model, adapter.provider)
+        if translated_model != request.model:
+            request = LLMRequest(
+                messages=request.messages,
+                model=translated_model,
+                temperature=request.temperature,
+                max_tokens=request.max_tokens,
+                json_mode=request.json_mode,
+                stream=request.stream,
+                metadata=request.metadata
+            )
+        
         logger.debug(
             f"LLM_GATEWAY_ROUTE provider={adapter.provider.value} model={request.model} "
             f"json_mode={request.json_mode} stream={request.stream}"
@@ -633,6 +673,18 @@ class LLMGateway:
     ) -> Iterator[str]:
         """Execute streaming chat completion through appropriate adapter."""
         adapter = self._get_adapter(provider_override, business_account_id, campaign_id)
+        
+        translated_model = self._translate_model_for_provider(request.model, adapter.provider)
+        if translated_model != request.model:
+            request = LLMRequest(
+                messages=request.messages,
+                model=translated_model,
+                temperature=request.temperature,
+                max_tokens=request.max_tokens,
+                json_mode=request.json_mode,
+                stream=request.stream,
+                metadata=request.metadata
+            )
         
         logger.debug(
             f"LLM_GATEWAY_STREAM provider={adapter.provider.value} model={request.model}"
