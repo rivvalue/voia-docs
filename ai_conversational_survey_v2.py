@@ -1094,7 +1094,7 @@ class DeterministicSurveyController:
         # Recent conversation context (last 6 messages for pronoun resolution)
         recent_history = self.conversation_history[-6:] if len(self.conversation_history) > 6 else self.conversation_history
         context_snippet = "\n".join([
-            f"{msg['sender']}: {msg['message'][:100]}" 
+            f"{msg['sender']}: {msg['message'][:400]}"  # Jan 2026: Increased from 100 to preserve question context for accurate field mapping
             for msg in recent_history
         ])
         
@@ -1331,7 +1331,7 @@ Return ONLY the JSON object, no explanation."""
         # Recent conversation context
         recent_history = self.conversation_history[-6:]
         context_snippet = "\n".join([
-            f"{msg['sender']}: {msg['message'][:100]}" 
+            f"{msg['sender']}: {msg['message'][:400]}"  # Jan 2026: Increased from 100 to preserve question context
             for msg in recent_history
         ])
         
