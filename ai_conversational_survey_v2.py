@@ -1074,6 +1074,20 @@ class DeterministicSurveyController:
         if not product_description:
             product_description = 'our services'
         
+        # Company description: Campaign → Business Account fallback (Jan 2026)
+        company_description = getattr(self.campaign, 'company_description', None)
+        if not company_description:
+            company_description = getattr(self.business_account, 'company_description', None)
+        if not company_description:
+            company_description = ''
+        
+        # Target clients: Campaign → Business Account fallback (Jan 2026)
+        target_clients_description = getattr(self.campaign, 'target_clients_description', None)
+        if not target_clients_description:
+            target_clients_description = getattr(self.business_account, 'target_clients_description', None)
+        if not target_clients_description:
+            target_clients_description = ''
+        
         industry = self.participant_data.get('client_industry', 'your industry')
         role = self.participant_data.get('role', 'team member')
         
@@ -1086,28 +1100,36 @@ class DeterministicSurveyController:
         
         # Use feature flag to select prompt version
         if USE_REVISED_EXTRACTION_PROMPT:
-            return self._build_revised_extraction_prompt(user_message, client_company, vendor_name, product_description, industry, role, context_snippet)
+            return self._build_revised_extraction_prompt(user_message, client_company, vendor_name, product_description, company_description, target_clients_description, industry, role, context_snippet)
         else:
-            return self._build_original_extraction_prompt(user_message, client_company, vendor_name, product_description, industry, role, context_snippet)
+            return self._build_original_extraction_prompt(user_message, client_company, vendor_name, product_description, company_description, target_clients_description, industry, role, context_snippet)
     
-    def _build_revised_extraction_prompt(self, user_message: str, client_company: str, vendor_name: str, product_description: str, industry: str, role: str, context_snippet: str) -> str:
+    def _build_revised_extraction_prompt(self, user_message: str, client_company: str, vendor_name: str, product_description: str, company_description: str, target_clients_description: str, industry: str, role: str, context_snippet: str) -> str:
         """
-        REVISED extraction prompt (Nov 2025)
+        REVISED extraction prompt (Nov 2025, enhanced Jan 2026)
         
         Key improvements:
         - Consolidated service/support into single service_rating field
         - Clear NPS (recommendation) vs overall satisfaction separation
         - Explicit rating parsing rules (7/10 → 7, no adjective guessing)
         - Scale normalization instructions for 5-point → 10-point conversion
+        - Jan 2026: Added VOÏA role clarification + company/target context
         """
-        prompt = f"""Extract structured data from the user's response below.
+        # Build optional context lines (only include if populated)
+        vendor_context = f"\n- Vendor Description: {company_description}" if company_description else ""
+        target_context = f"\n- Target Customers: {target_clients_description}" if target_clients_description else ""
+        
+        prompt = f"""**YOUR ROLE:**
+You are extracting feedback data from a survey conducted on behalf of {vendor_name}.
+
+Extract structured data from the user's response below.
 
 **STATIC CONTEXT (for understanding only, do NOT restate):**
-- Vendor Being Evaluated: {vendor_name}
-- Product/Service: {product_description}
-- Client Company (Respondent's Employer): {client_company}
-- Client Industry: {industry}
-- Respondent Role: {role}
+- Vendor: {vendor_name}{vendor_context}
+- Product/Service: {product_description}{target_context}
+- Respondent's Company: {client_company}
+- Respondent's Industry: {industry}
+- Respondent's Role: {role}
 
 **RECENT CONVERSATION:**
 {context_snippet}
@@ -1202,20 +1224,28 @@ WHEN IN DOUBT, DO NOT FLAG AS DEFLECTION. Only flag when the user provides ZERO 
         
         return prompt
     
-    def _build_original_extraction_prompt(self, user_message: str, client_company: str, vendor_name: str, product_description: str, industry: str, role: str, context_snippet: str) -> str:
+    def _build_original_extraction_prompt(self, user_message: str, client_company: str, vendor_name: str, product_description: str, company_description: str, target_clients_description: str, industry: str, role: str, context_snippet: str) -> str:
         """
-        ORIGINAL extraction prompt (pre-Nov 2025)
+        ORIGINAL extraction prompt (pre-Nov 2025, enhanced Jan 2026)
         
         Kept for rollback safety. Set USE_REVISED_EXTRACTION_PROMPT=false to use this.
+        Jan 2026: Added VOÏA role clarification + company/target context
         """
-        prompt = f"""Extract structured data from the user's response below.
+        # Build optional context lines (only include if populated)
+        vendor_context = f"\n- Vendor Description: {company_description}" if company_description else ""
+        target_context = f"\n- Target Customers: {target_clients_description}" if target_clients_description else ""
+        
+        prompt = f"""**YOUR ROLE:**
+You are extracting feedback data from a survey conducted on behalf of {vendor_name}.
+
+Extract structured data from the user's response below.
 
 **STATIC CONTEXT (for understanding only, do NOT restate):**
-- Vendor Being Evaluated: {vendor_name}
-- Product/Service: {product_description}
-- Client Company (Respondent's Employer): {client_company}
-- Client Industry: {industry}
-- Respondent Role: {role}
+- Vendor: {vendor_name}{vendor_context}
+- Product/Service: {product_description}{target_context}
+- Respondent's Company: {client_company}
+- Respondent's Industry: {industry}
+- Respondent's Role: {role}
 
 **RECENT CONVERSATION:**
 {context_snippet}
@@ -1277,6 +1307,20 @@ Return ONLY the JSON object, no explanation."""
         if not product_description:
             product_description = 'our services'
         
+        # Company description: Campaign → Business Account fallback (Jan 2026)
+        company_description = getattr(self.campaign, 'company_description', None)
+        if not company_description:
+            company_description = getattr(self.business_account, 'company_description', None)
+        if not company_description:
+            company_description = ''
+        
+        # Target clients: Campaign → Business Account fallback (Jan 2026)
+        target_clients_description = getattr(self.campaign, 'target_clients_description', None)
+        if not target_clients_description:
+            target_clients_description = getattr(self.business_account, 'target_clients_description', None)
+        if not target_clients_description:
+            target_clients_description = ''
+        
         industry = self.participant_data.get('client_industry', 'your industry')
         role = self.participant_data.get('role', 'team member')
         
@@ -1327,14 +1371,21 @@ Ask a clarifying question to get more specific information about the missing fie
 """
                 logger.debug(f"Injecting persona guidance for tier={self.persona_tier}, topic={topic_name}, lang={lang_code}")
         
-        prompt = f"""Generate a natural, conversational question for the topic: {topic_name}
+        # Build optional context lines (only include if populated) - Jan 2026
+        vendor_context = f"\n- Vendor Description: {company_description}" if company_description else ""
+        target_context = f"\n- Target Customers: {target_clients_description}" if target_clients_description else ""
+        
+        prompt = f"""**YOUR ROLE:**
+You are VOÏA, conducting a feedback survey on behalf of {vendor_name} to understand their client's experience with {product_description}.
+
+Generate a natural, conversational question for the topic: {topic_name}
 
 **STATIC CONTEXT (for understanding only, do NOT restate):**
-- Vendor Being Evaluated: {vendor_name}
-- Product/Service: {product_description}
-- Client Company (Respondent's Employer): {client_company}
-- Client Industry: {industry}
-- Respondent Role: {role}
+- Vendor: {vendor_name}{vendor_context}
+- Product/Service: {product_description}{target_context}
+- Respondent's Company: {client_company}
+- Respondent's Industry: {industry}
+- Respondent's Role: {role}
 - Conversation Tone: {conversation_tone}
 {persona_guidance_block}
 
