@@ -545,7 +545,9 @@ class DeterministicSurveyController:
         
         # Jan 2026: Handle final feedback response
         # SAFETY: Verify last AI message was actually the final feedback prompt
-        if self.final_feedback_asked and self._is_awaiting_final_feedback():
+        is_awaiting = self._is_awaiting_final_feedback()
+        logger.info(f"Final feedback check: asked={self.final_feedback_asked}, awaiting={is_awaiting}")
+        if self.final_feedback_asked and is_awaiting:
             return self._handle_final_feedback_response(user_input)
         
         # STEP 1: Extract data (LLM performs extraction ONLY, no flow decisions)
