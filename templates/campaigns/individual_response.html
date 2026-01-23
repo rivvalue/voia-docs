@@ -484,11 +484,41 @@
             </div>
 
             <!-- Text Responses -->
-            {% if response.improvement_feedback or response.recommendation_reason or response.additional_comments %}
+            {% if response.improvement_feedback or response.recommendation_reason or response.additional_comments or response.product_quality_feedback or response.service_rating_feedback or response.support_experience_feedback or response.user_experience_feedback or response.feature_requests or response.general_feedback %}
             <div class="data-section">
                 <h3 class="section-title">
                     <i class="fas fa-comment-alt"></i>Written Feedback
                 </h3>
+                {% if response.product_quality_feedback %}
+                <div class="mb-2">
+                    <span class="data-label d-block">{{ _('Product Feedback:') }}</span>
+                    <p class="text-muted">{{ response.product_quality_feedback }}</p>
+                </div>
+                {% endif %}
+                {% if response.service_rating_feedback %}
+                <div class="mb-2">
+                    <span class="data-label d-block">{{ _('Service Feedback:') }}</span>
+                    <p class="text-muted">{{ response.service_rating_feedback }}</p>
+                </div>
+                {% endif %}
+                {% if response.support_experience_feedback %}
+                <div class="mb-2">
+                    <span class="data-label d-block">{{ _('Support Experience:') }}</span>
+                    <p class="text-muted">{{ response.support_experience_feedback }}</p>
+                </div>
+                {% endif %}
+                {% if response.user_experience_feedback %}
+                <div class="mb-2">
+                    <span class="data-label d-block">{{ _('User Experience:') }}</span>
+                    <p class="text-muted">{{ response.user_experience_feedback }}</p>
+                </div>
+                {% endif %}
+                {% if response.feature_requests %}
+                <div class="mb-2">
+                    <span class="data-label d-block">{{ _('Feature Requests:') }}</span>
+                    <p class="text-muted">{{ response.feature_requests }}</p>
+                </div>
+                {% endif %}
                 {% if response.improvement_feedback %}
                 <div class="mb-2">
                     <span class="data-label d-block">{{ _('Improvement Feedback:') }}</span>
@@ -499,6 +529,12 @@
                 <div class="mb-2">
                     <span class="data-label d-block">{{ _('Recommendation Reason:') }}</span>
                     <p class="text-muted">{{ response.recommendation_reason }}</p>
+                </div>
+                {% endif %}
+                {% if response.general_feedback %}
+                <div class="mb-2">
+                    <span class="data-label d-block">{{ _('General Feedback:') }}</span>
+                    <p class="text-muted">{{ response.general_feedback }}</p>
                 </div>
                 {% endif %}
                 {% if response.additional_comments %}
