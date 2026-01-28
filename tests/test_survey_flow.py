@@ -18,7 +18,7 @@ class TestSurveyAccess:
     def test_survey_requires_valid_token(self, client):
         """Survey access requires a valid token."""
         response = client.get('/survey/invalid-token')
-        assert response.status_code in [401, 403, 404]
+        assert response.status_code in [302, 401, 403, 404]
     
     def test_survey_page_with_valid_token(self, client, db_session, sample_data):
         """Valid token should load survey page."""

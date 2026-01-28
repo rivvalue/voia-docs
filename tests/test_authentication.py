@@ -22,16 +22,18 @@ class TestBusinessLogin:
     
     def test_login_with_valid_credentials(self, client, db_session, sample_data):
         """Valid credentials should allow login."""
+        import uuid
+        unique_email = f'valid_{uuid.uuid4().hex[:8]}@example.com'
         account = sample_data.create_business_account(db_session)
         user = sample_data.create_business_user(
             db_session, 
             account, 
-            email='valid@example.com'
+            email=unique_email
         )
         db_session.commit()
         
         response = client.post('/business/login', data={
-            'email': 'valid@example.com',
+            'email': unique_email,
             'password': 'testpassword123'
         }, follow_redirects=True)
         
@@ -39,16 +41,18 @@ class TestBusinessLogin:
     
     def test_login_with_invalid_password(self, client, db_session, sample_data):
         """Invalid password should be rejected."""
+        import uuid
+        unique_email = f'user_{uuid.uuid4().hex[:8]}@example.com'
         account = sample_data.create_business_account(db_session)
         user = sample_data.create_business_user(
             db_session, 
             account, 
-            email='user@example.com'
+            email=unique_email
         )
         db_session.commit()
         
         response = client.post('/business/login', data={
-            'email': 'user@example.com',
+            'email': unique_email,
             'password': 'wrongpassword'
         })
         
@@ -125,18 +129,20 @@ class TestPasswordReset:
     @patch('email_service.send_email')
     def test_password_reset_request(self, mock_send, client, db_session, sample_data):
         """Password reset request should send email."""
+        import uuid
+        unique_email = f'reset_{uuid.uuid4().hex[:8]}@example.com'
         mock_send.return_value = {'success': True}
         
         account = sample_data.create_business_account(db_session)
         user = sample_data.create_business_user(
             db_session,
             account,
-            email='reset@example.com'
+            email=unique_email
         )
         db_session.commit()
         
         response = client.post('/business/forgot-password/request', data={
-            'email': 'reset@example.com'
+            'email': unique_email
         })
         
         assert response.status_code in [200, 302]

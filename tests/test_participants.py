@@ -58,12 +58,8 @@ class TestParticipantList:
         """Should list participants for authenticated user."""
         client, user, account = authenticated_client
         
-        sample_data.create_participant(db_session, account, first_name='John')
-        sample_data.create_participant(
-            db_session, account, 
-            first_name='Jane', 
-            email='jane@example.com'
-        )
+        sample_data.create_participant(db_session, account, name='John Doe')
+        sample_data.create_participant(db_session, account, name='Jane Doe')
         db_session.commit()
         
         response = client.get('/business/participants/')
@@ -73,16 +69,8 @@ class TestParticipantList:
         """Should filter participants by company name."""
         client, user, account = authenticated_client
         
-        sample_data.create_participant(
-            db_session, account, 
-            company_name='Acme Corp',
-            email='acme@example.com'
-        )
-        sample_data.create_participant(
-            db_session, account, 
-            company_name='Beta Inc',
-            email='beta@example.com'
-        )
+        sample_data.create_participant(db_session, account, company_name='Acme Corp')
+        sample_data.create_participant(db_session, account, company_name='Beta Inc')
         db_session.commit()
         
         response = client.get('/business/participants/api/filter?company_name=Acme')
@@ -99,8 +87,7 @@ class TestParticipantEdit:
         db_session.commit()
         
         response = client.post(f'/business/participants/{participant.id}/edit', data={
-            'first_name': 'Updated',
-            'last_name': 'Name',
+            'name': 'Updated Name',
             'email': participant.email,
             'company_name': 'Updated Company',
         }, follow_redirects=True)
@@ -109,22 +96,18 @@ class TestParticipantEdit:
     
     def test_cannot_edit_other_account_participant(self, authenticated_client, db_session, sample_data):
         """Should not edit participants from other accounts."""
+        import uuid
         client, user, account = authenticated_client
         
         other_account = sample_data.create_business_account(
             db_session,
-            name='Other Company',
-            company_name='Other Corp'
+            name=f'Other Company {uuid.uuid4().hex[:8]}'
         )
-        other_participant = sample_data.create_participant(
-            db_session, 
-            other_account,
-            email='other@example.com'
-        )
+        other_participant = sample_data.create_participant(db_session, other_account)
         db_session.commit()
         
         response = client.post(f'/business/participants/{other_participant.id}/edit', data={
-            'first_name': 'Hacked'
+            'name': 'Hacked Name'
         })
         
         assert response.status_code in [302, 403, 404]
@@ -150,8 +133,8 @@ class TestBulkOperations:
         """Should bulk edit multiple participants."""
         client, user, account = authenticated_client
         
-        p1 = sample_data.create_participant(db_session, account, email='p1@example.com')
-        p2 = sample_data.create_participant(db_session, account, email='p2@example.com')
+        p1 = sample_data.create_participant(db_session, account)
+        p2 = sample_data.create_participant(db_session, account)
         db_session.commit()
         
         response = client.post('/business/participants/bulk-edit', data={
@@ -181,8 +164,8 @@ class TestTokenManagement:
         """Each participant should have unique token."""
         account = sample_data.create_business_account(db_session)
         
-        p1 = sample_data.create_participant(db_session, account, email='p1@example.com')
-        p2 = sample_data.create_participant(db_session, account, email='p2@example.com')
+        p1 = sample_data.create_participant(db_session, account)
+        p2 = sample_data.create_participant(db_session, account)
         db_session.commit()
         
         assert p1.survey_token != p2.survey_token

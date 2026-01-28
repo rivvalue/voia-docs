@@ -175,9 +175,11 @@ class SampleDataFactory:
         """Create a sample business user."""
         from models import BusinessAccountUser
         from werkzeug.security import generate_password_hash
+        import uuid
         
+        unique_suffix = uuid.uuid4().hex[:8]
         defaults = {
-            'email': 'testuser@example.com',
+            'email': f'testuser_{unique_suffix}@example.com',
             'password_hash': generate_password_hash('testpassword123'),
             'first_name': 'Test',
             'last_name': 'User',
@@ -203,9 +205,9 @@ class SampleDataFactory:
             'description': 'A test campaign for automated testing',
             'status': 'draft',
             'business_account_id': business_account.id,
+            'client_identifier': business_account.name,
             'start_date': datetime.utcnow().date(),
             'end_date': (datetime.utcnow() + timedelta(days=30)).date(),
-            'created_at': datetime.utcnow(),
         }
         defaults.update(kwargs)
         
@@ -219,16 +221,16 @@ class SampleDataFactory:
         """Create a sample participant."""
         from models import Participant
         import secrets
+        import uuid
         
+        unique_suffix = uuid.uuid4().hex[:8]
         defaults = {
-            'first_name': 'John',
-            'last_name': 'Doe',
-            'email': 'john.doe@example.com',
+            'name': 'John Doe',
+            'email': f'john.doe_{unique_suffix}@example.com',
             'company_name': 'Client Company',
             'role': 'Manager',
             'survey_token': secrets.token_urlsafe(32),
             'business_account_id': business_account.id,
-            'created_at': datetime.utcnow(),
         }
         defaults.update(kwargs)
         
@@ -277,8 +279,12 @@ def authenticated_client(client, db_session, sample_data):
     Provide an authenticated test client.
     Creates a business account and user, then logs in.
     """
-    account = sample_data.create_business_account(db_session)
-    user = sample_data.create_business_user(db_session, account, email='test@example.com')
+    import uuid
+    unique_email = f'test_{uuid.uuid4().hex[:8]}@example.com'
+    unique_name = f'Test Company {uuid.uuid4().hex[:8]}'
+    
+    account = sample_data.create_business_account(db_session, name=unique_name)
+    user = sample_data.create_business_user(db_session, account, email=unique_email)
     db_session.commit()
     
     with client.session_transaction() as sess:
