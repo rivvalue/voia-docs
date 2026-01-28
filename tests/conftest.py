@@ -159,11 +159,9 @@ class SampleDataFactory:
         from models import BusinessAccount
         
         defaults = {
-            'name': 'Test Company',
-            'company_name': 'Test Company Inc.',
+            'name': 'Test Company Inc.',
             'account_type': 'customer',
-            'is_active': True,
-            'created_at': datetime.utcnow(),
+            'status': 'active',
         }
         defaults.update(kwargs)
         
@@ -175,22 +173,22 @@ class SampleDataFactory:
     @staticmethod
     def create_business_user(db_session, business_account, **kwargs):
         """Create a sample business user."""
-        from models import BusinessUser
+        from models import BusinessAccountUser
         from werkzeug.security import generate_password_hash
         
         defaults = {
             'email': 'testuser@example.com',
             'password_hash': generate_password_hash('testpassword123'),
-            'full_name': 'Test User',
+            'first_name': 'Test',
+            'last_name': 'User',
             'role': 'admin',
-            'is_active': True,
-            'is_verified': True,
+            'is_active_user': True,
+            'email_verified': True,
             'business_account_id': business_account.id,
-            'created_at': datetime.utcnow(),
         }
         defaults.update(kwargs)
         
-        user = BusinessUser(**defaults)
+        user = BusinessAccountUser(**defaults)
         db_session.add(user)
         db_session.flush()
         return user
