@@ -38,12 +38,11 @@ class TestParticipantCreation:
         client, user, account = authenticated_client
         
         response = client.post('/business/participants/create', data={
-            'first_name': 'Jane',
-            'last_name': 'Smith',
+            'name': 'Jane Smith',
             'company_name': 'New Client',
         })
         
-        assert response.status_code in [200, 400]
+        assert response.status_code in [200, 302, 400]
 
 
 class TestParticipantList:
@@ -153,7 +152,7 @@ class TestTokenManagement:
         """Should regenerate survey token for participant."""
         client, user, account = authenticated_client
         participant = sample_data.create_participant(db_session, account)
-        old_token = participant.survey_token
+        old_token = participant.token
         db_session.commit()
         
         response = client.post(f'/business/participants/{participant.id}/regenerate-token')
@@ -168,18 +167,11 @@ class TestTokenManagement:
         p2 = sample_data.create_participant(db_session, account)
         db_session.commit()
         
-        assert p1.survey_token != p2.survey_token
+        assert p1.token != p2.token
 
 
 class TestParticipantInvitations:
     """Test participant invitation functionality."""
-    
-    @pytest.fixture
-    def mock_email(self):
-        """Mock email service."""
-        with pytest.mock.patch('email_service.send_email') as mock:
-            mock.return_value = {'success': True}
-            yield mock
     
     def test_send_individual_invitation(self, authenticated_client, db_session, sample_data, mock_email_service):
         """Should send invitation to individual participant."""

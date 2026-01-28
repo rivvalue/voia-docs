@@ -118,7 +118,7 @@ def mock_openai():
 @pytest.fixture
 def mock_email_service():
     """Mock email service to prevent sending real emails."""
-    with patch('email_service.send_email') as mock_send:
+    with patch('email_service.EmailService.send_email') as mock_send:
         mock_send.return_value = {'success': True, 'message_id': 'test-123'}
         yield mock_send
 
@@ -229,7 +229,7 @@ class SampleDataFactory:
             'email': f'john.doe_{unique_suffix}@example.com',
             'company_name': 'Client Company',
             'role': 'Manager',
-            'survey_token': secrets.token_urlsafe(32),
+            'token': secrets.token_urlsafe(32),
             'business_account_id': business_account.id,
         }
         defaults.update(kwargs)
