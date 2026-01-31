@@ -7747,5 +7747,5 @@ msgstr "Faible"
 msgid "Insufficient"
 msgstr "Insuffisant"
 
-msgid "Confidence levels indicate data reliability: High (≥60% response rate + ≥10 responses), Medium (30-59% OR 5-9 responses), Low (<30% OR <5 responses), Insufficient (<5 invited)"
-msgstr "Les niveaux de confiance indiquent la fiabilité des données : Élevé (≥60% de taux de réponse + ≥10 réponses), Moyen (30-59% OU 5-9 réponses), Faible (<30% OU <5 réponses), Insuffisant (<5 invités)"
+msgid "Confidence levels indicate data reliability"
+msgstr "Les niveaux de confiance indiquent la fiabilité des données"
