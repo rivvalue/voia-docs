@@ -161,6 +161,17 @@
                 </div>
                 <div class="col">
                     <div class="kpi-card kpi-info">
+                        <div class="kpi-value text-info" id="responseRate">--</div>
+                        <div class="kpi-label">
+                            {{ _('Response Rate') }}
+                            <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" data-bs-placement="top" 
+                               title="{{ _('Percentage of invited participants who completed the survey') }}" style="font-size: 0.8em; opacity: 0.7;"></i>
+                        </div>
+                        <div class="kpi-trend" id="responseRateTrend">{{ _('Campaign participation') }}</div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="kpi-card kpi-info">
                         <div class="kpi-value text-info" id="recentResponses">0</div>
                         <div class="kpi-label">{{ _('Recent (30 days)') }}</div>
                         <div class="kpi-trend" id="recentResponsesTrend">{{ _('Latest customer feedback') }}</div>
@@ -230,6 +241,14 @@
                            style="font-size: 0.8em; opacity: 0.7;"></i>
                     </h5>
                     <small class="text-muted">Risk vs Opportunity {{ _('Balance') }} by {{ _('Company') }}</small>
+                    <div class="mt-1">
+                        <small class="text-muted">
+                            <i class="fas fa-chart-bar me-1"></i>{{ _('Response Rate') }} {{ _('Confidence Level') }}:
+                            <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" data-bs-placement="top" 
+                               title="{{ _('Confidence levels indicate data reliability: High (≥60% response rate + ≥10 responses), Medium (30-59% OR 5-9 responses), Low (<30% OR <5 responses), Insufficient (<5 invited)') }}" 
+                               style="opacity: 0.7;"></i>
+                        </small>
+                    </div>
                 </div>
                 <div class="card-body">
                             <!-- {{ _('Search') }} and Filters -->

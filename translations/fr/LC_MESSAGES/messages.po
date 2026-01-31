@@ -7722,3 +7722,30 @@ msgstr "Anglais"
 
 msgid "French"
 msgstr "Français"
+
+msgid "Response Rate"
+msgstr "Taux de réponse"
+
+msgid "Percentage of invited participants who completed the survey"
+msgstr "Pourcentage des participants invités ayant complété le sondage"
+
+msgid "Campaign participation"
+msgstr "Participation à la campagne"
+
+msgid "Confidence Level"
+msgstr "Niveau de confiance"
+
+msgid "High"
+msgstr "Élevé"
+
+msgid "Medium"
+msgstr "Moyen"
+
+msgid "Low"
+msgstr "Faible"
+
+msgid "Insufficient"
+msgstr "Insuffisant"
+
+msgid "Confidence levels indicate data reliability: High (≥60% response rate + ≥10 responses), Medium (30-59% OR 5-9 responses), Low (<30% OR <5 responses), Insufficient (<5 invited)"
+msgstr "Les niveaux de confiance indiquent la fiabilité des données : Élevé (≥60% de taux de réponse + ≥10 réponses), Moyen (30-59% OU 5-9 réponses), Faible (<30% OU <5 réponses), Insuffisant (<5 invités)"

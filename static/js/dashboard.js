@@ -8,6 +8,22 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+// Get confidence level badge for response rate metrics
+function getConfidenceBadge(level) {
+    const badges = {
+        'high': { color: '#198754', bg: '#19875420', label: 'High', labelFr: 'Élevé' },
+        'medium': { color: '#fd7e14', bg: '#fd7e1420', label: 'Medium', labelFr: 'Moyen' },
+        'low': { color: '#dc3545', bg: '#dc354520', label: 'Low', labelFr: 'Faible' },
+        'insufficient': { color: '#6c757d', bg: '#6c757d20', label: 'Insufficient', labelFr: 'Insuffisant' }
+    };
+    
+    const badge = badges[level] || badges['insufficient'];
+    const lang = document.documentElement.lang || 'en';
+    const label = lang.startsWith('fr') ? badge.labelFr : badge.label;
+    
+    return `<span class="badge" style="background-color: ${badge.bg}; color: ${badge.color}; border: 1px solid ${badge.color}; font-size: 0.7em;">${label}</span>`;
+}
+
 let dashboardData = null;
 let charts = {};
 let campaignData = null;
@@ -1521,6 +1537,16 @@ function populateDashboard() {
     document.getElementById('recentResponses').textContent = dashboardData.recent_responses || 0;
     document.getElementById('highRiskCount').textContent = dashboardData.high_risk_accounts?.length || 0;
     
+    // Response Rate - show percentage or N/A if not available
+    const responseRateEl = document.getElementById('responseRate');
+    if (responseRateEl) {
+        if (dashboardData.participation_rate !== null && dashboardData.participation_rate !== undefined) {
+            responseRateEl.textContent = dashboardData.participation_rate + '%';
+        } else {
+            responseRateEl.textContent = 'N/A';
+        }
+    }
+    
     // Growth potential as percentage
     const growthPotential = dashboardData.growth_factor_analysis?.total_growth_potential || 0;
     document.getElementById('growthPotential').textContent = Math.round(growthPotential * 100) + '%';
@@ -2764,22 +2790,31 @@ function renderAccountIntelligence(accountData, pagination) {
                     
                     <div class="account-details mb-3 p-2 rounded" style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
                         <div class="row">
-                            <div class="col-4">
+                            <div class="col-3">
                                 <small class="text-muted">NPS:</small>
                                 <div class="fw-bold" style="color: #8A8A8A;">
                                     ${account.company_nps !== undefined && account.company_nps !== null ? account.company_nps : 'N/A'}
                                 </div>
                             </div>
-                            <div class="col-4">
+                            <div class="col-3">
                                 <small class="text-muted">Max Tenure:</small>
                                 <div class="fw-bold" style="color: #8A8A8A;">
                                     ${account.max_tenure ? account.max_tenure + ' years' : 'N/A'}
                                 </div>
                             </div>
-                            <div class="col-4">
+                            <div class="col-3">
                                 <small class="text-muted">Commercial Value:</small>
                                 <div class="fw-bold" style="color: #8A8A8A;">
                                     ${account.commercial_value ? '$' + account.commercial_value.toLocaleString() : 'N/A $'}
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <small class="text-muted">Response Rate:</small>
+                                <div class="d-flex align-items-center">
+                                    <span class="fw-bold me-2" style="color: #8A8A8A;">
+                                        ${account.response_rate !== null && account.response_rate !== undefined ? account.response_rate + '%' : 'N/A'}
+                                    </span>
+                                    ${getConfidenceBadge(account.confidence_level)}
                                 </div>
                             </div>
                         </div>

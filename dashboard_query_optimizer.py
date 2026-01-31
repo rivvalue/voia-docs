@@ -7,7 +7,7 @@ import json
 from datetime import datetime, timedelta
 from sqlalchemy import func, text, case
 from app import db
-from models import SurveyResponse, Campaign, CampaignKPISnapshot
+from models import SurveyResponse, Campaign, CampaignKPISnapshot, CampaignParticipant
 
 
 def get_optimized_dashboard_data(campaign_id=None, business_account_id=None):
@@ -378,8 +378,21 @@ def get_optimized_dashboard_data(campaign_id=None, business_account_id=None):
     segmentation_data = calculate_segmentation_analytics(campaign_id, business_account_id) if campaign_id else {}
     logger.info(f"🔍 OPTIMIZER: Segmentation returned {len(segmentation_data)} top-level keys: {list(segmentation_data.keys())}")
     
+    # ============================================================================
+    # PARTICIPATION RATE: Calculate response rate for the campaign
+    # ============================================================================
+    total_participants = 0
+    participation_rate = None
+    
+    if campaign_id:
+        total_participants = CampaignParticipant.query.filter_by(campaign_id=campaign_id).count()
+        if total_participants > 0:
+            participation_rate = round((total_responses / total_participants) * 100, 1)
+    
     return {
         'total_responses': total_responses,
+        'total_participants': total_participants,
+        'participation_rate': participation_rate,
         'nps_score': round(nps_score, 1),
         'recent_responses': master_stats.recent_responses or 0,
         'nps_distribution': [

@@ -5,7 +5,7 @@ import logging
 from datetime import datetime, timedelta
 from sqlalchemy import func, case
 from app import db, cache
-from models import SurveyResponse, Campaign, CampaignKPISnapshot, Participant
+from models import SurveyResponse, Campaign, CampaignKPISnapshot, Participant, CampaignParticipant
 from flask import request
 from cache_config import cache_config
 
@@ -622,6 +622,38 @@ def get_dashboard_data(campaign_id=None, business_account_id=None):
             detractors = sum(1 for r in company_responses if r.nps_score <= 6)
             company_nps = round(((promoters - detractors) / total_company_responses) * 100) if total_company_responses > 0 else 0
             
+            # Calculate per-company participation rate (invited vs responded)
+            company_invited_count = 0
+            company_response_rate = None
+            company_confidence_level = 'insufficient'
+            
+            if campaign_id and target_business_account_id:
+                # Count participants invited from this company for this campaign
+                company_invited_count = db.session.query(func.count(CampaignParticipant.id)).join(
+                    Participant, CampaignParticipant.participant_id == Participant.id
+                ).filter(
+                    CampaignParticipant.campaign_id == campaign_id,
+                    func.upper(Participant.company_name) == company_key
+                ).scalar() or 0
+                
+                if company_invited_count > 0:
+                    company_response_rate = round((total_company_responses / company_invited_count) * 100, 1)
+                    
+                    # Calculate confidence level based on response rate AND sample size
+                    # Requirements:
+                    # - Insufficient: <5 invited (sample too small to be meaningful)
+                    # - High: ≥60% response rate AND ≥10 responses (strong representation)
+                    # - Medium: 30-59% response rate OR 5-9 responses (moderate representation)
+                    # - Low: <30% response rate AND <5 responses (weak representation)
+                    if company_invited_count < 5:
+                        company_confidence_level = 'insufficient'
+                    elif company_response_rate >= 60 and total_company_responses >= 10:
+                        company_confidence_level = 'high'
+                    elif (30 <= company_response_rate < 60) or (5 <= total_company_responses < 10):
+                        company_confidence_level = 'medium'
+                    else:
+                        company_confidence_level = 'low'
+            
             # Only include companies with either opportunities or risk factors
             if opportunities or risk_factors:
                 # Calculate account balance
@@ -661,7 +693,11 @@ def get_dashboard_data(campaign_id=None, business_account_id=None):
                     'critical_risks': critical_risk_count,
                     'max_tenure': max_tenure,
                     'commercial_value': commercial_value,
-                    'company_nps': company_nps
+                    'company_nps': company_nps,
+                    'invited_count': company_invited_count,
+                    'responded_count': total_company_responses,
+                    'response_rate': company_response_rate,
+                    'confidence_level': company_confidence_level
                 })
         
         # Sort accounts by priority (most critical risks first, then by balance)
