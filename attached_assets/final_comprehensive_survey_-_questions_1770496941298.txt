@@ -1,0 +1,248 @@
+COMPREHENSIVE CUSTOMER EXPERIENCE SURVEY
+=====================================================
+For In-Depth NPS Analysis & Insights Discovery
+
+Note: Link survey responses to CRM via email/customer ID for segmentation analysis
+(tenure, company size, industry, role, product tier, etc.)
+
+Estimated completion time: 8-12 minutes
+
+
+=====================================================
+SECTION 1: NPS & DRIVER ATTRIBUTION
+=====================================================
+
+Q1. Net Promoter Score (NPS)
+On a scale of 0-10, how likely are you to recommend our company to a friend or colleague?
+    0 = Not at all likely
+    10 = Extremely likely
+    [Scale: 0-1-2-3-4-5-6-7-8-9-10]
+
+
+--- DYNAMIC QUESTION BASED ON Q1 SCORE ---
+
+[IF Q1 = 0-6 (Detractors):]
+Q2. What were the main factors that led to your score? (Select all that apply)
+□ Product features & functionality
+□ Product value/pricing
+□ Professional services & support team
+□ Customer support & after-sales service
+□ Communication & transparency
+□ Onboarding & implementation experience
+□ Ease of use
+□ Reliability & performance
+□ Integration capabilities
+□ Other (please specify): _______
+
+[IF Q1 = 7-8 (Passives):]
+Q2. What's preventing you from rating us higher? (Select all that apply)
+□ Product features & functionality
+□ Product value/pricing
+□ Professional services & support team
+□ Customer support & after-sales service
+□ Communication & transparency
+□ Onboarding & implementation experience
+□ Ease of use
+□ Reliability & performance
+□ Integration capabilities
+□ Other (please specify): _______
+
+[IF Q1 = 9-10 (Promoters):]
+Q2. What do you value most about us? (Select all that apply)
+□ Product features & functionality
+□ Product value/pricing
+□ Professional services & support team
+□ Customer support & after-sales service
+□ Communication & transparency
+□ Onboarding & implementation experience
+□ Ease of use
+□ Reliability & performance
+□ Integration capabilities
+□ Other (please specify): _______
+
+
+Q3. Please explain your selection(s) above - what specifically influenced your score?
+[Open text field - required]
+This helps us understand the details behind your rating.
+
+
+Q4. What could we do to improve your experience?
+[IF Detractor/Passive:] What would it take for us to earn a score of 9 or 10 from you?
+[IF Promoter:] What could we do even better?
+[Open text field - required]
+
+
+Q5. Customer Satisfaction Score (CSAT)
+Overall, how satisfied are you with your experience with our company?
+    [Scale: 1-5]
+    1 = Very dissatisfied
+    2 = Dissatisfied
+    3 = Neutral
+    4 = Satisfied
+    5 = Very satisfied
+
+
+Q6. Customer Effort Score (CES)
+How easy was it to interact with our company and get your needs met?
+    [Scale: 1-8]
+    1 = Very difficult
+    2 = Difficult
+    3 = Somewhat difficult
+    4 = Neutral
+    5 = Somewhat easy
+    6 = Easy
+    7 = Very easy
+    8 = Extremely easy
+
+
+=====================================================
+SECTION 2: PRODUCT FEATURES - DETAILED EVALUATION
+=====================================================
+
+For each feature below, please tell us about your usage and satisfaction:
+
+--- Feature A ---
+Q7a. Do you use Feature A?
+○ Yes
+○ No - I don't know about this feature
+○ No - I don't need this feature
+○ No - It's too complicated/difficult to use
+○ No - Other reason
+
+[IF YES to Q7a:]
+Q7b. How often do you use Feature A?
+○ Daily
+○ Several times per week
+○ Weekly
+○ Monthly
+○ Rarely
+
+Q7c. How important is Feature A to your workflow?
+○ Critical - can't do my job without it
+○ Very important
+○ Somewhat important
+○ Nice to have
+○ Not important
+
+Q7d. How satisfied are you with Feature A?
+    [Scale: 1-5]
+    1 = Very dissatisfied
+    2 = Dissatisfied
+    3 = Neutral
+    4 = Satisfied
+    5 = Very satisfied
+
+
+--- Feature B ---
+Q8a. Do you use Feature B?
+○ Yes
+○ No - I don't know about this feature
+○ No - I don't need this feature
+○ No - It's too complicated/difficult to use
+○ No - Other reason
+
+[IF YES to Q8a:]
+Q8b. How often do you use Feature B?
+○ Daily / Several times per week / Weekly / Monthly / Rarely
+
+Q8c. How important is Feature B to your workflow?
+○ Critical / Very important / Somewhat important / Nice to have / Not important
+
+Q8d. How satisfied are you with Feature B?
+    [Scale: 1-5]
+
+
+--- Feature C ---
+Q9a. Do you use Feature C?
+○ Yes / No - don't know / No - don't need / No - too complicated / No - other
+
+[IF YES:]
+Q9b. Frequency? [Daily / Several times per week / Weekly / Monthly / Rarely]
+Q9c. Importance? [Critical / Very important / Somewhat / Nice to have / Not important]
+Q9d. Satisfaction? [Scale: 1-5]
+
+
+--- Feature D ---
+Q10a. Do you use Feature D?
+○ Yes / No - don't know / No - don't need / No - too complicated / No - other
+
+[IF YES:]
+Q10b. Frequency? [Daily / Several times per week / Weekly / Monthly / Rarely]
+Q10c. Importance? [Critical / Very important / Somewhat / Nice to have / Not important]
+Q10d. Satisfaction? [Scale: 1-5]
+
+
+--- Feature E ---
+Q11a. Do you use Feature E?
+○ Yes / No - don't know / No - don't need / No - too complicated / No - other
+
+[IF YES:]
+Q11b. Frequency? [Daily / Several times per week / Weekly / Monthly / Rarely]
+Q11c. Importance? [Critical / Very important / Somewhat / Nice to have / Not important]
+Q11d. Satisfaction? [Scale: 1-5]
+
+
+--- Feature F ---
+Q12a. Do you use Feature F?
+○ Yes / No - don't know / No - don't need / No - too complicated / No - other
+
+[IF YES:]
+Q12b. Frequency? [Daily / Several times per week / Weekly / Monthly / Rarely]
+Q12c. Importance? [Critical / Very important / Somewhat / Nice to have / Not important]
+Q12d. Satisfaction? [Scale: 1-5]
+
+
+--- Feature G ---
+Q13a. Do you use Feature G?
+○ Yes / No - don't know / No - don't need / No - too complicated / No - other
+
+[IF YES:]
+Q13b. Frequency? [Daily / Several times per week / Weekly / Monthly / Rarely]
+Q13c. Importance? [Critical / Very important / Somewhat / Nice to have / Not important]
+Q13d. Satisfaction? [Scale: 1-5]
+
+
+--- Feature H ---
+Q14a. Do you use Feature H?
+○ Yes / No - don't know / No - don't need / No - too complicated / No - other
+
+[IF YES:]
+Q14b. Frequency? [Daily / Several times per week / Weekly / Monthly / Rarely]
+Q14c. Importance? [Critical / Very important / Somewhat / Nice to have / Not important]
+Q14d. Satisfaction? [Scale: 1-5]
+
+
+--- Feature I ---
+Q15a. Do you use Feature I?
+○ Yes / No - don't know / No - don't need / No - too complicated / No - other
+
+[IF YES:]
+Q15b. Frequency? [Daily / Several times per week / Weekly / Monthly / Rarely]
+Q15c. Importance? [Critical / Very important / Somewhat / Nice to have / Not important]
+Q15d. Satisfaction? [Scale: 1-5]
+
+
+=====================================================
+SECTION 3: ADDITIONAL INSIGHTS
+=====================================================
+
+Q16. Which feature do you find MOST valuable and why?
+[Open text field]
+
+Q17. Which feature needs the MOST improvement and why?
+[Open text field]
+
+Q18. Please describe your biggest pain point or challenge when using our product:
+[Open text field]
+
+Q19. Are there any features or capabilities you expected but didn't find?
+[Open text field]
+
+Q20. Have you recommended us to others?
+○ Yes, I have recommended you
+○ No, but I would consider it
+○ No, and I wouldn't recommend you
+
+[IF "No, and I wouldn't recommend you":]
+Q20b. What holds you back from recommending us?
+[Open text field]
