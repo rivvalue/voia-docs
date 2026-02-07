@@ -1,14 +1,93 @@
-# Custom Questions for Traditional Surveys - Implementation Plan
+# Classic Survey Feature - Implementation Plan
 
 **Created:** January 21, 2026  
-**Status:** Ready for Implementation  
-**Estimated Effort:** 7-10 days  
+**Last Updated:** February 7, 2026  
+**Status:** Phase 2 Complete - Awaiting Approval  
 
 ---
 
-## Overview
+## Part A: Classic Survey System (Dual Survey Type Architecture)
+
+### Overview
+
+Add Classic Survey as an alternative survey type alongside the existing Conversational (VOÏA) surveys. Classic surveys use a structured multi-step form instead of the AI-powered chat interface.
+
+### Key Design Decisions
+
+1. **Zero impact on conversational surveys** - Completely separate code paths
+2. **Survey type locked after activation** - `frozen_at` timestamp on ClassicSurveyConfig prevents changes
+3. **Classic responses tagged differently** - `source_type='traditional'` for analytics separation
+4. **Bilingual support** - All UI text uses `_()` for EN/FR translation
+5. **Incremental phased implementation** - Formal approval gates between phases
+
+### Phase 1: Foundation (COMPLETED - Approved)
+
+**What was built:**
+- [x] `survey_type` field on Campaign model (default: 'conversational')
+- [x] `SurveyTemplate` model for reusable survey configurations
+- [x] `ClassicSurveyConfig` model with driver labels, features, sections (bilingual JSON)
+- [x] Campaign creation UI with survey type selector (Conversational vs Classic radio buttons)
+- [x] Survey type locked after campaign activation via `frozen_at` timestamp
+- [x] Database migrations executed successfully
+- [x] New SurveyResponse fields: `csat_score`, `ces_score`, `loyalty_drivers`, `recommendation_status`
+
+**Files modified:** `models.py`, `templates/campaigns/create.html`, `campaign_routes.py`
+
+### Phase 2: Participant Flow (COMPLETED - Awaiting Approval)
+
+**What was built:**
+- [x] Modified `/survey` route to branch classic campaigns to `/classic_survey` (zero impact on conversational)
+- [x] New `/classic_survey` GET route - loads config, prepares driver labels/features/sections, renders template
+- [x] New `/submit_classic_survey` POST route - full form handling with data mapping to SurveyResponse
+- [x] `templates/classic_survey.html` - Multi-step form with 3 sections:
+  - **Section 1**: NPS scale (0-10), dynamic driver checkboxes by NPS category, open-text explanation + improvement, CSAT (1-5), CES (1-8)
+  - **Section 2**: Feature evaluation cards (usage/frequency/importance/satisfaction per feature)
+  - **Section 3**: Additional insights (4 open text fields + recommendation status with conditional blocker question)
+- [x] Survey Settings guard on campaign view - hides conversational settings for classic campaigns, shows "Classic Survey" badge
+- [x] `source_type='traditional'` set on classic survey responses
+- [x] Server-side NPS validation (required field + range check 0-10)
+- [x] Client-side validation (NPS required before advancing sections)
+- [x] Progress bar tracking across sections
+
+**Files modified:** `routes.py`, `templates/classic_survey.html`, `templates/campaigns/view.html`
+
+**Data mapping:**
+| Form field | SurveyResponse column |
+|---|---|
+| NPS score (0-10) | `nps_score`, `nps_category` |
+| Driver checkboxes | `loyalty_drivers` (JSON array) |
+| Driver explanation | `recommendation_reason` |
+| Improvement feedback | `improvement_feedback` |
+| CSAT (1-5) | `csat_score`, `satisfaction_rating` |
+| CES (1-8) | `ces_score` |
+| Feature evaluations | `general_feedback` (JSON) |
+| Section 3 insights | `additional_comments` (concatenated text) |
+| Recommendation status | `recommendation_status` |
+
+**Validation guide:**
+1. Create a classic campaign → confirm survey type selector appears
+2. View classic campaign → confirm "Classic Survey" badge (not conversational settings)
+3. Open classic survey link → confirm multi-step form (not chat)
+4. Walk through form → NPS required before advancing, drivers appear dynamically
+5. Submit → saves to database with `source_type='traditional'`
+6. Check conversational campaign → confirm zero impact (chat interface unchanged)
+
+### Phase 3+ (Planned)
+
+- Classic survey config UI (admin editing of drivers/features/sections)
+- Analytics charts for classic survey data
+- Campaign comparison (classic vs conversational)
+
+---
+
+## Part B: Custom Questions for Traditional Surveys
+
+### Overview
 
 Enable business account users to define custom questions for traditional surveys. Custom questions are **additive** - they supplement the mandatory core metrics (NPS, satisfaction ratings) to ensure analytics compatibility.
+
+**Status:** Ready for Implementation  
+**Estimated Effort:** 7-10 days
 
 ### Key Design Decisions
 
