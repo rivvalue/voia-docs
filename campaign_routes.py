@@ -373,7 +373,7 @@ def preview_classic_survey(campaign_id):
                              authenticated=True,
                              email=session.get('business_email', ''),
                              participant_name='Preview User',
-                             participant_company=current_account.company_name or 'Preview Company',
+                             participant_company=current_account.name or 'Preview Company',
                              campaign_name=campaign.name,
                              campaign=campaign,
                              classic_config=classic_config,
