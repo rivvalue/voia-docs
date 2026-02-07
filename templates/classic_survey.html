@@ -657,7 +657,7 @@
             </div>
 
             <div class="question-block">
-                <div class="question-label">{{ _('Are there any features or capabilities you expected but didn\'t find?') }}</div>
+                <div class="question-label">{{ _("Are there any features or capabilities you expected but didn't find?") }}</div>
                 <textarea class="form-control" name="missing_features" rows="3" placeholder="{{ _('Tell us what you expected...') }}"></textarea>
             </div>
 
@@ -674,7 +674,7 @@
                     </label>
                     <label>
                         <input type="radio" name="recommendation_status" value="would_not_recommend">
-                        {{ _('No, and I wouldn\'t recommend you') }}
+                        {{ _("No, and I wouldn't recommend you") }}
                     </label>
                 </div>
             </div>
@@ -709,7 +709,7 @@ var totalSections = {{ 3 if sections_enabled.get('section_3', True) else (2 if s
 
 var driverLabels = {
     detractor: "{{ _('What were the main factors that led to your score?') }}",
-    passive: "{{ _('What\\'s preventing you from rating us higher?') }}",
+    passive: "{{ _('What is preventing you from rating us higher?') }}",
     promoter: "{{ _('What do you value most about us?') }}"
 };
 
