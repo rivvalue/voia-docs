@@ -13,7 +13,7 @@ from sqlalchemy import desc
 from sqlalchemy.orm import joinedload
 
 from business_auth_routes import require_business_auth, require_permission, get_current_business_account
-from models import Campaign, CampaignParticipant, Participant, BusinessAccount, EmailDelivery, SurveyResponse, db
+from models import Campaign, CampaignParticipant, Participant, BusinessAccount, EmailDelivery, SurveyResponse, SurveyTemplate, ClassicSurveyConfig, db
 from task_queue import add_email_task
 from email_service import email_service
 from sqlalchemy import func, text
@@ -22,6 +22,45 @@ from sqlalchemy import func, text
 campaign_bp = Blueprint('campaigns', __name__, url_prefix='/business/campaigns')
 
 logger = logging.getLogger(__name__)
+
+
+def seed_default_survey_template():
+    """Seed the default 'Comprehensive CX Survey' template if it doesn't exist."""
+    from models import SurveyTemplate
+    existing = SurveyTemplate.query.filter_by(name='Comprehensive CX Survey', is_system=True).first()
+    if existing:
+        return existing
+    
+    template = SurveyTemplate()
+    template.name = 'Comprehensive CX Survey'
+    template.version = '1.0'
+    template.is_system = True
+    template.description_en = 'Complete customer experience survey with NPS, driver attribution, feature evaluation, and open feedback sections.'
+    template.description_fr = 'Sondage complet sur l\'expérience client avec NPS, attribution des facteurs, évaluation des fonctionnalités et commentaires ouverts.'
+    template.estimated_duration_minutes = 10
+    template.sections_config = {
+        'section_1': {'name_en': 'NPS & Driver Attribution', 'name_fr': 'NPS et attribution des facteurs', 'required': True},
+        'section_2': {'name_en': 'Feature Evaluation', 'name_fr': 'Évaluation des fonctionnalités', 'required': False},
+        'section_3': {'name_en': 'Additional Insights', 'name_fr': 'Informations complémentaires', 'required': False}
+    }
+    template.default_driver_labels = [
+        {'key': 'product_features', 'label_en': 'Product features & functionality', 'label_fr': 'Fonctionnalités du produit'},
+        {'key': 'value_pricing', 'label_en': 'Product value/pricing', 'label_fr': 'Rapport qualité/prix'},
+        {'key': 'professional_services', 'label_en': 'Professional services & support team', 'label_fr': 'Services professionnels et équipe de support'},
+        {'key': 'customer_support', 'label_en': 'Customer support & after-sales service', 'label_fr': 'Support client et service après-vente'},
+        {'key': 'communication', 'label_en': 'Communication & transparency', 'label_fr': 'Communication et transparence'},
+        {'key': 'onboarding', 'label_en': 'Onboarding & implementation experience', 'label_fr': 'Expérience d\'intégration et de mise en œuvre'},
+        {'key': 'ease_of_use', 'label_en': 'Ease of use', 'label_fr': 'Facilité d\'utilisation'},
+        {'key': 'reliability', 'label_en': 'Reliability & performance', 'label_fr': 'Fiabilité et performance'},
+        {'key': 'integration', 'label_en': 'Integration capabilities', 'label_fr': 'Capacités d\'intégration'}
+    ]
+    template.default_feature_count = 5
+    template.max_features = 9
+    
+    db.session.add(template)
+    db.session.commit()
+    logger.info("Seeded default 'Comprehensive CX Survey' template")
+    return template
 
 
 @campaign_bp.route('/')
@@ -185,6 +224,12 @@ def create_campaign():
         campaign.status = 'draft'  # Initial status
         campaign.anonymize_responses = anonymize_responses
         
+        # Survey type selection (default: conversational for backward compatibility)
+        survey_type = request.form.get('survey_type', 'conversational').strip().lower()
+        if survey_type not in ['conversational', 'classic']:
+            survey_type = 'conversational'
+        campaign.survey_type = survey_type
+        
         # Language configuration
         language_code = request.form.get('language_code', 'en').strip().lower()
         if language_code not in ['en', 'fr']:
@@ -226,6 +271,28 @@ def create_campaign():
         db.session.add(campaign)
         db.session.commit()
         
+        # If classic survey type, create survey config from default template
+        if campaign.survey_type == 'classic':
+            try:
+                template = seed_default_survey_template()
+                config = ClassicSurveyConfig()
+                config.campaign_id = campaign.id
+                config.template_id = template.id
+                config.sections_enabled = {'section_1': True, 'section_2': True, 'section_3': True}
+                config.feature_count = template.default_feature_count
+                config.features = [
+                    {'key': f'feature_{chr(97+i)}', 'name_en': f'Feature {chr(65+i)}', 'name_fr': f'Fonctionnalité {chr(65+i)}'}
+                    for i in range(template.default_feature_count)
+                ]
+                config.driver_labels = template.default_driver_labels.copy() if template.default_driver_labels else []
+                config.custom_prompts = {}
+                db.session.add(config)
+                db.session.commit()
+                logger.info(f"Classic survey config created for campaign {campaign.id}")
+            except Exception as config_error:
+                logger.error(f"Failed to create classic survey config: {config_error}")
+                db.session.rollback()
+        
         # Audit log campaign creation
         try:
             from audit_utils import queue_audit_log
@@ -239,6 +306,7 @@ def create_campaign():
                     'start_date': start_date_obj.isoformat(),
                     'end_date': end_date_obj.isoformat(),
                     'status': 'draft',
+                    'survey_type': survey_type,
                     'anonymize_responses': anonymize_responses
                 }
             )
@@ -774,6 +842,10 @@ def activate_campaign(campaign_id):
         
         # Activate campaign
         campaign.status = 'active'
+        
+        # Freeze classic survey config on activation (prevents changes during active campaign)
+        if campaign.survey_type == 'classic' and campaign.classic_survey_config:
+            campaign.classic_survey_config.freeze()
         
         # Note: License tracking now uses time-scoped counting via can_activate_campaign() method
         

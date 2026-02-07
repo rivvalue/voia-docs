@@ -60,6 +60,11 @@ class SurveyResponse(db.Model):
     growth_range = db.Column(db.String(20))  # NPS range (e.g., "50-69")
     commercial_value = db.Column(db.Float)  # Commercial value of the client in dollars
     
+    csat_score = db.Column(db.Integer, nullable=True)  # Customer Satisfaction Score (1-5)
+    ces_score = db.Column(db.Integer, nullable=True)  # Customer Effort Score (1-8)
+    loyalty_drivers = db.Column(db.JSON, nullable=True)  # JSON array of selected driver keys
+    recommendation_status = db.Column(db.String(50), nullable=True)  # 'recommended', 'would_consider', 'would_not_recommend'
+    
     # AI-generated summary and reasoning (for transparency and trust)
     analysis_summary = db.Column(db.Text, nullable=True)  # 2-3 sentence plain-language summary of findings
     analysis_reasoning = db.Column(db.Text, nullable=True)  # Explanation of why AI reached these conclusions
@@ -142,6 +147,10 @@ class SurveyResponse(db.Model):
             'source_type': self.source_type,
             'transcript_filename': self.transcript_filename,
             'deflection_summary': json.loads(self.deflection_summary) if self.deflection_summary else None,
+            'csat_score': self.csat_score,
+            'ces_score': self.ces_score,
+            'loyalty_drivers': self.loyalty_drivers,
+            'recommendation_status': self.recommendation_status,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
             'analyzed_at': self.analyzed_at.isoformat() if self.analyzed_at else None
@@ -209,6 +218,7 @@ class Campaign(db.Model):
     start_date = db.Column(db.Date, nullable=False, index=True)
     end_date = db.Column(db.Date, nullable=False, index=True)
     status = db.Column(db.String(20), nullable=False, default='draft', index=True)  # draft, ready, active, completed
+    survey_type = db.Column(db.String(20), nullable=False, default='conversational', index=True)  # 'conversational' or 'classic'
     
     # Language configuration (en=English, fr=French)
     language_code = db.Column(db.String(5), nullable=False, default='en', index=True)
@@ -293,6 +303,7 @@ class Campaign(db.Model):
             'start_date': self.start_date.isoformat() if self.start_date else None,
             'end_date': self.end_date.isoformat() if self.end_date else None,
             'status': self.status,
+            'survey_type': self.survey_type,
             'language_code': self.language_code,
             'client_identifier': self.client_identifier,
             'business_account_id': self.business_account_id,
@@ -3262,4 +3273,94 @@ class BulkOperationJob(db.Model):
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'started_at': self.started_at.isoformat() if self.started_at else None,
             'completed_at': self.completed_at.isoformat() if self.completed_at else None
+        }
+
+
+class SurveyTemplate(db.Model):
+    """Reusable survey template defining structure and default content."""
+    __tablename__ = 'survey_templates'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200), nullable=False)
+    version = db.Column(db.String(20), nullable=False, default='1.0')
+    is_system = db.Column(db.Boolean, nullable=False, default=True)
+    
+    business_account_id = db.Column(db.Integer, db.ForeignKey('business_accounts.id'), nullable=True, index=True)
+    
+    description_en = db.Column(db.Text, nullable=True)
+    description_fr = db.Column(db.Text, nullable=True)
+    estimated_duration_minutes = db.Column(db.Integer, nullable=True, default=10)
+    
+    sections_config = db.Column(db.JSON, nullable=False, default={})
+    
+    default_driver_labels = db.Column(db.JSON, nullable=False, default=[])
+    default_feature_count = db.Column(db.Integer, nullable=False, default=5)
+    max_features = db.Column(db.Integer, nullable=False, default=9)
+    
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'version': self.version,
+            'is_system': self.is_system,
+            'description_en': self.description_en,
+            'description_fr': self.description_fr,
+            'estimated_duration_minutes': self.estimated_duration_minutes,
+            'sections_config': self.sections_config,
+            'default_driver_labels': self.default_driver_labels,
+            'default_feature_count': self.default_feature_count,
+            'max_features': self.max_features,
+        }
+
+
+class ClassicSurveyConfig(db.Model):
+    """Campaign-specific customization of a survey template. Created from template, editable per campaign."""
+    __tablename__ = 'classic_survey_configs'
+    __table_args__ = (
+        db.Index('idx_classic_survey_config_campaign', 'campaign_id'),
+    )
+    
+    id = db.Column(db.Integer, primary_key=True)
+    campaign_id = db.Column(db.Integer, db.ForeignKey('campaigns.id'), nullable=False, unique=True)
+    template_id = db.Column(db.Integer, db.ForeignKey('survey_templates.id'), nullable=False)
+    
+    sections_enabled = db.Column(db.JSON, nullable=False, default={'section_1': True, 'section_2': True, 'section_3': True})
+    
+    feature_count = db.Column(db.Integer, nullable=False, default=5)
+    features = db.Column(db.JSON, nullable=False, default=[])
+    
+    driver_labels = db.Column(db.JSON, nullable=False, default=[])
+    
+    custom_prompts = db.Column(db.JSON, nullable=False, default={})
+    
+    frozen_at = db.Column(db.DateTime, nullable=True)
+    
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    campaign = db.relationship('Campaign', backref=db.backref('classic_survey_config', uselist=False, lazy='joined'))
+    template = db.relationship('SurveyTemplate')
+    
+    def is_frozen(self):
+        return self.frozen_at is not None
+    
+    def freeze(self):
+        if not self.frozen_at:
+            self.frozen_at = datetime.utcnow()
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'campaign_id': self.campaign_id,
+            'template_id': self.template_id,
+            'sections_enabled': self.sections_enabled,
+            'feature_count': self.feature_count,
+            'features': self.features,
+            'driver_labels': self.driver_labels,
+            'custom_prompts': self.custom_prompts,
+            'frozen_at': self.frozen_at.isoformat() if self.frozen_at else None,
+            'is_frozen': self.is_frozen(),
         }

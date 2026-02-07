@@ -95,6 +95,16 @@
                 {% endif %}
             </div>
         </div>
+        <div class="info-item">
+            <div class="info-value">
+                {% if campaign.survey_type == 'classic' %}
+                    <i class="fas fa-clipboard-list me-1" style="color: var(--primary-red);"></i>{{ _('Classic') }}
+                {% else %}
+                    <i class="fas fa-robot me-1" style="color: var(--primary-red);"></i>{{ _('VOÏA') }}
+                {% endif %}
+            </div>
+            <div class="info-label">{{ _('Survey Type') }}</div>
+        </div>
         <!-- Engagement Metrics -->
         <div class="info-item">
             <div class="info-value">{{ campaign.engagement_metrics.invitations_sent }}</div>

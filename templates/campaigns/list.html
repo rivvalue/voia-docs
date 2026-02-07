@@ -81,6 +81,11 @@
                 <span class="campaign-status status-{{ campaign.status }}">
                     {{ campaign.status|title }}
                 </span>
+                {% if campaign.survey_type == 'classic' %}
+                    <span class="badge bg-light text-dark border ms-1" title="{{ _('Classic Survey') }}">
+                        <i class="fas fa-clipboard-list me-1"></i>{{ _('Classic') }}
+                    </span>
+                {% endif %}
             </div>
         </div>
         
@@ -250,6 +255,11 @@
                             <span class="campaign-status status-{{ campaign.status }}">
                                 {{ campaign.status|title }}
                             </span>
+                {% if campaign.survey_type == 'classic' %}
+                    <span class="badge bg-light text-dark border ms-1" title="{{ _('Classic Survey') }}">
+                        <i class="fas fa-clipboard-list me-1"></i>{{ _('Classic') }}
+                    </span>
+                {% endif %}
                         </td>
                         <td data-label="{{ _('Start') }} Date" class="hide-on-tablet">
                             <small>{{ campaign.start_date }}</small>

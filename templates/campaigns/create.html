@@ -127,6 +127,39 @@ window.CampaignFormI18n = {
                     </select>
                     <div class="form-text">{{ _('Language for all campaign communications (emails, survey pages, AI conversations)') }}</div>
                 </div>
+
+                <!-- Survey Type Selection -->
+                <div class="mb-3">
+                    <label class="form-label">{{ _('Survey Type') }} <span class="text-danger">*</span></label>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-check survey-type-card p-3 rounded border" id="surveyTypeConversationalCard" style="cursor: pointer; border-color: var(--primary-red) !important; background-color: rgba(225, 58, 68, 0.05);">
+                                <input class="form-check-input" type="radio" name="survey_type" id="survey_type_conversational" value="conversational" checked style="display: none;">
+                                <label class="form-check-label w-100" for="survey_type_conversational" style="cursor: pointer;">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="fas fa-robot fa-lg me-2" style="color: var(--primary-red);"></i>
+                                        <strong>{{ _('Conversational (VOÏA)') }}</strong>
+                                        <span class="badge bg-success ms-2">{{ _('Recommended') }}</span>
+                                    </div>
+                                    <small class="text-muted">{{ _('AI-powered dynamic interview that adapts questions based on participant responses. Richer insights through natural conversation.') }}</small>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check survey-type-card p-3 rounded border" id="surveyTypeClassicCard" style="cursor: pointer;">
+                                <input class="form-check-input" type="radio" name="survey_type" id="survey_type_classic" value="classic" style="display: none;">
+                                <label class="form-check-label w-100" for="survey_type_classic" style="cursor: pointer;">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="fas fa-clipboard-list fa-lg me-2" style="color: var(--primary-red);"></i>
+                                        <strong>{{ _('Classic Survey') }}</strong>
+                                    </div>
+                                    <small class="text-muted">{{ _('Structured questionnaire with NPS, driver attribution, feature evaluation, and open feedback. Familiar step-by-step format.') }}</small>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-text">{{ _('Survey type cannot be changed after campaign activation.') }}</div>
+                </div>
             </div>
 
             <!-- Schedule -->
@@ -507,6 +540,39 @@ document.addEventListener('DOMContentLoaded', function() {
     // Wait a tiny bit for the date inputs to be populated
     setTimeout(updateMidpointReminderDisplay, 100);
 });
+
+// Survey type card selection
+function updateSurveyTypeCards() {
+    const conversationalRadio = document.getElementById('survey_type_conversational');
+    const classicRadio = document.getElementById('survey_type_classic');
+    const conversationalCard = document.getElementById('surveyTypeConversationalCard');
+    const classicCard = document.getElementById('surveyTypeClassicCard');
+    
+    if (conversationalRadio.checked) {
+        conversationalCard.style.borderColor = 'var(--primary-red)';
+        conversationalCard.style.backgroundColor = 'rgba(225, 58, 68, 0.05)';
+        classicCard.style.borderColor = '#dee2e6';
+        classicCard.style.backgroundColor = '';
+    } else {
+        classicCard.style.borderColor = 'var(--primary-red)';
+        classicCard.style.backgroundColor = 'rgba(225, 58, 68, 0.05)';
+        conversationalCard.style.borderColor = '#dee2e6';
+        conversationalCard.style.backgroundColor = '';
+    }
+}
+
+// Click handlers for survey type cards
+document.getElementById('surveyTypeConversationalCard').addEventListener('click', function() {
+    document.getElementById('survey_type_conversational').checked = true;
+    updateSurveyTypeCards();
+});
+document.getElementById('surveyTypeClassicCard').addEventListener('click', function() {
+    document.getElementById('survey_type_classic').checked = true;
+    updateSurveyTypeCards();
+});
+
+// Initialize
+updateSurveyTypeCards();
 </script>
 {% endif %}
 {% endblock %}
