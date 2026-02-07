@@ -717,7 +717,16 @@ def survey():
             campaign_name = verification.get('campaign_name')
             
             if participant_name and campaign_name:
-                # Business participant - redirect to conversational survey (no choice)
+                # Business participant - check survey type for routing
+                campaign_id = session.get('campaign_id')
+                if campaign_id:
+                    from models import Campaign
+                    campaign = Campaign.query.get(campaign_id)
+                    if campaign and campaign.survey_type == 'classic':
+                        logger.info(f"Business participant detected, redirecting to classic survey: {participant_name}")
+                        return redirect(url_for('classic_survey', token=token))
+                
+                # Default: conversational survey (VOÏA)
                 logger.info(f"Business participant detected, redirecting to conversational survey: {participant_name}")
                 return redirect(url_for('conversational_survey', token=token))
             else:
@@ -982,6 +991,266 @@ def submit_survey_form():
         logger.error(f"Error in form survey submission: {e}")
         return render_template('survey.html', authenticated=True, email=session.get('auth_email'), 
                              error=f'Survey submission failed: {str(e)}')
+
+@app.route('/classic_survey')
+def classic_survey():
+    """Classic structured survey form for business participants"""
+    token = request.args.get('token')
+    
+    if not token:
+        if session.get('auth_token'):
+            token = session.get('auth_token')
+        else:
+            return redirect(url_for('server_auth'))
+    
+    # Use centralized token verification
+    verification = verify_survey_access(token)
+    if not verification['valid']:
+        error_code = verification.get('error_code', 'invalid_token')
+        branding = get_branding_context()
+        return render_template('survey_unavailable.html',
+                             error_code=error_code,
+                             error_message=verification.get('error'),
+                             campaign_name=verification.get('campaign_name'),
+                             campaign_end_date=verification.get('campaign_end_date'),
+                             campaign_start_date=verification.get('campaign_start_date'),
+                             completed_at=verification.get('completed_at'),
+                             show_contact_info=True,
+                             branding=branding)
+    
+    # Get campaign and classic survey config
+    campaign_id = session.get('campaign_id')
+    campaign = None
+    classic_config = None
+    
+    if campaign_id:
+        from models import Campaign, ClassicSurveyConfig
+        campaign = Campaign.query.get(campaign_id)
+        if campaign:
+            classic_config = ClassicSurveyConfig.query.filter_by(campaign_id=campaign.id).first()
+    
+    if not campaign or campaign.survey_type != 'classic':
+        return redirect(url_for('conversational_survey', token=token))
+    
+    # Get branding context
+    business_account_id = verification.get('business_account_id') or session.get('business_account_id')
+    branding = get_branding_context(business_account_id)
+    
+    # Determine language
+    lang = session.get('language', 'en')
+    
+    # Prepare driver labels from config
+    driver_labels = []
+    if classic_config and classic_config.driver_labels:
+        driver_labels = classic_config.driver_labels
+    
+    # Prepare features from config  
+    features = []
+    if classic_config and classic_config.features:
+        features = classic_config.features
+    
+    # Prepare sections enabled
+    sections_enabled = {'section_1': True, 'section_2': True, 'section_3': True}
+    if classic_config and classic_config.sections_enabled:
+        sections_enabled = classic_config.sections_enabled
+    
+    return render_template('classic_survey.html',
+                         authenticated=verification['authenticated'],
+                         email=verification['email'],
+                         participant_name=verification.get('participant_name'),
+                         participant_company=verification.get('participant_company'),
+                         campaign_name=verification.get('campaign_name'),
+                         campaign=campaign,
+                         classic_config=classic_config,
+                         driver_labels=driver_labels,
+                         features=features,
+                         sections_enabled=sections_enabled,
+                         lang=lang,
+                         branding=branding,
+                         token=token)
+
+@app.route('/submit_classic_survey', methods=['POST'])
+@rate_limit(limit=10)
+def submit_classic_survey():
+    """Handle classic survey form submission"""
+    try:
+        from models import SurveyResponse, Campaign, CampaignParticipant
+        import json
+        
+        # Check authentication
+        if not session.get('auth_token'):
+            flash('Authentication required', 'error')
+            return redirect(url_for('server_auth'))
+        
+        authenticated_email = session.get('auth_email')
+        if not authenticated_email:
+            flash('Authentication session expired', 'error')
+            return redirect(url_for('server_auth'))
+        
+        data = request.form.to_dict()
+        
+        # Get campaign data from session
+        association_id = session.get('association_id')
+        campaign_id = session.get('campaign_id')
+        campaign = Campaign.query.get(campaign_id) if campaign_id else None
+        
+        # === Section 1: NPS & Driver Attribution ===
+        if not data.get('nps_score') and data.get('nps_score') != '0':
+            flash('NPS score is required.', 'error')
+            token = session.get('auth_token', request.form.get('token', ''))
+            return redirect(url_for('classic_survey', token=token))
+        
+        nps_score = int(data.get('nps_score', 0))
+        if nps_score < 0 or nps_score > 10:
+            flash('NPS score must be between 0 and 10.', 'error')
+            token = session.get('auth_token', request.form.get('token', ''))
+            return redirect(url_for('classic_survey', token=token))
+        
+        if nps_score >= 9:
+            nps_category = 'Promoter'
+        elif nps_score >= 7:
+            nps_category = 'Passive'
+        else:
+            nps_category = 'Detractor'
+        
+        # Collect selected drivers (checkboxes come as separate form fields)
+        selected_drivers = request.form.getlist('drivers')
+        other_driver = data.get('driver_other_text', '').strip()
+        if other_driver:
+            selected_drivers.append(f'other:{other_driver}')
+        
+        # Open text fields
+        driver_explanation = data.get('driver_explanation', '').strip()
+        improvement_feedback = data.get('improvement_feedback', '').strip()
+        
+        # CSAT and CES
+        csat_score = int(data.get('csat_score', 0)) if data.get('csat_score') else None
+        ces_score = int(data.get('ces_score', 0)) if data.get('ces_score') else None
+        
+        # === Section 2: Feature Evaluation ===
+        feature_evaluations = {}
+        feature_keys = [k.replace('feature_usage_', '') for k in data.keys() if k.startswith('feature_usage_')]
+        for fkey in feature_keys:
+            feature_evaluations[fkey] = {
+                'usage': data.get(f'feature_usage_{fkey}'),
+                'frequency': data.get(f'feature_frequency_{fkey}'),
+                'importance': data.get(f'feature_importance_{fkey}'),
+                'satisfaction': int(data.get(f'feature_satisfaction_{fkey}', 0)) if data.get(f'feature_satisfaction_{fkey}') else None
+            }
+        
+        # === Section 3: Additional Insights ===
+        most_valuable_feature = data.get('most_valuable_feature', '').strip()
+        most_improvement_needed = data.get('most_improvement_needed', '').strip()
+        biggest_pain_point = data.get('biggest_pain_point', '').strip()
+        missing_features = data.get('missing_features', '').strip()
+        recommendation_status = data.get('recommendation_status', '').strip() or None
+        recommendation_blocker = data.get('recommendation_blocker', '').strip()
+        
+        # Prepare response data for potential anonymization
+        response_data = {
+            'company_name': normalize_company_name(data.get('participant_company', '')),
+            'respondent_name': data.get('participant_name', ''),
+            'respondent_email': authenticated_email
+        }
+        
+        # Apply anonymization if campaign requires it
+        response_data = anonymize_response_data(campaign, response_data)
+        
+        # Build additional_comments as combined Section 3 insights
+        section_3_parts = []
+        if most_valuable_feature:
+            section_3_parts.append(f"Most valuable feature: {most_valuable_feature}")
+        if most_improvement_needed:
+            section_3_parts.append(f"Needs most improvement: {most_improvement_needed}")
+        if biggest_pain_point:
+            section_3_parts.append(f"Biggest pain point: {biggest_pain_point}")
+        if missing_features:
+            section_3_parts.append(f"Missing features: {missing_features}")
+        if recommendation_blocker:
+            section_3_parts.append(f"Recommendation blocker: {recommendation_blocker}")
+        additional_comments = '\n\n'.join(section_3_parts) if section_3_parts else None
+        
+        # Get participant tenure from database
+        participant_id = session.get('participant_id')
+        tenure_category = None
+        if participant_id:
+            from models import Participant
+            participant = Participant.query.get(participant_id)
+            if participant and hasattr(participant, 'tenure_years') and participant.tenure_years is not None:
+                tenure_category = map_tenure_years_to_category(participant.tenure_years)
+        
+        # Create SurveyResponse
+        response = SurveyResponse(
+            company_name=response_data['company_name'],
+            respondent_name=response_data['respondent_name'],
+            respondent_email=response_data['respondent_email'],
+            tenure_with_fc=tenure_category,
+            nps_score=nps_score,
+            nps_category=nps_category,
+            source_type='traditional',
+            satisfaction_rating=csat_score,
+            csat_score=csat_score,
+            ces_score=ces_score,
+            loyalty_drivers=selected_drivers,
+            recommendation_status=recommendation_status,
+            recommendation_reason=driver_explanation,
+            improvement_feedback=improvement_feedback,
+            additional_comments=additional_comments,
+            general_feedback=json.dumps(feature_evaluations) if feature_evaluations else None,
+            campaign_id=campaign_id,
+            campaign_participant_id=association_id
+        )
+        
+        db.session.add(response)
+        db.session.commit()
+        
+        # Mark association as completed
+        if association_id:
+            try:
+                import campaign_participant_token_system
+                campaign_participant_token_system.mark_survey_completed(association_id, response.id)
+            except Exception as e:
+                logger.error(f"Failed to mark association completed: {e}")
+        elif campaign_id and authenticated_email:
+            fallback_assoc_id = lookup_association_id_fallback(authenticated_email, campaign_id)
+            if fallback_assoc_id:
+                response.campaign_participant_id = fallback_assoc_id
+                db.session.commit()
+                try:
+                    import campaign_participant_token_system
+                    campaign_participant_token_system.mark_survey_completed(fallback_assoc_id, response.id)
+                except Exception as e:
+                    logger.error(f"Failed to mark association completed via fallback: {e}")
+        
+        # Queue AI analysis
+        try:
+            add_analysis_task(response.id)
+            analysis_status = "queued"
+        except Exception as e:
+            logger.error(f"Failed to queue AI analysis for classic survey: {e}")
+            analysis_status = "failed"
+        
+        # Invalidate token
+        session.pop('auth_token', None)
+        session.pop('auth_email', None)
+        session.permanent = False
+        logger.info(f"Classic survey submitted by {authenticated_email} - Token invalidated")
+        
+        # Get branding context for success page
+        branding = get_branding_context()
+        
+        return render_template('survey_success.html',
+                             response_id=response.id,
+                             analysis_status=analysis_status,
+                             email=authenticated_email,
+                             branding=branding)
+        
+    except Exception as e:
+        logger.error(f"Error in classic survey submission: {e}")
+        db.session.rollback()
+        flash(f'Survey submission failed. Please try again.', 'error')
+        token = session.get('auth_token', request.form.get('token', ''))
+        return redirect(url_for('classic_survey', token=token))
 
 @app.route('/submit_survey', methods=['POST'])
 @rate_limit(limit=10)  # 10 survey submissions per minute per IP

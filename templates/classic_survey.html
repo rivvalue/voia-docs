@@ -1,0 +1,793 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Survey') }} - {% if branding and branding.company_name %}{{ branding.company_name }}{% else %}VOÏA{% endif %}{% endblock %}
+
+{% block page_class %}page-classic-survey{% endblock %}
+
+{% block content %}
+<style>
+.classic-survey-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.survey-header {
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: var(--radius-2xl);
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.survey-header h1 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.survey-header p {
+    opacity: 0.9;
+    margin-bottom: 0;
+    font-size: 0.95rem;
+}
+
+.progress-bar-container {
+    background: #e9ecef;
+    border-radius: 10px;
+    height: 8px;
+    margin-bottom: 2rem;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    background: var(--primary-red);
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.4s ease;
+}
+
+.progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+}
+
+.survey-section {
+    background: white;
+    border-radius: var(--radius-xl);
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--light-gray);
+    display: none;
+}
+
+.survey-section.active {
+    display: block;
+}
+
+.section-header {
+    border-bottom: 2px solid var(--primary-red);
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.section-header h2 {
+    font-size: 1.25rem;
+    color: var(--primary-black);
+    margin-bottom: 0.25rem;
+}
+
+.section-header p {
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin-bottom: 0;
+}
+
+.question-block {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.question-block:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.question-label {
+    font-weight: 600;
+    color: var(--primary-black);
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+}
+
+.question-hint {
+    color: #6c757d;
+    font-size: 0.85rem;
+    margin-bottom: 0.75rem;
+}
+
+.nps-scale {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 1rem 0;
+}
+
+.nps-scale label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+}
+
+.nps-scale input[type="radio"] {
+    display: none;
+}
+
+.nps-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1rem;
+    border: 2px solid #dee2e6;
+    background: white;
+    color: #333;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.nps-scale input[type="radio"]:checked + .nps-btn {
+    color: white;
+    border-color: transparent;
+    transform: scale(1.1);
+}
+
+.nps-scale label:nth-child(-n+7) input[type="radio"]:checked + .nps-btn {
+    background: #dc3545;
+}
+
+.nps-scale label:nth-child(8) input[type="radio"]:checked + .nps-btn,
+.nps-scale label:nth-child(9) input[type="radio"]:checked + .nps-btn {
+    background: #ffc107;
+    color: #333;
+}
+
+.nps-scale label:nth-child(10) input[type="radio"]:checked + .nps-btn,
+.nps-scale label:nth-child(11) input[type="radio"]:checked + .nps-btn {
+    background: #28a745;
+}
+
+.nps-anchors {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-top: 0.5rem;
+}
+
+.driver-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+}
+
+@media (max-width: 576px) {
+    .driver-grid {
+        grid-template-columns: 1fr;
+    }
+    .nps-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 0.9rem;
+    }
+}
+
+.driver-option {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.driver-option:hover {
+    border-color: var(--primary-red);
+    background: rgba(225, 58, 68, 0.03);
+}
+
+.driver-option input[type="checkbox"]:checked ~ span {
+    color: var(--primary-red);
+    font-weight: 600;
+}
+
+.driver-option input[type="checkbox"] {
+    margin-right: 0.75rem;
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary-red);
+}
+
+.satisfaction-scale {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.satisfaction-scale label {
+    cursor: pointer;
+}
+
+.satisfaction-scale input[type="radio"] {
+    display: none;
+}
+
+.sat-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    background: white;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.satisfaction-scale input[type="radio"]:checked + .sat-btn {
+    border-color: var(--primary-red);
+    background: rgba(225, 58, 68, 0.08);
+    color: var(--primary-red);
+    font-weight: 600;
+}
+
+.ces-scale {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.ces-scale label {
+    cursor: pointer;
+}
+
+.ces-scale input[type="radio"] {
+    display: none;
+}
+
+.ces-btn {
+    width: 52px;
+    height: 44px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border: 2px solid #dee2e6;
+    background: white;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.ces-scale input[type="radio"]:checked + .ces-btn {
+    border-color: var(--primary-red);
+    background: var(--primary-red);
+    color: white;
+}
+
+.feature-card {
+    border: 1px solid #e9ecef;
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    background: #fafbfc;
+}
+
+.feature-card h4 {
+    font-size: 1rem;
+    color: var(--primary-black);
+    margin-bottom: 1rem;
+}
+
+.feature-sub-question {
+    margin-bottom: 1rem;
+}
+
+.feature-sub-question:last-child {
+    margin-bottom: 0;
+}
+
+.feature-sub-question label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.btn-nav {
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    border-radius: 8px;
+}
+
+.btn-nav-next {
+    background: var(--primary-red);
+    color: white;
+    border: none;
+}
+
+.btn-nav-next:hover {
+    background: var(--red-hover);
+    color: white;
+}
+
+.btn-nav-prev {
+    background: white;
+    color: var(--primary-black);
+    border: 1px solid #dee2e6;
+}
+
+.btn-nav-prev:hover {
+    background: #f8f9fa;
+}
+
+.btn-submit {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 0.75rem 2.5rem;
+    font-weight: 600;
+    border-radius: 8px;
+    font-size: 1.05rem;
+}
+
+.btn-submit:hover {
+    background: #218838;
+    color: white;
+}
+
+.recommendation-options label {
+    display: block;
+    padding: 0.75rem 1rem;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.recommendation-options input[type="radio"] {
+    margin-right: 0.75rem;
+    accent-color: var(--primary-red);
+}
+
+.recommendation-options label:hover {
+    border-color: var(--primary-red);
+    background: rgba(225, 58, 68, 0.03);
+}
+
+.nps-dynamic-question {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.nps-dynamic-question.visible {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.validation-error {
+    color: #dc3545;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+    display: none;
+}
+
+.validation-error.show {
+    display: block;
+}
+</style>
+
+<div class="classic-survey-container">
+    {% if branding and branding.logo_url %}
+    <div class="text-center mb-3">
+        <img src="{{ branding.logo_url }}" alt="{{ branding.company_name }}" class="img-fluid" style="max-height: 60px;">
+    </div>
+    {% endif %}
+
+    <div class="survey-header">
+        <h1>{{ _('Customer Experience Survey') }}</h1>
+        <p>{{ _('Your feedback helps us improve. This survey takes approximately 8-12 minutes.') }}</p>
+        {% if participant_name %}
+        <p class="mt-2" style="font-size: 0.85rem; opacity: 0.8;">{{ _('Welcome, %(name)s', name=participant_name) }}</p>
+        {% endif %}
+    </div>
+
+    <div class="progress-label">
+        <span id="progressText">{{ _('Section') }} 1 {{ _('of') }} {{ 3 if sections_enabled.get('section_3', True) else (2 if sections_enabled.get('section_2', True) else 1) }}</span>
+        <span id="progressPercent">0%</span>
+    </div>
+    <div class="progress-bar-container">
+        <div class="progress-bar-fill" id="progressBar" style="width: 0%"></div>
+    </div>
+
+    <form method="POST" action="{{ url_for('submit_classic_survey') }}" id="classicSurveyForm">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="token" value="{{ token }}">
+        <input type="hidden" name="participant_name" value="{{ participant_name or '' }}">
+        <input type="hidden" name="participant_company" value="{{ participant_company or '' }}">
+
+        <!-- ==================== SECTION 1: NPS & Driver Attribution ==================== -->
+        <div class="survey-section active" id="section1" data-section="1">
+            <div class="section-header">
+                <h2><i class="fas fa-chart-line me-2" style="color: var(--primary-red);"></i>{{ _('NPS & Driver Attribution') }}</h2>
+                <p>{{ _('Help us understand your overall experience') }}</p>
+            </div>
+
+            <!-- Q1: NPS Score -->
+            <div class="question-block">
+                <div class="question-label">{{ _('On a scale of 0-10, how likely are you to recommend our company to a friend or colleague?') }} <span class="text-danger">*</span></div>
+                <div class="nps-scale" id="npsScale">
+                    {% for i in range(11) %}
+                    <label>
+                        <input type="radio" name="nps_score" value="{{ i }}" required>
+                        <span class="nps-btn">{{ i }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+                <div class="nps-anchors">
+                    <span>{{ _('Not at all likely') }}</span>
+                    <span>{{ _('Extremely likely') }}</span>
+                </div>
+                <div class="validation-error" id="npsError">{{ _('Please select a score') }}</div>
+            </div>
+
+            <!-- Q2: Dynamic Driver Attribution (shown after NPS selection) -->
+            <div class="question-block nps-dynamic-question" id="driverQuestion">
+                <div class="question-label" id="driverQuestionLabel"></div>
+                <div class="question-hint">{{ _('Select all that apply') }}</div>
+                <div class="driver-grid">
+                    {% for driver in driver_labels %}
+                    <div class="driver-option">
+                        <input type="checkbox" name="drivers" value="{{ driver.key }}" id="driver_{{ driver.key }}">
+                        <span>{{ driver['label_' + lang] if driver.get('label_' + lang) else driver.get('label_en', driver.key) }}</span>
+                    </div>
+                    {% endfor %}
+                    <div class="driver-option">
+                        <input type="checkbox" name="drivers" value="other" id="driver_other" onchange="toggleOtherDriver()">
+                        <span>{{ _('Other') }}</span>
+                    </div>
+                </div>
+                <div id="otherDriverField" style="display: none; margin-top: 0.75rem;">
+                    <input type="text" class="form-control" name="driver_other_text" placeholder="{{ _('Please specify...') }}">
+                </div>
+            </div>
+
+            <!-- Q3: Driver Explanation -->
+            <div class="question-block nps-dynamic-question" id="explanationQuestion">
+                <div class="question-label">{{ _('Please explain your selection(s) above - what specifically influenced your score?') }} <span class="text-danger">*</span></div>
+                <div class="question-hint">{{ _('This helps us understand the details behind your rating.') }}</div>
+                <textarea class="form-control" name="driver_explanation" rows="3" placeholder="{{ _('Share your thoughts...') }}"></textarea>
+            </div>
+
+            <!-- Q4: Improvement -->
+            <div class="question-block nps-dynamic-question" id="improvementQuestion">
+                <div class="question-label" id="improvementLabel"></div>
+                <textarea class="form-control" name="improvement_feedback" rows="3" placeholder="{{ _('Share your suggestions...') }}"></textarea>
+            </div>
+
+            <!-- Q5: CSAT -->
+            <div class="question-block">
+                <div class="question-label">{{ _('Overall, how satisfied are you with your experience with our company?') }}</div>
+                <div class="satisfaction-scale">
+                    <label><input type="radio" name="csat_score" value="1"><span class="sat-btn">1 - {{ _('Very dissatisfied') }}</span></label>
+                    <label><input type="radio" name="csat_score" value="2"><span class="sat-btn">2 - {{ _('Dissatisfied') }}</span></label>
+                    <label><input type="radio" name="csat_score" value="3"><span class="sat-btn">3 - {{ _('Neutral') }}</span></label>
+                    <label><input type="radio" name="csat_score" value="4"><span class="sat-btn">4 - {{ _('Satisfied') }}</span></label>
+                    <label><input type="radio" name="csat_score" value="5"><span class="sat-btn">5 - {{ _('Very satisfied') }}</span></label>
+                </div>
+            </div>
+
+            <!-- Q6: CES -->
+            <div class="question-block">
+                <div class="question-label">{{ _('How easy was it to interact with our company and get your needs met?') }}</div>
+                <div class="ces-scale">
+                    <label><input type="radio" name="ces_score" value="1"><span class="ces-btn" title="{{ _('Very difficult') }}">1</span></label>
+                    <label><input type="radio" name="ces_score" value="2"><span class="ces-btn" title="{{ _('Difficult') }}">2</span></label>
+                    <label><input type="radio" name="ces_score" value="3"><span class="ces-btn" title="{{ _('Somewhat difficult') }}">3</span></label>
+                    <label><input type="radio" name="ces_score" value="4"><span class="ces-btn" title="{{ _('Neutral') }}">4</span></label>
+                    <label><input type="radio" name="ces_score" value="5"><span class="ces-btn" title="{{ _('Somewhat easy') }}">5</span></label>
+                    <label><input type="radio" name="ces_score" value="6"><span class="ces-btn" title="{{ _('Easy') }}">6</span></label>
+                    <label><input type="radio" name="ces_score" value="7"><span class="ces-btn" title="{{ _('Very easy') }}">7</span></label>
+                    <label><input type="radio" name="ces_score" value="8"><span class="ces-btn" title="{{ _('Extremely easy') }}">8</span></label>
+                </div>
+                <div class="nps-anchors">
+                    <span>{{ _('Very difficult') }}</span>
+                    <span>{{ _('Extremely easy') }}</span>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end mt-3">
+                {% if sections_enabled.get('section_2', True) or sections_enabled.get('section_3', True) %}
+                <button type="button" class="btn btn-nav btn-nav-next" onclick="goToSection(2)">
+                    {{ _('Next') }} <i class="fas fa-arrow-right ms-2"></i>
+                </button>
+                {% else %}
+                <button type="submit" class="btn btn-submit">
+                    <i class="fas fa-paper-plane me-2"></i>{{ _('Submit Survey') }}
+                </button>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- ==================== SECTION 2: Feature Evaluation ==================== -->
+        {% if sections_enabled.get('section_2', True) %}
+        <div class="survey-section" id="section2" data-section="2">
+            <div class="section-header">
+                <h2><i class="fas fa-star me-2" style="color: var(--primary-red);"></i>{{ _('Product Features - Detailed Evaluation') }}</h2>
+                <p>{{ _('For each feature below, please tell us about your usage and satisfaction') }}</p>
+            </div>
+
+            {% for feature in features %}
+            <div class="feature-card">
+                <h4>{{ feature['name_' + lang] if feature.get('name_' + lang) else feature.get('name_en', 'Feature ' + loop.index|string) }}</h4>
+
+                <div class="feature-sub-question">
+                    <label>{{ _('Do you use this feature?') }}</label>
+                    <select class="form-select form-select-sm" name="feature_usage_{{ feature.key }}" onchange="toggleFeatureDetails('{{ feature.key }}', this.value)">
+                        <option value="">{{ _('Select...') }}</option>
+                        <option value="yes">{{ _('Yes') }}</option>
+                        <option value="no_unknown">{{ _("No - I don't know about this feature") }}</option>
+                        <option value="no_unneeded">{{ _("No - I don't need this feature") }}</option>
+                        <option value="no_complicated">{{ _("No - It's too complicated/difficult to use") }}</option>
+                        <option value="no_other">{{ _('No - Other reason') }}</option>
+                    </select>
+                </div>
+
+                <div id="featureDetails_{{ feature.key }}" style="display: none;">
+                    <div class="feature-sub-question">
+                        <label>{{ _('How often do you use this feature?') }}</label>
+                        <select class="form-select form-select-sm" name="feature_frequency_{{ feature.key }}">
+                            <option value="">{{ _('Select...') }}</option>
+                            <option value="daily">{{ _('Daily') }}</option>
+                            <option value="several_weekly">{{ _('Several times per week') }}</option>
+                            <option value="weekly">{{ _('Weekly') }}</option>
+                            <option value="monthly">{{ _('Monthly') }}</option>
+                            <option value="rarely">{{ _('Rarely') }}</option>
+                        </select>
+                    </div>
+
+                    <div class="feature-sub-question">
+                        <label>{{ _('How important is this feature to your workflow?') }}</label>
+                        <select class="form-select form-select-sm" name="feature_importance_{{ feature.key }}">
+                            <option value="">{{ _('Select...') }}</option>
+                            <option value="critical">{{ _("Critical - can't do my job without it") }}</option>
+                            <option value="very_important">{{ _('Very important') }}</option>
+                            <option value="somewhat_important">{{ _('Somewhat important') }}</option>
+                            <option value="nice_to_have">{{ _('Nice to have') }}</option>
+                            <option value="not_important">{{ _('Not important') }}</option>
+                        </select>
+                    </div>
+
+                    <div class="feature-sub-question">
+                        <label>{{ _('How satisfied are you with this feature?') }}</label>
+                        <div class="satisfaction-scale">
+                            {% for val in range(1, 6) %}
+                            <label><input type="radio" name="feature_satisfaction_{{ feature.key }}" value="{{ val }}"><span class="sat-btn">{{ val }}</span></label>
+                            {% endfor %}
+                        </div>
+                        <div class="nps-anchors" style="max-width: 300px;">
+                            <span>{{ _('Very dissatisfied') }}</span>
+                            <span>{{ _('Very satisfied') }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+            <div class="d-flex justify-content-between mt-3">
+                <button type="button" class="btn btn-nav btn-nav-prev" onclick="goToSection(1)">
+                    <i class="fas fa-arrow-left me-2"></i>{{ _('Previous') }}
+                </button>
+                {% if sections_enabled.get('section_3', True) %}
+                <button type="button" class="btn btn-nav btn-nav-next" onclick="goToSection(3)">
+                    {{ _('Next') }} <i class="fas fa-arrow-right ms-2"></i>
+                </button>
+                {% else %}
+                <button type="submit" class="btn btn-submit">
+                    <i class="fas fa-paper-plane me-2"></i>{{ _('Submit Survey') }}
+                </button>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- ==================== SECTION 3: Additional Insights ==================== -->
+        {% if sections_enabled.get('section_3', True) %}
+        <div class="survey-section" id="section3" data-section="3">
+            <div class="section-header">
+                <h2><i class="fas fa-lightbulb me-2" style="color: var(--primary-red);"></i>{{ _('Additional Insights') }}</h2>
+                <p>{{ _('Help us understand what matters most to you') }}</p>
+            </div>
+
+            <div class="question-block">
+                <div class="question-label">{{ _('Which feature do you find MOST valuable and why?') }}</div>
+                <textarea class="form-control" name="most_valuable_feature" rows="3" placeholder="{{ _('Tell us about the feature you value most...') }}"></textarea>
+            </div>
+
+            <div class="question-block">
+                <div class="question-label">{{ _('Which feature needs the MOST improvement and why?') }}</div>
+                <textarea class="form-control" name="most_improvement_needed" rows="3" placeholder="{{ _('Tell us what could be improved...') }}"></textarea>
+            </div>
+
+            <div class="question-block">
+                <div class="question-label">{{ _('Please describe your biggest pain point or challenge when using our product:') }}</div>
+                <textarea class="form-control" name="biggest_pain_point" rows="3" placeholder="{{ _('Describe your biggest challenge...') }}"></textarea>
+            </div>
+
+            <div class="question-block">
+                <div class="question-label">{{ _('Are there any features or capabilities you expected but didn\'t find?') }}</div>
+                <textarea class="form-control" name="missing_features" rows="3" placeholder="{{ _('Tell us what you expected...') }}"></textarea>
+            </div>
+
+            <div class="question-block">
+                <div class="question-label">{{ _('Have you recommended us to others?') }}</div>
+                <div class="recommendation-options">
+                    <label>
+                        <input type="radio" name="recommendation_status" value="recommended">
+                        {{ _('Yes, I have recommended you') }}
+                    </label>
+                    <label>
+                        <input type="radio" name="recommendation_status" value="would_consider">
+                        {{ _('No, but I would consider it') }}
+                    </label>
+                    <label>
+                        <input type="radio" name="recommendation_status" value="would_not_recommend">
+                        {{ _('No, and I wouldn\'t recommend you') }}
+                    </label>
+                </div>
+            </div>
+
+            <div class="question-block nps-dynamic-question" id="recommendationBlocker" style="display: none;">
+                <div class="question-label">{{ _('What holds you back from recommending us?') }}</div>
+                <textarea class="form-control" name="recommendation_blocker" rows="3" placeholder="{{ _('Please share your concerns...') }}"></textarea>
+            </div>
+
+            <div class="d-flex justify-content-between mt-3">
+                <button type="button" class="btn btn-nav btn-nav-prev" onclick="goToSection({{ 2 if sections_enabled.get('section_2', True) else 1 }})">
+                    <i class="fas fa-arrow-left me-2"></i>{{ _('Previous') }}
+                </button>
+                <button type="submit" class="btn btn-submit" id="submitBtn">
+                    <i class="fas fa-paper-plane me-2"></i>{{ _('Submit Survey') }}
+                </button>
+            </div>
+        </div>
+        {% endif %}
+    </form>
+</div>
+
+<script>
+var currentSection = 1;
+var totalSections = {{ 3 if sections_enabled.get('section_3', True) else (2 if sections_enabled.get('section_2', True) else 1) }};
+
+var driverLabels = {
+    detractor: "{{ _('What were the main factors that led to your score?') }}",
+    passive: "{{ _('What\\'s preventing you from rating us higher?') }}",
+    promoter: "{{ _('What do you value most about us?') }}"
+};
+
+var improvementLabels = {
+    detractor: "{{ _('What would it take for us to earn a score of 9 or 10 from you?') }}",
+    passive: "{{ _('What would it take for us to earn a score of 9 or 10 from you?') }}",
+    promoter: "{{ _('What could we do even better?') }}"
+};
+
+function updateProgress() {
+    var pct = Math.round((currentSection / totalSections) * 100);
+    document.getElementById('progressBar').style.width = pct + '%';
+    document.getElementById('progressPercent').textContent = pct + '%';
+    document.getElementById('progressText').textContent = "{{ _('Section') }} " + currentSection + " {{ _('of') }} " + totalSections;
+}
+
+function goToSection(num) {
+    if (num === 2 && currentSection === 1) {
+        var npsSelected = document.querySelector('input[name="nps_score"]:checked');
+        if (!npsSelected) {
+            document.getElementById('npsError').classList.add('show');
+            document.getElementById('npsScale').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
+        document.getElementById('npsError').classList.remove('show');
+    }
+
+    document.querySelectorAll('.survey-section').forEach(function(s) {
+        s.classList.remove('active');
+    });
+
+    var target = document.getElementById('section' + num);
+    if (target) {
+        target.classList.add('active');
+        currentSection = num;
+        updateProgress();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+}
+
+document.querySelectorAll('input[name="nps_score"]').forEach(function(radio) {
+    radio.addEventListener('change', function() {
+        var score = parseInt(this.value);
+        var category = score <= 6 ? 'detractor' : (score <= 8 ? 'passive' : 'promoter');
+
+        document.getElementById('driverQuestionLabel').textContent = driverLabels[category];
+        document.getElementById('improvementLabel').textContent = improvementLabels[category];
+
+        document.querySelectorAll('#section1 .nps-dynamic-question').forEach(function(el) {
+            el.classList.add('visible');
+        });
+
+        document.getElementById('npsError').classList.remove('show');
+    });
+});
+
+function toggleOtherDriver() {
+    var otherChecked = document.getElementById('driver_other').checked;
+    document.getElementById('otherDriverField').style.display = otherChecked ? 'block' : 'none';
+}
+
+function toggleFeatureDetails(featureKey, value) {
+    var details = document.getElementById('featureDetails_' + featureKey);
+    if (details) {
+        details.style.display = (value === 'yes') ? 'block' : 'none';
+    }
+}
+
+document.querySelectorAll('input[name="recommendation_status"]').forEach(function(radio) {
+    radio.addEventListener('change', function() {
+        var blocker = document.getElementById('recommendationBlocker');
+        if (this.value === 'would_not_recommend') {
+            blocker.style.display = 'block';
+        } else {
+            blocker.style.display = 'none';
+        }
+    });
+});
+
+document.getElementById('classicSurveyForm').addEventListener('submit', function(e) {
+    var npsSelected = document.querySelector('input[name="nps_score"]:checked');
+    if (!npsSelected) {
+        e.preventDefault();
+        goToSection(1);
+        document.getElementById('npsError').classList.add('show');
+        document.getElementById('npsScale').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return false;
+    }
+
+    var submitBtn = document.getElementById('submitBtn');
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>{{ _("Submitting...") }}';
+    }
+});
+
+updateProgress();
+</script>
+{% endblock %}
