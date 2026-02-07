@@ -327,6 +327,70 @@ def create_campaign():
                              business_account=current_account.to_dict() if current_account else {})
 
 
+@campaign_bp.route('/<int:campaign_id>/preview_survey')
+@require_business_auth
+def preview_classic_survey(campaign_id):
+    """Preview classic survey questionnaire without requiring activation or participant token"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            flash('Business account context not found.', 'error')
+            return redirect(url_for('business_auth.login'))
+
+        campaign = Campaign.query.filter_by(
+            id=campaign_id,
+            business_account_id=current_account.id
+        ).first()
+
+        if not campaign:
+            flash('Campaign not found.', 'error')
+            return redirect(url_for('campaigns.list_campaigns'))
+
+        if campaign.survey_type != 'classic':
+            flash('Preview is only available for classic surveys.', 'warning')
+            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+
+        classic_config = ClassicSurveyConfig.query.filter_by(campaign_id=campaign.id).first()
+
+        from routes import get_branding_context
+        branding = get_branding_context(current_account.id)
+
+        lang = session.get('language', 'en')
+
+        driver_labels = []
+        if classic_config and classic_config.driver_labels:
+            driver_labels = classic_config.driver_labels
+
+        features = []
+        if classic_config and classic_config.features:
+            features = classic_config.features
+
+        sections_enabled = {'section_1': True, 'section_2': True, 'section_3': True}
+        if classic_config and classic_config.sections_enabled:
+            sections_enabled = classic_config.sections_enabled
+
+        return render_template('classic_survey.html',
+                             authenticated=True,
+                             email=session.get('business_email', ''),
+                             participant_name='Preview User',
+                             participant_company=current_account.company_name or 'Preview Company',
+                             campaign_name=campaign.name,
+                             campaign=campaign,
+                             classic_config=classic_config,
+                             driver_labels=driver_labels,
+                             features=features,
+                             sections_enabled=sections_enabled,
+                             lang=lang,
+                             branding=branding,
+                             token='',
+                             preview_mode=True)
+
+    except Exception as e:
+        logging.error(f"Error in classic survey preview: {e}")
+        flash('Unable to load survey preview.', 'error')
+        return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+
+
 @campaign_bp.route('/<int:campaign_id>')
 @require_business_auth
 def view_campaign(campaign_id):

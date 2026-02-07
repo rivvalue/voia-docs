@@ -541,10 +541,10 @@
                         {% endif %}
                     </a>
                     {% else %}
-                    <span class="btn btn-outline-secondary" title="{{ _('Classic surveys use a fixed questionnaire format') }}">
-                        <i class="fas fa-clipboard-list me-2"></i>{{ _('Classic Survey') }}
-                        <span class="badge bg-info ms-1"><i class="fas fa-check"></i></span>
-                    </span>
+                    <a href="{{ url_for('campaigns.preview_classic_survey', campaign_id=campaign.id) }}" 
+                       class="btn btn-secondary" target="_blank" title="{{ _('Preview the classic survey questionnaire') }}">
+                        <i class="fas fa-eye me-2"></i>{{ _('Preview Survey') }}
+                    </a>
                     {% endif %}
                 </div>
             </div>
@@ -572,10 +572,10 @@
                     {% endif %}
                 </a>
                 {% else %}
-                <span class="btn btn-outline-secondary" title="{{ _('Classic surveys use a fixed questionnaire format') }}">
-                    <i class="fas fa-clipboard-list me-2"></i>{{ _('Classic Survey') }}
-                    <span class="badge bg-info ms-1"><i class="fas fa-check"></i></span>
-                </span>
+                <a href="{{ url_for('campaigns.preview_classic_survey', campaign_id=campaign.id) }}" 
+                   class="btn btn-secondary" target="_blank" title="{{ _('Preview the classic survey questionnaire') }}">
+                    <i class="fas fa-eye me-2"></i>{{ _('Preview Survey') }}
+                </a>
                 {% endif %}
             </div>
         {% endif %}

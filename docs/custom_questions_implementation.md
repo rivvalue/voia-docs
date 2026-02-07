@@ -72,6 +72,25 @@ Add Classic Survey as an alternative survey type alongside the existing Conversa
 5. Submit → saves to database with `source_type='traditional'`
 6. Check conversational campaign → confirm zero impact (chat interface unchanged)
 
+### Phase 2b: Survey Preview (COMPLETED)
+
+**What was built:**
+- [x] `/campaigns/<id>/preview_survey` route — business-authenticated preview of the classic survey questionnaire
+- [x] Preview mode banner with "Back to Campaign" link at top of survey
+- [x] Form submission disabled in preview mode (`onsubmit="return false;"`, submit button disabled)
+- [x] "Preview Survey" button replaces the static "Classic Survey" badge on campaign view page (both with-participants and no-participants states)
+- [x] Opens in new tab (`target="_blank"`) so campaign manager stays on the campaign page
+- [x] Tenant isolation enforced — only the campaign owner's business account can preview
+
+**Files modified:** `campaign_routes.py`, `templates/classic_survey.html`, `templates/campaigns/view.html`
+
+**Validation guide:**
+1. View any classic campaign (draft or active) → confirm "Preview Survey" button appears
+2. Click "Preview Survey" → opens the full survey form in a new tab with preview banner
+3. Walk through all 3 sections → NPS selection, driver checkboxes, feature evaluation, insights all interactive
+4. Submit button shows "Preview Only — Submit Disabled" and cannot be clicked
+5. "Back to Campaign" link returns to the campaign view
+
 ### Phase 3+ (Planned)
 
 - Classic survey config UI (admin editing of drivers/features/sections)

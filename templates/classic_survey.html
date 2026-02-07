@@ -422,6 +422,18 @@
         {% endif %}
     </div>
 
+    {% if preview_mode %}
+    <div class="alert alert-warning d-flex align-items-center mb-3" style="border-radius: var(--radius-lg); font-size: 0.95rem;">
+        <i class="fas fa-eye me-2" style="font-size: 1.2rem;"></i>
+        <div>
+            <strong>{{ _('Preview Mode') }}</strong> — {{ _('This is a preview of the survey questionnaire. Responses will not be saved.') }}
+            <a href="{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}" class="ms-2 text-decoration-underline">
+                <i class="fas fa-arrow-left me-1"></i>{{ _('Back to Campaign') }}
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
     <div class="progress-label">
         <span id="progressText">{{ _('Section') }} 1 {{ _('of') }} {{ 3 if sections_enabled.get('section_3', True) else (2 if sections_enabled.get('section_2', True) else 1) }}</span>
         <span id="progressPercent">0%</span>
@@ -430,9 +442,9 @@
         <div class="progress-bar-fill" id="progressBar" style="width: 0%"></div>
     </div>
 
-    <form method="POST" action="{{ url_for('submit_classic_survey') }}" id="classicSurveyForm">
+    <form method="POST" action="{% if not preview_mode %}{{ url_for('submit_classic_survey') }}{% else %}#{% endif %}" id="classicSurveyForm" {% if preview_mode %}onsubmit="return false;"{% endif %}>
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <input type="hidden" name="token" value="{{ token }}">
+        <input type="hidden" name="token" value="{{ token or '' }}">
         <input type="hidden" name="participant_name" value="{{ participant_name or '' }}">
         <input type="hidden" name="participant_company" value="{{ participant_company or '' }}">
 
@@ -676,9 +688,15 @@
                 <button type="button" class="btn btn-nav btn-nav-prev" onclick="goToSection({{ 2 if sections_enabled.get('section_2', True) else 1 }})">
                     <i class="fas fa-arrow-left me-2"></i>{{ _('Previous') }}
                 </button>
+                {% if preview_mode %}
+                <button type="button" class="btn btn-submit" disabled style="opacity: 0.6; cursor: not-allowed;">
+                    <i class="fas fa-eye me-2"></i>{{ _('Preview Only — Submit Disabled') }}
+                </button>
+                {% else %}
                 <button type="submit" class="btn btn-submit" id="submitBtn">
                     <i class="fas fa-paper-plane me-2"></i>{{ _('Submit Survey') }}
                 </button>
+                {% endif %}
             </div>
         </div>
         {% endif %}
