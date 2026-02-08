@@ -450,8 +450,8 @@
 </style>
 
 <div class="classic-survey-container">
-    <!-- Welcome / Landing Section (hidden in preview mode) -->
-    <div id="classicWelcomeSection" {% if preview_mode %}style="display: none;"{% endif %}>
+    <!-- Welcome / Landing Section (hidden in preview mode and completed state) -->
+    <div id="classicWelcomeSection" {% if preview_mode or survey_completed %}style="display: none;"{% endif %}>
         
         <!-- Hero Section — V2 design matching conversational survey -->
         <div class="conv-hero" role="banner">
@@ -538,8 +538,8 @@
         </div>
     </div>
 
-    <!-- Survey Form (hidden until Start Survey is clicked, visible in preview mode) -->
-    <div id="classicSurveyFormWrapper" {% if preview_mode %}style="display: block;"{% else %}style="display: none;"{% endif %}>
+    <!-- Survey Form (hidden until Start Survey is clicked, visible in preview mode, hidden when completed) -->
+    <div id="classicSurveyFormWrapper" {% if survey_completed %}style="display: none;"{% elif preview_mode %}style="display: block;"{% else %}style="display: none;"{% endif %}>
     
     {% if branding and branding.logo_url %}
     <div class="text-center mb-3">
@@ -835,9 +835,69 @@
         {% endif %}
     </form>
     </div><!-- end classicSurveyFormWrapper -->
+
+    <!-- Survey Complete Section (shown after successful submission) -->
+    {% if survey_completed %}
+    <div id="classicSurveyComplete">
+        <div class="conv-card">
+            <div class="conv-complete">
+                <div class="conv-complete-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                
+                {% if participant_name %}
+                <h4>{{ _('Thank you, {}!').format(participant_name) }}</h4>
+                {% else %}
+                <h4>{{ _('Thank you!') }}</h4>
+                {% endif %}
+                
+                <p class="lead mb-2">
+                    {% if campaign_name %}
+                    {{ _('Your feedback for') }} <strong>{{ campaign_name }}</strong> {{ _('has been successfully submitted.') }}
+                    {% else %}
+                    {{ _('Your feedback has been successfully submitted.') }}
+                    {% endif %}
+                </p>
+                
+                {% if custom_end_message %}
+                <div class="conv-complete-message">
+                    <p class="mb-0">{{ custom_end_message }}</p>
+                </div>
+                {% else %}
+                <p class="text-muted mb-4">
+                    {{ _('Your insights help us continuously improve our services. Thank you for taking the time to share your experience.') }}
+                </p>
+                {% endif %}
+                
+                <div class="border rounded p-4 mb-4" style="background-color: var(--light-gray); border-color: var(--medium-gray) !important;">
+                    <h5 class="mb-3" style="font-family: var(--font-family-headings); font-weight: 600;">
+                        <i class="fas fa-info-circle me-2" style="color: var(--primary-red);"></i>{{ _('What Happens Next?') }}
+                    </h5>
+                    <ul class="text-start" style="list-style: none; padding-left: 0; font-family: var(--font-family-base);">
+                        <li class="mb-2">
+                            <i class="fas fa-robot me-2" style="color: var(--primary-red);"></i>
+                            {{ _('Our AI analyzes your feedback to extract key insights') }}
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-chart-bar me-2" style="color: var(--primary-red);"></i>
+                            {{ _('Your responses contribute to comprehensive analytics') }}
+                        </li>
+                        <li>
+                            <i class="fas fa-users me-2" style="color: var(--primary-red);"></i>
+                            {{ _('We use your input to improve our services and client experience') }}
+                        </li>
+                    </ul>
+                </div>
+                
+                <small class="text-muted">{{ _('You can now close this window.') }}</small>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </div>
 
 <script>
+{% if not survey_completed %}
 function startClassicSurvey() {
     document.getElementById('classicWelcomeSection').style.display = 'none';
     document.getElementById('classicSurveyFormWrapper').style.display = 'block';
@@ -947,5 +1007,6 @@ document.getElementById('classicSurveyForm').addEventListener('submit', function
 });
 
 updateProgress();
+{% endif %}
 </script>
 {% endblock %}

@@ -1239,20 +1239,41 @@ def submit_classic_survey():
             logger.error(f"Failed to queue AI analysis for classic survey: {e}")
             analysis_status = "failed"
         
+        # Capture context before invalidating session
+        business_account_id = session.get('business_account_id')
+        participant_name = data.get('participant_name', '').strip()
+        campaign_name_display = campaign.name if campaign else None
+        custom_end_message = campaign.custom_end_message if campaign and hasattr(campaign, 'custom_end_message') else None
+        campaign_lang = campaign.language_code if campaign and hasattr(campaign, 'language_code') else 'en'
+        branding = get_branding_context(business_account_id)
+        
+        # Explicitly set locale to campaign language for the completion page
+        session['language'] = campaign_lang
+        from flask_babel import refresh as babel_refresh
+        babel_refresh()
+        
         # Invalidate token
         session.pop('auth_token', None)
         session.pop('auth_email', None)
         session.permanent = False
         logger.info(f"Classic survey submitted by {authenticated_email} - Token invalidated")
         
-        # Get branding context for success page
-        branding = get_branding_context()
-        
-        return render_template('survey_success.html',
-                             response_id=response.id,
-                             analysis_status=analysis_status,
+        return render_template('classic_survey.html',
+                             survey_completed=True,
+                             participant_name=participant_name,
+                             campaign_name=campaign_name_display,
+                             custom_end_message=custom_end_message,
+                             branding=branding,
+                             authenticated=False,
                              email=authenticated_email,
-                             branding=branding)
+                             campaign=campaign,
+                             classic_config=None,
+                             driver_labels=[],
+                             features=[],
+                             sections_enabled={'section_1': False, 'section_2': False, 'section_3': False},
+                             lang=campaign_lang,
+                             token=None,
+                             preview_mode=False)
         
     except Exception as e:
         logger.error(f"Error in classic survey submission: {e}")
