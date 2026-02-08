@@ -1003,8 +1003,14 @@ def classic_survey():
         else:
             return redirect(url_for('server_auth'))
     
-    # Use centralized token verification
+    # Use centralized token verification (sets session['language'] from campaign.language_code)
     verification = verify_survey_access(token)
+    
+    # Force Babel to re-evaluate locale now that session['language'] is set
+    # Without this, Babel may have cached a locale from the browser Accept-Language header
+    from flask_babel import refresh as babel_refresh
+    babel_refresh()
+    
     if not verification['valid']:
         error_code = verification.get('error_code', 'invalid_token')
         branding = get_branding_context()
