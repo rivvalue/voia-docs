@@ -1742,12 +1742,14 @@ def campaign_responses(campaign_id):
             })
         
         # For HTML requests, render template
+        is_classic = campaign.survey_type == 'classic'
         return render_template('campaigns/responses_list.html',
                              campaign=campaign.to_dict(),
                              responses=responses_data,
                              pagination=pagination,
                              search_query=search_query,
-                             business_account=current_account.to_dict())
+                             business_account=current_account.to_dict(),
+                             is_classic=is_classic)
         
     except Exception as e:
         logger.error(f"Error loading campaign responses for campaign {campaign_id}: {e}")
@@ -1824,9 +1826,40 @@ def individual_response(campaign_id, participant_id):
             'campaign': campaign.to_dict()
         })
         
-        # Parse conversation history for chat display
+        is_classic = campaign.survey_type == 'classic'
+        
+        feature_evaluations = []
+        loyalty_driver_labels = []
+        classic_config = None
+        
+        if is_classic:
+            import json as json_mod
+            if survey_response.general_feedback:
+                try:
+                    feature_evaluations = json_mod.loads(survey_response.general_feedback) if isinstance(survey_response.general_feedback, str) else survey_response.general_feedback
+                    if not isinstance(feature_evaluations, list):
+                        feature_evaluations = []
+                except (json_mod.JSONDecodeError, TypeError):
+                    feature_evaluations = []
+            
+            classic_config = ClassicSurveyConfig.query.filter_by(campaign_id=campaign_id).first()
+            if classic_config and survey_response.loyalty_drivers:
+                driver_labels_data = classic_config.driver_labels or {}
+                nps_cat = (survey_response.nps_category or 'detractor').lower()
+                available_drivers = driver_labels_data.get(nps_cat, driver_labels_data.get('detractor', {}))
+                drivers_raw = survey_response.loyalty_drivers
+                if isinstance(drivers_raw, str):
+                    try:
+                        drivers_raw = json_mod.loads(drivers_raw)
+                    except (json_mod.JSONDecodeError, TypeError):
+                        drivers_raw = []
+                for driver_key in (drivers_raw or []):
+                    label = available_drivers.get(driver_key, driver_key.replace('_', ' ').title())
+                    loyalty_driver_labels.append({'key': driver_key, 'label': label})
+        
+        # Parse conversation history for chat display (conversational surveys only)
         conversation_history = []
-        if survey_response.conversation_history:
+        if not is_classic and survey_response.conversation_history:
             try:
                 import json
                 conversation_history = json.loads(survey_response.conversation_history)
@@ -1835,7 +1868,6 @@ def individual_response(campaign_id, participant_id):
                 if search_query:
                     for msg in conversation_history:
                         if 'content' in msg and search_query.lower() in msg['content'].lower():
-                            # Simple highlighting by wrapping matches in <mark> tags
                             content = msg['content']
                             highlighted = content.replace(
                                 search_query, f'<mark>{search_query}</mark>'
@@ -1861,7 +1893,10 @@ def individual_response(campaign_id, participant_id):
                              campaign=campaign.to_dict(),
                              conversation_history=conversation_history,
                              search_query=search_query,
-                             business_account=current_account.to_dict())
+                             business_account=current_account.to_dict(),
+                             is_classic=is_classic,
+                             feature_evaluations=feature_evaluations,
+                             loyalty_driver_labels=loyalty_driver_labels)
         
     except Exception as e:
         logger.error(f"Error loading individual response for participant {participant_id} in campaign {campaign_id}: {e}")

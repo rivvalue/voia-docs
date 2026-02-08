@@ -1,8 +1,8 @@
 # Classic Survey Feature - Implementation Plan
 
 **Created:** January 21, 2026  
-**Last Updated:** February 7, 2026  
-**Status:** Phase 2 Complete - Awaiting Approval  
+**Last Updated:** February 8, 2026  
+**Status:** Phase 2c Complete - Awaiting Approval  
 
 ---
 
@@ -90,6 +90,34 @@ Add Classic Survey as an alternative survey type alongside the existing Conversa
 3. Walk through all 3 sections → NPS selection, driver checkboxes, feature evaluation, insights all interactive
 4. Submit button shows "Preview Only — Submit Disabled" and cannot be clicked
 5. "Back to Campaign" link returns to the campaign view
+
+### Phase 2c: Response Viewing (COMPLETED)
+
+**What was built:**
+- [x] Updated `individual_response` route to detect classic surveys and parse classic-specific data:
+  - `general_feedback` JSON parsed into feature evaluation objects
+  - `loyalty_drivers` JSON resolved against `ClassicSurveyConfig` driver labels for human-readable display
+  - `is_classic` flag passed to template for conditional rendering
+- [x] Updated `individual_response.html` with classic-specific display:
+  - Ratings section shows CSAT (1-5) and CES (1-8) for classic; standard ratings for conversational
+  - Loyalty Drivers section with tag-style display
+  - Recommendation Status section with color-coded indicators (recommended/would consider/would not recommend)
+  - Right panel shows Feature Evaluations in card layout (usage, frequency, importance, satisfaction per feature) instead of conversation transcript
+  - `general_feedback` excluded from Written Feedback section for classic (it stores JSON, not text)
+- [x] Updated `responses_list.html` with classic-specific columns:
+  - CSAT and CES columns added to table for classic campaigns
+  - "Classic Survey" badge in page header
+- [x] Updated `campaign_responses` route to pass `is_classic` flag to template
+
+**Files modified:** `campaign_routes.py`, `templates/campaigns/individual_response.html`, `templates/campaigns/responses_list.html`
+
+**Validation guide:**
+1. Open a classic campaign → click "Responses" → confirm CSAT and CES columns appear in table, "Classic Survey" badge visible
+2. Click "View Details" on a classic response → confirm CSAT/CES scores shown in Ratings section
+3. Loyalty drivers display as tags (if selected by participant)
+4. Recommendation status shows color-coded indicator
+5. Right panel shows Feature Evaluations (not conversation transcript)
+6. Open a conversational campaign response → confirm layout unchanged (conversation transcript still shows)
 
 ### Phase 3+ (Planned)
 

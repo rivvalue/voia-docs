@@ -108,7 +108,11 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-md-8">
-                    <h1 class="mb-1">{{ campaign.name }} - Individual Responses</h1>
+                    <h1 class="mb-1">{{ campaign.name }} - {{ _('Individual Responses') }}
+                        {% if is_classic %}
+                        <span style="display: inline-block; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.75rem; font-weight: 500; background-color: rgba(255,255,255,0.2); color: white; vertical-align: middle; margin-left: 0.5rem;">{{ _('Classic Survey') }}</span>
+                        {% endif %}
+                    </h1>
                     <p class="mb-0 opacity-75">{{ _('Review and analyze individual participant responses') }}</p>
                 </div>
                 <div class="col-md-4 text-end">
@@ -176,6 +180,10 @@
                         <th>{{ _('Participant') }}</th>
                         <th>{{ _('Company') }}</th>
                         <th>{{ _('NPS Score') }}</th>
+                        {% if is_classic %}
+                        <th>{{ _('CSAT') }}</th>
+                        <th>{{ _('CES') }}</th>
+                        {% endif %}
                         <th>{{ _('Status') }}</th>
                         <th>{{ _('Response Date') }}</th>
                         <th class="text-end">{{ _('Actions') }}</th>
@@ -197,6 +205,22 @@
                                 {{ response.nps_score if response.nps_score is not none else 'N/A' }}
                             </span>
                         </td>
+                        {% if is_classic %}
+                        <td>
+                            {% if response.csat_score is not none %}
+                                <span class="data-value">{{ response.csat_score }}/5</span>
+                            {% else %}
+                                <span class="text-muted">N/A</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if response.ces_score is not none %}
+                                <span class="data-value">{{ response.ces_score }}/8</span>
+                            {% else %}
+                                <span class="text-muted">N/A</span>
+                            {% endif %}
+                        </td>
+                        {% endif %}
                         <td>
                             <span class="status-badge status-{{ response.completion_status or 'unknown' }}">
                                 {{ response.completion_status or 'Unknown' }}
@@ -217,7 +241,7 @@
                                               campaign_id=campaign.id, 
                                               participant_id=response.participant_id) }}{% if search_query %}?search={{ search_query }}{% endif %}" 
                                class="btn btn-sm btn-outline-danger">
-                                <i class="fas fa-eye me-1"></i>View Details
+                                <i class="fas fa-eye me-1"></i>{{ _('View Details') }}
                             </a>
                             {% endif %}
                         </td>

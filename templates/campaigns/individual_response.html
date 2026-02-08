@@ -249,6 +249,55 @@
     border: 1px solid var(--light-gray);
 }
 
+.feature-eval-card {
+    background: var(--light-gray, #f8f9fa);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    border: 1px solid #e9ecef;
+}
+
+.feature-eval-name {
+    font-weight: 600;
+    color: var(--primary-dark, #333);
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.feature-eval-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+}
+
+.feature-eval-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.feature-eval-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: var(--gray-dark, #6c757d);
+    letter-spacing: 0.5px;
+    margin-bottom: 0.15rem;
+}
+
+.feature-eval-value {
+    font-size: 0.85rem;
+    color: var(--primary-dark, #333);
+}
+
+.classic-badge {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    background-color: #e8f4fd;
+    color: #0d6efd;
+}
+
 @media (max-width: 768px) {
     .response-container {
         grid-template-columns: 1fr;
@@ -266,6 +315,10 @@
     
     .message-content {
         max-width: 85%;
+    }
+
+    .feature-eval-grid {
+        grid-template-columns: 1fr;
     }
 }
 </style>
@@ -333,7 +386,7 @@
             <!-- NPS and Ratings -->
             <div class="data-section">
                 <h3 class="section-title">
-                    <i class="fas fa-star"></i>Ratings & Scores
+                    <i class="fas fa-star"></i>{{ _('Ratings & Scores') }}
                 </h3>
                 <div class="data-item">
                     <span class="data-label">{{ _('NPS Score:') }}</span>
@@ -341,6 +394,20 @@
                         {{ response.nps_score if response.nps_score is not none else 'N/A' }}
                     </span>
                 </div>
+                {% if is_classic %}
+                {% if response.csat_score is not none %}
+                <div class="data-item">
+                    <span class="data-label">{{ _('CSAT Score:') }}</span>
+                    <span class="data-value">{{ response.csat_score }}/5</span>
+                </div>
+                {% endif %}
+                {% if response.ces_score is not none %}
+                <div class="data-item">
+                    <span class="data-label">{{ _('CES Score:') }}</span>
+                    <span class="data-value">{{ response.ces_score }}/8</span>
+                </div>
+                {% endif %}
+                {% else %}
                 {% if response.satisfaction_rating %}
                 <div class="data-item">
                     <span class="data-label">{{ _('Satisfaction:') }}</span>
@@ -373,7 +440,43 @@
                     <span class="data-label">{{ _('Support Quality:') }}</span>
                     <span class="data-value">{% if response.support_rating %}{{ response.support_rating }}/5{% else %}N/A{% endif %}</span>
                 </div>
+                {% endif %}
             </div>
+
+            {% if is_classic and loyalty_driver_labels %}
+            <div class="data-section">
+                <h3 class="section-title">
+                    <i class="fas fa-heart"></i>{{ _('Loyalty Drivers') }}
+                </h3>
+                <div class="themes-list">
+                    {% for driver in loyalty_driver_labels %}
+                    <span class="theme-tag">{{ driver.label }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if is_classic and response.recommendation_status %}
+            <div class="data-section">
+                <h3 class="section-title">
+                    <i class="fas fa-bullhorn"></i>{{ _('Recommendation') }}
+                </h3>
+                <div class="data-item">
+                    <span class="data-label">{{ _('Status:') }}</span>
+                    <span class="data-value">
+                        {% if response.recommendation_status == 'recommended' %}
+                            <span class="sentiment-indicator sentiment-positive"><i class="fas fa-check-circle"></i> {{ _('Has recommended') }}</span>
+                        {% elif response.recommendation_status == 'would_consider' %}
+                            <span class="sentiment-indicator sentiment-neutral"><i class="fas fa-minus-circle"></i> {{ _('Would consider recommending') }}</span>
+                        {% elif response.recommendation_status == 'would_not_recommend' %}
+                            <span class="sentiment-indicator sentiment-negative"><i class="fas fa-times-circle"></i> {{ _('Would not recommend') }}</span>
+                        {% else %}
+                            {{ response.recommendation_status }}
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+            {% endif %}
 
             <!-- AI Analysis -->
             <div class="data-section">
@@ -531,7 +634,7 @@
                     <p class="text-muted">{{ response.recommendation_reason }}</p>
                 </div>
                 {% endif %}
-                {% if response.general_feedback %}
+                {% if response.general_feedback and not is_classic %}
                 <div class="mb-2">
                     <span class="data-label d-block">{{ _('General Feedback:') }}</span>
                     <p class="text-muted">{{ response.general_feedback }}</p>
@@ -547,10 +650,93 @@
             {% endif %}
         </div>
 
+        {% if is_classic %}
+        <!-- Classic Survey Details Panel (Right Side) -->
+        <div class="conversation-panel">
+            <h3 class="section-title">
+                <i class="fas fa-clipboard-list"></i>{{ _('Classic Survey Details') }}
+            </h3>
+
+            {% if feature_evaluations %}
+            <div class="data-section">
+                <h4 class="section-title" style="font-size: 1rem;">
+                    <i class="fas fa-puzzle-piece"></i>{{ _('Feature Evaluations') }}
+                </h4>
+                {% for feature in feature_evaluations %}
+                <div class="feature-eval-card">
+                    <div class="feature-eval-name">{{ feature.name or feature.get('feature_name', 'Unknown') }}</div>
+                    <div class="feature-eval-grid">
+                        {% if feature.get('usage') %}
+                        <div class="feature-eval-item">
+                            <span class="feature-eval-label">{{ _('Usage') }}</span>
+                            <span class="feature-eval-value">
+                                {% if feature.usage == 'yes_active' %}{{ _('Active user') }}
+                                {% elif feature.usage == 'yes_occasional' %}{{ _('Occasional') }}
+                                {% elif feature.usage == 'no_unknown' %}{{ _('Not aware') }}
+                                {% elif feature.usage == 'no_unneeded' %}{{ _('Not needed') }}
+                                {% else %}{{ feature.usage }}{% endif %}
+                            </span>
+                        </div>
+                        {% endif %}
+                        {% if feature.get('frequency') %}
+                        <div class="feature-eval-item">
+                            <span class="feature-eval-label">{{ _('Frequency') }}</span>
+                            <span class="feature-eval-value">
+                                {% if feature.frequency == 'daily' %}{{ _('Daily') }}
+                                {% elif feature.frequency == 'weekly' %}{{ _('Weekly') }}
+                                {% elif feature.frequency == 'monthly' %}{{ _('Monthly') }}
+                                {% elif feature.frequency == 'rarely' %}{{ _('Rarely') }}
+                                {% else %}{{ feature.frequency }}{% endif %}
+                            </span>
+                        </div>
+                        {% endif %}
+                        {% if feature.get('importance') %}
+                        <div class="feature-eval-item">
+                            <span class="feature-eval-label">{{ _('Importance') }}</span>
+                            <span class="feature-eval-value">
+                                {% if feature.importance == 'critical' %}
+                                    <span style="color: #dc3545; font-weight: 600;">{{ _('Critical') }}</span>
+                                {% elif feature.importance == 'important' %}
+                                    <span style="color: #fd7e14; font-weight: 500;">{{ _('Important') }}</span>
+                                {% elif feature.importance == 'nice_to_have' %}
+                                    <span style="color: #6c757d;">{{ _('Nice to have') }}</span>
+                                {% elif feature.importance == 'not_important' %}
+                                    <span style="color: #adb5bd;">{{ _('Not important') }}</span>
+                                {% else %}{{ feature.importance }}{% endif %}
+                            </span>
+                        </div>
+                        {% endif %}
+                        {% if feature.get('satisfaction') %}
+                        <div class="feature-eval-item">
+                            <span class="feature-eval-label">{{ _('Satisfaction') }}</span>
+                            <span class="feature-eval-value">
+                                {% set sat = feature.satisfaction|int %}
+                                {% for i in range(sat) %}<i class="fas fa-star" style="color: #ffc107; font-size: 0.8rem;"></i>{% endfor %}
+                                {% for i in range(5 - sat) %}<i class="far fa-star" style="color: #dee2e6; font-size: 0.8rem;"></i>{% endfor %}
+                                <span class="ms-1">({{ sat }}/5)</span>
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% if not feature_evaluations %}
+            <div class="text-center py-4">
+                <i class="fas fa-clipboard-check fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">{{ _('No Feature Evaluations') }}</h5>
+                <p class="text-muted">{{ _('This participant did not complete the feature evaluation section.') }}</p>
+            </div>
+            {% endif %}
+        </div>
+
+        {% else %}
         <!-- Conversation Panel (Right Side) -->
         <div class="conversation-panel">
             <h3 class="section-title">
-                <i class="fas fa-comments"></i>Conversation Transcript
+                <i class="fas fa-comments"></i>{{ _('Conversation Transcript') }}
             </h3>
             
             <div class="conversation-transcript">
@@ -588,11 +774,12 @@
                     <div class="text-center py-5">
                         <i class="fas fa-comment-slash fa-3x text-muted mb-3"></i>
                         <h5 class="text-muted">{{ _('No Conversation History') }}</h5>
-                        <p class="text-muted">{{ _("This response doesn't contain conversational transcript data.") }}</p>
+                        <p class="text-muted">{{ _("This response does not contain conversational transcript data.") }}</p>
                     </div>
                 {% endif %}
             </div>
         </div>
+        {% endif %}
     </div>
 </div>
 
