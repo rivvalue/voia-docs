@@ -861,7 +861,10 @@ def activate_campaign(campaign_id):
             flash('Campagne introuvable.', 'error')
             return redirect(url_for('campaigns.list_campaigns'))
         
-        # Validate campaign can be activated
+        if campaign.status == 'active':
+            flash(f'Campaign "{campaign.name}" is already active.', 'info')
+            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        
         if campaign.status != 'ready':
             flash(f'Campaign must be ready to activate. Current status: {campaign.status}', 'error')
             return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
