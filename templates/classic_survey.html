@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base_minimal.html" %}
 
 {% block title %}{{ _('Survey') }} - {% if branding and branding.company_name %}{{ branding.company_name }}{% else %}VOÏA{% endif %}{% endblock %}
 
@@ -406,172 +406,116 @@
     display: block;
 }
 
-.classic-welcome-hero {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-    color: white;
-    padding: 2.5rem 2rem;
-    border-radius: var(--radius-2xl);
-    margin-bottom: 2rem;
-    text-align: center;
-}
-
-.classic-welcome-hero .welcome-brand-block {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-}
-
-.classic-welcome-hero .welcome-business-logo {
-    max-height: 50px;
-    border-radius: 8px;
-    background: white;
-    padding: 4px;
-}
-
-.classic-welcome-hero .welcome-company-name {
-    font-size: 1.4rem;
-    font-weight: 700;
-    margin: 0;
-}
-
-.classic-welcome-hero .welcome-company-tagline {
-    font-size: 0.9rem;
-    opacity: 0.8;
-    margin: 0;
-}
-
-.classic-welcome-hero .welcome-greeting {
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
-}
-
-.classic-welcome-hero .welcome-campaign-meta {
-    text-align: left;
-    max-width: 500px;
-    margin: 0 auto 1rem;
-    font-size: 0.95rem;
-}
-
-.classic-welcome-hero .welcome-campaign-meta > div {
-    padding: 0.4rem 0;
-    opacity: 0.9;
-}
-
-.classic-welcome-hero .welcome-powered-footer {
-    margin-top: 1.5rem;
-    font-size: 0.85rem;
-    opacity: 0.7;
-}
-
-.classic-welcome-hero .voia-red-accent {
-    color: #E13A44;
-}
-
 .classic-welcome-card {
-    background: white;
+    background: var(--primary-white);
     border-radius: var(--radius-xl);
-    padding: 2rem;
-    margin-bottom: 1.5rem;
+    padding: var(--spacing-2xl);
+    margin-bottom: var(--spacing-lg);
     box-shadow: var(--shadow-md);
     border: 1px solid var(--light-gray);
 }
 
 .classic-welcome-card .welcome-card-header {
-    border-bottom: 2px solid var(--primary-red);
-    padding-bottom: 0.75rem;
-    margin-bottom: 1.5rem;
+    border-bottom: 2px solid var(--light-gray);
+    padding-bottom: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
 }
 
 .classic-welcome-card .welcome-card-header h5 {
-    font-size: 1.1rem;
+    font-family: var(--font-family-headings);
+    font-size: var(--font-size-lg);
     font-weight: 600;
-    margin-bottom: 0.25rem;
+    color: var(--neutral-dark);
+    margin-bottom: var(--spacing-xs);
 }
 
 .classic-welcome-card .welcome-card-header small {
-    color: #6c757d;
+    color: var(--gray-dark);
+    font-family: var(--font-family-base);
+}
+
+.classic-welcome-card .form-label {
+    font-family: var(--font-family-base);
+    font-weight: 600;
+    color: var(--neutral-dark);
+    font-size: var(--font-size-sm);
 }
 
 .classic-welcome-card .form-control[readonly] {
     background-color: #f8f9fa;
-    border-color: #e9ecef;
-}
-
-.classic-welcome-card .btn-start-survey {
-    background: linear-gradient(135deg, var(--primary-red) 0%, #c4303a 100%);
-    color: white;
-    border: none;
-    padding: 0.85rem 2rem;
-    font-size: 1.05rem;
-    font-weight: 600;
-    border-radius: var(--radius-lg);
-    transition: all 0.3s;
-}
-
-.classic-welcome-card .btn-start-survey:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(225, 58, 68, 0.3);
+    border-color: var(--light-gray);
+    color: var(--neutral-dark);
+    font-family: var(--font-family-base);
 }
 </style>
+
+<!-- Language Selector (Fixed Position) -->
+<div style="position: fixed; top: 20px; right: 20px; z-index: 9999;">
+    {% include 'components/language_selector.html' %}
+</div>
 
 <div class="classic-survey-container">
     <!-- Welcome / Landing Section (hidden in preview mode) -->
     <div id="classicWelcomeSection" {% if preview_mode %}style="display: none;"{% endif %}>
-        <div class="classic-welcome-hero" role="banner">
-            <div class="welcome-brand-block">
-                {% if branding and branding.logo_url %}
-                    <img src="{{ branding.logo_url }}" alt="{{ branding.company_name }}" class="welcome-business-logo">
-                {% endif %}
-                <div>
-                    {% if branding and branding.company_name %}
-                        <h1 class="welcome-company-name">{{ branding.company_name }}</h1>
+        
+        <!-- Hero Section — V2 design matching conversational survey -->
+        <div class="conv-hero" role="banner">
+            <div class="conv-hero-content">
+                <div class="conv-hero-primary" aria-label="{{ _('Survey information') }}">
+                    <div class="conv-brand-block">
+                        {% if branding and branding.logo_url %}
+                            <img src="{{ branding.logo_url }}" alt="{{ branding.company_name }}" class="conv-business-logo">
+                        {% endif %}
+                        <div class="conv-brand-text">
+                            {% if branding and branding.company_name %}
+                                <h1 class="conv-company-name">{{ branding.company_name }}</h1>
+                            {% endif %}
+                            {% if branding and branding.tagline %}
+                                <p class="conv-company-tagline">{{ branding.tagline }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    {% if participant_name %}
+                    <div class="conv-hero-welcome">
+                        <h2>{{ _('Hi') }} {{ participant_name }}, {{ _('thank you for participating') }}</h2>
+                    </div>
                     {% endif %}
-                    {% if branding and branding.tagline %}
-                        <p class="welcome-company-tagline">{{ branding.tagline }}</p>
+                    
+                    {% if campaign_name or campaign_description or campaign_end_date %}
+                    <div class="conv-campaign-meta" aria-label="{{ _('Campaign details') }}">
+                        {% if campaign_name %}
+                            <div class="conv-campaign-name">
+                                <i class="fas fa-bullseye me-2" aria-hidden="true"></i>
+                                <strong>{{ _('Campaign:') }}</strong> {{ campaign_name }}
+                            </div>
+                        {% endif %}
+                        {% if campaign_description %}
+                            <div class="conv-campaign-objective">
+                                <i class="fas fa-info-circle me-2" aria-hidden="true"></i>
+                                <strong>{{ _('Objective:') }}</strong> {{ campaign_description }}
+                            </div>
+                        {% endif %}
+                        {% if campaign_end_date %}
+                            <div class="conv-campaign-deadline">
+                                <i class="fas fa-clock me-2" aria-hidden="true"></i>
+                                <strong>{{ _('Please respond by:') }}</strong> 
+                                <span class="conv-deadline-date">{{ campaign_end_date.strftime('%B %d, %Y') if campaign_end_date else '' }}</span>
+                            </div>
+                        {% endif %}
+                    </div>
                     {% endif %}
                 </div>
-            </div>
-            
-            {% if participant_name %}
-            <div class="welcome-greeting">
-                {{ _('Hi') }} {{ participant_name }}, {{ _('thank you for participating') }}
-            </div>
-            {% endif %}
-            
-            {% if campaign_name or campaign_description or campaign_end_date %}
-            <div class="welcome-campaign-meta" aria-label="{{ _('Campaign details') }}">
-                {% if campaign_name %}
-                    <div>
-                        <i class="fas fa-bullseye me-2" aria-hidden="true"></i>
-                        <strong>{{ _('Campaign:') }}</strong> {{ campaign_name }}
-                    </div>
-                {% endif %}
-                {% if campaign_description %}
-                    <div>
-                        <i class="fas fa-info-circle me-2" aria-hidden="true"></i>
-                        <strong>{{ _('Objective:') }}</strong> {{ campaign_description }}
-                    </div>
-                {% endif %}
-                {% if campaign_end_date %}
-                    <div>
-                        <i class="fas fa-clock me-2" aria-hidden="true"></i>
-                        <strong>{{ _('Please respond by:') }}</strong> 
-                        <span>{{ campaign_end_date.strftime('%B %d, %Y') if campaign_end_date else '' }}</span>
-                    </div>
-                {% endif %}
-            </div>
-            {% endif %}
-            
-            <div class="welcome-powered-footer">
-                <span>{{ _('Powered by') }}</span>
-                <span style="font-weight: 700;">VO<span class="voia-red-accent">I</span>A</span>
-                <span>{{ _('Voice Of Client') }}</span>
+                
+                <div class="conv-hero-footer" aria-label="{{ _('Platform information') }}">
+                    <span class="conv-powered-text">{{ _('Powered by') }}</span>
+                    <span class="conv-voia-brand">VO<span class="voia-red-accent" style="color: #E13A44;">I</span>A</span>
+                    <span class="conv-voia-tagline">{{ _('Voice Of Client') }}</span>
+                </div>
             </div>
         </div>
         
+        <!-- Participant Info Card -->
         <div class="classic-welcome-card">
             <div class="welcome-card-header">
                 <h5><i class="fas fa-user-circle me-2"></i>{{ _('Your Information') }}</h5>
@@ -592,7 +536,7 @@
                     <label class="form-label">{{ _('Email Address') }}</label>
                     <input type="email" class="form-control" value="{{ email or '' }}" readonly>
                 </div>
-                <button type="button" class="btn btn-lg w-100 btn-start-survey" onclick="startClassicSurvey()">
+                <button type="button" class="btn btn-lg w-100 btn-voia-primary" onclick="startClassicSurvey()">
                     <i class="fas fa-clipboard-list me-2"></i>{{ _('Start Survey') }}
                 </button>
             </div>
