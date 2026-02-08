@@ -2,7 +2,7 @@
 
 **Created:** January 21, 2026  
 **Last Updated:** February 8, 2026  
-**Status:** Phase 2c Complete - Awaiting Approval  
+**Status:** Phase 2d Complete - Awaiting Approval  
 
 ---
 
@@ -118,6 +118,36 @@ Add Classic Survey as an alternative survey type alongside the existing Conversa
 4. Recommendation status shows color-coded indicator
 5. Right panel shows Feature Evaluations (not conversation transcript)
 6. Open a conversational campaign response → confirm layout unchanged (conversation transcript still shows)
+
+### Phase 2d: Welcome Page & V2 Design Compliance (COMPLETED)
+
+**What was built:**
+- [x] Welcome/landing page for classic survey participants — matching the conversational survey experience:
+  - Hero section with business branding (logo, company name, tagline)
+  - Personalized greeting ("Hi [name], thank you for participating")
+  - Campaign metadata (name, objective, respond-by deadline)
+  - Participant info card (company, name, email — read-only fields)
+  - "Start Survey" call-to-action button that reveals the survey form
+- [x] Switched template from `base.html` to `base_minimal.html` to remove the "Welcome to VOÏA Demo" navbar banner (not appropriate for real participants)
+- [x] Reused V2 `conv-hero` CSS classes (same as conversational survey) for consistent design:
+  - Primary-red gradient hero, Montserrat/Karla typography, V2 spacing/radius/shadow tokens
+  - `btn-voia-primary` for the Start Survey button
+- [x] Added fixed-position language selector (since `base_minimal.html` has no navbar)
+- [x] Preview mode bypasses welcome page — shows survey form directly for campaign managers
+- [x] Route updated to pass `campaign_description`, `campaign_start_date`, `campaign_end_date` to template
+- [x] CSRF token timeout extended to 2 hours to prevent "Security token validation failed" errors on longer sessions
+- [x] Campaign activation route improved: graceful handling when campaign is already active (info message instead of error)
+
+**Files modified:** `templates/classic_survey.html`, `routes.py`, `app.py`, `campaign_routes.py`
+
+**Validation guide:**
+1. Open a participant survey link for a classic campaign → welcome page appears with branding, greeting, campaign details
+2. No "Welcome to VOÏA Demo" banner in the navbar
+3. Participant info (name, email, company) displayed as read-only fields
+4. Click "Start Survey" → survey form appears, welcome page hides
+5. Language selector visible in top-right corner
+6. Preview mode (from campaign view) → survey form shows immediately, no welcome page
+7. Colors and layout match the conversational survey welcome page (V2 design tokens)
 
 ### Phase 3+ (Planned)
 
