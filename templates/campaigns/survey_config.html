@@ -601,11 +601,11 @@
             <!-- Customization Section -->
             <div class="form-section">
                 <div class="mb-3">
-                    <label for="custom_end_message" class="form-label">{{ _('Custom End Message') }}</label>
+                    <label for="custom_end_message" class="form-label">{{ _('Survey Termination Message') }}</label>
                     <textarea class="form-control" id="custom_end_message" name="custom_end_message" rows="3" 
-                              placeholder={{ _('Optional custom thank you message for survey completion') }}
+                              placeholder="{{ _('e.g., Your feedback will be reviewed by our team within 48 hours. We will follow up with you if needed.') }}"
                               {% if is_readonly %}disabled{% endif %}>{{ campaign.custom_end_message or '' }}</textarea>
-                    <div class="form-text">{{ _('Personalized message shown when participants complete the survey') }}</div>
+                    <div class="form-text">{{ _('Custom message displayed in the "What Happens Next?" section after survey completion. Leave empty for a simple default thank you.') }}</div>
                     {% if campaign.custom_end_message %}
                     <div class="preview-container" id="end_message_preview">
                         "{{ campaign.custom_end_message }}"

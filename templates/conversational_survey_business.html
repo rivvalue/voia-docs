@@ -168,37 +168,17 @@
                     </p>
                     
                     {% if custom_end_message %}
-                    <!-- Custom Completion Message from Campaign Settings -->
-                    <div class="conv-complete-message">
-                        <p class="mb-0">{{ custom_end_message }}</p>
-                    </div>
-                    {% else %}
-                    <!-- Default Completion Message -->
-                    <p class="text-muted mb-4">
-                        {{ _('Your insights help us continuously improve our services. Thank you for taking the time to share your experience.') }}
-                    </p>
-                    {% endif %}
-                    
-                    <!-- What Happens Next Section -->
                     <div class="border rounded p-4 mb-4" style="background-color: #f8f9fa; border-color: #e5e7eb !important;">
                         <h5 class="mb-3" style="font-family: 'Montserrat', sans-serif; font-weight: 600;">
                             <i class="fas fa-info-circle me-2" style="color: #E13A44;"></i>{{ _('What Happens Next?') }}
                         </h5>
-                        <ul class="text-start" style="list-style: none; padding-left: 0; font-family: 'Karla', sans-serif;">
-                            <li class="mb-2">
-                                <i class="fas fa-robot me-2" style="color: #E13A44;"></i>
-                                {{ _('Our AI analyzes your feedback to extract key insights') }}
-                            </li>
-                            <li class="mb-2">
-                                <i class="fas fa-chart-bar me-2" style="color: #E13A44;"></i>
-                                {{ _('Your responses contribute to comprehensive analytics') }}
-                            </li>
-                            <li>
-                                <i class="fas fa-users me-2" style="color: #E13A44;"></i>
-                                {{ _('We use your input to improve our services and client experience') }}
-                            </li>
-                        </ul>
+                        <p class="mb-0" style="font-family: 'Karla', sans-serif;">{{ custom_end_message }}</p>
                     </div>
+                    {% else %}
+                    <p class="text-muted mb-4">
+                        {{ _('Your insights help us continuously improve our services. Thank you for taking the time to share your experience.') }}
+                    </p>
+                    {% endif %}
                     
                     <small class="text-muted">{{ _('You can now close this window.') }}</small>
                 </div>
