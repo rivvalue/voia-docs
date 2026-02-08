@@ -55,7 +55,8 @@ CORS(app,
      allow_headers=['Content-Type', 'Authorization', 'Accept', 'X-CSRFToken'],
      supports_credentials=True)
 
-# Disable template caching for development
+app.config["WTF_CSRF_TIME_LIMIT"] = 7200
+
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 # Static file caching: Enable in production for performance, disable in dev for convenience
