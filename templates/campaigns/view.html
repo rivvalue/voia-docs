@@ -541,9 +541,13 @@
                         {% endif %}
                     </a>
                     {% else %}
+                    <a href="{{ url_for('campaigns.classic_survey_config', campaign_id=campaign.id) }}" 
+                       class="btn btn-secondary">
+                        <i class="fas fa-cog me-2"></i>{{ _('Configure Survey') }}
+                    </a>
                     <a href="{{ url_for('campaigns.preview_classic_survey', campaign_id=campaign.id) }}" 
-                       class="btn btn-secondary" target="_blank" title="{{ _('Preview the classic survey questionnaire') }}">
-                        <i class="fas fa-eye me-2"></i>{{ _('Preview Survey') }}
+                       class="btn btn-outline-secondary" target="_blank" title="{{ _('Preview the classic survey questionnaire') }}">
+                        <i class="fas fa-eye me-2"></i>{{ _('Preview') }}
                     </a>
                     {% endif %}
                 </div>
@@ -572,9 +576,13 @@
                     {% endif %}
                 </a>
                 {% else %}
+                <a href="{{ url_for('campaigns.classic_survey_config', campaign_id=campaign.id) }}" 
+                   class="btn btn-secondary">
+                    <i class="fas fa-cog me-2"></i>{{ _('Configure Survey') }}
+                </a>
                 <a href="{{ url_for('campaigns.preview_classic_survey', campaign_id=campaign.id) }}" 
-                   class="btn btn-secondary" target="_blank" title="{{ _('Preview the classic survey questionnaire') }}">
-                    <i class="fas fa-eye me-2"></i>{{ _('Preview Survey') }}
+                   class="btn btn-outline-secondary" target="_blank" title="{{ _('Preview the classic survey questionnaire') }}">
+                    <i class="fas fa-eye me-2"></i>{{ _('Preview') }}
                 </a>
                 {% endif %}
             </div>

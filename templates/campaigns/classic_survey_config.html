@@ -1,0 +1,441 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Classic Survey Configuration') }} - {{ campaign.name }}{% endblock %}
+
+{% block page_class %}page-classic-survey-config{% endblock %}
+
+{% block content %}
+{# Breadcrumb Navigation #}
+{% set breadcrumb_items = [
+    {'label': _('Campaigns'), 'url': url_for('campaigns.list_campaigns')},
+    {'label': campaign.name, 'url': url_for('campaigns.view_campaign', campaign_id=campaign.id)},
+    {'label': _('Classic Survey Configuration'), 'current': true}
+] %}
+{% include 'components/breadcrumb.html' %}
+
+<style>
+.form-header {
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    color: var(--primary-white);
+    padding: 2rem 0;
+    border-radius: var(--radius-2xl);
+    margin-bottom: 2rem;
+}
+
+.form-container {
+    background: var(--primary-white);
+    border-radius: var(--radius-2xl);
+    padding: var(--spacing-2xl);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--light-gray);
+}
+
+.form-section {
+    margin-bottom: 2.5rem;
+    border: 1px solid var(--light-gray);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    background: var(--light-gray);
+}
+
+.form-section:last-child {
+    margin-bottom: 0;
+}
+
+.section-title {
+    color: var(--primary-black);
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.section-description {
+    color: var(--gray-dark);
+    font-size: var(--font-size-sm);
+    margin-bottom: 1.5rem;
+    line-height: var(--line-height-relaxed);
+}
+
+.driver-row {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    background: var(--primary-white);
+    padding: 0.75rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--medium-gray);
+}
+
+.driver-row .form-control {
+    flex: 1;
+    min-width: 0;
+}
+
+.feature-row {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    background: var(--primary-white);
+    padding: 0.75rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--medium-gray);
+}
+
+.feature-row .form-control {
+    flex: 1;
+    min-width: 0;
+}
+
+.feature-row .feature-number {
+    font-weight: 600;
+    color: var(--primary-red);
+    min-width: 24px;
+    text-align: center;
+    font-size: var(--font-size-sm);
+}
+
+.btn-remove-driver {
+    background: none;
+    border: 1px solid var(--primary-red);
+    color: var(--primary-red);
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    font-size: 1.1rem;
+    line-height: 1;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.btn-remove-driver:hover {
+    background: var(--primary-red);
+    color: var(--primary-white);
+}
+
+.section-toggle-item {
+    background: var(--primary-white);
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--medium-gray);
+    margin-bottom: 0.5rem;
+}
+
+.section-toggle-item .form-check-label {
+    font-weight: 500;
+}
+
+.section-toggle-item .toggle-description {
+    font-size: var(--font-size-xs);
+    color: var(--gray-dark);
+    margin-top: 0.25rem;
+    margin-left: 2.5rem;
+}
+
+.hint-text {
+    font-size: var(--font-size-xs);
+    color: var(--gray-dark);
+    margin-top: 0.5rem;
+    line-height: var(--line-height-relaxed);
+}
+
+.frozen-banner {
+    background-color: #fff3cd;
+    border: 1px solid #ffc107;
+    color: #856404;
+    border-radius: var(--radius-md);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.frozen-banner i {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    flex-wrap: wrap;
+    padding-top: 1rem;
+    border-top: 1px solid var(--medium-gray);
+}
+
+@media (max-width: 768px) {
+    .driver-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .driver-row .btn-remove-driver {
+        align-self: flex-end;
+    }
+
+    .feature-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .feature-row .feature-number {
+        text-align: left;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .action-buttons .btn {
+        width: 100%;
+    }
+
+    .form-container {
+        padding: var(--spacing-lg);
+    }
+}
+</style>
+
+<div class="container">
+    <div class="form-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-1">{{ _('Classic Survey Configuration') }}</h1>
+                    <p class="mb-0 opacity-75">{{ campaign.name }}</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <span class="badge bg-light text-dark">
+                        <i class="fas fa-clipboard-list me-1"></i>{{ _('Classic') }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-container">
+        {% if is_frozen %}
+        <div class="frozen-banner" role="alert">
+            <i class="fas fa-lock"></i>
+            <span>{{ _('This survey configuration is locked because the campaign has been activated. Changes are no longer allowed.') }}</span>
+        </div>
+        {% endif %}
+
+        <form method="POST" action="{{ url_for('campaigns.save_classic_survey_config', campaign_id=campaign.id) }}" id="classicSurveyForm">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="form-section">
+                <h3 class="section-title">
+                    <i class="fas fa-layer-group"></i>{{ _('Survey Sections') }}
+                </h3>
+                <p class="section-description">
+                    {{ _('Enable or disable sections of the classic survey. Section 1 (NPS & Drivers) is always required.') }}
+                </p>
+
+                <div class="section-toggle-item">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="section1Toggle" checked disabled>
+                        <label class="form-check-label" for="section1Toggle">
+                            {{ _('Section 1: NPS & Driver Attribution') }}
+                        </label>
+                    </div>
+                    <div class="toggle-description">{{ _('Core NPS question and driver selection. This section is always required.') }}</div>
+                </div>
+
+                <div class="section-toggle-item">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="section2Toggle"
+                               name="sections_enabled_section_2" value="true"
+                               {% if classic_config.sections_enabled.section_2 %}checked{% endif %}
+                               {% if is_frozen %}disabled{% endif %}>
+                        <label class="form-check-label" for="section2Toggle">
+                            {{ _('Section 2: Feature Evaluation') }}
+                        </label>
+                    </div>
+                    <div class="toggle-description">{{ _('Participants evaluate product features for usage, importance, and satisfaction.') }}</div>
+                </div>
+
+                <div class="section-toggle-item">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="section3Toggle"
+                               name="sections_enabled_section_3" value="true"
+                               {% if classic_config.sections_enabled.section_3 %}checked{% endif %}
+                               {% if is_frozen %}disabled{% endif %}>
+                        <label class="form-check-label" for="section3Toggle">
+                            {{ _('Section 3: Additional Insights') }}
+                        </label>
+                    </div>
+                    <div class="toggle-description">{{ _('Open-ended questions for deeper qualitative feedback.') }}</div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3 class="section-title">
+                    <i class="fas fa-tags"></i>{{ _('NPS Driver Labels') }}
+                </h3>
+                <p class="section-description">
+                    {{ _('Customize the driver labels that appear as checkbox options when participants explain their NPS score. Provide labels in both English and French.') }}
+                </p>
+
+                <div id="driverList">
+                    {% for driver in classic_config.driver_labels %}
+                    <div class="driver-row" data-index="{{ loop.index0 }}">
+                        <input type="hidden" name="driver_key_{{ loop.index0 }}" value="{{ driver.key }}">
+                        <input type="text" class="form-control" name="driver_label_en_{{ loop.index0 }}"
+                               value="{{ driver.label_en }}"
+                               placeholder="{{ _('English label') }}"
+                               {% if is_frozen %}disabled{% endif %}>
+                        <input type="text" class="form-control" name="driver_label_fr_{{ loop.index0 }}"
+                               value="{{ driver.label_fr }}"
+                               placeholder="{{ _('French label') }}"
+                               {% if is_frozen %}disabled{% endif %}>
+                        <button type="button" class="btn-remove-driver" onclick="removeDriverRow(this)"
+                                title="{{ _('Remove driver') }}"
+                                {% if is_frozen %}disabled{% endif %}>&times;</button>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                {% if not is_frozen %}
+                <button type="button" class="btn btn-outline-secondary btn-sm mt-2" onclick="addDriverRow()">
+                    <i class="fas fa-plus me-1"></i>{{ _('Add Driver') }}
+                </button>
+                {% endif %}
+                <div class="hint-text">{{ _('You can add up to 15 driver labels.') }}</div>
+            </div>
+
+            <div class="form-section">
+                <h3 class="section-title">
+                    <i class="fas fa-star"></i>{{ _('Feature Evaluation') }}
+                </h3>
+                <p class="section-description">
+                    {{ _('Define the product features or services that participants will evaluate for usage, importance, and satisfaction.') }}
+                </p>
+
+                <div class="mb-3">
+                    <label for="featureCount" class="form-label fw-semibold">{{ _('Number of Features') }}</label>
+                    <select class="form-select" id="featureCount" name="feature_count" onchange="updateFeatureCount()"
+                            style="max-width: 200px;"
+                            {% if is_frozen %}disabled{% endif %}>
+                        {% for i in range(1, (template_info.max_features or 9) + 1) %}
+                        <option value="{{ i }}" {% if classic_config.feature_count == i %}selected{% endif %}>{{ i }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div id="featureList">
+                    {% for i in range(template_info.max_features or 9) %}
+                    {% set feature = classic_config.features[i] if i < classic_config.features|length else none %}
+                    <div class="feature-row" id="featureRow{{ i }}" {% if i >= classic_config.feature_count %}style="display: none;"{% endif %}>
+                        <span class="feature-number">{{ i + 1 }}</span>
+                        <input type="hidden" name="feature_key_{{ i }}" value="{{ feature.key if feature else 'feature_' ~ (i + 1) }}">
+                        <input type="text" class="form-control" name="feature_name_en_{{ i }}"
+                               value="{{ feature.name_en if feature else '' }}"
+                               placeholder="{{ _('Feature name (English)') }}"
+                               {% if is_frozen %}disabled{% endif %}>
+                        <input type="text" class="form-control" name="feature_name_fr_{{ i }}"
+                               value="{{ feature.name_fr if feature else '' }}"
+                               placeholder="{{ _('Feature name (French)') }}"
+                               {% if is_frozen %}disabled{% endif %}>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="hint-text">
+                    {{ _('Give each feature a clear, specific name so participants understand what they\'re evaluating.') }}
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="action-buttons">
+                    <button type="submit" class="btn btn-primary" {% if is_frozen %}disabled{% endif %}>
+                        <i class="fas fa-save me-1"></i>{{ _('Save Configuration') }}
+                    </button>
+                    <a href="{{ url_for('campaigns.preview_classic_survey', campaign_id=campaign.id) }}"
+                       class="btn btn-outline-secondary" target="_blank">
+                        <i class="fas fa-eye me-1"></i>{{ _('Preview Survey') }}
+                    </a>
+                    <a href="{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}"
+                       class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>{{ _('Cancel') }}
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function() {
+    var driverIndex = {{ classic_config.driver_labels|length }};
+    var maxDrivers = 15;
+    var maxFeatures = {{ template_info.max_features or 9 }};
+    var isFrozen = {{ 'true' if is_frozen else 'false' }};
+
+    window.addDriverRow = function() {
+        if (isFrozen) return;
+        var list = document.getElementById('driverList');
+        var currentRows = list.querySelectorAll('.driver-row').length;
+        if (currentRows >= maxDrivers) {
+            alert('{{ _("Maximum of 15 drivers reached.") }}');
+            return;
+        }
+
+        var row = document.createElement('div');
+        row.className = 'driver-row';
+        row.setAttribute('data-index', driverIndex);
+        row.innerHTML =
+            '<input type="hidden" name="driver_key_' + driverIndex + '" value="custom_driver_' + driverIndex + '">' +
+            '<input type="text" class="form-control" name="driver_label_en_' + driverIndex + '" placeholder="' + '{{ _("English label") }}' + '">' +
+            '<input type="text" class="form-control" name="driver_label_fr_' + driverIndex + '" placeholder="' + '{{ _("French label") }}' + '">' +
+            '<button type="button" class="btn-remove-driver" onclick="removeDriverRow(this)" title="' + '{{ _("Remove driver") }}' + '">&times;</button>';
+        list.appendChild(row);
+        driverIndex++;
+    };
+
+    window.removeDriverRow = function(btn) {
+        if (isFrozen) return;
+        var row = btn.closest('.driver-row');
+        if (row) {
+            row.remove();
+        }
+    };
+
+    window.updateFeatureCount = function() {
+        var count = parseInt(document.getElementById('featureCount').value, 10);
+        for (var i = 0; i < maxFeatures; i++) {
+            var row = document.getElementById('featureRow' + i);
+            if (row) {
+                row.style.display = (i < count) ? '' : 'none';
+            }
+        }
+    };
+
+    if (isFrozen) {
+        document.addEventListener('DOMContentLoaded', function() {
+            var form = document.getElementById('classicSurveyForm');
+            if (form) {
+                var inputs = form.querySelectorAll('input, select, textarea, button[type="submit"]');
+                inputs.forEach(function(el) {
+                    if (el.type !== 'hidden') {
+                        el.disabled = true;
+                    }
+                });
+            }
+        });
+    }
+})();
+</script>
+{% endblock %}

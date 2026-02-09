@@ -1605,6 +1605,173 @@ def save_survey_config(campaign_id):
         return redirect(url_for('campaigns.survey_config', campaign_id=campaign_id))
 
 
+@campaign_bp.route('/<int:campaign_id>/classic-survey-config')
+@require_business_auth
+@require_permission('manage_participants')
+def classic_survey_config(campaign_id):
+    """Display classic survey configuration editor"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            flash('Contexte du compte entreprise introuvable.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        campaign = Campaign.query.filter_by(
+            id=campaign_id,
+            business_account_id=current_account.id
+        ).first()
+        
+        if not campaign:
+            flash('Campagne introuvable.', 'error')
+            return redirect(url_for('campaigns.list_campaigns'))
+        
+        if campaign.survey_type != 'classic':
+            flash('This configuration is only available for classic surveys.', 'warning')
+            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        
+        classic_config = ClassicSurveyConfig.query.filter_by(campaign_id=campaign.id).first()
+        if not classic_config:
+            template = seed_default_survey_template()
+            classic_config = ClassicSurveyConfig()
+            classic_config.campaign_id = campaign.id
+            classic_config.template_id = template.id
+            classic_config.sections_enabled = {'section_1': True, 'section_2': True, 'section_3': True}
+            classic_config.feature_count = template.default_feature_count
+            classic_config.features = [
+                {'key': f'feature_{chr(97+i)}', 'name_en': f'Feature {chr(65+i)}', 'name_fr': f'Fonctionnalité {chr(65+i)}'}
+                for i in range(template.default_feature_count)
+            ]
+            classic_config.driver_labels = template.default_driver_labels.copy() if template.default_driver_labels else []
+            classic_config.custom_prompts = {}
+            db.session.add(classic_config)
+            db.session.commit()
+            logger.info(f"Classic survey config auto-created for campaign {campaign.id}")
+        
+        template = classic_config.template
+        is_frozen = classic_config.is_frozen()
+        
+        return render_template('campaigns/classic_survey_config.html',
+                             campaign=campaign.to_dict(),
+                             classic_config=classic_config.to_dict(),
+                             template_info=template.to_dict() if template else {'max_features': 9},
+                             is_frozen=is_frozen)
+        
+    except Exception as e:
+        logger.error(f"Classic survey config display error for campaign {campaign_id}: {e}")
+        flash('Erreur lors du chargement de la configuration.', 'error')
+        return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+
+
+@campaign_bp.route('/<int:campaign_id>/classic-survey-config/save', methods=['POST'])
+@require_business_auth
+@require_permission('manage_participants')
+def save_classic_survey_config(campaign_id):
+    """Save classic survey configuration"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            flash('Contexte du compte entreprise introuvable.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        campaign = Campaign.query.filter_by(
+            id=campaign_id,
+            business_account_id=current_account.id
+        ).first()
+        
+        if not campaign:
+            flash('Campagne introuvable.', 'error')
+            return redirect(url_for('campaigns.list_campaigns'))
+        
+        if campaign.survey_type != 'classic':
+            flash('This configuration is only available for classic surveys.', 'warning')
+            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        
+        classic_config = ClassicSurveyConfig.query.filter_by(campaign_id=campaign.id).first()
+        if not classic_config:
+            flash('Configuration introuvable.', 'error')
+            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        
+        if classic_config.is_frozen():
+            flash('La configuration est verrouillée car la campagne a été activée.', 'error')
+            return redirect(url_for('campaigns.classic_survey_config', campaign_id=campaign_id))
+        
+        sections_enabled = {
+            'section_1': True,
+            'section_2': request.form.get('sections_enabled_section_2') == 'true',
+            'section_3': request.form.get('sections_enabled_section_3') == 'true'
+        }
+        classic_config.sections_enabled = sections_enabled
+        
+        driver_labels = []
+        idx = 0
+        while idx < 50:
+            key = request.form.get(f'driver_key_{idx}')
+            if key is None:
+                break
+            label_en = request.form.get(f'driver_label_en_{idx}', '').strip()
+            label_fr = request.form.get(f'driver_label_fr_{idx}', '').strip()
+            if label_en or label_fr:
+                driver_labels.append({
+                    'key': key,
+                    'label_en': label_en,
+                    'label_fr': label_fr
+                })
+            idx += 1
+        if len(driver_labels) > 15:
+            driver_labels = driver_labels[:15]
+        classic_config.driver_labels = driver_labels
+        
+        feature_count = int(request.form.get('feature_count', 5))
+        feature_count = max(1, min(feature_count, 9))
+        classic_config.feature_count = feature_count
+        
+        features = []
+        for i in range(feature_count):
+            key = request.form.get(f'feature_key_{i}', f'feature_{chr(97+i)}')
+            name_en = request.form.get(f'feature_name_en_{i}', '').strip()
+            name_fr = request.form.get(f'feature_name_fr_{i}', '').strip()
+            if not name_en:
+                name_en = f'Feature {chr(65+i)}'
+            if not name_fr:
+                name_fr = f'Fonctionnalité {chr(65+i)}'
+            features.append({
+                'key': key,
+                'name_en': name_en,
+                'name_fr': name_fr
+            })
+        classic_config.features = features
+        
+        db.session.commit()
+        
+        try:
+            from audit_utils import queue_audit_log
+            queue_audit_log(
+                business_account_id=current_account.id,
+                action_type='classic_survey_config_updated',
+                resource_type='campaign',
+                resource_id=campaign.id,
+                resource_name=campaign.name,
+                details={
+                    'sections_enabled': sections_enabled,
+                    'driver_count': len(driver_labels),
+                    'feature_count': feature_count
+                }
+            )
+        except Exception as audit_error:
+            logger.error(f"Failed to audit classic survey config update: {audit_error}")
+        
+        logger.info(f"Classic survey config updated for campaign '{campaign.name}' (ID: {campaign_id}) by business account {current_account.id}")
+        flash('Configuration de l\'enquête classique enregistrée avec succès !', 'success')
+        
+        return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        
+    except Exception as e:
+        logger.error(f"Error saving classic survey config for campaign {campaign_id}: {e}")
+        db.session.rollback()
+        flash('Échec de l\'enregistrement de la configuration. Veuillez réessayer.', 'error')
+        return redirect(url_for('campaigns.classic_survey_config', campaign_id=campaign_id))
+
+
 @campaign_bp.route('/<int:campaign_id>/email-preview')
 @require_business_auth
 @require_permission('manage_participants')
