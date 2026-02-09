@@ -1,8 +1,8 @@
 # Classic Survey Feature - Implementation Plan
 
 **Created:** January 21, 2026  
-**Last Updated:** February 8, 2026  
-**Status:** Phase 2d Complete - Awaiting Approval  
+**Last Updated:** February 9, 2026  
+**Status:** Phase 2f Complete - KPI Snapshots & Analytics Tab UX  
 
 ---
 
@@ -149,11 +149,67 @@ Add Classic Survey as an alternative survey type alongside the existing Conversa
 6. Preview mode (from campaign view) → survey form shows immediately, no welcome page
 7. Colors and layout match the conversational survey welcome page (V2 design tokens)
 
+### Phase 2e: Classic Analytics & Cross-Type Comparison (COMPLETED)
+
+**What was built:**
+- [x] Dedicated `/api/classic_survey_analytics` endpoint serving 5 chart types:
+  - CSAT distribution (1-5 scale)
+  - CES distribution (1-8 scale)
+  - Driver attribution with bilingual labels (resolved from ClassicSurveyConfig)
+  - Feature adoption/satisfaction analysis
+  - Recommendation status breakdown
+- [x] Chart.js rendering integrated into campaign insights page via `checkAndLoadClassicAnalytics()`
+- [x] Conditionally displayed for classic campaigns only
+- [x] Cross-type comparison: survey_type badge on campaigns (purple=Classic, blue=Conversational AI)
+- [x] Shared metrics (NPS, satisfaction, response rate) work for both survey types via type-agnostic dashboard data pipeline
+- [x] Comparison API includes survey_type field
+- [x] 30 automated tests covering model CRUD, freeze logic, route access control, data storage, analytics API, tenant isolation, cross-type comparison, and regression safety
+
+**Files modified:** `routes.py`, `data_storage.py`, `templates/campaign_insights.html`, `tests/test_classic_survey.py`
+
+### Phase 2f: KPI Snapshots & Analytics Tab UX Redesign (COMPLETED)
+
+**What was built:**
+- [x] CampaignKPISnapshot model extended with 8 classic-specific fields:
+  - `survey_type` — campaign survey type at snapshot time
+  - `avg_csat` — average CSAT score (Float)
+  - `avg_ces` — average CES score (Float)
+  - `csat_distribution` — CSAT score distribution (JSON in TEXT)
+  - `ces_distribution` — CES score distribution (JSON in TEXT)
+  - `driver_attribution` — NPS driver attribution data (JSON in TEXT)
+  - `feature_analytics` — feature evaluation analytics (JSON in TEXT)
+  - `recommendation_distribution` — recommendation status breakdown (JSON in TEXT)
+- [x] `generate_campaign_kpi_snapshot()` captures classic metrics when `survey_type=='classic'`, reusing analytics logic from `classic_survey_analytics` endpoint. Conversational campaigns leave classic fields as None.
+- [x] `convert_snapshot_to_dashboard_format()` includes `classic_analytics_snapshot` only when `snapshot.survey_type == 'classic'`
+- [x] Classic analytics endpoint serves from snapshot for completed campaigns (avoids recalculating from raw responses)
+- [x] Analytics tab redesigned with mutually exclusive containers:
+  - `#conversationalAnalyticsSection` — NPS distribution, sentiment, tenure, growth factor, ratings (shown for conversational campaigns)
+  - `#classicAnalyticsSection` — CSAT, CES, drivers, features, recommendation (shown for classic campaigns)
+  - `checkAndLoadClassicAnalytics()` toggles visibility based on campaign survey_type
+  - Prevents Chart.js conflicts between survey types
+- [x] 7 new snapshot-specific tests (37 total) covering:
+  - Snapshot model has classic fields
+  - Snapshot `to_dict()` includes classic fields
+  - Conversational snapshot unaffected
+  - Snapshot generation captures classic data
+  - Snapshot generation for conversational has no classic data
+  - Snapshot conversion includes classic analytics for classic
+  - Snapshot conversion excludes classic analytics for conversational
+
+**Files modified:** `models.py`, `data_storage.py`, `routes.py`, `templates/campaign_insights.html`, `tests/test_classic_survey.py`
+
+**Validation guide:**
+1. View a completed classic campaign → Analytics tab shows classic charts (CSAT, CES, drivers, features, recommendation)
+2. View a completed conversational campaign → Analytics tab shows conversational charts only (NPS, sentiment, tenure, growth factor)
+3. No Chart.js conflicts — each survey type renders in its own container
+4. Generate a KPI snapshot for a classic campaign → snapshot includes avg_csat, avg_ces, distributions
+5. Generate a KPI snapshot for a conversational campaign → classic fields remain null
+6. Classic analytics endpoint for completed campaign → serves from snapshot (not recalculated)
+
 ### Phase 3+ (Planned)
 
 - Classic survey config UI (admin editing of drivers/features/sections)
-- Analytics charts for classic survey data
-- Campaign comparison (classic vs conversational)
+- Part B: Custom Questions for Traditional Surveys (see below)
 
 ---
 
