@@ -1188,29 +1188,73 @@ def submit_classic_survey():
             if participant and hasattr(participant, 'tenure_years') and participant.tenure_years is not None:
                 tenure_category = map_tenure_years_to_category(participant.tenure_years)
         
-        # Create SurveyResponse
-        response = SurveyResponse(
-            company_name=response_data['company_name'],
-            respondent_name=response_data['respondent_name'],
-            respondent_email=response_data['respondent_email'],
-            tenure_with_fc=tenure_category,
-            nps_score=nps_score,
-            nps_category=nps_category,
-            source_type='traditional',
-            satisfaction_rating=csat_score,
-            csat_score=csat_score,
-            ces_score=ces_score,
-            loyalty_drivers=selected_drivers,
-            recommendation_status=recommendation_status,
-            recommendation_reason=driver_explanation,
-            improvement_feedback=improvement_feedback,
-            additional_comments=additional_comments,
-            general_feedback=json.dumps(feature_evaluations) if feature_evaluations else None,
-            campaign_id=campaign_id,
-            campaign_participant_id=association_id
-        )
+        # Ensure association_id is available (fallback lookup for re-entry via fresh session)
+        if not association_id and campaign_id and authenticated_email:
+            association_id = lookup_association_id_fallback(authenticated_email, campaign_id)
+            if association_id:
+                session['association_id'] = association_id
+                logger.info(f"Classic survey: recovered association_id {association_id} via fallback lookup")
         
-        db.session.add(response)
+        # Upsert: look up existing response to update instead of creating duplicates
+        existing_response = None
+        if association_id:
+            existing_response = SurveyResponse.query.filter_by(
+                campaign_participant_id=association_id
+            ).first()
+        if not existing_response and campaign_id and authenticated_email:
+            existing_response = SurveyResponse.query.filter_by(
+                respondent_email=authenticated_email,
+                campaign_id=campaign_id
+            ).first()
+        
+        if existing_response:
+            logger.info(f"Classic survey: updating existing response {existing_response.id} (resubmission)")
+            existing_response.company_name = response_data['company_name']
+            existing_response.respondent_name = response_data['respondent_name']
+            existing_response.respondent_email = response_data['respondent_email']
+            existing_response.tenure_with_fc = tenure_category
+            existing_response.nps_score = nps_score
+            existing_response.nps_category = nps_category
+            existing_response.source_type = 'traditional'
+            existing_response.satisfaction_rating = csat_score
+            existing_response.csat_score = csat_score
+            existing_response.ces_score = ces_score
+            existing_response.loyalty_drivers = selected_drivers
+            existing_response.recommendation_status = recommendation_status
+            existing_response.recommendation_reason = driver_explanation
+            existing_response.improvement_feedback = improvement_feedback
+            existing_response.additional_comments = additional_comments
+            existing_response.general_feedback = json.dumps(feature_evaluations) if feature_evaluations else None
+            if campaign_id:
+                existing_response.campaign_id = campaign_id
+            if association_id:
+                existing_response.campaign_participant_id = association_id
+            existing_response.updated_at = datetime.utcnow()
+            existing_response.analyzed_at = None
+            response = existing_response
+        else:
+            response = SurveyResponse(
+                company_name=response_data['company_name'],
+                respondent_name=response_data['respondent_name'],
+                respondent_email=response_data['respondent_email'],
+                tenure_with_fc=tenure_category,
+                nps_score=nps_score,
+                nps_category=nps_category,
+                source_type='traditional',
+                satisfaction_rating=csat_score,
+                csat_score=csat_score,
+                ces_score=ces_score,
+                loyalty_drivers=selected_drivers,
+                recommendation_status=recommendation_status,
+                recommendation_reason=driver_explanation,
+                improvement_feedback=improvement_feedback,
+                additional_comments=additional_comments,
+                general_feedback=json.dumps(feature_evaluations) if feature_evaluations else None,
+                campaign_id=campaign_id,
+                campaign_participant_id=association_id
+            )
+            db.session.add(response)
+        
         db.session.commit()
         
         # Mark association as completed
@@ -1220,16 +1264,6 @@ def submit_classic_survey():
                 campaign_participant_token_system.mark_survey_completed(association_id, response.id)
             except Exception as e:
                 logger.error(f"Failed to mark association completed: {e}")
-        elif campaign_id and authenticated_email:
-            fallback_assoc_id = lookup_association_id_fallback(authenticated_email, campaign_id)
-            if fallback_assoc_id:
-                response.campaign_participant_id = fallback_assoc_id
-                db.session.commit()
-                try:
-                    import campaign_participant_token_system
-                    campaign_participant_token_system.mark_survey_completed(fallback_assoc_id, response.id)
-                except Exception as e:
-                    logger.error(f"Failed to mark association completed via fallback: {e}")
         
         # Queue AI analysis
         try:
@@ -3298,6 +3332,13 @@ def finalize_conversation():
         else:
             campaign = Campaign.query.get(campaign_id)
         
+        # Ensure association_id is available (fallback lookup for re-entry via fresh session)
+        if not association_id and campaign_id and authenticated_email:
+            association_id = lookup_association_id_fallback(authenticated_email, campaign_id)
+            if association_id:
+                session['association_id'] = association_id
+                logger.info(f"Conversational survey: recovered association_id {association_id} via fallback lookup")
+        
         # Prepare response data for potential anonymization
         response_data = {
             'company_name': normalize_company_name(structured_data.get('company_name')),
@@ -3316,8 +3357,8 @@ def finalize_conversation():
             existing_response = SurveyResponse.query.filter_by(
                 campaign_participant_id=association_id
             ).first()
-        elif campaign_id:
-            # Legacy system: Use (email, campaign_id) to prevent cross-campaign corruption
+        if not existing_response and campaign_id:
+            # Fallback: Use (email, campaign_id) to catch cases where association_id wasn't linked
             existing_response = SurveyResponse.query.filter_by(
                 respondent_email=authenticated_email,
                 campaign_id=campaign_id
@@ -3352,8 +3393,10 @@ def finalize_conversation():
             # Update association if available (new system)
             if association_id:
                 existing_response.campaign_participant_id = association_id
-            # Track when response was last updated
+            # Track when response was last updated and reset analysis for re-processing
             existing_response.updated_at = datetime.utcnow()
+            existing_response.analyzed_at = None
+            logger.info(f"Conversational survey: updating existing response {existing_response.id} (resubmission)")
 
             response = existing_response
         else:
