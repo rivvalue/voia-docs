@@ -355,35 +355,47 @@ def preview_classic_survey(campaign_id):
         from routes import get_branding_context
         branding = get_branding_context(current_account.id)
 
-        lang = session.get('language', 'en')
+        original_language = session.get('language')
+        try:
+            campaign_lang = campaign.language_code if hasattr(campaign, 'language_code') and campaign.language_code else 'en'
+            session['language'] = campaign_lang
+            from flask_babel import refresh as babel_refresh
+            babel_refresh()
 
-        driver_labels = []
-        if classic_config and classic_config.driver_labels:
-            driver_labels = classic_config.driver_labels
+            lang = campaign_lang
 
-        features = []
-        if classic_config and classic_config.features:
-            features = classic_config.features
+            driver_labels = []
+            if classic_config and classic_config.driver_labels:
+                driver_labels = classic_config.driver_labels
 
-        sections_enabled = {'section_1': True, 'section_2': True, 'section_3': True}
-        if classic_config and classic_config.sections_enabled:
-            sections_enabled = classic_config.sections_enabled
+            features = []
+            if classic_config and classic_config.features:
+                features = classic_config.features
 
-        return render_template('classic_survey.html',
-                             authenticated=True,
-                             email=session.get('business_email', ''),
-                             participant_name='Preview User',
-                             participant_company=current_account.name or 'Preview Company',
-                             campaign_name=campaign.name,
-                             campaign=campaign,
-                             classic_config=classic_config,
-                             driver_labels=driver_labels,
-                             features=features,
-                             sections_enabled=sections_enabled,
-                             lang=lang,
-                             branding=branding,
-                             token='',
-                             preview_mode=True)
+            sections_enabled = {'section_1': True, 'section_2': True, 'section_3': True}
+            if classic_config and classic_config.sections_enabled:
+                sections_enabled = classic_config.sections_enabled
+
+            return render_template('classic_survey.html',
+                                 authenticated=True,
+                                 email=session.get('business_email', ''),
+                                 participant_name='Preview User',
+                                 participant_company=current_account.name or 'Preview Company',
+                                 campaign_name=campaign.name,
+                                 campaign=campaign,
+                                 classic_config=classic_config,
+                                 driver_labels=driver_labels,
+                                 features=features,
+                                 sections_enabled=sections_enabled,
+                                 lang=lang,
+                                 branding=branding,
+                                 token='',
+                                 preview_mode=True)
+        finally:
+            if original_language is not None:
+                session['language'] = original_language
+            else:
+                session.pop('language', None)
 
     except Exception as e:
         logging.error(f"Error in classic survey preview: {e}")
