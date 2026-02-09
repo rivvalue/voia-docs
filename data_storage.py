@@ -1045,7 +1045,8 @@ def convert_snapshot_to_dashboard_format(snapshot):
                 },
                 'drivers': json.loads(snapshot.driver_attribution) if snapshot.driver_attribution else {},
                 'features': json.loads(snapshot.feature_analytics) if snapshot.feature_analytics else {},
-                'recommendation': json.loads(snapshot.recommendation_distribution) if snapshot.recommendation_distribution else {}
+                'recommendation': json.loads(snapshot.recommendation_distribution) if snapshot.recommendation_distribution else {},
+                'correlation': json.loads(snapshot.correlation_data) if getattr(snapshot, 'correlation_data', None) else {'points': [], 'summary': {'avg_ces_by_nps_category': {}, 'nps_csat_alignment_pct': None, 'total_correlated_responses': 0}}
             }
         
         return result
@@ -1837,12 +1838,21 @@ def generate_campaign_kpi_snapshot(campaign_id):
                 ces_dist[str(s)] = ces_dist.get(str(s), 0) + 1
             ces_avg = round(sum(ces_scores) / len(ces_scores), 2) if ces_scores else None
             
-            driver_counts = {}
+            driver_data = {}
             for r in responses_list:
                 if r.loyalty_drivers:
                     drivers_list = r.loyalty_drivers if isinstance(r.loyalty_drivers, list) else []
+                    nps_cat = getattr(r, 'nps_category', None) or 'Unknown'
                     for d in drivers_list:
-                        driver_counts[d] = driver_counts.get(d, 0) + 1
+                        if d not in driver_data:
+                            driver_data[d] = {'count': 0, 'promoters': 0, 'passives': 0, 'detractors': 0}
+                        driver_data[d]['count'] += 1
+                        if nps_cat == 'Promoter':
+                            driver_data[d]['promoters'] += 1
+                        elif nps_cat == 'Passive':
+                            driver_data[d]['passives'] += 1
+                        elif nps_cat == 'Detractor':
+                            driver_data[d]['detractors'] += 1
             
             classic_config = ClassicSurveyConfig.query.filter_by(campaign_id=campaign_id).first()
             driver_label_map = {}
@@ -1854,14 +1864,47 @@ def generate_campaign_kpi_snapshot(campaign_id):
                     }
             
             drivers_with_labels = {}
-            for key, count in driver_counts.items():
+            for key, dd in driver_data.items():
                 labels = driver_label_map.get(key, {'label_en': key, 'label_fr': key})
                 drivers_with_labels[key] = {
-                    'count': count,
-                    'percentage': round(count / total_responses * 100, 1) if total_responses > 0 else 0,
+                    'count': dd['count'],
+                    'percentage': round(dd['count'] / total_responses * 100, 1) if total_responses > 0 else 0,
+                    'promoters': dd['promoters'],
+                    'passives': dd['passives'],
+                    'detractors': dd['detractors'],
+                    'net_impact': dd['promoters'] - dd['detractors'],
                     'label_en': labels['label_en'],
                     'label_fr': labels['label_fr']
                 }
+            
+            correlation_points = []
+            for r in responses_list:
+                if r.csat_score is not None and r.ces_score is not None and r.nps_score is not None:
+                    nps_cat = getattr(r, 'nps_category', None) or 'Unknown'
+                    correlation_points.append({
+                        'csat': r.csat_score,
+                        'ces': r.ces_score,
+                        'nps_score': r.nps_score,
+                        'nps_category': nps_cat
+                    })
+            
+            avg_ces_by_nps = {}
+            for cat in ['Promoter', 'Passive', 'Detractor']:
+                cat_ces = [p['ces'] for p in correlation_points if p['nps_category'] == cat]
+                avg_ces_by_nps[cat] = round(sum(cat_ces) / len(cat_ces), 2) if cat_ces else None
+            
+            high_nps = sum(1 for p in correlation_points if p['nps_score'] >= 9 and p['csat'] >= 4)
+            total_high_nps = sum(1 for p in correlation_points if p['nps_score'] >= 9)
+            nps_csat_alignment = round(high_nps / total_high_nps * 100, 1) if total_high_nps > 0 else None
+            
+            correlation_result = {
+                'points': correlation_points,
+                'summary': {
+                    'avg_ces_by_nps_category': avg_ces_by_nps,
+                    'nps_csat_alignment_pct': nps_csat_alignment,
+                    'total_correlated_responses': len(correlation_points)
+                }
+            }
             
             feature_data = {}
             feature_label_map = {}
@@ -1925,6 +1968,7 @@ def generate_campaign_kpi_snapshot(campaign_id):
                 'driver_attribution': json.dumps(drivers_with_labels),
                 'feature_analytics': json.dumps(features_summary),
                 'recommendation_distribution': json.dumps(rec_counts),
+                'correlation_data': json.dumps(correlation_result),
             }
             
             print(f"   ✅ CSAT: avg={csat_avg}, {len(csat_scores)} scores")
@@ -1932,6 +1976,7 @@ def generate_campaign_kpi_snapshot(campaign_id):
             print(f"   ✅ Drivers: {len(drivers_with_labels)} unique")
             print(f"   ✅ Features: {len(features_summary)} evaluated")
             print(f"   ✅ Recommendations: {len(rec_counts)} statuses")
+            print(f"   ✅ Correlation: {len(correlation_points)} data points")
         
         # ============================================================================
         # CREATE SNAPSHOT RECORD
@@ -1983,6 +2028,7 @@ def generate_campaign_kpi_snapshot(campaign_id):
             driver_attribution=classic_snapshot_data.get('driver_attribution'),
             feature_analytics=classic_snapshot_data.get('feature_analytics'),
             recommendation_distribution=classic_snapshot_data.get('recommendation_distribution'),
+            correlation_data=classic_snapshot_data.get('correlation_data'),
             data_period_start=campaign.start_date,
             data_period_end=campaign.end_date
         )

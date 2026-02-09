@@ -477,21 +477,30 @@
                     </div>
                 </div>
 
-                <!-- Driver Attribution & Recommendation Status -->
+                <!-- Driver Impact Analysis -->
                 <div class="row mb-4 g-3">
-                    <div class="col-md-6">
+                    <div class="col-12">
                         <div class="chart-card">
                             <div class="card-header">
-                                <h5>{{ _('NPS Driver Attribution') }}</h5>
-                                <small class="text-muted">{{ _('What factors influenced satisfaction scores?') }}</small>
+                                <h5>{{ _('Driver Impact Analysis') }}</h5>
+                                <small class="text-muted">{{ _('Which factors positively or negatively influence NPS? Sorted by net impact (Promoters minus Detractors).') }}</small>
                             </div>
                             <div class="card-body">
-                                <div class="chart-container">
+                                <div class="chart-container" style="height: 350px;">
                                     <canvas id="classicDriverChart"></canvas>
+                                </div>
+                                <div class="d-flex justify-content-center gap-4 mt-2" style="font-size: 0.85rem;">
+                                    <span><span style="display:inline-block;width:12px;height:12px;background:rgba(40,167,69,0.8);border-radius:2px;margin-right:4px;"></span>{{ _('Promoters (9-10)') }}</span>
+                                    <span><span style="display:inline-block;width:12px;height:12px;background:rgba(255,193,7,0.8);border-radius:2px;margin-right:4px;"></span>{{ _('Passives (7-8)') }}</span>
+                                    <span><span style="display:inline-block;width:12px;height:12px;background:rgba(220,53,69,0.8);border-radius:2px;margin-right:4px;"></span>{{ _('Detractors (0-6)') }}</span>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <!-- Recommendation Status & NPS-CSAT-CES Correlation -->
+                <div class="row mb-4 g-3">
                     <div class="col-md-6">
                         <div class="chart-card">
                             <div class="card-header">
@@ -501,6 +510,36 @@
                             <div class="card-body">
                                 <div class="chart-container">
                                     <canvas id="classicRecommendationChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="chart-card">
+                            <div class="card-header">
+                                <h5>{{ _('NPS–CSAT–CES Correlation') }}</h5>
+                                <small class="text-muted">{{ _('How do satisfaction, effort, and loyalty metrics relate?') }}</small>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container" style="height: 280px;">
+                                    <canvas id="classicCorrelationChart"></canvas>
+                                </div>
+                                <div id="correlationSummaryCard" class="mt-3 p-3" style="background: #f8f9fa; border-radius: 8px; font-size: 0.85rem; display: none;">
+                                    <div class="row text-center">
+                                        <div class="col-4">
+                                            <div style="font-weight: 600; color: #333;" id="corrAlignmentPct">--</div>
+                                            <div class="text-muted" style="font-size: 0.78rem;">{{ _('NPS–CSAT Alignment') }}</div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div style="font-weight: 600; color: #dc3545;" id="corrDetractorCes">--</div>
+                                            <div class="text-muted" style="font-size: 0.78rem;">{{ _('Avg CES (Detractors)') }}</div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div style="font-weight: 600; color: #28a745;" id="corrPromoterCes">--</div>
+                                            <div class="text-muted" style="font-size: 0.78rem;">{{ _('Avg CES (Promoters)') }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-center mt-2" id="corrInsightText" style="font-style: italic; color: #555;"></div>
                                 </div>
                             </div>
                         </div>
@@ -1124,7 +1163,8 @@ let classicCharts = {
     ces: null,
     drivers: null,
     recommendation: null,
-    features: null
+    features: null,
+    correlation: null
 };
 
 let currentSurveyType = null;
@@ -1177,6 +1217,9 @@ async function loadClassicAnalyticsData(campaignId) {
         renderDriverChart(data.drivers);
         renderRecommendationChart(data.recommendation);
         renderFeatureChart(data.features);
+        if (data.correlation) {
+            renderCorrelationChart(data.correlation);
+        }
     } catch (err) {
         console.error('Classic analytics error:', err);
     }
@@ -1287,40 +1330,246 @@ function renderDriverChart(driversData) {
 
     const lang = document.documentElement.lang || 'en';
     const langKey = lang === 'fr' ? 'label_fr' : 'label_en';
-    const entries = Object.entries(driversData).sort((a, b) => b[1].count - a[1].count);
-    const labels = entries.map(([_, d]) => d[langKey] || d.label_en);
-    const values = entries.map(([_, d]) => d.count);
+    const entries = Object.entries(driversData);
 
-    classicCharts.drivers = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: '{{ _("Selections") }}',
-                data: values,
-                backgroundColor: 'rgba(225, 58, 68, 0.7)',
-                borderColor: '#E13A44',
-                borderWidth: 2,
-                borderRadius: 6
-            }]
-        },
+    const hasImpactData = entries.length > 0 && entries[0][1].net_impact !== undefined;
+
+    if (hasImpactData) {
+        entries.sort((a, b) => b[1].net_impact - a[1].net_impact);
+        const labels = entries.map(([_, d]) => d[langKey] || d.label_en);
+        const promoters = entries.map(([_, d]) => d.promoters || 0);
+        const passives = entries.map(([_, d]) => d.passives || 0);
+        const detractors = entries.map(([_, d]) => -(d.detractors || 0));
+
+        classicCharts.drivers = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: '{{ _("Detractors (0-6)") }}',
+                        data: detractors,
+                        backgroundColor: 'rgba(220, 53, 69, 0.8)',
+                        borderColor: '#dc3545',
+                        borderWidth: 1,
+                        borderRadius: 4,
+                        borderSkipped: false
+                    },
+                    {
+                        label: '{{ _("Passives (7-8)") }}',
+                        data: passives,
+                        backgroundColor: 'rgba(255, 193, 7, 0.8)',
+                        borderColor: '#ffc107',
+                        borderWidth: 1,
+                        borderRadius: 4,
+                        borderSkipped: false
+                    },
+                    {
+                        label: '{{ _("Promoters (9-10)") }}',
+                        data: promoters,
+                        backgroundColor: 'rgba(40, 167, 69, 0.8)',
+                        borderColor: '#28a745',
+                        borderWidth: 1,
+                        borderRadius: 4,
+                        borderSkipped: false
+                    }
+                ]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const entry = entries[context.dataIndex];
+                                if (!entry) return '';
+                                const d = entry[1];
+                                const val = Math.abs(context.raw);
+                                return context.dataset.label + ': ' + val;
+                            },
+                            afterBody: function(contexts) {
+                                const entry = entries[contexts[0].dataIndex];
+                                if (!entry) return '';
+                                const d = entry[1];
+                                const netLabel = lang === 'fr' ? 'Impact net' : 'Net Impact';
+                                return netLabel + ': ' + (d.net_impact > 0 ? '+' : '') + d.net_impact + ' (' + d.percentage + '% {{ _("of respondents") }})';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        stacked: true,
+                        title: { display: true, text: lang === 'fr' ? '← Détracteurs | Promoteurs →' : '← Detractors | Promoters →' },
+                        ticks: {
+                            callback: function(v) { return Math.abs(v); }
+                        },
+                        grid: {
+                            color: function(context) {
+                                return context.tick.value === 0 ? '#333' : '#e9ecef';
+                            },
+                            lineWidth: function(context) {
+                                return context.tick.value === 0 ? 2 : 1;
+                            }
+                        }
+                    },
+                    y: {
+                        stacked: true,
+                        ticks: { font: { size: 12 } }
+                    }
+                }
+            }
+        });
+    } else {
+        entries.sort((a, b) => b[1].count - a[1].count);
+        const labels = entries.map(([_, d]) => d[langKey] || d.label_en);
+        const values = entries.map(([_, d]) => d.count);
+
+        classicCharts.drivers = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: '{{ _("Selections") }}',
+                    data: values,
+                    backgroundColor: 'rgba(225, 58, 68, 0.7)',
+                    borderColor: '#E13A44',
+                    borderWidth: 2,
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            afterLabel: function(ctx) {
+                                const entry = entries[ctx.dataIndex];
+                                return entry ? entry[1].percentage + '% {{ _("of respondents") }}' : '';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: { beginAtZero: true, ticks: { stepSize: 1 }, title: { display: true, text: '{{ _("Number of selections") }}' } }
+                }
+            }
+        });
+    }
+}
+
+function renderCorrelationChart(correlationData) {
+    const ctx = document.getElementById('classicCorrelationChart');
+    if (!ctx) return;
+    if (classicCharts.correlation) classicCharts.correlation.destroy();
+
+    const points = correlationData.points || [];
+    const summary = correlationData.summary || {};
+
+    if (points.length === 0) {
+        ctx.parentElement.innerHTML = '<div class="text-center text-muted py-4"><i class="fas fa-chart-scatter fa-2x mb-2"></i><p>{{ _("Not enough data for correlation analysis") }}</p></div>';
+        return;
+    }
+
+    const summaryCard = document.getElementById('correlationSummaryCard');
+    if (summaryCard && summary.total_correlated_responses > 0) {
+        summaryCard.style.display = 'block';
+        const alignEl = document.getElementById('corrAlignmentPct');
+        if (alignEl) alignEl.textContent = summary.nps_csat_alignment_pct !== null ? summary.nps_csat_alignment_pct + '%' : '--';
+        const detCesEl = document.getElementById('corrDetractorCes');
+        if (detCesEl) detCesEl.textContent = summary.avg_ces_by_nps_category?.Detractor !== null ? summary.avg_ces_by_nps_category.Detractor : '--';
+        const promCesEl = document.getElementById('corrPromoterCes');
+        if (promCesEl) promCesEl.textContent = summary.avg_ces_by_nps_category?.Promoter !== null ? summary.avg_ces_by_nps_category.Promoter : '--';
+
+        const insightEl = document.getElementById('corrInsightText');
+        if (insightEl && summary.avg_ces_by_nps_category) {
+            const detCes = summary.avg_ces_by_nps_category.Detractor;
+            const promCes = summary.avg_ces_by_nps_category.Promoter;
+            const lang = document.documentElement.lang || 'en';
+            if (detCes && promCes && detCes < promCes) {
+                const ratio = (promCes / detCes).toFixed(1);
+                insightEl.textContent = lang === 'fr'
+                    ? `Les détracteurs signalent un effort ${ratio}x plus élevé que les promoteurs`
+                    : `Detractors report ${ratio}x higher effort than Promoters`;
+            } else if (detCes && promCes) {
+                insightEl.textContent = lang === 'fr'
+                    ? 'Les scores d\'effort sont similaires entre les catégories NPS'
+                    : 'Effort scores are similar across NPS categories';
+            }
+        }
+    }
+
+    const colorMap = {
+        'Promoter': { bg: 'rgba(40, 167, 69, 0.6)', border: '#28a745' },
+        'Passive': { bg: 'rgba(255, 193, 7, 0.6)', border: '#ffc107' },
+        'Detractor': { bg: 'rgba(220, 53, 69, 0.6)', border: '#dc3545' },
+        'Unknown': { bg: 'rgba(108, 117, 125, 0.6)', border: '#6c757d' }
+    };
+
+    const datasets = ['Promoter', 'Passive', 'Detractor'].map(cat => {
+        const catPoints = points.filter(p => p.nps_category === cat);
+        const labelMap = {
+            'Promoter': '{{ _("Promoters (9-10)") }}',
+            'Passive': '{{ _("Passives (7-8)") }}',
+            'Detractor': '{{ _("Detractors (0-6)") }}'
+        };
+        return {
+            label: labelMap[cat] || cat,
+            data: catPoints.map(p => ({
+                x: p.csat,
+                y: p.ces,
+                r: Math.max(4, Math.min(12, p.nps_score * 1.1))
+            })),
+            backgroundColor: colorMap[cat].bg,
+            borderColor: colorMap[cat].border,
+            borderWidth: 1,
+            pointHitRadius: 8
+        };
+    }).filter(ds => ds.data.length > 0);
+
+    classicCharts.correlation = new Chart(ctx, {
+        type: 'bubble',
+        data: { datasets: datasets },
         options: {
-            indexAxis: 'y',
             responsive: true,
-            maintainAspectRatio: true,
+            maintainAspectRatio: false,
             plugins: {
-                legend: { display: false },
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: { usePointStyle: true, pointStyle: 'circle', font: { size: 11 } }
+                },
                 tooltip: {
                     callbacks: {
-                        afterLabel: function(ctx) {
-                            const entry = entries[ctx.dataIndex];
-                            return entry ? entry[1].percentage + '% {{ _("of respondents") }}' : '';
+                        label: function(context) {
+                            const p = points.find(pt =>
+                                pt.csat === context.raw.x && pt.ces === context.raw.y
+                            );
+                            const npsLabel = p ? ' | NPS: ' + p.nps_score : '';
+                            return 'CSAT: ' + context.raw.x + ' | CES: ' + context.raw.y + npsLabel;
                         }
                     }
                 }
             },
             scales: {
-                x: { beginAtZero: true, ticks: { stepSize: 1 }, title: { display: true, text: '{{ _("Number of selections") }}' } }
+                x: {
+                    min: 0.5, max: 5.5,
+                    title: { display: true, text: 'CSAT (1-5)', font: { weight: 'bold' } },
+                    ticks: { stepSize: 1 },
+                    grid: { color: '#f0f0f0' }
+                },
+                y: {
+                    min: 0.5, max: 8.5,
+                    title: { display: true, text: 'CES (1-8)', font: { weight: 'bold' } },
+                    ticks: { stepSize: 1 },
+                    grid: { color: '#f0f0f0' }
+                }
             }
         }
     });

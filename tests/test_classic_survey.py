@@ -372,7 +372,7 @@ class TestClassicSurveyAnalyticsAPI:
         assert isinstance(data['ces']['distribution'], dict)
 
     def test_analytics_driver_attribution(self, authenticated_client, db_session, sample_data, app_context):
-        """Analytics returns driver counts with bilingual labels."""
+        """Analytics returns driver counts with NPS category breakdown and bilingual labels."""
         client, user, account = authenticated_client
         campaign = self._create_classic_campaign_with_responses(db_session, sample_data, account)
         db_session.commit()
@@ -385,6 +385,36 @@ class TestClassicSurveyAnalyticsAPI:
         assert drivers['product_quality']['count'] == 2
         assert 'label_en' in drivers['product_quality']
         assert 'label_fr' in drivers['product_quality']
+        assert 'promoters' in drivers['product_quality']
+        assert 'passives' in drivers['product_quality']
+        assert 'detractors' in drivers['product_quality']
+        assert 'net_impact' in drivers['product_quality']
+        assert drivers['product_quality']['net_impact'] == drivers['product_quality']['promoters'] - drivers['product_quality']['detractors']
+
+    def test_analytics_correlation_data(self, authenticated_client, db_session, sample_data, app_context):
+        """Analytics returns NPS-CSAT-CES correlation scatter points and summary."""
+        client, user, account = authenticated_client
+        campaign = self._create_classic_campaign_with_responses(db_session, sample_data, account)
+        db_session.commit()
+
+        response = client.get(f'/api/classic_survey_analytics?campaign_id={campaign.id}')
+        assert response.status_code == 200
+        data = response.get_json()
+        assert 'correlation' in data
+        corr = data['correlation']
+        assert 'points' in corr
+        assert 'summary' in corr
+        assert isinstance(corr['points'], list)
+        assert len(corr['points']) > 0
+        point = corr['points'][0]
+        assert 'csat' in point
+        assert 'ces' in point
+        assert 'nps_score' in point
+        assert 'nps_category' in point
+        summary = corr['summary']
+        assert 'avg_ces_by_nps_category' in summary
+        assert 'nps_csat_alignment_pct' in summary
+        assert 'total_correlated_responses' in summary
 
     def test_analytics_feature_data(self, authenticated_client, db_session, sample_data, app_context):
         """Analytics returns feature adoption and satisfaction data."""
@@ -626,7 +656,7 @@ class TestClassicKPISnapshot:
         members = [m[0] for m in inspect.getmembers(CampaignKPISnapshot)]
         for field in ['survey_type', 'avg_csat', 'avg_ces', 'csat_distribution',
                       'ces_distribution', 'driver_attribution', 'feature_analytics',
-                      'recommendation_distribution']:
+                      'recommendation_distribution', 'correlation_data']:
             assert field in members, f"Missing field: {field}"
 
     def test_snapshot_to_dict_includes_classic_fields(self, db_session, sample_data, app_context):
@@ -773,8 +803,13 @@ class TestClassicKPISnapshot:
         drivers = json_mod.loads(snapshot.driver_attribution)
         assert 'quality' in drivers
         assert drivers['quality']['count'] == 2
+        assert drivers['quality']['promoters'] == 1
+        assert drivers['quality']['detractors'] == 1
+        assert drivers['quality']['net_impact'] == 0
         assert 'support' in drivers
         assert drivers['support']['count'] == 1
+        assert drivers['support']['promoters'] == 1
+        assert drivers['support']['net_impact'] == 1
 
         features = json_mod.loads(snapshot.feature_analytics)
         assert 'feat_a' in features
@@ -784,6 +819,15 @@ class TestClassicKPISnapshot:
         rec = json_mod.loads(snapshot.recommendation_distribution)
         assert rec['recommended'] == 1
         assert rec['would_not_recommend'] == 1
+
+        assert snapshot.correlation_data is not None
+        corr = json_mod.loads(snapshot.correlation_data)
+        assert 'points' in corr
+        assert 'summary' in corr
+        assert len(corr['points']) == 2
+        assert corr['summary']['total_correlated_responses'] == 2
+        assert 'Promoter' in corr['summary']['avg_ces_by_nps_category']
+        assert 'Detractor' in corr['summary']['avg_ces_by_nps_category']
 
         existing = CampaignKPISnapshot.query.filter_by(campaign_id=campaign.id).first()
         db_session.delete(existing)
@@ -818,6 +862,7 @@ class TestClassicKPISnapshot:
         assert snapshot.driver_attribution is None
         assert snapshot.feature_analytics is None
         assert snapshot.recommendation_distribution is None
+        assert snapshot.correlation_data is None
 
         existing = CampaignKPISnapshot.query.filter_by(campaign_id=campaign.id).first()
         db_session.delete(existing)
@@ -863,6 +908,9 @@ class TestClassicKPISnapshot:
         assert classic['drivers']['quality']['count'] == 4
         assert classic['features']['dash']['adoption_rate'] == 80.0
         assert classic['recommendation']['recommended'] == 3
+        assert 'correlation' in classic
+        assert 'points' in classic['correlation']
+        assert 'summary' in classic['correlation']
 
     def test_convert_snapshot_conversational_no_classic(self, db_session, sample_data, app_context):
         """convert_snapshot_to_dashboard_format for conversational has no classic_analytics_snapshot."""

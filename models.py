@@ -812,9 +812,10 @@ class CampaignKPISnapshot(db.Model):
     avg_ces = db.Column(db.Float, nullable=True)
     csat_distribution = db.Column(db.Text, nullable=True)  # JSON: {"1": 2, "2": 1, "3": 5, ...}
     ces_distribution = db.Column(db.Text, nullable=True)  # JSON: {"1": 0, "2": 1, ...}
-    driver_attribution = db.Column(db.Text, nullable=True)  # JSON: {driver_key: {count, percentage, label_en, label_fr}}
+    driver_attribution = db.Column(db.Text, nullable=True)  # JSON: {driver_key: {count, percentage, promoters, passives, detractors, net_impact, label_en, label_fr}}
     feature_analytics = db.Column(db.Text, nullable=True)  # JSON: {feature_key: {name_en, name_fr, adoption_rate, avg_satisfaction, ...}}
     recommendation_distribution = db.Column(db.Text, nullable=True)  # JSON: {recommended: N, would_consider: N, ...}
+    correlation_data = db.Column(db.Text, nullable=True)  # JSON: {points: [{csat, ces, nps_score, nps_category}], summary: {...}}
     
     # Snapshot Metadata
     snapshot_version = db.Column(db.String(10), nullable=False, default='v1.0')  # Track engine versions
@@ -871,6 +872,7 @@ class CampaignKPISnapshot(db.Model):
             'driver_attribution': json.loads(self.driver_attribution) if self.driver_attribution else {},
             'feature_analytics': json.loads(self.feature_analytics) if self.feature_analytics else {},
             'recommendation_distribution': json.loads(self.recommendation_distribution) if self.recommendation_distribution else {},
+            'correlation_data': json.loads(self.correlation_data) if self.correlation_data else {},
             'snapshot_version': self.snapshot_version,
             'snapshot_created_at': self.snapshot_created_at.isoformat() if self.snapshot_created_at else None,
             'data_period_start': self.data_period_start.isoformat() if self.data_period_start else None,

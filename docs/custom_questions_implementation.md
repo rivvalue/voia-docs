@@ -2,7 +2,7 @@
 
 **Created:** January 21, 2026  
 **Last Updated:** February 9, 2026  
-**Status:** Phase 2f Complete - KPI Snapshots & Analytics Tab UX  
+**Status:** Phase 2g Complete - Driver Impact Analysis & Metric Correlation  
 
 ---
 
@@ -205,6 +205,44 @@ Add Classic Survey as an alternative survey type alongside the existing Conversa
 4. Generate a KPI snapshot for a classic campaign → snapshot includes avg_csat, avg_ces, distributions
 5. Generate a KPI snapshot for a conversational campaign → classic fields remain null
 6. Classic analytics endpoint for completed campaign → serves from snapshot (not recalculated)
+
+### Phase 2g: Driver Impact Analysis & NPS-CSAT-CES Correlation (COMPLETED)
+
+**What was built:**
+- [x] **Driver Impact Analysis (Diverging Bar Chart)**: Replaced simple driver count chart with NPS-aware impact analysis
+  - Each driver now tracked by NPS category: promoters, passives, detractors counts
+  - Net impact score calculated per driver (promoters minus detractors)
+  - Diverging horizontal bar chart: green bars (promoters) extend right, red bars (detractors) extend left
+  - Sorted by net impact — strengths at top, weaknesses at bottom
+  - Tooltip shows per-category breakdown and net impact score
+  - Custom legend with color-coded NPS categories
+  - Backward-compatible fallback: old snapshot data without NPS breakdown renders as simple bar chart
+- [x] **NPS-CSAT-CES Correlation Chart**: Bubble scatter chart revealing metric relationships
+  - Each dot = one survey response, positioned by CSAT (x-axis, 1-5) and CES (y-axis, 1-8)
+  - Color-coded by NPS category (green=Promoter, yellow=Passive, red=Detractor)
+  - Bubble size proportional to NPS score
+  - Chart.js bubble chart with interactive tooltips
+- [x] **Correlation Summary Card**: Key insight stats below the scatter chart
+  - NPS-CSAT alignment percentage (% of Promoters who also gave high CSAT)
+  - Average CES by NPS category (Detractors vs Promoters)
+  - Auto-generated insight text (e.g., "Detractors report 1.8x higher effort than Promoters")
+- [x] `correlation_data` column added to CampaignKPISnapshot model (TEXT, JSON)
+  - Stores scatter points and summary stats for completed campaign snapshots
+  - No database migration needed beyond ALTER TABLE ADD COLUMN
+- [x] Snapshot generation captures correlation data alongside enriched driver breakdown
+- [x] Snapshot loading serves correlation data with backward-compatible fallback for old snapshots
+- [x] 38 total tests (1 new: test_analytics_correlation_data, updated: driver attribution and snapshot tests)
+
+**Files modified:** `models.py`, `data_storage.py`, `routes.py`, `templates/campaign_insights.html`, `tests/test_classic_survey.py`
+
+**Validation guide:**
+1. Open a classic campaign with responses → "Driver Impact Analysis" chart shows diverging bars (green right, red left)
+2. Drivers sorted by net impact — strongest positive drivers at top
+3. Hover tooltip shows promoters/passives/detractors counts and net impact
+4. "NPS-CSAT-CES Correlation" scatter chart shows colored dots by NPS category
+5. Correlation summary card shows alignment %, avg CES by category, and insight text
+6. Old snapshots without NPS breakdown → fallback to simple bar chart (no crash)
+7. New snapshot generation → includes enriched driver data and correlation points
 
 ### Phase 3+ (Planned)
 
