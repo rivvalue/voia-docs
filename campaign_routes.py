@@ -359,6 +359,7 @@ def preview_classic_survey(campaign_id):
         try:
             campaign_lang = campaign.language_code if hasattr(campaign, 'language_code') and campaign.language_code else 'en'
             session['language'] = campaign_lang
+            session['_preview_language_override'] = True
             from flask_babel import refresh as babel_refresh
             babel_refresh()
 
@@ -392,6 +393,7 @@ def preview_classic_survey(campaign_id):
                                  token='',
                                  preview_mode=True)
         finally:
+            session.pop('_preview_language_override', None)
             if original_language is not None:
                 session['language'] = original_language
             else:

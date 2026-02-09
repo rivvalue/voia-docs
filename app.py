@@ -114,6 +114,12 @@ def get_locale():
     supported_locales = app.config.get('BABEL_SUPPORTED_LOCALES', ['en', 'fr'])
     default_locale = app.config.get('BABEL_DEFAULT_LOCALE', 'en')
     
+    # 0. Check for preview language override (temporary, per-request)
+    if session.get('_preview_language_override'):
+        preview_lang = session.get('language')
+        if preview_lang and preview_lang in supported_locales:
+            return preview_lang
+
     # 1. Check database preference for authenticated business users (persistent across devices)
     business_user_id = session.get('business_user_id')
     if business_user_id:
