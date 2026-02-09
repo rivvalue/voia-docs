@@ -2,7 +2,7 @@
 
 **Created:** January 21, 2026  
 **Last Updated:** February 9, 2026  
-**Status:** Phase 2h Complete - Classic Survey Executive Reports  
+**Status:** Part A Complete | Part B (Objective-Based Survey Configuration) Architecture Defined  
 
 ---
 
@@ -267,295 +267,240 @@ Add Classic Survey as an alternative survey type alongside the existing Conversa
 4. Empty classic data → Charts show "No data available" fallback text
 5. Report Details section now shows Survey Type
 
-### Phase 3+ (Planned)
+### Part A Summary
 
-- Classic survey config UI (admin editing of drivers/features/sections)
-- Part B: Custom Questions for Traditional Surveys (see below)
+**Part A is FULLY COMPLETE as of February 9, 2026.** All phases delivered:
+- Phase 1: Foundation (models, survey type selector)
+- Phase 2: Participant survey form (multi-step classic questionnaire)
+- Phase 2b: Survey preview for campaign managers
+- Phase 2c: Response viewing (classic-specific display)
+- Phase 2d: Welcome page & V2 design compliance
+- Phase 2e: Classic analytics & cross-type comparison
+- Phase 2f: KPI snapshots & analytics tab redesign
+- Phase 2g: Driver Impact Analysis & NPS-CSAT-CES correlation
+- Phase 2h: Classic survey executive reports
+- Classic survey config editor UI (drivers/features/sections editing)
+
+### Pending: Performance Optimizations (from Architect Review, Feb 2026)
+
+4 items identified during performance validation — not blockers for Part B:
+1. **Matplotlib figure cleanup (High)** — Verify all chart methods explicitly close figures after saving to buffer to prevent memory leaks
+2. **Classic analytics query optimization (Medium)** — Select only needed columns instead of full response rows for large campaigns
+3. **Classic analytics endpoint caching (Medium)** — Confirm classic_survey_analytics route leverages response caching strategy
+4. **Concurrent report generation safeguards (Medium)** — Rate limiting or queue-based generation to prevent memory spikes
 
 ---
 
-## Part B: Custom Questions for Traditional Surveys
+## Part B: Objective-Based Survey Configuration
 
-### Overview
+### Vision
 
-Enable business account users to define custom questions for traditional surveys. Custom questions are **additive** - they supplement the mandatory core metrics (NPS, satisfaction ratings) to ensure analytics compatibility.
+VOÏA uses an **Objective-Based Survey Configuration** paradigm — NOT question-based design.
 
-**Status:** Ready for Implementation  
-**Estimated Effort:** 7-10 days
+Instead of:
+> "Create your survey"
+
+VOÏA offers:
+> **"What do you want to understand?"**
+
+Users configure **intent**, not methodology.
+
+**Status:** Architecture Defined — Implementation Pending  
+**Last Updated:** February 9, 2026
+
+### Core Principle
+
+Each business objective unlocks a **pre-designed, expert-curated question set** with proven ordering, scales, and logic. Users never see or manipulate individual questions — they select what they want to learn, and VOÏA handles the survey design.
+
+### Example Objectives
+
+| Objective | What It Answers | Target Use Case |
+|---|---|---|
+| **360 CX View** | Comprehensive customer experience assessment across all touchpoints | General CX health check |
+| **Understand Loyalty Drivers** | What drives customers to stay or recommend | Retention strategy |
+| **Understand Churn Risk** | Why customers leave and early warning signals | Churn prevention |
+| **Prioritize Product Roadmap** | Which features matter most to customers | Product planning |
+| **Diagnose Onboarding Friction** | Where new customers struggle in their journey | Onboarding improvement |
+| **Prepare Renewal Discussions** | Customer sentiment and priorities before contract renewal | Account management |
+
+### What Each Objective Includes
+
+Every objective is a **self-describing template** that packages both halves together:
+
+**Survey Side:**
+- Curated question set with proven ordering
+- Appropriate scales and response types for each question
+- Section organization optimized for respondent experience
+- Bilingual support (EN/FR)
+
+**Analytics Side:**
+- Pre-built dashboard charts specific to the objective's data
+- KPI definitions and calculation logic
+- Executive report sections with appropriate chart types (matplotlib)
+- AI insight prompts tailored to the objective's focus area
+
+One cannot exist without the other. Adding a new objective to VOÏA means delivering both the question set AND its analytics module as a single unit.
+
+---
+
+### Architecture
+
+#### Self-Describing Template Model
+
+Each objective/template defines:
+
+```
+Template = {
+    Metadata:       name, description, icon, category
+    Questions:      ordered list of questions with types, scales, options
+    Sections:       how questions are grouped in the survey form
+    Metrics:        how to calculate KPIs from the answers
+    Charts:         what chart type to use for each metric (bar, distribution, diverging, scatter, heatmap)
+    Report:         which KPIs and charts appear in the executive report
+    AI Prompts:     objective-specific insight generation prompts
+}
+```
+
+#### Layered Survey Assembly
+
+Every classic survey is assembled from two layers:
+
+1. **Core Metrics (mandatory, always present):**
+   - NPS (0-10) with category-based driver attribution
+   - CSAT (1-5)
+   - CES (1-8)
+   - These provide standardized cross-campaign benchmarking regardless of objective
+
+2. **Objective-Specific Questions (from selected template):**
+   - Curated questions that serve the chosen objective
+   - Rendered after core metrics in the survey form
+   - Analytics pre-built for the known data structure
+
+#### Relationship to Current Classic Survey
+
+The current Part A classic survey (NPS + CSAT + CES + drivers + features + recommendation) becomes the **first template**: **"360 CX View"**. This is a reframing, not a rebuild:
+
+- The existing `ClassicSurveyConfig` with its drivers, features, and sections = the "360 CX View" template definition
+- The existing classic analytics (CSAT/CES distributions, driver impact, correlation, feature analytics, recommendation) = the "360 CX View" analytics module
+- The existing executive report classic sections = the "360 CX View" report module
+
+No existing functionality is lost or rewritten. It is repositioned as the first entry in the objective catalog.
+
+#### Campaign Configuration Flow
+
+1. User creates a new classic campaign
+2. System presents: **"What do you want to understand?"** with available objectives
+3. User selects an objective (one per campaign in v1)
+4. System auto-assembles the survey from core metrics + objective's question set
+5. User can preview the assembled survey
+6. Objective choice is locked after campaign activation (existing freeze pattern)
+
+---
 
 ### Key Design Decisions
 
-1. **Core metrics remain mandatory** - NPS, satisfaction, service, pricing, product ratings always captured
-2. **Custom questions are additive** - Rendered after core questions
-3. **Backward compatible** - Campaigns without custom questions work exactly as before
-4. **No changes to SurveyResponse** - Custom responses stored in separate table
-5. **Bilingual support** - EN/FR question text
+1. **One objective per campaign (v1)** — Keeps surveys focused, avoids question overlap/deduplication, and makes analytics clean. Multi-objective support can be added later.
+2. **Core metrics always mandatory** — NPS, CSAT, CES captured in every survey regardless of objective, enabling cross-campaign and cross-objective benchmarking.
+3. **Templates are paired units** — Every template ships its question set AND its analytics module together. You cannot add one without the other.
+4. **Configuration-driven, not hardcoded** — Objectives and question sets are stored as data (database/config), not as code. Adding a new objective does not require code changes to the rendering or analytics engines.
+5. **Platform admin controls the catalog** — Only platform admins can create/modify objectives. Business users select from the catalog. This ensures survey quality and analytics consistency.
+6. **Backward compatible** — Existing classic campaigns continue to work exactly as they do today. The "360 CX View" template maps directly to the current classic survey structure.
+7. **Versioning** — Templates carry a version number. Updates to a template do not affect campaigns already using an earlier version.
+8. **Bilingual** — All template content (question text, section titles, option labels) supports EN/FR.
 
 ---
 
-## Database Schema
+### Phased Implementation Roadmap
 
-### CampaignQuestion Model
+#### Phase B1: Reframe Current Classic Survey as "360 CX View" Template
 
-```python
-class CampaignQuestion(db.Model):
-    """Custom question defined for a campaign's traditional survey."""
-    __tablename__ = 'campaign_question'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    campaign_id = db.Column(db.Integer, db.ForeignKey('campaign.id'), nullable=False)
-    
-    # Question content (bilingual)
-    question_text_en = db.Column(db.Text, nullable=False)
-    question_text_fr = db.Column(db.Text, nullable=True)
-    
-    # Question type: 'text', 'textarea', 'rating_1_5', 'rating_0_10', 'yes_no', 'single_choice', 'multiple_choice'
-    question_type = db.Column(db.String(50), nullable=False, default='text')
-    
-    # Options for choice questions (JSON array: ["Option A", "Option B", "Option C"])
-    options_json = db.Column(db.Text, nullable=True)
-    
-    # Configuration
-    is_required = db.Column(db.Boolean, default=False)
-    display_order = db.Column(db.Integer, default=0)
-    
-    # Timestamps
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
-    # Relationships
-    campaign = db.relationship('Campaign', backref=db.backref('custom_questions', lazy='dynamic'))
-```
+**Scope:** UI and data model changes only. No new survey content or analytics.
 
-### QuestionResponse Model
+- [ ] Create `SurveyObjective` model (name, description, icon, category, version, is_active, is_system)
+- [ ] Create mapping between `SurveyObjective` and `ClassicSurveyConfig` (objective_id on campaign or config)
+- [ ] Seed "360 CX View" as the first (and only) objective with metadata
+- [ ] Update campaign creation flow: replace direct classic config setup with objective selection step ("What do you want to understand?")
+- [ ] When "360 CX View" is selected, auto-create `ClassicSurveyConfig` with current default values (same behavior as today, different UX framing)
+- [ ] Campaign view shows selected objective name and description
+- [ ] Lock objective choice after activation (existing freeze pattern)
+- [ ] Existing classic campaigns without an objective assignment default to "360 CX View" (backward compatibility)
 
-```python
-class QuestionResponse(db.Model):
-    """Response to a custom campaign question."""
-    __tablename__ = 'question_response'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    survey_response_id = db.Column(db.Integer, db.ForeignKey('survey_response.id'), nullable=False)
-    question_id = db.Column(db.Integer, db.ForeignKey('campaign_question.id'), nullable=False)
-    
-    # Response data
-    response_value = db.Column(db.String(255), nullable=True)  # For ratings, yes/no, single choice
-    response_text = db.Column(db.Text, nullable=True)  # For text, textarea, multiple choice (JSON)
-    
-    # Timestamps
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    # Relationships
-    survey_response = db.relationship('SurveyResponse', backref=db.backref('custom_responses', lazy='dynamic'))
-    question = db.relationship('CampaignQuestion', backref=db.backref('responses', lazy='dynamic'))
-```
+**Outcome:** Users experience the new "What do you want to understand?" flow. Only one option available ("360 CX View"), but the architecture is in place for more.
 
----
+#### Phase B2: Generic Survey Rendering Engine
 
-## Phased Implementation Plan
+**Scope:** Decouple survey form rendering from hardcoded field references.
 
-### Phase 1: Database Foundation (Day 1)
+- [ ] Define a question specification format within the template (question key, type, scale range, options, section, order, required flag, bilingual text)
+- [ ] Build a generic survey form renderer that reads the template's question specifications and generates the appropriate form inputs (rating scales, checkboxes, text areas, etc.)
+- [ ] Build a generic response storage mechanism: `ObjectiveAnswer` table (response_id, question_key, answer_type, numeric_value, text_value, options_json)
+- [ ] Migrate the "360 CX View" survey rendering to use the generic engine (same output, different internal path)
+- [ ] Verify all existing classic survey functionality produces identical results through the new engine
 
-**Tasks:**
-- [ ] Add `CampaignQuestion` model to `models.py`
-- [ ] Add `QuestionResponse` model to `models.py`
-- [ ] Run database migrations via SQLAlchemy
+**Outcome:** Survey forms are rendered from template configuration, not hardcoded HTML. Adding new questions or sections to a template does not require template code changes.
 
-**Validation Checkpoint 1:**
-- [ ] Verify tables created: `SELECT * FROM campaign_question LIMIT 1;`
-- [ ] Verify existing surveys still work (complete a traditional survey)
-- [ ] Confirm no errors in application logs
+#### Phase B3: Generic Analytics Engine
 
-**Rollback:**
-```sql
-DROP TABLE IF EXISTS question_response;
-DROP TABLE IF EXISTS campaign_question;
-```
+**Scope:** Decouple analytics from hardcoded chart methods and field references.
+
+- [ ] Define an analytics specification format within the template: metric definitions (which questions feed which KPIs), chart definitions (chart type, data source, labels, colors), and report section definitions
+- [ ] Build a chart type registry: question_type → appropriate chart renderer (distribution bar, diverging bar, scatter, frequency, heatmap)
+- [ ] Build a generic KPI calculator that computes metrics from template-defined formulas
+- [ ] Build a dashboard composer that renders chart sections based on the template's analytics spec
+- [ ] Build an executive report composer that generates report sections from the template's report spec
+- [ ] Migrate "360 CX View" analytics to use the generic engine (same charts and KPIs, different internal path)
+- [ ] Verify all existing analytics, dashboard charts, and executive report sections produce identical results
+
+**Outcome:** Analytics are driven by template configuration. Each template defines what to measure and how to visualize it. The rendering engine is shared.
+
+#### Phase B4: Second Objective — Proof of Architecture
+
+**Scope:** Add a second objective to validate the architecture works end-to-end.
+
+- [ ] Design a second objective (e.g., "Understand Churn Risk") with its curated question set
+- [ ] Define its analytics spec: KPIs, chart types, report sections
+- [ ] Add it to the objective catalog (database seed)
+- [ ] Verify: campaign creation offers two choices, survey renders the correct questions, analytics show the correct charts, executive report includes the correct sections
+- [ ] Verify: "360 CX View" campaigns are completely unaffected
+
+**Outcome:** The architecture is proven. Adding the third, fourth, fifth objective follows the same pattern — define the template, seed it, done.
+
+#### Phase B5+: Expand the Objective Catalog
+
+Future objectives to design and add (each following the same template pattern):
+- [ ] Understand Loyalty Drivers
+- [ ] Prioritize Product Roadmap
+- [ ] Diagnose Onboarding Friction
+- [ ] Prepare Renewal Discussions
+- [ ] Platform admin UI for managing the objective catalog
 
 ---
 
-### Phase 2: Backend API (Day 2)
+### Risk Assessment
 
-**Tasks:**
-- [ ] Add route `GET /business/campaign/<id>/questions` - List questions
-- [ ] Add route `POST /business/campaign/<id>/questions` - Create question
-- [ ] Add route `PUT /business/campaign/<id>/questions/<qid>` - Update question
-- [ ] Add route `DELETE /business/campaign/<id>/questions/<qid>` - Delete question
-- [ ] Add route `POST /business/campaign/<id>/questions/reorder` - Reorder questions
-- [ ] Add authorization: only campaign owner can manage questions
+| Risk | Severity | Mitigation |
+|---|---|---|
+| Generic engine produces different results than current hardcoded analytics | High | Phase B2/B3 include explicit verification that output is identical before switching |
+| Over-engineering the generic engine before proving value | Medium | Phase B1 is pure reframing (minimal changes). B2/B3 only needed before adding second objective |
+| Template specification format too rigid for future objectives | Medium | Design spec format based on requirements of 3-4 known objectives before finalizing |
+| Performance regression from generic rendering vs hardcoded | Low | Generic engine uses same underlying queries/matplotlib; overhead is configuration lookup only |
+| Backward compatibility for existing campaigns | Medium | Default assignment to "360 CX View" for campaigns without explicit objective |
 
-**Validation Checkpoint 2:**
-- [ ] Test CRUD operations via API (curl or Postman)
-- [ ] Verify authorization prevents unauthorized access
-- [ ] Confirm existing campaign routes unchanged
+### Pragmatic Approach
 
-**Rollback:**
-```bash
-git checkout <checkpoint> -- business_auth_routes.py
-```
+Phases B1 through B3 can be done incrementally. The most pragmatic path:
+
+- **Phase B1 can be done now** — it's a small UI/data model change that reframes the existing experience without touching analytics or survey rendering internals.
+- **Phases B2-B3 should be done together**, but only when you're ready to add the second objective. Building the generic engine without a second template to validate it risks over-engineering.
+- **Phase B4 is the proof point** — if the second objective works cleanly through the generic engine, the architecture is validated and every subsequent objective is just configuration.
 
 ---
 
-### Phase 3: Question Editor UI (Days 3-4)
+### Success Criteria
 
-**Tasks:**
-- [ ] Add "Custom Questions" tab to campaign edit page (`templates/business/campaign_edit.html`)
-- [ ] Build question list with add/edit/delete buttons
-- [ ] Create question form modal (type selector, text fields, options editor)
-- [ ] Implement drag-and-drop reordering
-- [ ] Add question type icons and previews
-
-**Question Types Supported:**
-| Type | Input Control | Response Storage |
-|------|--------------|------------------|
-| `text` | Single-line input | `response_text` |
-| `textarea` | Multi-line textarea | `response_text` |
-| `rating_1_5` | Radio buttons 1-5 | `response_value` |
-| `rating_0_10` | Radio buttons 0-10 | `response_value` |
-| `yes_no` | Yes/No buttons | `response_value` |
-| `single_choice` | Radio buttons | `response_value` |
-| `multiple_choice` | Checkboxes | `response_text` (JSON array) |
-
-**Validation Checkpoint 3:**
-- [ ] Create campaign with 3+ custom questions of different types
-- [ ] Verify questions save and reload correctly
-- [ ] Test reordering and deletion
-- [ ] Verify bilingual fields (EN/FR)
-
-**Rollback:**
-```bash
-git checkout <checkpoint> -- templates/business/campaign_edit.html
-git checkout <checkpoint> -- static/js/campaign_questions.js
-```
-
----
-
-### Phase 4: Survey Form Integration (Days 5-6)
-
-**Tasks:**
-- [ ] Update `survey_form` route to pass custom questions to template
-- [ ] Modify `templates/survey.html` to render custom questions after core questions
-- [ ] Keep NPS, satisfaction, service, pricing, product ratings mandatory
-- [ ] Add dynamic rendering logic per question type
-- [ ] Implement bilingual rendering based on participant language
-- [ ] Add form validation for required custom questions
-
-**Survey Structure:**
-```
-Step 1: Basic Information (fixed)
-Step 2: NPS Score (fixed, mandatory)
-Step 3: Core Ratings (fixed - satisfaction, product, service, pricing)
-Step 4: Custom Questions (dynamic, from database)
-Step 5: Additional Feedback (fixed)
-Step 6: Submit
-```
-
-**Validation Checkpoint 4:**
-- [ ] Complete survey on campaign WITH custom questions - all questions appear
-- [ ] Complete survey on campaign WITHOUT custom questions - works as before
-- [ ] Switch language and verify bilingual rendering
-- [ ] Test required vs optional custom questions
-
-**Rollback:**
-```bash
-git checkout <checkpoint> -- templates/survey.html
-git checkout <checkpoint> -- routes.py
-```
-
----
-
-### Phase 5: Response Storage & Analytics (Days 7-8)
-
-**Tasks:**
-- [ ] Update `submit_survey_form` to extract custom question responses from form
-- [ ] Save responses to `QuestionResponse` table
-- [ ] Verify AI analysis still runs on core metrics (no changes needed)
-- [ ] Update CSV export to include custom question columns
-- [ ] Add custom responses to survey response detail view
-
-**Export Format:**
-```
-existing_columns..., custom_q1_text, custom_q1_response, custom_q2_text, custom_q2_response, ...
-```
-
-**Validation Checkpoint 5:**
-- [ ] Submit survey with custom questions and verify responses stored
-- [ ] Check AI analysis generates sentiment/churn scores (core metrics)
-- [ ] Export CSV and verify custom question columns present
-- [ ] View survey response detail and see custom answers
-
-**Rollback:**
-```bash
-git checkout <checkpoint> -- routes.py
-git checkout <checkpoint> -- business_auth_routes.py  # export routes
-```
-
----
-
-### Phase 6: Final Validation & Documentation (Day 9-10)
-
-**Tasks:**
-- [ ] Full regression testing on existing campaigns (no custom questions)
-- [ ] Test AI conversational surveys are unaffected
-- [ ] Update `replit.md` with feature documentation
-- [ ] Add rollback procedure to this document
-
-**Validation Checkpoint 6:**
-- [ ] All existing functionality works
-- [ ] New feature works end-to-end
-- [ ] Documentation complete
-- [ ] Ready for production
-
----
-
-## Complete Rollback Procedure
-
-If any phase causes issues, follow these steps:
-
-### Immediate Rollback (Any Phase)
-
-```bash
-# 1. Restore code to pre-implementation state
-git checkout 9b3322155bcc430e84cd97d60958785dce566070 -- models.py
-git checkout 9b3322155bcc430e84cd97d60958785dce566070 -- routes.py
-git checkout 9b3322155bcc430e84cd97d60958785dce566070 -- business_auth_routes.py
-git checkout 9b3322155bcc430e84cd97d60958785dce566070 -- templates/survey.html
-git checkout 9b3322155bcc430e84cd97d60958785dce566070 -- templates/business/campaign_edit.html
-
-# 2. Drop new database tables (if created)
-psql $DATABASE_URL -c "DROP TABLE IF EXISTS question_response CASCADE;"
-psql $DATABASE_URL -c "DROP TABLE IF EXISTS campaign_question CASCADE;"
-
-# 3. Restart application
-pkill gunicorn && gunicorn --bind 0.0.0.0:5000 --reuse-port --reload main:app
-```
-
-### Verification After Rollback
-
-- [ ] Traditional surveys work (submit test survey)
-- [ ] AI conversational surveys work
-- [ ] Campaign management works
-- [ ] CSV exports work
-- [ ] No errors in logs
-
----
-
-## Risk Mitigation
-
-| Risk | Mitigation |
-|------|------------|
-| Existing surveys break | All changes additive; core form unchanged if no custom questions |
-| Export schema changes | Custom columns appended at end; existing columns unchanged |
-| Performance degradation | Questions loaded with campaign; lazy loading for responses |
-| Data loss on rollback | Custom questions/responses in separate tables; dropping doesn't affect SurveyResponse |
-
----
-
-## Success Criteria
-
-1. Business users can add custom questions during campaign setup
-2. Traditional surveys render core questions + custom questions
-3. Campaigns without custom questions work exactly as before
-4. Custom responses are stored and included in exports
-5. AI analysis continues to work on core metrics
-6. Full backward compatibility maintained
+1. Users see "What do you want to understand?" when creating a classic campaign — not "Create your survey"
+2. Each objective delivers a complete, expert-designed survey with no user configuration of individual questions
+3. Each objective ships with its own analytics dashboard, KPIs, and executive report sections
+4. Adding a new objective requires only template configuration, not code changes to the rendering or analytics engines
+5. Existing "360 CX View" campaigns and analytics work identically to today
+6. Full backward compatibility maintained throughout all phases
