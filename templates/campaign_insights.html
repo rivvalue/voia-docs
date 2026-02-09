@@ -328,79 +328,83 @@
 
         <!-- Analytics Tab -->
         <div class="tab-pane fade" id="analytics" role="tabpanel" aria-labelledby="analytics-tab">
-            <!-- Charts Row -->
-    <div class="row mb-4 g-3">
-        <div class="col-md-6">
-            <div class="chart-card">
-                <div class="card-header">
-                    <h5>{{ _('NPS Distribution') }}</h5>
-                </div>
-                <div class="card-body">
-                    <div class="chart-container">
-                        <canvas id="npsChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="chart-card">
-                <div class="card-header">
-                    <h5>{{ _('Sentiment Analysis') }}</h5>
-                </div>
-                <div class="card-body">
-                    <div class="chart-container">
-                        <canvas id="sentimentChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Tenure Distribution -->
-    <div class="row mb-4 g-3">
-        <div class="col-md-6">
-            <div class="chart-card">
-                <div class="card-header">
-                    <h5>{{ _('Customer Tenure Distribution') }}</h5>
-                </div>
-                <div class="card-body">
-                    <div class="chart-container">
-                        <canvas id="tenureChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="chart-card">
-                <div class="card-header">
-                    <h5>{{ _('NPS-Based Opportunity Analysis') }}</h5>
-                </div>
-                <div class="card-body">
-                    <div class="chart-container">
-                        <canvas id="growthFactorChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-            <!-- {{ _('Average Ratings') }} -->
-            <div class="row mb-4">
-                <div class="col-12">
-                    <div class="chart-card">
-                        <div class="card-header">
-                            <h5>{{ _('Average Ratings') }}</h5>
+            
+            <!-- Conversational Analytics Container (hidden for classic campaigns) -->
+            <div id="conversationalAnalyticsSection">
+                <!-- Charts Row -->
+                <div class="row mb-4 g-3">
+                    <div class="col-md-6">
+                        <div class="chart-card">
+                            <div class="card-header">
+                                <h5>{{ _('NPS Distribution') }}</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="npsChart"></canvas>
+                                </div>
+                            </div>
                         </div>
-                        <div class="card-body">
-                            <div class="chart-container">
-                                <canvas id="ratingsChart"></canvas>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="chart-card">
+                            <div class="card-header">
+                                <h5>{{ _('Sentiment Analysis') }}</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="sentimentChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tenure Distribution -->
+                <div class="row mb-4 g-3">
+                    <div class="col-md-6">
+                        <div class="chart-card">
+                            <div class="card-header">
+                                <h5>{{ _('Customer Tenure Distribution') }}</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="tenureChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="chart-card">
+                            <div class="card-header">
+                                <h5>{{ _('NPS-Based Opportunity Analysis') }}</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="growthFactorChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- {{ _('Average Ratings') }} -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="chart-card">
+                            <div class="card-header">
+                                <h5>{{ _('Average Ratings') }}</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="ratingsChart"></canvas>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Classic Survey Analytics Section (shown only for classic campaigns) -->
+            <!-- Classic Analytics Container (hidden for conversational campaigns) -->
             <div id="classicAnalyticsSection" style="display: none;">
                 <div class="row mb-3">
                     <div class="col-12">
@@ -1126,17 +1130,20 @@ let classicCharts = {
 let currentSurveyType = null;
 
 function checkAndLoadClassicAnalytics(data) {
-    const section = document.getElementById('classicAnalyticsSection');
-    if (!section) return;
+    const classicSection = document.getElementById('classicAnalyticsSection');
+    const conversationalSection = document.getElementById('conversationalAnalyticsSection');
+    if (!classicSection || !conversationalSection) return;
 
     const campaignInfo = data.active_campaign;
     currentSurveyType = campaignInfo ? campaignInfo.survey_type : null;
 
     if (currentSurveyType === 'classic' && campaignInfo) {
-        section.style.display = 'block';
+        classicSection.style.display = 'block';
+        conversationalSection.style.display = 'none';
         loadClassicAnalyticsData(campaignInfo.id);
     } else {
-        section.style.display = 'none';
+        classicSection.style.display = 'none';
+        conversationalSection.style.display = 'block';
     }
 }
 

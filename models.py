@@ -806,6 +806,16 @@ class CampaignKPISnapshot(db.Model):
     # Segmentation Analytics Data
     segmentation_analytics = db.Column(db.Text, nullable=True)  # JSON: NPS and satisfaction by role, region, customer tier
     
+    # Classic Survey-Specific Metrics
+    survey_type = db.Column(db.String(20), nullable=True, default='conversational')
+    avg_csat = db.Column(db.Float, nullable=True)
+    avg_ces = db.Column(db.Float, nullable=True)
+    csat_distribution = db.Column(db.Text, nullable=True)  # JSON: {"1": 2, "2": 1, "3": 5, ...}
+    ces_distribution = db.Column(db.Text, nullable=True)  # JSON: {"1": 0, "2": 1, ...}
+    driver_attribution = db.Column(db.Text, nullable=True)  # JSON: {driver_key: {count, percentage, label_en, label_fr}}
+    feature_analytics = db.Column(db.Text, nullable=True)  # JSON: {feature_key: {name_en, name_fr, adoption_rate, avg_satisfaction, ...}}
+    recommendation_distribution = db.Column(db.Text, nullable=True)  # JSON: {recommended: N, would_consider: N, ...}
+    
     # Snapshot Metadata
     snapshot_version = db.Column(db.String(10), nullable=False, default='v1.0')  # Track engine versions
     snapshot_created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
@@ -853,6 +863,14 @@ class CampaignKPISnapshot(db.Model):
             'tenure_analysis': json.loads(self.tenure_analysis) if self.tenure_analysis else [],
             'growth_factor_analysis_detailed': json.loads(self.growth_factor_analysis_detailed) if self.growth_factor_analysis_detailed else {},
             'segmentation_analytics': json.loads(self.segmentation_analytics) if self.segmentation_analytics else {},
+            'survey_type': self.survey_type or 'conversational',
+            'avg_csat': self.avg_csat,
+            'avg_ces': self.avg_ces,
+            'csat_distribution': json.loads(self.csat_distribution) if self.csat_distribution else {},
+            'ces_distribution': json.loads(self.ces_distribution) if self.ces_distribution else {},
+            'driver_attribution': json.loads(self.driver_attribution) if self.driver_attribution else {},
+            'feature_analytics': json.loads(self.feature_analytics) if self.feature_analytics else {},
+            'recommendation_distribution': json.loads(self.recommendation_distribution) if self.recommendation_distribution else {},
             'snapshot_version': self.snapshot_version,
             'snapshot_created_at': self.snapshot_created_at.isoformat() if self.snapshot_created_at else None,
             'data_period_start': self.data_period_start.isoformat() if self.data_period_start else None,

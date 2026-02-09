@@ -613,3 +613,279 @@ class TestDriverLabelValidation:
 
         assert config.feature_count == 9
         assert len(config.features) == 9
+
+
+class TestClassicKPISnapshot:
+    """Test KPI snapshot generation and loading for classic surveys."""
+
+    def test_snapshot_model_has_classic_fields(self, db_session, app_context):
+        """CampaignKPISnapshot model includes classic-specific fields."""
+        from models import CampaignKPISnapshot
+        import inspect
+
+        members = [m[0] for m in inspect.getmembers(CampaignKPISnapshot)]
+        for field in ['survey_type', 'avg_csat', 'avg_ces', 'csat_distribution',
+                      'ces_distribution', 'driver_attribution', 'feature_analytics',
+                      'recommendation_distribution']:
+            assert field in members, f"Missing field: {field}"
+
+    def test_snapshot_to_dict_includes_classic_fields(self, db_session, sample_data, app_context):
+        """to_dict() on snapshot returns classic-specific fields."""
+        from models import CampaignKPISnapshot
+        import json as json_mod
+
+        account = sample_data.create_business_account(db_session)
+        campaign = sample_data.create_campaign(db_session, account, survey_type='classic')
+
+        snapshot = CampaignKPISnapshot(
+            campaign_id=campaign.id,
+            survey_type='classic',
+            total_responses=10,
+            total_companies=3,
+            nps_score=50.0,
+            promoters_count=7,
+            passives_count=2,
+            detractors_count=1,
+            avg_csat=4.2,
+            avg_ces=5.5,
+            csat_distribution=json_mod.dumps({"4": 5, "5": 5}),
+            ces_distribution=json_mod.dumps({"5": 4, "6": 6}),
+            driver_attribution=json_mod.dumps({"quality": {"count": 8, "percentage": 80.0}}),
+            feature_analytics=json_mod.dumps({"dashboard": {"adoption_rate": 90.0, "avg_satisfaction": 4.5}}),
+            recommendation_distribution=json_mod.dumps({"recommended": 7, "would_consider": 2, "would_not_recommend": 1}),
+            data_period_start=campaign.start_date,
+            data_period_end=campaign.end_date,
+        )
+        db_session.add(snapshot)
+        db_session.flush()
+
+        d = snapshot.to_dict()
+        assert d['survey_type'] == 'classic'
+        assert d['avg_csat'] == 4.2
+        assert d['avg_ces'] == 5.5
+        assert d['csat_distribution'] == {"4": 5, "5": 5}
+        assert d['ces_distribution'] == {"5": 4, "6": 6}
+        assert d['driver_attribution']['quality']['count'] == 8
+        assert d['feature_analytics']['dashboard']['adoption_rate'] == 90.0
+        assert d['recommendation_distribution']['recommended'] == 7
+
+    def test_conversational_snapshot_unaffected(self, db_session, sample_data, app_context):
+        """Conversational campaign snapshot has empty classic fields."""
+        from models import CampaignKPISnapshot
+
+        account = sample_data.create_business_account(db_session)
+        campaign = sample_data.create_campaign(db_session, account, survey_type='conversational')
+
+        snapshot = CampaignKPISnapshot(
+            campaign_id=campaign.id,
+            survey_type='conversational',
+            total_responses=5,
+            total_companies=2,
+            nps_score=60.0,
+            promoters_count=4,
+            passives_count=1,
+            detractors_count=0,
+            data_period_start=campaign.start_date,
+            data_period_end=campaign.end_date,
+        )
+        db_session.add(snapshot)
+        db_session.flush()
+
+        d = snapshot.to_dict()
+        assert d['survey_type'] == 'conversational'
+        assert d['avg_csat'] is None
+        assert d['avg_ces'] is None
+        assert d['csat_distribution'] == {}
+        assert d['ces_distribution'] == {}
+        assert d['driver_attribution'] == {}
+        assert d['feature_analytics'] == {}
+        assert d['recommendation_distribution'] == {}
+
+    def test_snapshot_generation_captures_classic_data(self, db_session, sample_data, app_context):
+        """generate_campaign_kpi_snapshot includes classic metrics for classic campaigns."""
+        from models import ClassicSurveyConfig, SurveyTemplate, CampaignKPISnapshot
+        import json as json_mod
+
+        account = sample_data.create_business_account(db_session)
+        campaign = sample_data.create_campaign(
+            db_session, account,
+            survey_type='classic',
+            status='active',
+        )
+
+        template = SurveyTemplate(name='T', version='1.0', is_system=True)
+        db_session.add(template)
+        db_session.flush()
+
+        config = ClassicSurveyConfig(
+            campaign_id=campaign.id,
+            template_id=template.id,
+            feature_count=2,
+            features=[
+                {'key': 'feat_a', 'name_en': 'Feature A', 'name_fr': 'Fonct A'},
+                {'key': 'feat_b', 'name_en': 'Feature B', 'name_fr': 'Fonct B'},
+            ],
+            driver_labels=[
+                {'key': 'quality', 'label_en': 'Quality', 'label_fr': 'Qualité'},
+                {'key': 'support', 'label_en': 'Support', 'label_fr': 'Support'},
+            ],
+        )
+        db_session.add(config)
+        db_session.flush()
+
+        sample_data.create_survey_response(
+            db_session, campaign,
+            nps_score=9, nps_category='Promoter',
+            csat_score=5, ces_score=7,
+            loyalty_drivers=['quality', 'support'],
+            recommendation_status='recommended',
+            general_feedback=json_mod.dumps({
+                'feat_a': {'usage': 'yes', 'satisfaction': 5},
+                'feat_b': {'usage': 'no_not_needed', 'satisfaction': None},
+            }),
+        )
+        sample_data.create_survey_response(
+            db_session, campaign,
+            nps_score=6, nps_category='Detractor',
+            csat_score=2, ces_score=3,
+            loyalty_drivers=['quality'],
+            recommendation_status='would_not_recommend',
+            general_feedback=json_mod.dumps({
+                'feat_a': {'usage': 'yes', 'satisfaction': 3},
+                'feat_b': {'usage': 'yes', 'satisfaction': 4},
+            }),
+        )
+        db_session.commit()
+
+        from data_storage import generate_campaign_kpi_snapshot
+        snapshot = generate_campaign_kpi_snapshot(campaign.id)
+
+        assert snapshot is not None
+        assert snapshot.survey_type == 'classic'
+        assert snapshot.avg_csat == 3.5
+        assert snapshot.avg_ces == 5.0
+        assert snapshot.total_responses == 2
+
+        csat_dist = json_mod.loads(snapshot.csat_distribution)
+        assert '5' in csat_dist
+        assert '2' in csat_dist
+
+        drivers = json_mod.loads(snapshot.driver_attribution)
+        assert 'quality' in drivers
+        assert drivers['quality']['count'] == 2
+        assert 'support' in drivers
+        assert drivers['support']['count'] == 1
+
+        features = json_mod.loads(snapshot.feature_analytics)
+        assert 'feat_a' in features
+        assert features['feat_a']['adoption_rate'] == 100.0
+        assert features['feat_a']['avg_satisfaction'] == 4.0
+
+        rec = json_mod.loads(snapshot.recommendation_distribution)
+        assert rec['recommended'] == 1
+        assert rec['would_not_recommend'] == 1
+
+        existing = CampaignKPISnapshot.query.filter_by(campaign_id=campaign.id).first()
+        db_session.delete(existing)
+        db_session.commit()
+
+    def test_snapshot_generation_conversational_no_classic_data(self, db_session, sample_data, app_context):
+        """generate_campaign_kpi_snapshot for conversational campaign has no classic fields populated."""
+        from models import CampaignKPISnapshot
+
+        account = sample_data.create_business_account(db_session)
+        campaign = sample_data.create_campaign(
+            db_session, account,
+            survey_type='conversational',
+            status='active',
+        )
+
+        sample_data.create_survey_response(
+            db_session, campaign,
+            nps_score=8, nps_category='Passive',
+            satisfaction_rating=4,
+        )
+        db_session.commit()
+
+        from data_storage import generate_campaign_kpi_snapshot
+        snapshot = generate_campaign_kpi_snapshot(campaign.id)
+
+        assert snapshot is not None
+        assert snapshot.survey_type == 'conversational'
+        assert snapshot.avg_csat is None
+        assert snapshot.avg_ces is None
+        assert snapshot.csat_distribution is None
+        assert snapshot.driver_attribution is None
+        assert snapshot.feature_analytics is None
+        assert snapshot.recommendation_distribution is None
+
+        existing = CampaignKPISnapshot.query.filter_by(campaign_id=campaign.id).first()
+        db_session.delete(existing)
+        db_session.commit()
+
+    def test_convert_snapshot_classic_includes_analytics(self, db_session, sample_data, app_context):
+        """convert_snapshot_to_dashboard_format includes classic_analytics_snapshot for classic surveys."""
+        from models import CampaignKPISnapshot
+        from data_storage import convert_snapshot_to_dashboard_format
+        import json as json_mod
+
+        account = sample_data.create_business_account(db_session)
+        campaign = sample_data.create_campaign(db_session, account, survey_type='classic')
+
+        snapshot = CampaignKPISnapshot(
+            campaign_id=campaign.id,
+            survey_type='classic',
+            total_responses=5,
+            total_companies=2,
+            nps_score=40.0,
+            promoters_count=3,
+            passives_count=1,
+            detractors_count=1,
+            avg_csat=3.8,
+            avg_ces=4.5,
+            csat_distribution=json_mod.dumps({"3": 1, "4": 2, "5": 2}),
+            ces_distribution=json_mod.dumps({"4": 2, "5": 3}),
+            driver_attribution=json_mod.dumps({"quality": {"count": 4}}),
+            feature_analytics=json_mod.dumps({"dash": {"adoption_rate": 80.0}}),
+            recommendation_distribution=json_mod.dumps({"recommended": 3}),
+            data_period_start=campaign.start_date,
+            data_period_end=campaign.end_date,
+        )
+        db_session.add(snapshot)
+        db_session.flush()
+
+        result = convert_snapshot_to_dashboard_format(snapshot)
+
+        assert 'classic_analytics_snapshot' in result
+        classic = result['classic_analytics_snapshot']
+        assert classic['csat']['average'] == 3.8
+        assert classic['ces']['average'] == 4.5
+        assert classic['drivers']['quality']['count'] == 4
+        assert classic['features']['dash']['adoption_rate'] == 80.0
+        assert classic['recommendation']['recommended'] == 3
+
+    def test_convert_snapshot_conversational_no_classic(self, db_session, sample_data, app_context):
+        """convert_snapshot_to_dashboard_format for conversational has no classic_analytics_snapshot."""
+        from models import CampaignKPISnapshot
+        from data_storage import convert_snapshot_to_dashboard_format
+
+        account = sample_data.create_business_account(db_session)
+        campaign = sample_data.create_campaign(db_session, account, survey_type='conversational')
+
+        snapshot = CampaignKPISnapshot(
+            campaign_id=campaign.id,
+            survey_type='conversational',
+            total_responses=3,
+            total_companies=1,
+            nps_score=70.0,
+            promoters_count=2,
+            passives_count=1,
+            detractors_count=0,
+            data_period_start=campaign.start_date,
+            data_period_end=campaign.end_date,
+        )
+        db_session.add(snapshot)
+        db_session.flush()
+
+        result = convert_snapshot_to_dashboard_format(snapshot)
+        assert 'classic_analytics_snapshot' not in result

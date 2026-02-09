@@ -5,7 +5,7 @@ import logging
 from datetime import datetime, timedelta
 from sqlalchemy import func, case
 from app import db, cache
-from models import SurveyResponse, Campaign, CampaignKPISnapshot, Participant, CampaignParticipant
+from models import SurveyResponse, Campaign, CampaignKPISnapshot, Participant, CampaignParticipant, ClassicSurveyConfig
 from flask import request
 from cache_config import cache_config
 
@@ -1006,7 +1006,7 @@ def convert_snapshot_to_dashboard_format(snapshot):
             elif 'company_nps' not in account:
                 account['company_nps'] = 0
         
-        return {
+        result = {
             'total_responses': snapshot.total_responses,
             'total_companies': snapshot.total_companies,
             'nps_score': snapshot.nps_score,
@@ -1028,6 +1028,27 @@ def convert_snapshot_to_dashboard_format(snapshot):
             },
             'segmentation_analytics': json.loads(snapshot.segmentation_analytics) if snapshot.segmentation_analytics else {}
         }
+        
+        snapshot_survey_type = getattr(snapshot, 'survey_type', None) or 'conversational'
+        if snapshot_survey_type == 'classic':
+            result['classic_analytics_snapshot'] = {
+                'total_responses': snapshot.total_responses,
+                'csat': {
+                    'average': snapshot.avg_csat,
+                    'distribution': json.loads(snapshot.csat_distribution) if snapshot.csat_distribution else {},
+                    'count': sum(json.loads(snapshot.csat_distribution).values()) if snapshot.csat_distribution else 0
+                },
+                'ces': {
+                    'average': snapshot.avg_ces,
+                    'distribution': json.loads(snapshot.ces_distribution) if snapshot.ces_distribution else {},
+                    'count': sum(json.loads(snapshot.ces_distribution).values()) if snapshot.ces_distribution else 0
+                },
+                'drivers': json.loads(snapshot.driver_attribution) if snapshot.driver_attribution else {},
+                'features': json.loads(snapshot.feature_analytics) if snapshot.feature_analytics else {},
+                'recommendation': json.loads(snapshot.recommendation_distribution) if snapshot.recommendation_distribution else {}
+            }
+        
+        return result
         
     except Exception as e:
         print(f"Error converting snapshot to dashboard format: {e}")
@@ -1793,11 +1814,132 @@ def generate_campaign_kpi_snapshot(campaign_id):
         print(f"   ✅ Segmentation Analytics: {segment_count} segments")
         
         # ============================================================================
+        # CLASSIC SURVEY-SPECIFIC METRICS (only for classic campaigns)
+        # ============================================================================
+        
+        campaign_survey_type = getattr(campaign, 'survey_type', 'conversational') or 'conversational'
+        classic_snapshot_data = {}
+        
+        if campaign_survey_type == 'classic':
+            print("📋 Capturing classic survey-specific metrics...")
+            
+            responses_list = base_query.all()
+            
+            csat_scores = [r.csat_score for r in responses_list if r.csat_score is not None]
+            csat_dist = {}
+            for s in csat_scores:
+                csat_dist[str(s)] = csat_dist.get(str(s), 0) + 1
+            csat_avg = round(sum(csat_scores) / len(csat_scores), 2) if csat_scores else None
+            
+            ces_scores = [r.ces_score for r in responses_list if r.ces_score is not None]
+            ces_dist = {}
+            for s in ces_scores:
+                ces_dist[str(s)] = ces_dist.get(str(s), 0) + 1
+            ces_avg = round(sum(ces_scores) / len(ces_scores), 2) if ces_scores else None
+            
+            driver_counts = {}
+            for r in responses_list:
+                if r.loyalty_drivers:
+                    drivers_list = r.loyalty_drivers if isinstance(r.loyalty_drivers, list) else []
+                    for d in drivers_list:
+                        driver_counts[d] = driver_counts.get(d, 0) + 1
+            
+            classic_config = ClassicSurveyConfig.query.filter_by(campaign_id=campaign_id).first()
+            driver_label_map = {}
+            if classic_config and classic_config.driver_labels:
+                for dl in classic_config.driver_labels:
+                    driver_label_map[dl['key']] = {
+                        'label_en': dl.get('label_en', dl['key']),
+                        'label_fr': dl.get('label_fr', dl['key'])
+                    }
+            
+            drivers_with_labels = {}
+            for key, count in driver_counts.items():
+                labels = driver_label_map.get(key, {'label_en': key, 'label_fr': key})
+                drivers_with_labels[key] = {
+                    'count': count,
+                    'percentage': round(count / total_responses * 100, 1) if total_responses > 0 else 0,
+                    'label_en': labels['label_en'],
+                    'label_fr': labels['label_fr']
+                }
+            
+            feature_data = {}
+            feature_label_map = {}
+            if classic_config and classic_config.features:
+                for f in classic_config.features:
+                    feature_label_map[f['key']] = {
+                        'name_en': f.get('name_en', f['key']),
+                        'name_fr': f.get('name_fr', f['key'])
+                    }
+            
+            for r in responses_list:
+                if r.general_feedback:
+                    try:
+                        evals = json.loads(r.general_feedback) if isinstance(r.general_feedback, str) else r.general_feedback
+                        if isinstance(evals, dict):
+                            for fkey, fdata in evals.items():
+                                if fkey not in feature_data:
+                                    f_labels = feature_label_map.get(fkey, {'name_en': fkey, 'name_fr': fkey})
+                                    feature_data[fkey] = {
+                                        'name_en': f_labels['name_en'],
+                                        'name_fr': f_labels['name_fr'],
+                                        'usage_yes': 0,
+                                        'usage_no': 0,
+                                        'satisfaction_scores': []
+                                    }
+                                fd = feature_data[fkey]
+                                usage = fdata.get('usage', '') if isinstance(fdata, dict) else ''
+                                if usage == 'yes':
+                                    fd['usage_yes'] += 1
+                                elif usage and str(usage).startswith('no'):
+                                    fd['usage_no'] += 1
+                                if isinstance(fdata, dict) and fdata.get('satisfaction') is not None:
+                                    fd['satisfaction_scores'].append(fdata['satisfaction'])
+                    except (json.JSONDecodeError, AttributeError):
+                        pass
+            
+            features_summary = {}
+            for fkey, fd in feature_data.items():
+                avg_sat = round(sum(fd['satisfaction_scores']) / len(fd['satisfaction_scores']), 2) if fd['satisfaction_scores'] else None
+                total_usage = fd['usage_yes'] + fd['usage_no']
+                adoption = round(fd['usage_yes'] / total_usage * 100, 1) if total_usage > 0 else 0
+                features_summary[fkey] = {
+                    'name_en': fd['name_en'],
+                    'name_fr': fd['name_fr'],
+                    'adoption_rate': adoption,
+                    'usage_yes': fd['usage_yes'],
+                    'usage_no': fd['usage_no'],
+                    'avg_satisfaction': avg_sat
+                }
+            
+            rec_counts = {}
+            for r in responses_list:
+                if r.recommendation_status:
+                    rec_counts[r.recommendation_status] = rec_counts.get(r.recommendation_status, 0) + 1
+            
+            classic_snapshot_data = {
+                'avg_csat': csat_avg,
+                'avg_ces': ces_avg,
+                'csat_distribution': json.dumps(csat_dist),
+                'ces_distribution': json.dumps(ces_dist),
+                'driver_attribution': json.dumps(drivers_with_labels),
+                'feature_analytics': json.dumps(features_summary),
+                'recommendation_distribution': json.dumps(rec_counts),
+            }
+            
+            print(f"   ✅ CSAT: avg={csat_avg}, {len(csat_scores)} scores")
+            print(f"   ✅ CES: avg={ces_avg}, {len(ces_scores)} scores")
+            print(f"   ✅ Drivers: {len(drivers_with_labels)} unique")
+            print(f"   ✅ Features: {len(features_summary)} evaluated")
+            print(f"   ✅ Recommendations: {len(rec_counts)} statuses")
+        
+        # ============================================================================
         # CREATE SNAPSHOT RECORD
         # ============================================================================
         
         snapshot = CampaignKPISnapshot(
             campaign_id=campaign_id,
+            survey_type=campaign_survey_type,
             total_responses=total_responses,
             total_companies=total_companies,
             nps_score=round(nps_score, 1),
@@ -1834,6 +1976,13 @@ def generate_campaign_kpi_snapshot(campaign_id):
             tenure_analysis=json.dumps(tenure_analysis),
             growth_factor_analysis_detailed=json.dumps(growth_factor_analysis_detailed),
             segmentation_analytics=json.dumps(segmentation_analytics),
+            avg_csat=classic_snapshot_data.get('avg_csat'),
+            avg_ces=classic_snapshot_data.get('avg_ces'),
+            csat_distribution=classic_snapshot_data.get('csat_distribution'),
+            ces_distribution=classic_snapshot_data.get('ces_distribution'),
+            driver_attribution=classic_snapshot_data.get('driver_attribution'),
+            feature_analytics=classic_snapshot_data.get('feature_analytics'),
+            recommendation_distribution=classic_snapshot_data.get('recommendation_distribution'),
             data_period_start=campaign.start_date,
             data_period_end=campaign.end_date
         )

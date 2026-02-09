@@ -3630,7 +3630,7 @@ def get_campaign_filter_options():
 def classic_survey_analytics():
     """API endpoint for classic survey-specific analytics (CSAT, CES, drivers, features, recommendation)"""
     try:
-        from models import Campaign, SurveyResponse, ClassicSurveyConfig
+        from models import Campaign, SurveyResponse, ClassicSurveyConfig, CampaignKPISnapshot
         from business_auth_routes import get_current_business_account
         import json as json_module
 
@@ -3648,6 +3648,26 @@ def classic_survey_analytics():
         ).first()
         if not campaign or campaign.survey_type != 'classic':
             return jsonify({'error': 'Classic campaign not found'}), 404
+
+        if campaign.status == 'completed':
+            snapshot = CampaignKPISnapshot.query.filter_by(campaign_id=campaign_id).first()
+            if snapshot and snapshot.csat_distribution:
+                return jsonify({
+                    'total_responses': snapshot.total_responses,
+                    'csat': {
+                        'average': snapshot.avg_csat,
+                        'distribution': json_module.loads(snapshot.csat_distribution) if snapshot.csat_distribution else {},
+                        'count': sum(json_module.loads(snapshot.csat_distribution).values()) if snapshot.csat_distribution else 0
+                    },
+                    'ces': {
+                        'average': snapshot.avg_ces,
+                        'distribution': json_module.loads(snapshot.ces_distribution) if snapshot.ces_distribution else {},
+                        'count': sum(json_module.loads(snapshot.ces_distribution).values()) if snapshot.ces_distribution else 0
+                    },
+                    'drivers': json_module.loads(snapshot.driver_attribution) if snapshot.driver_attribution else {},
+                    'features': json_module.loads(snapshot.feature_analytics) if snapshot.feature_analytics else {},
+                    'recommendation': json_module.loads(snapshot.recommendation_distribution) if snapshot.recommendation_distribution else {}
+                })
 
         responses = SurveyResponse.query.filter_by(campaign_id=campaign_id).all()
         total = len(responses)
