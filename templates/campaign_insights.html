@@ -79,6 +79,9 @@
                             <span class="badge text-dark border" id="selectedCampaignDaysLeft" style="display: none; background: #f5f5f5;">
                                 <i class="fas fa-clock me-1" style="color: #E13A44;"></i><span class="campaign-days-text"></span>
                             </span>
+                            <span class="badge" id="selectedCampaignSurveyType" style="display: none;">
+                                <i class="fas fa-clipboard-list me-1"></i><span class="campaign-survey-type-text"></span>
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -393,6 +396,136 @@
                                 <canvas id="ratingsChart"></canvas>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Classic Survey Analytics Section (shown only for classic campaigns) -->
+            <div id="classicAnalyticsSection" style="display: none;">
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <h4 class="mb-1" style="color: var(--primary-black);">
+                            <i class="fas fa-poll me-2" style="color: #E13A44;"></i>{{ _('Classic Survey Metrics') }}
+                        </h4>
+                        <p class="text-muted mb-0">{{ _('Detailed metrics from structured survey questions') }}</p>
+                    </div>
+                </div>
+
+                <!-- CSAT & CES KPI Cards -->
+                <div class="row mb-4 g-3">
+                    <div class="col-md-3">
+                        <div class="kpi-card kpi-success">
+                            <div class="kpi-value" id="classicCsatAvg" style="color: #E13A44;">--</div>
+                            <div class="kpi-label">{{ _('Avg. CSAT Score') }}</div>
+                            <div class="kpi-trend">{{ _('Customer Satisfaction (1-5)') }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="kpi-card kpi-primary">
+                            <div class="kpi-value" id="classicCesAvg" style="color: #E13A44;">--</div>
+                            <div class="kpi-label">{{ _('Avg. CES Score') }}</div>
+                            <div class="kpi-trend">{{ _('Customer Effort (1-8)') }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="kpi-card kpi-info">
+                            <div class="kpi-value" id="classicDriverCount" style="color: #E13A44;">--</div>
+                            <div class="kpi-label">{{ _('Unique Drivers') }}</div>
+                            <div class="kpi-trend">{{ _('NPS attribution factors') }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="kpi-card kpi-info">
+                            <div class="kpi-value" id="classicFeatureCount" style="color: #E13A44;">--</div>
+                            <div class="kpi-label">{{ _('Features Evaluated') }}</div>
+                            <div class="kpi-trend">{{ _('Product feature coverage') }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CSAT Distribution & CES Distribution -->
+                <div class="row mb-4 g-3">
+                    <div class="col-md-6">
+                        <div class="chart-card">
+                            <div class="card-header">
+                                <h5>{{ _('CSAT Distribution') }}</h5>
+                                <small class="text-muted">{{ _('Customer Satisfaction Score breakdown (1-5)') }}</small>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="classicCsatChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="chart-card">
+                            <div class="card-header">
+                                <h5>{{ _('CES Distribution') }}</h5>
+                                <small class="text-muted">{{ _('Customer Effort Score breakdown (1-8)') }}</small>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="classicCesChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Driver Attribution & Recommendation Status -->
+                <div class="row mb-4 g-3">
+                    <div class="col-md-6">
+                        <div class="chart-card">
+                            <div class="card-header">
+                                <h5>{{ _('NPS Driver Attribution') }}</h5>
+                                <small class="text-muted">{{ _('What factors influenced satisfaction scores?') }}</small>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="classicDriverChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="chart-card">
+                            <div class="card-header">
+                                <h5>{{ _('Recommendation Status') }}</h5>
+                                <small class="text-muted">{{ _('Would respondents recommend your company?') }}</small>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="classicRecommendationChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature Adoption & Satisfaction -->
+                <div class="row mb-4 g-3">
+                    <div class="col-12">
+                        <div class="chart-card">
+                            <div class="card-header">
+                                <h5>{{ _('Feature Adoption & Satisfaction') }}</h5>
+                                <small class="text-muted">{{ _('Usage rates and satisfaction scores per feature') }}</small>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container" style="height: 350px;">
+                                    <canvas id="classicFeatureChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Classic Analytics Empty State -->
+                <div id="classicAnalyticsEmpty" style="display: none;">
+                    <div class="text-center py-5">
+                        <i class="fas fa-chart-bar fa-3x mb-3" style="color: #dee2e6;"></i>
+                        <h5 class="text-muted">{{ _('No classic survey data available yet') }}</h5>
+                        <p class="text-muted">{{ _('Analytics will appear once participants complete the classic survey.') }}</p>
                     </div>
                 </div>
             </div>
@@ -980,6 +1113,329 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- JavaScript disabled for company NPS table - using server-side rendering only -->
 <script src="{{ url_for('static', filename='js/dashboard.js') }}?v={{ range(1000, 9999) | random }}"></script>
 
+<!-- Classic Survey Analytics Rendering -->
+<script>
+let classicCharts = {
+    csat: null,
+    ces: null,
+    drivers: null,
+    recommendation: null,
+    features: null
+};
+
+let currentSurveyType = null;
+
+function checkAndLoadClassicAnalytics(data) {
+    const section = document.getElementById('classicAnalyticsSection');
+    if (!section) return;
+
+    const campaignInfo = data.active_campaign;
+    currentSurveyType = campaignInfo ? campaignInfo.survey_type : null;
+
+    if (currentSurveyType === 'classic' && campaignInfo) {
+        section.style.display = 'block';
+        loadClassicAnalyticsData(campaignInfo.id);
+    } else {
+        section.style.display = 'none';
+    }
+}
+
+async function loadClassicAnalyticsData(campaignId) {
+    try {
+        const response = await fetch(`/api/classic_survey_analytics?campaign_id=${campaignId}&_t=${Date.now()}`);
+        if (!response.ok) throw new Error('Failed to load classic analytics');
+        const data = await response.json();
+
+        const emptyState = document.getElementById('classicAnalyticsEmpty');
+        if (data.total_responses === 0) {
+            if (emptyState) emptyState.style.display = 'block';
+            return;
+        }
+        if (emptyState) emptyState.style.display = 'none';
+
+        const csatEl = document.getElementById('classicCsatAvg');
+        if (csatEl) csatEl.textContent = data.csat.average !== null ? data.csat.average.toFixed(1) : '--';
+
+        const cesEl = document.getElementById('classicCesAvg');
+        if (cesEl) cesEl.textContent = data.ces.average !== null ? data.ces.average.toFixed(1) : '--';
+
+        const driverEl = document.getElementById('classicDriverCount');
+        if (driverEl) driverEl.textContent = Object.keys(data.drivers).length;
+
+        const featureEl = document.getElementById('classicFeatureCount');
+        if (featureEl) featureEl.textContent = Object.keys(data.features).length;
+
+        renderCsatChart(data.csat);
+        renderCesChart(data.ces);
+        renderDriverChart(data.drivers);
+        renderRecommendationChart(data.recommendation);
+        renderFeatureChart(data.features);
+    } catch (err) {
+        console.error('Classic analytics error:', err);
+    }
+}
+
+function renderCsatChart(csatData) {
+    const ctx = document.getElementById('classicCsatChart');
+    if (!ctx) return;
+    if (classicCharts.csat) classicCharts.csat.destroy();
+
+    const labels = ['1', '2', '3', '4', '5'];
+    const values = labels.map(l => csatData.distribution[l] || 0);
+    const colors = ['#dc3545', '#fd7e14', '#ffc107', '#28a745', '#198754'];
+
+    classicCharts.csat = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: [
+                '1 - ' + (translations.veryDissatisfied || '{{ _("Very dissatisfied") }}'),
+                '2 - ' + (translations.dissatisfied || '{{ _("Dissatisfied") }}'),
+                '3 - ' + (translations.neutral || '{{ _("Neutral") }}'),
+                '4 - ' + (translations.satisfied || '{{ _("Satisfied") }}'),
+                '5 - ' + (translations.verySatisfied || '{{ _("Very satisfied") }}')
+            ],
+            datasets: [{
+                label: '{{ _("Responses") }}',
+                data: values,
+                backgroundColor: colors.map(c => c + 'cc'),
+                borderColor: colors,
+                borderWidth: 2,
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        afterLabel: function(ctx) {
+                            const total = values.reduce((a, b) => a + b, 0);
+                            return total > 0 ? Math.round(ctx.raw / total * 100) + '%' : '';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: { beginAtZero: true, ticks: { stepSize: 1 }, title: { display: true, text: '{{ _("Responses") }}' } },
+                x: { ticks: { maxRotation: 30 } }
+            }
+        }
+    });
+}
+
+function renderCesChart(cesData) {
+    const ctx = document.getElementById('classicCesChart');
+    if (!ctx) return;
+    if (classicCharts.ces) classicCharts.ces.destroy();
+
+    const labels = ['1', '2', '3', '4', '5', '6', '7', '8'];
+    const values = labels.map(l => cesData.distribution[l] || 0);
+
+    classicCharts.ces = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: '{{ _("Responses") }}',
+                data: values,
+                backgroundColor: labels.map((_, i) => {
+                    const ratio = i / 7;
+                    if (ratio < 0.375) return 'rgba(220, 53, 69, 0.7)';
+                    if (ratio < 0.625) return 'rgba(255, 193, 7, 0.7)';
+                    return 'rgba(40, 167, 69, 0.7)';
+                }),
+                borderColor: labels.map((_, i) => {
+                    const ratio = i / 7;
+                    if (ratio < 0.375) return '#dc3545';
+                    if (ratio < 0.625) return '#ffc107';
+                    return '#28a745';
+                }),
+                borderWidth: 2,
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: { display: false },
+                title: {
+                    display: true,
+                    text: '{{ _("1 = Very difficult → 8 = Extremely easy") }}'
+                }
+            },
+            scales: {
+                y: { beginAtZero: true, ticks: { stepSize: 1 }, title: { display: true, text: '{{ _("Responses") }}' } }
+            }
+        }
+    });
+}
+
+function renderDriverChart(driversData) {
+    const ctx = document.getElementById('classicDriverChart');
+    if (!ctx) return;
+    if (classicCharts.drivers) classicCharts.drivers.destroy();
+
+    const lang = document.documentElement.lang || 'en';
+    const langKey = lang === 'fr' ? 'label_fr' : 'label_en';
+    const entries = Object.entries(driversData).sort((a, b) => b[1].count - a[1].count);
+    const labels = entries.map(([_, d]) => d[langKey] || d.label_en);
+    const values = entries.map(([_, d]) => d.count);
+
+    classicCharts.drivers = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: '{{ _("Selections") }}',
+                data: values,
+                backgroundColor: 'rgba(225, 58, 68, 0.7)',
+                borderColor: '#E13A44',
+                borderWidth: 2,
+                borderRadius: 6
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        afterLabel: function(ctx) {
+                            const entry = entries[ctx.dataIndex];
+                            return entry ? entry[1].percentage + '% {{ _("of respondents") }}' : '';
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: { beginAtZero: true, ticks: { stepSize: 1 }, title: { display: true, text: '{{ _("Number of selections") }}' } }
+            }
+        }
+    });
+}
+
+function renderRecommendationChart(recData) {
+    const ctx = document.getElementById('classicRecommendationChart');
+    if (!ctx) return;
+    if (classicCharts.recommendation) classicCharts.recommendation.destroy();
+
+    const labelMap = {
+        'recommended': '{{ _("Would recommend") }}',
+        'would_consider': '{{ _("Would consider") }}',
+        'would_not_recommend': '{{ _("Would not recommend") }}'
+    };
+    const colorMap = {
+        'recommended': '#28a745',
+        'would_consider': '#ffc107',
+        'would_not_recommend': '#dc3545'
+    };
+
+    const labels = Object.keys(recData).map(k => labelMap[k] || k);
+    const values = Object.values(recData);
+    const colors = Object.keys(recData).map(k => colorMap[k] || '#6c757d');
+
+    classicCharts.recommendation = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: values,
+                backgroundColor: colors.map(c => c + 'cc'),
+                borderColor: colors,
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: { position: 'bottom' },
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx) {
+                            const total = values.reduce((a, b) => a + b, 0);
+                            const pct = total > 0 ? Math.round(ctx.raw / total * 100) : 0;
+                            return ctx.label + ': ' + ctx.raw + ' (' + pct + '%)';
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function renderFeatureChart(featuresData) {
+    const ctx = document.getElementById('classicFeatureChart');
+    if (!ctx) return;
+    if (classicCharts.features) classicCharts.features.destroy();
+
+    const lang = document.documentElement.lang || 'en';
+    const nameKey = lang === 'fr' ? 'name_fr' : 'name_en';
+    const entries = Object.entries(featuresData);
+    const labels = entries.map(([_, f]) => f[nameKey] || f.name_en);
+    const adoptionData = entries.map(([_, f]) => f.adoption_rate);
+    const satisfactionData = entries.map(([_, f]) => f.avg_satisfaction !== null ? f.avg_satisfaction : 0);
+
+    classicCharts.features = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: '{{ _("Adoption Rate (%)") }}',
+                    data: adoptionData,
+                    backgroundColor: 'rgba(225, 58, 68, 0.6)',
+                    borderColor: '#E13A44',
+                    borderWidth: 2,
+                    borderRadius: 6,
+                    yAxisID: 'y'
+                },
+                {
+                    label: '{{ _("Avg. Satisfaction (1-5)") }}',
+                    data: satisfactionData,
+                    type: 'line',
+                    borderColor: '#0d6efd',
+                    backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                    borderWidth: 3,
+                    pointRadius: 6,
+                    pointBackgroundColor: '#0d6efd',
+                    fill: false,
+                    yAxisID: 'y1'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: { position: 'top' }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    title: { display: true, text: '{{ _("Adoption %") }}' },
+                    position: 'left'
+                },
+                y1: {
+                    beginAtZero: true,
+                    max: 5,
+                    title: { display: true, text: '{{ _("Satisfaction") }}' },
+                    position: 'right',
+                    grid: { drawOnChartArea: false }
+                },
+                x: { ticks: { maxRotation: 45 } }
+            }
+        }
+    });
+}
+</script>
+
 <!-- Segmentation Analytics Rendering -->
 <script>
 // Store segmentation charts globally for cleanup
@@ -1179,6 +1635,7 @@ if (typeof window.originalRenderDashboard === 'undefined' && typeof renderDashbo
     renderDashboard = function(data) {
         window.originalRenderDashboard(data);
         renderSegmentationInsights(data);
+        checkAndLoadClassicAnalytics(data);
     };
 }
 </script>

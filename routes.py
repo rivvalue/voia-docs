@@ -1926,7 +1926,8 @@ def dashboard_data():
                     'start_date': campaign.start_date.isoformat(),
                     'end_date': campaign.end_date.isoformat(),
                     'days_remaining': campaign.days_remaining(),
-                    'days_since_ended': campaign.days_since_ended()
+                    'days_since_ended': campaign.days_since_ended(),
+                    'survey_type': getattr(campaign, 'survey_type', 'conversational')
                 }
         
         return jsonify(data)
@@ -3614,7 +3615,8 @@ def get_campaign_filter_options():
                     'start_date': campaign.start_date.isoformat(),
                     'end_date': campaign.end_date.isoformat(),
                     'status': campaign.status,
-                    'description': campaign.description
+                    'description': campaign.description,
+                    'survey_type': getattr(campaign, 'survey_type', 'conversational')
                 }
                 for campaign in campaigns
             ]
@@ -3622,6 +3624,156 @@ def get_campaign_filter_options():
     except Exception as e:
         logger.error(f"Error getting campaign filter options: {e}")
         return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/classic_survey_analytics')
+def classic_survey_analytics():
+    """API endpoint for classic survey-specific analytics (CSAT, CES, drivers, features, recommendation)"""
+    try:
+        from models import Campaign, SurveyResponse, ClassicSurveyConfig
+        from business_auth_routes import get_current_business_account
+        import json as json_module
+
+        campaign_id = request.args.get('campaign_id', type=int)
+        if not campaign_id:
+            return jsonify({'error': 'campaign_id required'}), 400
+
+        current_account = get_current_business_account()
+        if not current_account:
+            return jsonify({'error': 'Authentication required'}), 401
+
+        campaign = Campaign.query.filter_by(
+            id=campaign_id,
+            business_account_id=current_account.id
+        ).first()
+        if not campaign or campaign.survey_type != 'classic':
+            return jsonify({'error': 'Classic campaign not found'}), 404
+
+        responses = SurveyResponse.query.filter_by(campaign_id=campaign_id).all()
+        total = len(responses)
+
+        if total == 0:
+            return jsonify({
+                'total_responses': 0,
+                'csat': {'average': None, 'distribution': {}},
+                'ces': {'average': None, 'distribution': {}},
+                'drivers': {},
+                'features': {},
+                'recommendation': {}
+            })
+
+        csat_scores = [r.csat_score for r in responses if r.csat_score is not None]
+        csat_dist = {}
+        for s in csat_scores:
+            csat_dist[str(s)] = csat_dist.get(str(s), 0) + 1
+        csat_avg = round(sum(csat_scores) / len(csat_scores), 2) if csat_scores else None
+
+        ces_scores = [r.ces_score for r in responses if r.ces_score is not None]
+        ces_dist = {}
+        for s in ces_scores:
+            ces_dist[str(s)] = ces_dist.get(str(s), 0) + 1
+        ces_avg = round(sum(ces_scores) / len(ces_scores), 2) if ces_scores else None
+
+        driver_counts = {}
+        for r in responses:
+            if r.loyalty_drivers:
+                drivers = r.loyalty_drivers if isinstance(r.loyalty_drivers, list) else []
+                for d in drivers:
+                    driver_counts[d] = driver_counts.get(d, 0) + 1
+
+        classic_config = ClassicSurveyConfig.query.filter_by(campaign_id=campaign_id).first()
+        driver_label_map = {}
+        if classic_config and classic_config.driver_labels:
+            for dl in classic_config.driver_labels:
+                driver_label_map[dl['key']] = {
+                    'label_en': dl.get('label_en', dl['key']),
+                    'label_fr': dl.get('label_fr', dl['key'])
+                }
+
+        drivers_with_labels = {}
+        for key, count in driver_counts.items():
+            labels = driver_label_map.get(key, {'label_en': key, 'label_fr': key})
+            drivers_with_labels[key] = {
+                'count': count,
+                'percentage': round(count / total * 100, 1),
+                'label_en': labels['label_en'],
+                'label_fr': labels['label_fr']
+            }
+
+        feature_data = {}
+        feature_label_map = {}
+        if classic_config and classic_config.features:
+            for f in classic_config.features:
+                feature_label_map[f['key']] = {
+                    'name_en': f.get('name_en', f['key']),
+                    'name_fr': f.get('name_fr', f['key'])
+                }
+
+        for r in responses:
+            if r.general_feedback:
+                try:
+                    evals = json_module.loads(r.general_feedback) if isinstance(r.general_feedback, str) else r.general_feedback
+                    for fkey, fdata in evals.items():
+                        if fkey not in feature_data:
+                            labels = feature_label_map.get(fkey, {'name_en': fkey, 'name_fr': fkey})
+                            feature_data[fkey] = {
+                                'name_en': labels['name_en'],
+                                'name_fr': labels['name_fr'],
+                                'usage_yes': 0,
+                                'usage_no': 0,
+                                'satisfaction_scores': [],
+                                'importance_counts': {},
+                                'frequency_counts': {}
+                            }
+                        fd = feature_data[fkey]
+                        usage = fdata.get('usage', '')
+                        if usage == 'yes':
+                            fd['usage_yes'] += 1
+                        elif usage and usage.startswith('no'):
+                            fd['usage_no'] += 1
+                        if fdata.get('satisfaction') is not None:
+                            fd['satisfaction_scores'].append(fdata['satisfaction'])
+                        if fdata.get('importance'):
+                            fd['importance_counts'][fdata['importance']] = fd['importance_counts'].get(fdata['importance'], 0) + 1
+                        if fdata.get('frequency'):
+                            fd['frequency_counts'][fdata['frequency']] = fd['frequency_counts'].get(fdata['frequency'], 0) + 1
+                except (json_module.JSONDecodeError, AttributeError):
+                    pass
+
+        features_summary = {}
+        for fkey, fd in feature_data.items():
+            avg_sat = round(sum(fd['satisfaction_scores']) / len(fd['satisfaction_scores']), 2) if fd['satisfaction_scores'] else None
+            total_usage = fd['usage_yes'] + fd['usage_no']
+            adoption = round(fd['usage_yes'] / total_usage * 100, 1) if total_usage > 0 else 0
+            features_summary[fkey] = {
+                'name_en': fd['name_en'],
+                'name_fr': fd['name_fr'],
+                'adoption_rate': adoption,
+                'usage_yes': fd['usage_yes'],
+                'usage_no': fd['usage_no'],
+                'avg_satisfaction': avg_sat,
+                'importance': fd['importance_counts'],
+                'frequency': fd['frequency_counts']
+            }
+
+        rec_counts = {}
+        for r in responses:
+            if r.recommendation_status:
+                rec_counts[r.recommendation_status] = rec_counts.get(r.recommendation_status, 0) + 1
+
+        return jsonify({
+            'total_responses': total,
+            'csat': {'average': csat_avg, 'distribution': csat_dist, 'count': len(csat_scores)},
+            'ces': {'average': ces_avg, 'distribution': ces_dist, 'count': len(ces_scores)},
+            'drivers': drivers_with_labels,
+            'features': features_summary,
+            'recommendation': rec_counts
+        })
+
+    except Exception as e:
+        logger.error(f"Error in classic survey analytics: {e}")
+        return jsonify({'error': str(e)}), 500
+
 
 @app.route('/api/campaigns/comparison')
 def get_campaign_comparison():
@@ -3678,6 +3830,7 @@ def get_campaign_comparison():
                 'id': campaign1.id,
                 'name': campaign1.name,
                 'status': campaign1.status,
+                'survey_type': getattr(campaign1, 'survey_type', 'conversational'),
                 'start_date': campaign1.start_date.isoformat() if campaign1.start_date else None,
                 'end_date': campaign1.end_date.isoformat() if campaign1.end_date else None,
                 'data': {
@@ -3697,6 +3850,7 @@ def get_campaign_comparison():
                 'id': campaign2.id,
                 'name': campaign2.name,
                 'status': campaign2.status,
+                'survey_type': getattr(campaign2, 'survey_type', 'conversational'),
                 'start_date': campaign2.start_date.isoformat() if campaign2.start_date else None,
                 'end_date': campaign2.end_date.isoformat() if campaign2.end_date else None,
                 'data': {

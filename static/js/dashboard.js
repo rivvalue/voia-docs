@@ -454,6 +454,7 @@ function populateCampaignFilterDropdown() {
         option.setAttribute('data-status', rawStatus);  // Store raw status for logic
         option.setAttribute('data-status-display', displayStatus);  // Store translated for display
         option.setAttribute('data-description', campaign.description || '');
+        option.setAttribute('data-survey-type', campaign.survey_type || 'conversational');
         
         // Set as selected if this is the default campaign
         if (defaultCampaign && campaign.id === defaultCampaign.id) {
@@ -682,6 +683,23 @@ function updateSelectedCampaignInfo() {
             } else {
                 daysLeftSpan.style.display = 'none';
             }
+        }
+        
+        // Update survey type badge
+        const surveyTypeBadge = document.getElementById('selectedCampaignSurveyType');
+        const surveyTypeText = document.querySelector('.campaign-survey-type-text');
+        const surveyType = option.getAttribute('data-survey-type') || 'conversational';
+        if (surveyTypeBadge && surveyTypeText) {
+            if (surveyType === 'classic') {
+                surveyTypeText.textContent = translations.classicSurvey || 'Classic Survey';
+                surveyTypeBadge.style.backgroundColor = '#6f42c1';
+                surveyTypeBadge.style.color = 'white';
+            } else {
+                surveyTypeText.textContent = translations.conversationalAI || 'Conversational AI';
+                surveyTypeBadge.style.backgroundColor = '#0d6efd';
+                surveyTypeBadge.style.color = 'white';
+            }
+            surveyTypeBadge.style.display = '';
         }
         
         // Show the inline badges (smooth transition)
@@ -1593,6 +1611,13 @@ function populateDashboard() {
                 renderSegmentationInsights(dashboardData);
             }
         }, 350);
+        
+        // Defer classic survey analytics (Analytics tab - not visible initially)
+        setTimeout(() => {
+            if (typeof checkAndLoadClassicAnalytics === 'function') {
+                checkAndLoadClassicAnalytics(dashboardData);
+            }
+        }, 400);
         
         console.log('✅ Deferred data loading scheduled');
     });
