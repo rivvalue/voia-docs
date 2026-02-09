@@ -72,9 +72,9 @@ class ExecutiveReportGenerator:
         """Collect all data needed for the executive report"""
         from models import SurveyResponse, Campaign
         from app import db
-        # Note: NPS calculation handled directly in this function
         
-        # Get campaign responses via CampaignParticipant
+        survey_type = getattr(campaign, 'survey_type', 'conversational') or 'conversational'
+        
         from models import CampaignParticipant
         responses = SurveyResponse.query.join(
             CampaignParticipant, SurveyResponse.campaign_participant_id == CampaignParticipant.id
@@ -84,27 +84,22 @@ class ExecutiveReportGenerator:
             joinedload(SurveyResponse.campaign_participant)
         ).all()
         
-        # Calculate current campaign KPIs
         current_kpis = self._calculate_campaign_kpis(responses, campaign)
         
-        # Get previous campaigns for delta calculations
         previous_campaigns = self._get_previous_campaigns(campaign, business_account.id)
         delta_kpis = self._calculate_kpi_deltas(current_kpis, previous_campaigns)
         
-        # Generate visualizations with business account branding
         branding_config = business_account.branding_config if hasattr(business_account, 'branding_config') else None
         chart_colors = branding_config.get_chart_colors() if branding_config else ['#dc3545', '#28a745', '#6c757d', '#17a2b8', '#ffc107', '#fd7e14', '#6610f2', '#e83e8c']
-        charts = self._generate_charts(responses, current_kpis, chart_colors)
+        charts = self._generate_charts(responses, current_kpis, chart_colors, survey_type=survey_type)
         
-        # Get AI insights
         ai_insights = self._extract_ai_insights(responses)
         
-        # Calculate additional dashboard metrics
         high_risk_accounts = self._calculate_high_risk_accounts(responses)
         key_themes = self._calculate_key_themes(responses)
         average_ratings = self._calculate_average_ratings(responses)
         
-        return {
+        report_data = {
             'campaign': campaign,
             'business_account': business_account,
             'responses': responses,
@@ -116,7 +111,162 @@ class ExecutiveReportGenerator:
             'high_risk_accounts': high_risk_accounts,
             'key_themes': key_themes,
             'average_ratings': average_ratings,
-            'generated_at': datetime.utcnow()
+            'generated_at': datetime.utcnow(),
+            'survey_type': survey_type
+        }
+        
+        if survey_type == 'classic':
+            classic_analytics = self._collect_classic_analytics(responses, campaign)
+            report_data['classic_analytics'] = classic_analytics
+            classic_charts = self._generate_classic_charts(classic_analytics, chart_colors)
+            report_data['classic_charts'] = classic_charts
+        
+        return report_data
+    
+    def _collect_classic_analytics(self, responses: List, campaign) -> Dict:
+        """Collect classic survey-specific analytics: CSAT, CES, drivers, features, recommendation, correlation"""
+        import json as json_module
+        
+        total = len(responses)
+        
+        csat_scores = [r.csat_score for r in responses if r.csat_score is not None]
+        csat_dist = {}
+        for s in csat_scores:
+            csat_dist[str(s)] = csat_dist.get(str(s), 0) + 1
+        csat_avg = round(sum(csat_scores) / len(csat_scores), 2) if csat_scores else None
+        
+        ces_scores = [r.ces_score for r in responses if r.ces_score is not None]
+        ces_dist = {}
+        for s in ces_scores:
+            ces_dist[str(s)] = ces_dist.get(str(s), 0) + 1
+        ces_avg = round(sum(ces_scores) / len(ces_scores), 2) if ces_scores else None
+        
+        driver_data = {}
+        for r in responses:
+            if r.loyalty_drivers:
+                drivers = r.loyalty_drivers if isinstance(r.loyalty_drivers, list) else []
+                nps_cat = getattr(r, 'nps_category', None) or 'Unknown'
+                for d in drivers:
+                    if d not in driver_data:
+                        driver_data[d] = {'count': 0, 'promoters': 0, 'passives': 0, 'detractors': 0}
+                    driver_data[d]['count'] += 1
+                    if nps_cat == 'Promoter':
+                        driver_data[d]['promoters'] += 1
+                    elif nps_cat == 'Passive':
+                        driver_data[d]['passives'] += 1
+                    elif nps_cat == 'Detractor':
+                        driver_data[d]['detractors'] += 1
+        
+        driver_label_map = {}
+        try:
+            from models import ClassicSurveyConfig
+            classic_config = ClassicSurveyConfig.query.filter_by(campaign_id=campaign.id).first()
+            if classic_config and classic_config.driver_labels:
+                for dl in classic_config.driver_labels:
+                    driver_label_map[dl['key']] = dl.get('label_en', dl['key'])
+        except Exception:
+            classic_config = None
+        
+        drivers_with_impact = {}
+        for key, dd in driver_data.items():
+            label = driver_label_map.get(key, key.replace('_', ' ').title())
+            net_impact = dd['promoters'] - dd['detractors']
+            drivers_with_impact[key] = {
+                'label': label,
+                'count': dd['count'],
+                'promoters': dd['promoters'],
+                'passives': dd['passives'],
+                'detractors': dd['detractors'],
+                'net_impact': net_impact
+            }
+        
+        correlation_points = []
+        for r in responses:
+            if r.csat_score is not None and r.ces_score is not None and r.nps_score is not None:
+                nps_cat = getattr(r, 'nps_category', None) or 'Unknown'
+                correlation_points.append({
+                    'csat': r.csat_score,
+                    'ces': r.ces_score,
+                    'nps_score': r.nps_score,
+                    'nps_category': nps_cat
+                })
+        
+        avg_ces_by_nps = {}
+        for cat in ['Promoter', 'Passive', 'Detractor']:
+            cat_ces = [p['ces'] for p in correlation_points if p['nps_category'] == cat]
+            avg_ces_by_nps[cat] = round(sum(cat_ces) / len(cat_ces), 2) if cat_ces else None
+        
+        high_nps = sum(1 for p in correlation_points if p['nps_score'] >= 9 and p['csat'] >= 4)
+        total_high_nps = sum(1 for p in correlation_points if p['nps_score'] >= 9)
+        nps_csat_alignment = round(high_nps / total_high_nps * 100, 1) if total_high_nps > 0 else None
+        
+        det_ces = avg_ces_by_nps.get('Detractor')
+        pro_ces = avg_ces_by_nps.get('Promoter')
+        if det_ces is not None and pro_ces is not None and pro_ces > 0:
+            effort_ratio = round(det_ces / pro_ces, 1)
+            insight_text = f"Detractors report {effort_ratio}x higher effort than Promoters"
+        else:
+            insight_text = None
+        
+        feature_data = {}
+        feature_label_map = {}
+        if classic_config and hasattr(classic_config, 'features') and classic_config.features:
+            for f in classic_config.features:
+                feature_label_map[f['key']] = f.get('name_en', f['key'])
+        
+        for r in responses:
+            if r.general_feedback:
+                try:
+                    evals = json_module.loads(r.general_feedback) if isinstance(r.general_feedback, str) else r.general_feedback
+                    if not isinstance(evals, dict):
+                        continue
+                    for fkey, fdata in evals.items():
+                        if fkey not in feature_data:
+                            feature_data[fkey] = {
+                                'label': feature_label_map.get(fkey, fkey.replace('_', ' ').title()),
+                                'usage_yes': 0, 'usage_no': 0,
+                                'satisfaction_scores': []
+                            }
+                        fd = feature_data[fkey]
+                        usage = fdata.get('usage', '')
+                        if usage == 'yes':
+                            fd['usage_yes'] += 1
+                        elif usage and str(usage).startswith('no'):
+                            fd['usage_no'] += 1
+                        if fdata.get('satisfaction') is not None:
+                            fd['satisfaction_scores'].append(fdata['satisfaction'])
+                except (json_module.JSONDecodeError, AttributeError, TypeError):
+                    pass
+        
+        features_summary = {}
+        for fkey, fd in feature_data.items():
+            total_usage = fd['usage_yes'] + fd['usage_no']
+            features_summary[fkey] = {
+                'label': fd['label'],
+                'adoption_rate': round(fd['usage_yes'] / total_usage * 100, 1) if total_usage > 0 else 0,
+                'avg_satisfaction': round(sum(fd['satisfaction_scores']) / len(fd['satisfaction_scores']), 2) if fd['satisfaction_scores'] else None
+            }
+        
+        rec_counts = {}
+        for r in responses:
+            if r.recommendation_status:
+                rec_counts[r.recommendation_status] = rec_counts.get(r.recommendation_status, 0) + 1
+        
+        return {
+            'csat': {'average': csat_avg, 'distribution': csat_dist, 'count': len(csat_scores)},
+            'ces': {'average': ces_avg, 'distribution': ces_dist, 'count': len(ces_scores)},
+            'drivers': drivers_with_impact,
+            'features': features_summary,
+            'recommendation': rec_counts,
+            'correlation': {
+                'points': correlation_points,
+                'summary': {
+                    'avg_ces_by_nps_category': avg_ces_by_nps,
+                    'nps_csat_alignment_pct': nps_csat_alignment,
+                    'total_correlated_responses': len(correlation_points),
+                    'insight_text': insight_text
+                }
+            }
         }
     
     def _calculate_campaign_kpis(self, responses: List, campaign) -> Dict:
@@ -261,24 +411,42 @@ class ExecutiveReportGenerator:
             'comparison_count': len(previous_campaigns)
         }
     
-    def _generate_charts(self, responses: List, kpis: Dict, chart_colors: List) -> Dict:
+    def _generate_charts(self, responses: List, kpis: Dict, chart_colors: List, survey_type: str = 'conversational') -> Dict:
         """Generate chart images for the report with business account branding"""
         charts = {}
         
-        # chart_colors is now guaranteed to be provided
-        
         try:
-            # NPS Distribution Chart
             charts['nps_distribution'] = self._create_nps_distribution_chart(responses, chart_colors)
             
-            # Sentiment Breakdown Chart
-            charts['sentiment_breakdown'] = self._create_sentiment_chart(kpis['sentiment_breakdown'], chart_colors)
+            if survey_type != 'classic':
+                charts['sentiment_breakdown'] = self._create_sentiment_chart(kpis['sentiment_breakdown'], chart_colors)
             
-            # Response Timeline Chart
             charts['response_timeline'] = self._create_response_timeline_chart(responses, chart_colors[0])
             
         except Exception as e:
             logger.error(f"Error generating charts: {e}")
+        
+        return charts
+    
+    def _generate_classic_charts(self, classic_analytics: Dict, chart_colors: List) -> Dict:
+        """Generate classic survey-specific charts (CSAT, CES, driver impact, correlation)"""
+        charts = {}
+        
+        try:
+            charts['csat_distribution'] = self._create_csat_distribution_chart(
+                classic_analytics['csat']['distribution'], chart_colors)
+            
+            charts['ces_distribution'] = self._create_ces_distribution_chart(
+                classic_analytics['ces']['distribution'], chart_colors)
+            
+            charts['driver_impact'] = self._create_driver_impact_chart(
+                classic_analytics['drivers'], chart_colors)
+            
+            charts['correlation_scatter'] = self._create_correlation_scatter_chart(
+                classic_analytics['correlation']['points'], chart_colors)
+            
+        except Exception as e:
+            logger.error(f"Error generating classic charts: {e}")
         
         return charts
     
@@ -370,6 +538,125 @@ class ExecutiveReportGenerator:
             ax.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d'))
             ax.xaxis.set_major_locator(mdates.DayLocator(interval=max(1, len(sorted_dates) // 10)))
             plt.xticks(rotation=45)
+        
+        plt.tight_layout()
+        return self._fig_to_base64(fig)
+    
+    def _create_csat_distribution_chart(self, csat_distribution: Dict, chart_colors: List) -> str:
+        """Create CSAT score distribution bar chart (1-5 scale)"""
+        fig, ax = plt.subplots(figsize=(7, 4))
+        
+        if not csat_distribution:
+            ax.text(0.5, 0.5, 'No CSAT data available', ha='center', va='center', transform=ax.transAxes)
+        else:
+            labels = [str(i) for i in range(1, 6)]
+            values = [csat_distribution.get(str(i), 0) for i in range(1, 6)]
+            color_map = ['#dc3545', '#fd7e14', '#ffc107', '#28a745', '#198754']
+            
+            bars = ax.bar(labels, values, color=color_map, alpha=0.85, edgecolor='white', linewidth=0.5)
+            ax.set_xlabel('Satisfaction Score', fontsize=10)
+            ax.set_ylabel('Number of Responses', fontsize=10)
+            ax.set_title('Customer Satisfaction (CSAT) Distribution', fontsize=12, fontweight='bold')
+            ax.grid(axis='y', alpha=0.3)
+            
+            for bar, value in zip(bars, values):
+                if value > 0:
+                    ax.text(bar.get_x() + bar.get_width()/2., bar.get_height() + 0.1,
+                           str(value), ha='center', va='bottom', fontsize=9, fontweight='bold')
+        
+        plt.tight_layout()
+        return self._fig_to_base64(fig)
+    
+    def _create_ces_distribution_chart(self, ces_distribution: Dict, chart_colors: List) -> str:
+        """Create CES score distribution bar chart (1-8 scale)"""
+        fig, ax = plt.subplots(figsize=(8, 4))
+        
+        if not ces_distribution:
+            ax.text(0.5, 0.5, 'No CES data available', ha='center', va='center', transform=ax.transAxes)
+        else:
+            labels = [str(i) for i in range(1, 9)]
+            values = [ces_distribution.get(str(i), 0) for i in range(1, 9)]
+            color_map = ['#198754', '#28a745', '#6bcf7f', '#ffc107', '#fd7e14', '#e05d44', '#dc3545', '#c82333']
+            
+            bars = ax.bar(labels, values, color=color_map, alpha=0.85, edgecolor='white', linewidth=0.5)
+            ax.set_xlabel('Effort Score (1 = Low Effort, 8 = High Effort)', fontsize=10)
+            ax.set_ylabel('Number of Responses', fontsize=10)
+            ax.set_title('Customer Effort Score (CES) Distribution', fontsize=12, fontweight='bold')
+            ax.grid(axis='y', alpha=0.3)
+            
+            for bar, value in zip(bars, values):
+                if value > 0:
+                    ax.text(bar.get_x() + bar.get_width()/2., bar.get_height() + 0.1,
+                           str(value), ha='center', va='bottom', fontsize=9, fontweight='bold')
+        
+        plt.tight_layout()
+        return self._fig_to_base64(fig)
+    
+    def _create_driver_impact_chart(self, drivers: Dict, chart_colors: List) -> str:
+        """Create diverging horizontal bar chart for driver impact analysis"""
+        fig, ax = plt.subplots(figsize=(9, max(4, len(drivers) * 0.7 + 1)))
+        
+        if not drivers:
+            ax.text(0.5, 0.5, 'No driver data available', ha='center', va='center', transform=ax.transAxes)
+            plt.tight_layout()
+            return self._fig_to_base64(fig)
+        
+        sorted_drivers = sorted(drivers.items(), key=lambda x: x[1].get('net_impact', 0), reverse=True)
+        
+        labels = [d[1].get('label', d[0].replace('_', ' ').title()) for d in sorted_drivers]
+        promoters = [d[1].get('promoters', 0) for d in sorted_drivers]
+        detractors = [-d[1].get('detractors', 0) for d in sorted_drivers]
+        net_impacts = [d[1].get('net_impact', 0) for d in sorted_drivers]
+        
+        y_pos = range(len(labels))
+        
+        ax.barh(y_pos, promoters, color='#28a745', alpha=0.85, label='Promoters', edgecolor='white', linewidth=0.5)
+        ax.barh(y_pos, detractors, color='#dc3545', alpha=0.85, label='Detractors', edgecolor='white', linewidth=0.5)
+        
+        ax.set_yticks(y_pos)
+        ax.set_yticklabels(labels, fontsize=9)
+        ax.set_xlabel('Number of Respondents', fontsize=10)
+        ax.set_title('Driver Impact Analysis', fontsize=12, fontweight='bold')
+        ax.axvline(x=0, color='#333', linewidth=0.8)
+        ax.grid(axis='x', alpha=0.3)
+        ax.legend(loc='lower right', fontsize=9)
+        
+        for i, ni in enumerate(net_impacts):
+            x_pos = max(promoters[i], 0) + 0.3
+            ax.text(x_pos, i, f'Net: {ni:+d}', va='center', fontsize=8, color='#333', fontweight='bold')
+        
+        ax.invert_yaxis()
+        plt.tight_layout()
+        return self._fig_to_base64(fig)
+    
+    def _create_correlation_scatter_chart(self, correlation_points: List, chart_colors: List) -> str:
+        """Create NPS-CSAT-CES correlation scatter chart"""
+        fig, ax = plt.subplots(figsize=(8, 6))
+        
+        if not correlation_points:
+            ax.text(0.5, 0.5, 'No correlated data available\n(requires NPS + CSAT + CES)', 
+                   ha='center', va='center', transform=ax.transAxes, fontsize=11)
+            plt.tight_layout()
+            return self._fig_to_base64(fig)
+        
+        cat_colors = {'Promoter': '#28a745', 'Passive': '#ffc107', 'Detractor': '#dc3545', 'Unknown': '#6c757d'}
+        
+        for cat in ['Detractor', 'Passive', 'Promoter']:
+            pts = [p for p in correlation_points if p['nps_category'] == cat]
+            if pts:
+                x = [p['csat'] for p in pts]
+                y = [p['ces'] for p in pts]
+                sizes = [max(30, p['nps_score'] * 8) for p in pts]
+                ax.scatter(x, y, s=sizes, c=cat_colors.get(cat, '#6c757d'),
+                          alpha=0.7, edgecolors='white', linewidth=0.5, label=f'{cat} ({len(pts)})')
+        
+        ax.set_xlabel('CSAT Score (1-5)', fontsize=10)
+        ax.set_ylabel('CES Score (1-8, lower = less effort)', fontsize=10)
+        ax.set_title('NPS-CSAT-CES Correlation', fontsize=12, fontweight='bold')
+        ax.set_xlim(0.5, 5.5)
+        ax.set_ylim(0.5, 8.5)
+        ax.grid(True, alpha=0.2)
+        ax.legend(loc='upper left', fontsize=9, title='NPS Category')
         
         plt.tight_layout()
         return self._fig_to_base64(fig)
@@ -821,6 +1108,15 @@ class ExecutiveReportGenerator:
                     
                     <p><strong>Key Insights:</strong> {{ ai_insights.insights_available }} responses analyzed with {{ ai_insights.total_themes }} distinct themes identified.</p>
                     
+                    {% if survey_type == 'classic' and classic_analytics %}
+                    {% if classic_analytics.csat.average is not none %}
+                    <p><strong>Customer Satisfaction:</strong> Average CSAT of {{ classic_analytics.csat.average }}/5 across {{ classic_analytics.csat.count }} responses.</p>
+                    {% endif %}
+                    {% if classic_analytics.ces.average is not none %}
+                    <p><strong>Customer Effort:</strong> Average CES of {{ classic_analytics.ces.average }}/8 across {{ classic_analytics.ces.count }} responses.</p>
+                    {% endif %}
+                    {% endif %}
+                    
                     {% if ai_insights.critical_issues %}
                     <p><strong>Immediate Attention Required:</strong> {{ ai_insights.critical_issues|length }} high-risk respondents identified.</p>
                     {% endif %}
@@ -870,6 +1166,16 @@ class ExecutiveReportGenerator:
                         </div>
                         {% endif %}
                     </div>
+                    {% if survey_type == 'classic' and classic_analytics %}
+                    <div class="kpi-card">
+                        <div class="kpi-value" style="color: {% if classic_analytics.csat.average and classic_analytics.csat.average >= 4 %}#28a745{% elif classic_analytics.csat.average and classic_analytics.csat.average >= 3 %}#ffc107{% else %}#dc3545{% endif %};">{{ classic_analytics.csat.average or 'N/A' }}/5</div>
+                        <div class="kpi-label">Avg CSAT Score</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value" style="color: {% if classic_analytics.ces.average and classic_analytics.ces.average <= 3 %}#28a745{% elif classic_analytics.ces.average and classic_analytics.ces.average <= 5 %}#ffc107{% else %}#dc3545{% endif %};">{{ classic_analytics.ces.average or 'N/A' }}/8</div>
+                        <div class="kpi-label">Avg CES Score</div>
+                    </div>
+                    {% endif %}
                 </div>
                 
                 <p><strong>Campaign Duration:</strong> {{ campaign.start_date.strftime('%B %d, %Y') }} - {{ campaign.end_date.strftime('%B %d, %Y') }}</p>
@@ -887,13 +1193,145 @@ class ExecutiveReportGenerator:
                 </div>
                 {% endif %}
                 
-                {% if charts.sentiment_breakdown %}
+                {% if survey_type != 'classic' and charts.sentiment_breakdown %}
                 <div class="chart-container">
                     <h3>Sentiment Analysis</h3>
                     <img src="{{ charts.sentiment_breakdown }}" alt="Sentiment Breakdown" class="chart-image">
                 </div>
                 {% endif %}
             </div>
+            
+            {% if survey_type == 'classic' and classic_charts %}
+            <!-- Classic Survey Analytics -->
+            <div class="section page-break">
+                <h2 class="section-title">📋 Classic Survey Analytics</h2>
+                
+                {% if classic_charts.csat_distribution %}
+                <div class="chart-container">
+                    <h3>Customer Satisfaction (CSAT) Distribution</h3>
+                    <img src="{{ classic_charts.csat_distribution }}" alt="CSAT Distribution" class="chart-image">
+                </div>
+                {% endif %}
+                
+                {% if classic_charts.ces_distribution %}
+                <div class="chart-container">
+                    <h3>Customer Effort Score (CES) Distribution</h3>
+                    <img src="{{ classic_charts.ces_distribution }}" alt="CES Distribution" class="chart-image">
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Driver Impact Analysis -->
+            <div class="section page-break">
+                <h2 class="section-title">📊 Driver Impact Analysis</h2>
+                <p style="color: #666; margin-bottom: 15px;">Which factors positively or negatively influence customer loyalty. Green bars show Promoter mentions, red bars show Detractor mentions. Sorted by net impact (strongest drivers at top).</p>
+                
+                {% if classic_charts.driver_impact %}
+                <div class="chart-container">
+                    <img src="{{ classic_charts.driver_impact }}" alt="Driver Impact Analysis" class="chart-image">
+                </div>
+                {% endif %}
+                
+                {% if classic_analytics and classic_analytics.drivers %}
+                <div class="insights-list" style="margin-top: 15px;">
+                    <h4 style="margin-bottom: 10px;">Driver Breakdown</h4>
+                    {% for key, driver in classic_analytics.drivers.items() %}
+                    <div class="insight-item" style="display: flex; justify-content: space-between; align-items: center;">
+                        <span><strong>{{ driver.label }}</strong> ({{ driver.count }} mentions)</span>
+                        <span style="font-weight: bold; color: {% if driver.net_impact > 0 %}#28a745{% elif driver.net_impact < 0 %}#dc3545{% else %}#6c757d{% endif %};">
+                            Net Impact: {{ '+' if driver.net_impact > 0 else '' }}{{ driver.net_impact }}
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- NPS-CSAT-CES Correlation -->
+            <div class="section page-break">
+                <h2 class="section-title">🔗 NPS-CSAT-CES Correlation</h2>
+                <p style="color: #666; margin-bottom: 15px;">How the three core metrics relate. Each dot represents a survey response, positioned by CSAT (x-axis) and CES (y-axis), colored by NPS category.</p>
+                
+                {% if classic_charts.correlation_scatter %}
+                <div class="chart-container">
+                    <img src="{{ classic_charts.correlation_scatter }}" alt="NPS-CSAT-CES Correlation" class="chart-image">
+                </div>
+                {% endif %}
+                
+                {% if classic_analytics and classic_analytics.correlation and classic_analytics.correlation.summary %}
+                <div class="summary-box" style="margin-top: 15px;">
+                    <h4 style="margin-bottom: 10px;">Correlation Summary</h4>
+                    <div class="kpi-grid">
+                        <div class="kpi-card">
+                            <div class="kpi-value" style="color: #4a90e2;">{{ classic_analytics.correlation.summary.total_correlated_responses }}</div>
+                            <div class="kpi-label">Responses with All 3 Metrics</div>
+                        </div>
+                        {% if classic_analytics.correlation.summary.nps_csat_alignment_pct is not none %}
+                        <div class="kpi-card">
+                            <div class="kpi-value" style="color: {% if classic_analytics.correlation.summary.nps_csat_alignment_pct >= 75 %}#28a745{% elif classic_analytics.correlation.summary.nps_csat_alignment_pct >= 50 %}#ffc107{% else %}#dc3545{% endif %};">{{ classic_analytics.correlation.summary.nps_csat_alignment_pct }}%</div>
+                            <div class="kpi-label">NPS-CSAT Alignment</div>
+                            <div style="font-size: 0.8em; color: #666; margin-top: 4px;">% of Promoters who also gave CSAT ≥ 4</div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if classic_analytics.correlation.summary.avg_ces_by_nps_category %}
+                    <div style="margin-top: 10px;">
+                        <strong>Average CES by NPS Category:</strong>
+                        <div style="display: flex; gap: 20px; margin-top: 8px; flex-wrap: wrap;">
+                            {% for cat, val in classic_analytics.correlation.summary.avg_ces_by_nps_category.items() %}
+                            {% if val is not none %}
+                            <div style="background: #f8f9fa; padding: 8px 16px; border-radius: 6px; border-left: 3px solid {% if cat == 'Promoter' %}#28a745{% elif cat == 'Passive' %}#ffc107{% else %}#dc3545{% endif %};">
+                                <span style="font-weight: bold;">{{ cat }}:</span> {{ val }}/8
+                            </div>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if classic_analytics.correlation.summary.insight_text %}
+                    <p style="margin-top: 12px; font-style: italic; color: #555;">{{ classic_analytics.correlation.summary.insight_text }}</p>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+            
+            {% if classic_analytics and classic_analytics.features %}
+            <!-- Feature Analytics -->
+            <div class="section page-break">
+                <h2 class="section-title">⚙️ Feature Analytics</h2>
+                <div class="insights-list">
+                    {% for key, feat in classic_analytics.features.items() %}
+                    <div class="insight-item" style="display: flex; justify-content: space-between; align-items: center;">
+                        <span><strong>{{ feat.label }}</strong></span>
+                        <span>
+                            Adoption: <strong>{{ feat.adoption_rate }}%</strong>
+                            {% if feat.avg_satisfaction is not none %}
+                             | Satisfaction: <strong style="color: {% if feat.avg_satisfaction >= 4 %}#28a745{% elif feat.avg_satisfaction >= 3 %}#ffc107{% else %}#dc3545{% endif %};">{{ feat.avg_satisfaction }}/5</strong>
+                            {% endif %}
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if classic_analytics and classic_analytics.recommendation %}
+            <!-- Recommendation Breakdown -->
+            <div class="section">
+                <h2 class="section-title">👍 Recommendation Breakdown</h2>
+                <div class="kpi-grid" style="grid-template-columns: repeat(3, 1fr);">
+                    {% for status, count in classic_analytics.recommendation.items() %}
+                    <div class="kpi-card" style="text-align: center;">
+                        <div class="kpi-value" style="color: {% if status == 'recommended' %}#28a745{% elif status == 'would_consider' %}#ffc107{% else %}#dc3545{% endif %};">{{ count }}</div>
+                        <div class="kpi-label">{{ status.replace('_', ' ').title() }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            {% endif %}
 
             <!-- Strategic Insights -->
             <div class="section page-break">
@@ -974,7 +1412,8 @@ class ExecutiveReportGenerator:
                 {% endif %}
             </div>
 
-            <!-- Average Ratings -->
+            {% if survey_type != 'classic' %}
+            <!-- Average Ratings (Conversational surveys only) -->
             <div class="section">
                 <h2 class="section-title">⭐ Average Ratings</h2>
                 
@@ -1013,6 +1452,7 @@ class ExecutiveReportGenerator:
                 <p>No rating data available for this campaign period.</p>
                 {% endif %}
             </div>
+            {% endif %}
 
             <!-- Report Details -->
             <div class="section page-break">
@@ -1020,6 +1460,7 @@ class ExecutiveReportGenerator:
                 <p><strong>Report Generated:</strong> {{ generated_at.strftime('%B %d, %Y at %I:%M %p UTC') }}</p>
                 <p><strong>Business Account:</strong> {{ business_account.name }}</p>
                 <p><strong>Campaign:</strong> {{ campaign.name }}</p>
+                <p><strong>Survey Type:</strong> {{ survey_type|title }}</p>
                 <p><strong>Data Period:</strong> {{ campaign.start_date.strftime('%B %d, %Y') }} - {{ campaign.end_date.strftime('%B %d, %Y') }}</p>
                 <p><strong>Total Responses Analyzed:</strong> {{ current_kpis.total_responses }}</p>
                 <p><strong>AI Insights Generated:</strong> {{ ai_insights.insights_available }} responses</p>
