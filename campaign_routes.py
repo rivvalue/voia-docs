@@ -1630,6 +1630,10 @@ def classic_survey_config(campaign_id):
             return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
         
         classic_config = ClassicSurveyConfig.query.filter_by(campaign_id=campaign.id).first()
+        if classic_config and classic_config.is_frozen():
+            flash('La configuration de l\'enquête est verrouillée car la campagne a été activée. Les modifications ne sont plus possibles.', 'warning')
+            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        
         if not classic_config:
             template = seed_default_survey_template()
             classic_config = ClassicSurveyConfig()
@@ -1648,13 +1652,12 @@ def classic_survey_config(campaign_id):
             logger.info(f"Classic survey config auto-created for campaign {campaign.id}")
         
         template = classic_config.template
-        is_frozen = classic_config.is_frozen()
         
         return render_template('campaigns/classic_survey_config.html',
                              campaign=campaign.to_dict(),
                              classic_config=classic_config.to_dict(),
                              template_info=template.to_dict() if template else {'max_features': 9},
-                             is_frozen=is_frozen)
+                             is_frozen=False)
         
     except Exception as e:
         logger.error(f"Classic survey config display error for campaign {campaign_id}: {e}")

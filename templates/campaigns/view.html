@@ -541,10 +541,12 @@
                         {% endif %}
                     </a>
                     {% else %}
+                    {% if campaign.status in ['draft', 'ready'] %}
                     <a href="{{ url_for('campaigns.classic_survey_config', campaign_id=campaign.id) }}" 
                        class="btn btn-secondary">
                         <i class="fas fa-cog me-2"></i>{{ _('Configure Survey') }}
                     </a>
+                    {% endif %}
                     <a href="{{ url_for('campaigns.preview_classic_survey', campaign_id=campaign.id) }}" 
                        class="btn btn-outline-secondary" target="_blank" title="{{ _('Preview the classic survey questionnaire') }}">
                         <i class="fas fa-eye me-2"></i>{{ _('Preview') }}
