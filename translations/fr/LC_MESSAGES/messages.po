@@ -491,9 +491,8 @@ msgstr "Comparer les KPI entre différentes campagnes"
 #: templates/campaigns/individual_response.html:578
 #: templates/classic_survey.html:485 templates/conversational_survey.html:35
 #: templates/conversational_survey_business.html:44
-#, fuzzy
 msgid "Campaign:"
-msgstr "Campagnes :"
+msgstr "Campagne :"
 
 #: templates/business_auth/audit_logs.html:114
 #: templates/campaign_insights.html:72 templates/campaign_insights.html:798
@@ -1177,27 +1176,25 @@ msgstr "Service"
 #: templates/campaign_insights.html:1241 templates/classic_survey.html:647
 #: templates/classic_survey.html:744
 msgid "Very dissatisfied"
-msgstr ""
+msgstr "Très insatisfait(e)"
 
 #: templates/campaign_insights.html:1242 templates/classic_survey.html:648
 msgid "Dissatisfied"
-msgstr ""
+msgstr "Insatisfait(e)"
 
 #: templates/campaign_insights.html:1243 templates/classic_survey.html:649
 #: templates/classic_survey.html:662
 msgid "Neutral"
-msgstr ""
+msgstr "Neutre"
 
 #: templates/campaign_insights.html:1244 templates/classic_survey.html:650
-#, fuzzy
 msgid "Satisfied"
-msgstr "Satisfaction"
+msgstr "Satisfait(e)"
 
 #: templates/campaign_insights.html:1245 templates/classic_survey.html:651
 #: templates/classic_survey.html:745
-#, fuzzy
 msgid "Very satisfied"
-msgstr "Satisfaction globale (1-5)"
+msgstr "Très satisfait(e)"
 
 #: templates/campaign_insights.html:1316
 msgid "1 = Very difficult → 8 = Extremely easy"
@@ -1295,15 +1292,13 @@ msgid "No segmentation data available"
 msgstr "Aucune donnée d'entreprise disponible pour le moment"
 
 #: templates/classic_survey.html:3
-#, fuzzy
 msgid "Survey"
-msgstr "Sujet de l'enquête"
+msgstr "Sondage"
 
 #: templates/classic_survey.html:459 templates/conversational_survey.html:15
 #: templates/conversational_survey_business.html:20
-#, fuzzy
 msgid "Survey information"
-msgstr "Informations de sécurité"
+msgstr "Informations sur le sondage"
 
 #: templates/classic_survey.html:476
 #: templates/conversational_survey_business.html:36
@@ -1317,41 +1312,35 @@ msgstr "merci de votre participation"
 
 #: templates/classic_survey.html:481 templates/conversational_survey.html:31
 #: templates/conversational_survey_business.html:40
-#, fuzzy
 msgid "Campaign details"
-msgstr "Actions de la campagne"
+msgstr "Détails de la campagne"
 
 #: templates/classic_survey.html:491 templates/conversational_survey.html:41
 #: templates/conversational_survey_business.html:50
-#, fuzzy
 msgid "Objective:"
-msgstr "Actif"
+msgstr "Objectif :"
 
 #: templates/classic_survey.html:497 templates/conversational_survey.html:47
 #: templates/conversational_survey_business.html:56
-#, fuzzy
 msgid "Please respond by:"
-msgstr "Dernière réponse"
+msgstr "Veuillez répondre avant le :"
 
 #: templates/classic_survey.html:505 templates/conversational_survey.html:56
 #: templates/conversational_survey_business.html:65
-#, fuzzy
 msgid "Platform information"
-msgstr "Administration de la plateforme"
+msgstr "Informations sur la plateforme"
 
 #: templates/classic_survey.html:506 templates/conversational_survey.html:57
 #: templates/conversational_survey_business.html:66
 #: templates/survey_unavailable.html:153
-#, fuzzy
 msgid "Powered by"
-msgstr "Propulsé par {}"
+msgstr "Propulsé par"
 
 #: templates/classic_survey.html:508 templates/conversational_survey.html:59
 #: templates/conversational_survey_business.html:68
 #: templates/survey_unavailable.html:157
-#, fuzzy
 msgid "Voice Of Client"
-msgstr "VOÏA - Voice Of Client"
+msgstr "Voice Of Client"
 
 #: templates/classic_survey.html:516
 #: templates/conversational_survey_business.html:80
@@ -1379,69 +1368,65 @@ msgid "Your Name"
 msgstr "Votre nom"
 
 #: templates/classic_survey.html:551
-#, fuzzy
 msgid "Customer Experience Survey"
-msgstr "Enquête de retour client"
+msgstr "Enquête sur l'expérience client"
 
 #: templates/classic_survey.html:552
 msgid ""
 "Your feedback helps us improve. This survey takes approximately 8-12 "
 "minutes."
 msgstr ""
+"Vos commentaires nous aident à nous améliorer. Ce sondage prend environ "
+"8 à 12 minutes."
 
 #: templates/classic_survey.html:554
-#, fuzzy, python-format
+#, python-format
 msgid "Welcome, %(name)s"
-msgstr "Configurer %(name)s"
+msgstr "Bienvenue, %(name)s"
 
 #: templates/classic_survey.html:562
-#, fuzzy
 msgid "Preview Mode"
-msgstr "Aperçu de l'e-mail"
+msgstr "Mode aperçu"
 
 #: templates/classic_survey.html:562
 msgid ""
 "This is a preview of the survey questionnaire. Responses will not be "
 "saved."
 msgstr ""
+"Ceci est un aperçu du questionnaire. Les réponses ne seront pas "
+"enregistrées."
 
 #: templates/classic_survey.html:564
-#, fuzzy
 msgid "Back to Campaign"
-msgstr "Campagnes actives"
+msgstr "Retour à la campagne"
 
 #: templates/classic_survey.html:571 templates/classic_survey.html:909
-#, fuzzy
 msgid "Section"
-msgstr "Action"
+msgstr "Section"
 
 #: templates/classic_survey.html:571 templates/classic_survey.html:909
 msgid "of"
-msgstr ""
+msgstr "sur"
 
 #: templates/classic_survey.html:587
-#, fuzzy
 msgid "NPS & Driver Attribution"
-msgstr "Répartition du NPS"
+msgstr "NPS et attribution des facteurs"
 
 #: templates/classic_survey.html:588
-#, fuzzy
 msgid "Help us understand your overall experience"
-msgstr "Aidez-nous à nous améliorer en partageant votre expérience"
+msgstr "Aidez-nous à comprendre votre expérience globale"
 
 #: templates/classic_survey.html:593
-#, fuzzy
 msgid ""
 "On a scale of 0-10, how likely are you to recommend our company to a "
 "friend or colleague?"
 msgstr ""
 "Sur une échelle de 0 à 10, quelle est la probabilité que vous "
-"recommandiez nos services à un ami ou un collègue ?"
+"recommandiez notre entreprise à un ami ou un collègue ?"
 
 #: templates/classic_survey.html:603
-#, fuzzy
 msgid "Not at all likely"
-msgstr "Peu probable"
+msgstr "Pas du tout probable"
 
 #: templates/classic_survey.html:604 templates/survey.html:107
 msgid "Extremely likely"
@@ -1449,11 +1434,11 @@ msgstr "Extrêmement probable"
 
 #: templates/classic_survey.html:606
 msgid "Please select a score"
-msgstr ""
+msgstr "Veuillez sélectionner un score"
 
 #: templates/classic_survey.html:612
 msgid "Select all that apply"
-msgstr ""
+msgstr "Sélectionnez tous ceux qui s'appliquent"
 
 #: templates/classic_survey.html:622 templates/participants/create.html:111
 #: templates/participants/create.html:129
@@ -1466,65 +1451,63 @@ msgstr "Autre"
 
 #: templates/classic_survey.html:626
 msgid "Please specify..."
-msgstr ""
+msgstr "Veuillez préciser..."
 
 #: templates/classic_survey.html:632
 msgid ""
 "Please explain your selection(s) above - what specifically influenced "
 "your score?"
 msgstr ""
+"Veuillez expliquer vos choix ci-dessus — qu'est-ce qui a spécifiquement "
+"influencé votre score ?"
 
 #: templates/classic_survey.html:633
 msgid "This helps us understand the details behind your rating."
-msgstr ""
+msgstr "Cela nous aide à comprendre les détails derrière votre évaluation."
 
 #: templates/classic_survey.html:634
 msgid "Share your thoughts..."
-msgstr ""
+msgstr "Partagez vos réflexions..."
 
 #: templates/classic_survey.html:640
-#, fuzzy
 msgid "Share your suggestions..."
-msgstr "Veuillez partager vos suggestions d'amélioration..."
+msgstr "Partagez vos suggestions..."
 
 #: templates/classic_survey.html:645
 msgid "Overall, how satisfied are you with your experience with our company?"
-msgstr ""
+msgstr "Dans l'ensemble, êtes-vous satisfait(e) de votre expérience avec notre entreprise ?"
 
 #: templates/classic_survey.html:657
 msgid "How easy was it to interact with our company and get your needs met?"
-msgstr ""
+msgstr "A-t-il été facile d'interagir avec notre entreprise et de répondre à vos besoins ?"
 
 #: templates/classic_survey.html:659 templates/classic_survey.html:669
-#, fuzzy
 msgid "Very difficult"
-msgstr "Paramètres par défaut de l'enquête"
+msgstr "Très difficile"
 
 #: templates/classic_survey.html:660
 msgid "Difficult"
-msgstr ""
+msgstr "Difficile"
 
 #: templates/classic_survey.html:661
 msgid "Somewhat difficult"
-msgstr ""
+msgstr "Plutôt difficile"
 
 #: templates/classic_survey.html:663
 msgid "Somewhat easy"
-msgstr ""
+msgstr "Plutôt facile"
 
 #: templates/classic_survey.html:664
-#, fuzzy
 msgid "Easy"
-msgstr "Créé"
+msgstr "Facile"
 
 #: templates/classic_survey.html:665
 msgid "Very easy"
-msgstr ""
+msgstr "Très facile"
 
 #: templates/classic_survey.html:666 templates/classic_survey.html:670
-#, fuzzy
 msgid "Extremely easy"
-msgstr "Extrêmement probable"
+msgstr "Extrêmement facile"
 
 #: templates/classic_survey.html:677 templates/classic_survey.html:758
 #: templates/company_responses.html:313 templates/survey.html:72
@@ -1540,101 +1523,98 @@ msgstr "Soumettre l'enquête"
 
 #: templates/classic_survey.html:691
 msgid "Product Features - Detailed Evaluation"
-msgstr ""
+msgstr "Fonctionnalités du produit — Évaluation détaillée"
 
 #: templates/classic_survey.html:692
 msgid "For each feature below, please tell us about your usage and satisfaction"
-msgstr ""
+msgstr "Pour chaque fonctionnalité ci-dessous, indiquez votre utilisation et votre satisfaction"
 
 #: templates/classic_survey.html:700
 msgid "Do you use this feature?"
-msgstr ""
+msgstr "Utilisez-vous cette fonctionnalité ?"
 
 #: templates/classic_survey.html:702 templates/classic_survey.html:715
 #: templates/classic_survey.html:727
-#, fuzzy
 msgid "Select..."
-msgstr "Sélectionnez la durée..."
+msgstr "Sélectionner..."
 
 #: templates/classic_survey.html:703
 msgid "Yes"
-msgstr ""
+msgstr "Oui"
 
 #: templates/classic_survey.html:704
 msgid "No - I don't know about this feature"
-msgstr ""
+msgstr "Non — Je ne connais pas cette fonctionnalité"
 
 #: templates/classic_survey.html:705
 msgid "No - I don't need this feature"
-msgstr ""
+msgstr "Non — Je n'ai pas besoin de cette fonctionnalité"
 
 #: templates/classic_survey.html:706
 msgid "No - It's too complicated/difficult to use"
-msgstr ""
+msgstr "Non — C'est trop compliqué/difficile à utiliser"
 
 #: templates/classic_survey.html:707
 msgid "No - Other reason"
-msgstr ""
+msgstr "Non — Autre raison"
 
 #: templates/classic_survey.html:713
 msgid "How often do you use this feature?"
-msgstr ""
+msgstr "À quelle fréquence utilisez-vous cette fonctionnalité ?"
 
 #: templates/campaigns/individual_response.html:685
 #: templates/classic_survey.html:716
-#, fuzzy
 msgid "Daily"
-msgstr "Détails"
+msgstr "Quotidiennement"
 
 #: templates/classic_survey.html:717
 msgid "Several times per week"
-msgstr ""
+msgstr "Plusieurs fois par semaine"
 
 #: templates/campaigns/individual_response.html:686
 #: templates/classic_survey.html:718
 msgid "Weekly"
-msgstr ""
+msgstr "Hebdomadairement"
 
 #: templates/campaigns/individual_response.html:687
 #: templates/classic_survey.html:719
 msgid "Monthly"
-msgstr ""
+msgstr "Mensuellement"
 
 #: templates/campaigns/individual_response.html:688
 #: templates/classic_survey.html:720
 msgid "Rarely"
-msgstr ""
+msgstr "Rarement"
 
 #: templates/classic_survey.html:725
 msgid "How important is this feature to your workflow?"
-msgstr ""
+msgstr "Quelle est l'importance de cette fonctionnalité dans votre travail ?"
 
 #: templates/classic_survey.html:728
 msgid "Critical - can't do my job without it"
-msgstr ""
+msgstr "Essentiel — impossible de travailler sans"
 
 #: templates/classic_survey.html:729
 msgid "Very important"
-msgstr ""
+msgstr "Très important"
 
 #: templates/classic_survey.html:730
 msgid "Somewhat important"
-msgstr ""
+msgstr "Plutôt important"
 
 #: templates/campaigns/individual_response.html:702
 #: templates/classic_survey.html:731
 msgid "Nice to have"
-msgstr ""
+msgstr "Appréciable mais non essentiel"
 
 #: templates/campaigns/individual_response.html:704
 #: templates/classic_survey.html:732
-#, fuzzy
 msgid "Not important"
-msgstr "Opportunités de croissance"
+msgstr "Pas important"
 
 #: templates/classic_survey.html:737
 msgid "How satisfied are you with this feature?"
-msgstr ""
+msgstr "Êtes-vous satisfait(e) de cette fonctionnalité ?"
 
 #: templates/classic_survey.html:754 templates/classic_survey.html:822
 #: templates/company_responses.html:292 templates/survey.html:110
@@ -1643,87 +1623,84 @@ msgid "Previous"
 msgstr "Précédent"
 
 #: templates/classic_survey.html:773
-#, fuzzy
 msgid "Additional Insights"
-msgstr "Analyses plus exploitables"
+msgstr "Informations complémentaires"
 
 #: templates/classic_survey.html:774
 msgid "Help us understand what matters most to you"
-msgstr ""
+msgstr "Aidez-nous à comprendre ce qui compte le plus pour vous"
 
 #: templates/classic_survey.html:778
 msgid "Which feature do you find MOST valuable and why?"
-msgstr ""
+msgstr "Quelle fonctionnalité trouvez-vous la PLUS précieuse et pourquoi ?"
 
 #: templates/classic_survey.html:779
 msgid "Tell us about the feature you value most..."
-msgstr ""
+msgstr "Parlez-nous de la fonctionnalité que vous appréciez le plus..."
 
 #: templates/classic_survey.html:783
 msgid "Which feature needs the MOST improvement and why?"
-msgstr ""
+msgstr "Quelle fonctionnalité nécessite le PLUS d'amélioration et pourquoi ?"
 
 #: templates/classic_survey.html:784
-#, fuzzy
 msgid "Tell us what could be improved..."
-msgstr "Que pourrions-nous améliorer ?"
+msgstr "Dites-nous ce qui pourrait être amélioré..."
 
 #: templates/classic_survey.html:788
 msgid ""
 "Please describe your biggest pain point or challenge when using our "
 "product:"
 msgstr ""
+"Décrivez votre principal problème ou défi lors de l'utilisation de notre "
+"produit :"
 
 #: templates/classic_survey.html:789
 msgid "Describe your biggest challenge..."
-msgstr ""
+msgstr "Décrivez votre principal défi..."
 
 #: templates/classic_survey.html:793
 msgid "Are there any features or capabilities you expected but didn't find?"
-msgstr ""
+msgstr "Y a-t-il des fonctionnalités que vous attendiez mais que vous n'avez pas trouvées ?"
 
 #: templates/classic_survey.html:794
-#, fuzzy
 msgid "Tell us what you expected..."
-msgstr "Parlez-nous davantage de votre expérience"
+msgstr "Dites-nous ce que vous attendiez..."
 
 #: templates/classic_survey.html:798
 msgid "Have you recommended us to others?"
-msgstr ""
+msgstr "Nous avez-vous recommandé à d'autres personnes ?"
 
 #: templates/classic_survey.html:802
 msgid "Yes, I have recommended you"
-msgstr ""
+msgstr "Oui, je vous ai recommandé"
 
 #: templates/classic_survey.html:806
 msgid "No, but I would consider it"
-msgstr ""
+msgstr "Non, mais j'y réfléchirais"
 
 #: templates/classic_survey.html:810
 msgid "No, and I wouldn't recommend you"
-msgstr ""
+msgstr "Non, et je ne vous recommanderais pas"
 
 #: templates/classic_survey.html:816
 msgid "What holds you back from recommending us?"
-msgstr ""
+msgstr "Qu'est-ce qui vous retient de nous recommander ?"
 
 #: templates/classic_survey.html:817
-#, fuzzy
 msgid "Please share your concerns..."
-msgstr "Veuillez partager vos suggestions d'amélioration..."
+msgstr "Partagez vos préoccupations..."
 
 #: templates/classic_survey.html:826
 msgid "Preview Only — Submit Disabled"
-msgstr ""
+msgstr "Aperçu uniquement — Envoi désactivé"
 
 #: templates/classic_survey.html:849
 #: templates/conversational_survey_business.html:164
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid "Thank you, {}!"
-msgstr "Merci, %s !"
+msgstr "Merci, {} !"
 
 #: templates/classic_survey.html:851
-#, fuzzy
 msgid "Thank you!"
 msgstr "Merci !"
 
@@ -1738,9 +1715,8 @@ msgid "has been successfully submitted."
 msgstr "a été soumis avec succès."
 
 #: templates/classic_survey.html:858
-#, fuzzy
 msgid "Your feedback has been successfully submitted."
-msgstr "a été soumis avec succès."
+msgstr "Vos commentaires ont été soumis avec succès."
 
 #: templates/classic_survey.html:865
 #: templates/conversational_survey_business.html:173
@@ -1762,31 +1738,28 @@ msgid "You can now close this window."
 msgstr "Vous pouvez maintenant fermer cette fenêtre."
 
 #: templates/classic_survey.html:894
-#, fuzzy
 msgid "What were the main factors that led to your score?"
-msgstr "Quelle est la principale raison de votre note ?"
+msgstr "Quels ont été les principaux facteurs qui ont conduit à votre score ?"
 
 #: templates/classic_survey.html:895
 msgid "What is preventing you from rating us higher?"
-msgstr ""
+msgstr "Qu'est-ce qui vous empêche de nous attribuer une note plus élevée ?"
 
 #: templates/classic_survey.html:896
 msgid "What do you value most about us?"
-msgstr ""
+msgstr "Qu'appréciez-vous le plus chez nous ?"
 
 #: templates/classic_survey.html:900 templates/classic_survey.html:901
 msgid "What would it take for us to earn a score of 9 or 10 from you?"
-msgstr ""
+msgstr "Que faudrait-il pour que vous nous attribuiez un score de 9 ou 10 ?"
 
 #: templates/classic_survey.html:902
-#, fuzzy
 msgid "What could we do even better?"
-msgstr "Que pourrions-nous améliorer ?"
+msgstr "Que pourrions-nous faire encore mieux ?"
 
 #: templates/classic_survey.html:988
-#, fuzzy
 msgid "Submitting..."
-msgstr "Connexion en cours..."
+msgstr "Envoi en cours..."
 
 #: templates/company_responses.html:53
 msgid "Campaign Responses"
@@ -3215,14 +3188,13 @@ msgstr ""
 "Merci !"
 
 #: templates/survey_choice.html:3
-#, fuzzy
 msgid "Choose Survey Type - VOÏA - Voice Of Client Agent"
-msgstr "Sondage IA - VOÏA - Agent Voix du Client"
+msgstr "Choisir le type de sondage - VOÏA - Voice Of Client Agent"
 
 #: templates/survey_choice.html:17
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid "Welcome, {}!"
-msgstr "Bienvenue sur VOÏA !"
+msgstr "Bienvenue, {} !"
 
 #: templates/survey_choice.html:33 templates/survey_choice.html:38
 msgid "AI Conversational"
@@ -3253,9 +3225,8 @@ msgid "5-7 minutes"
 msgstr "5 à 7 minutes"
 
 #: templates/survey_choice.html:53
-#, fuzzy
 msgid "Start AI Conversation"
-msgstr "Démarrer la conversation"
+msgstr "Démarrer la conversation IA"
 
 #: templates/survey_choice.html:67
 msgid ""
@@ -3282,15 +3253,16 @@ msgid "3-5 minutes"
 msgstr "3 à 5 minutes"
 
 #: templates/survey_choice.html:80
-#, fuzzy
 msgid "Start Form Survey"
-msgstr "Démarrer l'enquête conversationnelle"
+msgstr "Démarrer le sondage classique"
 
 #: templates/survey_choice.html:90
 msgid ""
 "Both options provide the same valuable insights. Choose what feels most "
 "comfortable for you."
 msgstr ""
+"Les deux options fournissent les mêmes informations précieuses. Choisissez "
+"celle qui vous convient le mieux."
 
 #: templates/survey_completed.html:3 templates/survey_completed.html:17
 msgid "Survey Already Completed"
