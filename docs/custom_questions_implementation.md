@@ -2,7 +2,7 @@
 
 **Created:** January 21, 2026  
 **Last Updated:** February 9, 2026  
-**Status:** Phase 2g Complete - Driver Impact Analysis & Metric Correlation  
+**Status:** Phase 2h Complete - Classic Survey Executive Reports  
 
 ---
 
@@ -243,6 +243,29 @@ Add Classic Survey as an alternative survey type alongside the existing Conversa
 5. Correlation summary card shows alignment %, avg CES by category, and insight text
 6. Old snapshots without NPS breakdown → fallback to simple bar chart (no crash)
 7. New snapshot generation → includes enriched driver data and correlation points
+
+### Phase 2h: Classic Survey Executive Reports (COMPLETED)
+
+**What was built:**
+- [x] **Classic survey awareness in executive reports**: Report generation now detects campaign survey_type and includes classic-specific analytics when applicable
+- [x] **Classic data collection**: _collect_classic_analytics method gathers CSAT/CES averages & distributions, driver attribution with NPS breakdown (promoters/passives/detractors/net_impact), correlation points & summary (alignment %, avg CES by NPS category, insight text), feature analytics, and recommendation counts
+- [x] **4 new matplotlib chart methods** for PDF rendering:
+  - _create_csat_distribution_chart: Color-coded bar chart (1-5 scale)
+  - _create_ces_distribution_chart: Color-coded bar chart (1-8 scale)
+  - _create_driver_impact_chart: Diverging horizontal bar chart (green promoters right, red detractors left, sorted by net impact)
+  - _create_correlation_scatter_chart: Scatter plot with NPS category color coding, sized by NPS score
+- [x] **Classic sections in HTML template**: CSAT/CES KPI cards in overview, CSAT/CES distribution charts, Driver Impact Analysis chart + breakdown table, NPS-CSAT-CES Correlation scatter chart + summary card (alignment %, avg CES by category, insight text), Feature analytics table, Recommendation breakdown
+- [x] **Conversational report unchanged**: Sentiment chart and Average Ratings section conditionally hidden for classic surveys; all other shared sections (NPS, high risk accounts, themes, timeline) remain for both types
+- [x] **Edge case handling**: All chart methods have empty-data fallbacks; correlation insight_text uses explicit None checks to handle 0.0 values correctly
+
+**Files modified:** `executive_report_service.py`
+
+**Validation guide:**
+1. Generate executive report for a conversational campaign → Report looks exactly like before (no changes)
+2. Generate executive report for a classic campaign → Report includes CSAT/CES KPI cards, distribution charts, driver impact chart, correlation scatter + summary, feature analytics, recommendation breakdown
+3. Classic report does NOT show sentiment breakdown chart or conversational average ratings section
+4. Empty classic data → Charts show "No data available" fallback text
+5. Report Details section now shows Survey Type
 
 ### Phase 3+ (Planned)
 
