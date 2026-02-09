@@ -131,43 +131,141 @@ class ErrorMonitor:
             return "Not Found", 404
     
     def _sentry_before_send(self, event, hint):
-        """Filter/modify events before sending to Sentry"""
+        """Filter/modify events before sending to Sentry.
+        
+        Enriches error events with metadata for triage (IDs, roles, survey type).
+        No PII (names, emails) is included — only numeric IDs and categorical tags.
+        Wrapped in try/except so enrichment failures never block error reporting.
+        """
         from flask import has_request_context
         
-        # Add Phase 2b context (only if in request context)
         if 'contexts' not in event:
             event['contexts'] = {}
+        if 'tags' not in event:
+            event['tags'] = {}
         
-        if has_request_context():
-            event['contexts']['phase2b'] = {
-                'ui_version': session.get('ui_version', 'v1'),
-                'feature_flags': {
-                    'sidebar_enabled': session.get('sidebar_enabled', False)
+        try:
+            if has_request_context():
+                self._enrich_request_context(event)
+            else:
+                event['contexts']['execution'] = {
+                    'context_type': 'non-request',
+                    'note': 'Captured outside HTTP request context (background task or CLI)'
                 }
-            }
-            
-            # Add request context
-            event['contexts']['request'] = {
-                'url': request.url,
-                'method': request.method,
-                'user_agent': request.user_agent.string if request.user_agent else None
-            }
-        else:
-            # Background task or CLI context
-            event['contexts']['execution'] = {
-                'context_type': 'non-request',
-                'note': 'Captured outside HTTP request context'
-            }
+                event['tags']['user_type'] = 'background'
+        except Exception:
+            event['tags']['enrichment_error'] = 'true'
         
-        # Filter sensitive data
-        if 'request' in event and 'headers' in event['request']:
-            headers = event['request']['headers']
-            sensitive_headers = ['Authorization', 'Cookie', 'X-Api-Key']
-            for header in sensitive_headers:
-                if header in headers:
-                    headers[header] = '[Filtered]'
+        try:
+            if 'request' in event and 'headers' in event['request']:
+                headers = event['request']['headers']
+                sensitive_headers = ['Authorization', 'Cookie', 'X-Api-Key']
+                for header in sensitive_headers:
+                    if header in headers:
+                        headers[header] = '[Filtered]'
+        except Exception:
+            pass
         
         return event
+    
+    def _enrich_request_context(self, event):
+        """Add request-scoped metadata to a Sentry event. IDs only, no PII."""
+        event['contexts']['ui'] = {
+            'ui_version': session.get('ui_version', 'v1'),
+            'feature_flags': {
+                'sidebar_enabled': session.get('sidebar_enabled', False)
+            }
+        }
+        
+        event['contexts']['request_info'] = {
+            'url': request.url,
+            'method': request.method,
+            'endpoint': request.endpoint,
+            'user_agent': request.user_agent.string if request.user_agent else None
+        }
+        
+        user_type = self._determine_user_type(session)
+        event['tags']['user_type'] = user_type
+        
+        if user_type == 'business_user':
+            event['contexts']['business'] = {
+                'business_account_id': session.get('business_account_id'),
+                'business_user_id': session.get('business_user_id'),
+                'user_role': session.get('user_role'),
+            }
+            event['tags']['business_account_id'] = str(session.get('business_account_id', ''))
+            event['tags']['user_role'] = session.get('user_role', '')
+            
+            try:
+                import sentry_sdk
+                sentry_sdk.set_user({
+                    'id': str(session.get('business_user_id', '')),
+                })
+            except Exception:
+                pass
+        
+        elif user_type == 'participant':
+            campaign_id = session.get('campaign_id')
+            participant_id = session.get('participant_id')
+            
+            event['contexts']['survey_session'] = {
+                'campaign_id': campaign_id,
+                'participant_id': participant_id,
+                'business_account_id': session.get('business_account_id'),
+                'language': session.get('language'),
+            }
+            event['tags']['campaign_id'] = str(campaign_id) if campaign_id else ''
+            event['tags']['participant_id'] = str(participant_id) if participant_id else ''
+            
+            survey_type = self._detect_survey_type(request)
+            if survey_type:
+                event['tags']['survey_type'] = survey_type
+                event['contexts']['survey_session']['survey_type'] = survey_type
+            
+            try:
+                import sentry_sdk
+                sentry_sdk.set_user({
+                    'id': f"participant_{participant_id}" if participant_id else 'unknown',
+                })
+            except Exception:
+                pass
+        
+        elif user_type == 'platform_admin':
+            admin_id = session.get('user_id')
+            event['tags']['admin_id'] = str(admin_id) if admin_id else ''
+            event['contexts']['admin'] = {
+                'admin_id': admin_id,
+            }
+            
+            try:
+                import sentry_sdk
+                sentry_sdk.set_user({
+                    'id': f"admin_{admin_id}" if admin_id else 'unknown',
+                })
+            except Exception:
+                pass
+    
+    def _determine_user_type(self, sess):
+        """Determine the type of user from session data"""
+        if sess.get('business_user_id'):
+            return 'business_user'
+        elif sess.get('participant_id'):
+            return 'participant'
+        elif sess.get('user_id') or sess.get('is_admin'):
+            return 'platform_admin'
+        return 'anonymous'
+    
+    def _detect_survey_type(self, req):
+        """Detect survey type from the request endpoint/URL"""
+        endpoint = req.endpoint or ''
+        path = req.path or ''
+        if 'classic' in endpoint or 'classic' in path:
+            return 'classic'
+        elif 'conversation' in endpoint or 'chat' in path or 'voia' in path.lower():
+            return 'conversational'
+        elif 'survey' in endpoint or 'survey' in path:
+            return 'survey'
+        return None
     
     def capture_exception(self, exception, context=None):
         """Capture an exception with optional context"""
