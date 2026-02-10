@@ -2073,6 +2073,8 @@ function renderSegmentationTabs(segmentationData) {
     });
 }
 
+let segTabDataStore = {};
+
 const segResponseCountPlugin = {
     id: 'segResponseCount',
     afterDatasetsDraw(chart) {
@@ -2105,9 +2107,14 @@ const segResponseCountPlugin = {
         ctx.restore();
     }
 };
-Chart.register(segResponseCountPlugin);
 
-let segTabDataStore = {};
+if (typeof Chart !== 'undefined') {
+    Chart.register(segResponseCountPlugin);
+} else {
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof Chart !== 'undefined') Chart.register(segResponseCountPlugin);
+    });
+}
 
 function segSortTable(tbodyId, npsData, satData, sortField, sortOrder) {
     const tbody = document.getElementById(tbodyId);
