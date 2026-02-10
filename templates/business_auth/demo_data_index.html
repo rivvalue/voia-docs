@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+
+{% block title %}Demo Data Generator - VOÏA Platform Admin{% endblock %}
+
+{% block page_class %}page-admin-panel{% endblock %}
+
+{% block content %}
+<style>
+.demo-data-container {
+    max-width: 1000px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+.demo-header {
+    background: linear-gradient(135deg, #1a365d 0%, #2d5a87 100%);
+    color: white;
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+.demo-header h1 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+.demo-header p {
+    opacity: 0.85;
+    font-size: 0.95rem;
+    margin: 0;
+}
+.campaign-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border: 1px solid #e2e8f0;
+}
+.campaign-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+.campaign-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1a365d;
+}
+.campaign-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+.badge-exists {
+    background: #c6f6d5;
+    color: #22543d;
+}
+.badge-not-exists {
+    background: #fed7d7;
+    color: #822727;
+}
+.badge-running {
+    background: #fefcbf;
+    color: #744210;
+}
+.badge-error {
+    background: #fed7d7;
+    color: #822727;
+}
+.campaign-meta {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    color: #4a5568;
+}
+.campaign-meta span {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+.campaign-actions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+.btn-generate {
+    background: #2d5a87;
+    color: white;
+    border: none;
+    padding: 0.5rem 1.25rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.btn-generate:hover {
+    background: #1a365d;
+    color: white;
+    text-decoration: none;
+}
+.btn-delete {
+    background: white;
+    color: #e53e3e;
+    border: 1px solid #e53e3e;
+    padding: 0.5rem 1.25rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-delete:hover {
+    background: #e53e3e;
+    color: white;
+    text-decoration: none;
+}
+.btn-disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+.status-message {
+    margin-top: 0.75rem;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+}
+.status-running {
+    background: #fefcbf;
+    color: #744210;
+    border: 1px solid #ecc94b;
+}
+.status-completed {
+    background: #c6f6d5;
+    color: #22543d;
+    border: 1px solid #68d391;
+}
+.status-error {
+    background: #fed7d7;
+    color: #822727;
+    border: 1px solid #fc8181;
+}
+.status-deleted {
+    background: #e9d8fd;
+    color: #553c9a;
+    border: 1px solid #b794f4;
+}
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #4a5568;
+    text-decoration: none;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+.back-link:hover {
+    color: #1a365d;
+}
+.refresh-hint {
+    text-align: center;
+    color: #718096;
+    font-size: 0.85rem;
+    margin-top: 1rem;
+}
+</style>
+
+<div class="demo-data-container">
+    <a href="{{ url_for('business_auth.admin_panel') }}" class="back-link">
+        <i class="fas fa-arrow-left"></i> Back to Admin Panel
+    </a>
+
+    <div class="demo-header">
+        <h1><i class="fas fa-database"></i> Demo Data Generator</h1>
+        <p>Generate realistic survey data for {{ business_account.name if business_account else 'Archelo Group inc' }} — ArcheloFlow HRIS</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ 'success' if category == 'info' else category }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    {% for campaign in campaigns %}
+    <div class="campaign-card">
+        <div class="campaign-card-header">
+            <div>
+                <div class="campaign-name">{{ campaign.name }}</div>
+                <div style="font-size: 0.85rem; color: #718096; margin-top: 0.25rem;">Campaign key: {{ campaign.key }}</div>
+            </div>
+            <div>
+                {% if campaign.task_status == 'running' %}
+                    <span class="campaign-badge badge-running"><i class="fas fa-spinner fa-spin"></i> Running</span>
+                {% elif campaign.exists %}
+                    <span class="campaign-badge badge-exists"><i class="fas fa-check"></i> Generated ({{ campaign.response_count }} responses)</span>
+                {% else %}
+                    <span class="campaign-badge badge-not-exists">Not generated</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="campaign-meta">
+            <span><i class="fas fa-comments"></i> {{ campaign.survey_type|capitalize }}</span>
+            <span><i class="fas fa-language"></i> {{ 'English' if campaign.language == 'en' else 'French' }}</span>
+            <span><i class="fas fa-chart-bar"></i> {{ campaign.target_responses }} target responses</span>
+            <span><i class="fas fa-calendar"></i> {{ campaign.dates }}</span>
+        </div>
+
+        <div class="campaign-actions">
+            {% if campaign.task_status == 'running' %}
+                <span class="btn-generate btn-disabled"><i class="fas fa-spinner fa-spin"></i> In Progress...</span>
+            {% elif not campaign.exists %}
+                <a href="{{ url_for('business_auth.demo_data_confirm', campaign_key=campaign.key) }}" class="btn-generate">
+                    <i class="fas fa-plus"></i> Generate
+                </a>
+            {% else %}
+                <a href="{{ url_for('business_auth.demo_data_delete_confirm', campaign_key=campaign.key) }}" class="btn-delete">
+                    <i class="fas fa-trash"></i> Delete
+                </a>
+            {% endif %}
+        </div>
+
+        {% if campaign.task_status in ['completed', 'error', 'deleted', 'running'] %}
+        <div class="status-message status-{{ campaign.task_status }}">
+            {% if campaign.task_status == 'running' %}
+                <i class="fas fa-spinner fa-spin"></i>
+            {% elif campaign.task_status == 'completed' %}
+                <i class="fas fa-check-circle"></i>
+            {% elif campaign.task_status == 'deleted' %}
+                <i class="fas fa-trash-alt"></i>
+            {% elif campaign.task_status == 'error' %}
+                <i class="fas fa-exclamation-circle"></i>
+            {% endif %}
+            {{ campaign.task_message }}
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+
+    <div class="refresh-hint">
+        <i class="fas fa-sync-alt"></i> Refresh this page to check for updates after starting a generation or deletion.
+    </div>
+</div>
+{% endblock %}

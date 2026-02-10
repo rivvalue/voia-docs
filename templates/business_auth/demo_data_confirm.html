@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}Confirm {{ 'Generation' if action == 'generate' else 'Deletion' }} - Demo Data{% endblock %}
+
+{% block page_class %}page-admin-panel{% endblock %}
+
+{% block content %}
+<style>
+.confirm-container {
+    max-width: 600px;
+    margin: 3rem auto;
+    padding: 0 1rem;
+}
+.confirm-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+    border: 1px solid #e2e8f0;
+}
+.confirm-icon {
+    text-align: center;
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+.confirm-icon.generate {
+    color: #2d5a87;
+}
+.confirm-icon.delete {
+    color: #e53e3e;
+}
+.confirm-title {
+    text-align: center;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #1a365d;
+    margin-bottom: 1.5rem;
+}
+.confirm-details {
+    background: #f7fafc;
+    border-radius: 8px;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+.confirm-details dl {
+    margin: 0;
+}
+.confirm-details dt {
+    font-weight: 600;
+    color: #4a5568;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 0.75rem;
+}
+.confirm-details dt:first-child {
+    margin-top: 0;
+}
+.confirm-details dd {
+    margin: 0.25rem 0 0 0;
+    color: #2d3748;
+    font-size: 0.95rem;
+}
+.confirm-warning {
+    background: #fefcbf;
+    border: 1px solid #ecc94b;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    color: #744210;
+}
+.confirm-danger {
+    background: #fed7d7;
+    border: 1px solid #fc8181;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    color: #822727;
+}
+.confirm-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+.btn-confirm {
+    padding: 0.6rem 2rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+.btn-confirm-generate {
+    background: #2d5a87;
+    color: white;
+}
+.btn-confirm-generate:hover {
+    background: #1a365d;
+}
+.btn-confirm-delete {
+    background: #e53e3e;
+    color: white;
+}
+.btn-confirm-delete:hover {
+    background: #c53030;
+}
+.btn-cancel {
+    padding: 0.6rem 2rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    border: 1px solid #cbd5e0;
+    background: white;
+    color: #4a5568;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-cancel:hover {
+    background: #f7fafc;
+    color: #2d3748;
+    text-decoration: none;
+}
+</style>
+
+<div class="confirm-container">
+    <div class="confirm-card">
+        <div class="confirm-icon {{ action }}">
+            {% if action == 'generate' %}
+                <i class="fas fa-database"></i>
+            {% else %}
+                <i class="fas fa-trash-alt"></i>
+            {% endif %}
+        </div>
+
+        <div class="confirm-title">
+            {% if action == 'generate' %}
+                Confirm Data Generation
+            {% else %}
+                Confirm Data Deletion
+            {% endif %}
+        </div>
+
+        <div class="confirm-details">
+            <dl>
+                <dt>Campaign</dt>
+                <dd>{{ config.name }}</dd>
+
+                <dt>Survey Type</dt>
+                <dd>{{ config.survey_type|capitalize }}</dd>
+
+                <dt>Language</dt>
+                <dd>{{ 'English' if config.language_code == 'en' else 'French' }}</dd>
+
+                <dt>Target Responses</dt>
+                <dd>{{ config.responses }}</dd>
+
+                <dt>Date Range</dt>
+                <dd>{{ config.start_date }} to {{ config.end_date }}</dd>
+            </dl>
+        </div>
+
+        {% if action == 'generate' %}
+        <div class="confirm-warning">
+            <i class="fas fa-info-circle"></i>
+            This will create <strong>{{ config.responses }} survey responses</strong> with participants, campaign records, and all associated data. The process runs in the background and may take a minute.
+        </div>
+        {% else %}
+        <div class="confirm-danger">
+            <i class="fas fa-exclamation-triangle"></i>
+            This will <strong>permanently delete</strong> the campaign "{{ config.name }}" and all its responses, participants, and associated data. This action cannot be undone.
+        </div>
+        {% endif %}
+
+        <div class="confirm-actions">
+            <a href="{{ url_for('business_auth.demo_data_index') }}" class="btn-cancel">Cancel</a>
+
+            {% if action == 'generate' %}
+            <form method="POST" action="{{ url_for('business_auth.demo_data_generate', campaign_key=campaign_key) }}">
+                <button type="submit" class="btn-confirm btn-confirm-generate">
+                    <i class="fas fa-play"></i> Generate Data
+                </button>
+            </form>
+            {% else %}
+            <form method="POST" action="{{ url_for('business_auth.demo_data_delete', campaign_key=campaign_key) }}">
+                <button type="submit" class="btn-confirm btn-confirm-delete">
+                    <i class="fas fa-trash"></i> Delete Data
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

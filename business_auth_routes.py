@@ -6657,3 +6657,220 @@ def upload_decisions_form():
     except Exception as e:
         logger.error(f"Error loading upload form: {e}")
         return jsonify({'error': str(e)}), 500
+
+
+def _ensure_demo_data_table():
+    from sqlalchemy import text as sa_text
+    try:
+        db.session.execute(sa_text("""
+            CREATE TABLE IF NOT EXISTS demo_data_tasks (
+                id SERIAL PRIMARY KEY,
+                campaign_key VARCHAR(20) NOT NULL UNIQUE,
+                status VARCHAR(20) NOT NULL DEFAULT 'idle',
+                message TEXT DEFAULT '',
+                started_at TIMESTAMP,
+                completed_at TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT NOW()
+            )
+        """))
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+
+
+def _get_demo_task_status(campaign_key):
+    from sqlalchemy import text as sa_text
+    try:
+        result = db.session.execute(
+            sa_text("SELECT status, message FROM demo_data_tasks WHERE campaign_key = :key"),
+            {'key': campaign_key}
+        ).fetchone()
+        if result:
+            return {'status': result[0], 'message': result[1] or ''}
+        return {'status': 'idle', 'message': ''}
+    except Exception:
+        _ensure_demo_data_table()
+        return {'status': 'idle', 'message': ''}
+
+
+def _set_demo_task_status(campaign_key, status, message=''):
+    from sqlalchemy import text as sa_text
+    try:
+        now = datetime.utcnow()
+        db.session.execute(
+            sa_text("""
+                INSERT INTO demo_data_tasks (campaign_key, status, message, started_at, updated_at)
+                VALUES (:key, :status, :message, :now, :now)
+                ON CONFLICT (campaign_key)
+                DO UPDATE SET status = :status, message = :message, updated_at = :now,
+                    completed_at = CASE WHEN :status IN ('completed', 'error', 'deleted') THEN :now ELSE demo_data_tasks.completed_at END
+            """),
+            {'key': campaign_key, 'status': status, 'message': message, 'now': now}
+        )
+        db.session.commit()
+    except Exception as e:
+        logger.error(f"Failed to update demo task status for {campaign_key}: {e}")
+        db.session.rollback()
+
+
+@business_auth_bp.route('/admin/demo-data')
+@require_platform_admin
+def demo_data_index():
+    """Index page listing all demo data campaigns with status and actions"""
+    from generate_demo_data import CAMPAIGN_CONFIGS, BUSINESS_ACCOUNT_NAME
+    from models import Campaign
+
+    ba = BusinessAccount.query.filter_by(name=BUSINESS_ACCOUNT_NAME).first()
+    campaigns_info = []
+    for key, config in CAMPAIGN_CONFIGS.items():
+        existing = None
+        response_count = 0
+        if ba:
+            existing = Campaign.query.filter_by(
+                business_account_id=ba.id,
+                name=config['name']
+            ).first()
+            if existing:
+                from models import SurveyResponse
+                response_count = SurveyResponse.query.filter_by(campaign_id=existing.id).count()
+
+        task_status = _get_demo_task_status(key)
+
+        campaigns_info.append({
+            'key': key,
+            'name': config['name'],
+            'survey_type': config['survey_type'],
+            'language': config['language_code'],
+            'target_responses': config['responses'],
+            'dates': f"{config['start_date']} to {config['end_date']}",
+            'exists': existing is not None,
+            'campaign_id': existing.id if existing else None,
+            'response_count': response_count,
+            'task_status': task_status.get('status', 'idle'),
+            'task_message': task_status.get('message', ''),
+        })
+
+    return render_template('business_auth/demo_data_index.html',
+                           campaigns=campaigns_info,
+                           business_account=ba)
+
+
+@business_auth_bp.route('/admin/demo-data/<campaign_key>/confirm')
+@require_platform_admin
+def demo_data_confirm(campaign_key):
+    """Confirmation page before generating demo data"""
+    from generate_demo_data import CAMPAIGN_CONFIGS
+    if campaign_key not in CAMPAIGN_CONFIGS:
+        flash('Invalid campaign key.', 'error')
+        return redirect(url_for('business_auth.demo_data_index'))
+
+    config = CAMPAIGN_CONFIGS[campaign_key]
+    return render_template('business_auth/demo_data_confirm.html',
+                           campaign_key=campaign_key,
+                           config=config,
+                           action='generate')
+
+
+@business_auth_bp.route('/admin/demo-data/<campaign_key>/generate', methods=['POST'])
+@require_platform_admin
+def demo_data_generate(campaign_key):
+    """Generate demo data for a campaign in a background thread"""
+    from generate_demo_data import CAMPAIGN_CONFIGS, generate_campaign
+    import threading
+
+    if campaign_key not in CAMPAIGN_CONFIGS:
+        flash('Invalid campaign key.', 'error')
+        return redirect(url_for('business_auth.demo_data_index'))
+
+    current_status = _get_demo_task_status(campaign_key).get('status', 'idle')
+    if current_status == 'running':
+        flash(f'{campaign_key} generation is already in progress.', 'warning')
+        return redirect(url_for('business_auth.demo_data_index'))
+
+    _set_demo_task_status(campaign_key, 'running', 'Generation started...')
+
+    def run_generation(app_instance, key):
+        try:
+            with app_instance.app_context():
+                success = generate_campaign(key, dry_run=False)
+                if success:
+                    _set_demo_task_status(key, 'completed', f'{key} campaign generated successfully.')
+                else:
+                    _set_demo_task_status(key, 'error', f'{key} generation failed. Campaign may already exist.')
+        except Exception as e:
+            try:
+                with app_instance.app_context():
+                    _set_demo_task_status(key, 'error', f'Error: {str(e)[:200]}')
+            except Exception:
+                pass
+            logger.error(f"Demo data generation error for {key}: {e}")
+
+    from flask import current_app
+    app_instance = current_app._get_current_object()
+    thread = threading.Thread(target=run_generation, args=(app_instance, campaign_key), daemon=True)
+    thread.start()
+
+    flash(f'{campaign_key} generation started in the background. Refresh this page to check progress.', 'info')
+    return redirect(url_for('business_auth.demo_data_index'))
+
+
+@business_auth_bp.route('/admin/demo-data/<campaign_key>/delete/confirm')
+@require_platform_admin
+def demo_data_delete_confirm(campaign_key):
+    """Confirmation page before deleting demo data"""
+    from generate_demo_data import CAMPAIGN_CONFIGS
+    if campaign_key not in CAMPAIGN_CONFIGS:
+        flash('Invalid campaign key.', 'error')
+        return redirect(url_for('business_auth.demo_data_index'))
+
+    config = CAMPAIGN_CONFIGS[campaign_key]
+    return render_template('business_auth/demo_data_confirm.html',
+                           campaign_key=campaign_key,
+                           config=config,
+                           action='delete')
+
+
+@business_auth_bp.route('/admin/demo-data/<campaign_key>/delete', methods=['POST'])
+@require_platform_admin
+def demo_data_delete(campaign_key):
+    """Delete demo data for a campaign in a background thread"""
+    from generate_demo_data import CAMPAIGN_CONFIGS, delete_campaign
+    import threading
+
+    if campaign_key not in CAMPAIGN_CONFIGS:
+        flash('Invalid campaign key.', 'error')
+        return redirect(url_for('business_auth.demo_data_index'))
+
+    _set_demo_task_status(campaign_key, 'running', 'Deletion started...')
+
+    def run_deletion(app_instance, key):
+        try:
+            with app_instance.app_context():
+                success = delete_campaign(key)
+                if success:
+                    _set_demo_task_status(key, 'deleted', f'{key} campaign deleted successfully.')
+                else:
+                    _set_demo_task_status(key, 'error', f'{key} deletion failed.')
+        except Exception as e:
+            try:
+                with app_instance.app_context():
+                    _set_demo_task_status(key, 'error', f'Error: {str(e)[:200]}')
+            except Exception:
+                pass
+            logger.error(f"Demo data deletion error for {key}: {e}")
+
+    from flask import current_app
+    app_instance = current_app._get_current_object()
+    thread = threading.Thread(target=run_deletion, args=(app_instance, campaign_key), daemon=True)
+    thread.start()
+
+    flash(f'{campaign_key} deletion started in the background. Refresh this page to check progress.', 'info')
+    return redirect(url_for('business_auth.demo_data_index'))
+
+
+@business_auth_bp.route('/admin/demo-data/<campaign_key>/status')
+@require_platform_admin
+def demo_data_status(campaign_key):
+    """Check the status of a demo data generation/deletion task"""
+    status = _get_demo_task_status(campaign_key)
+    return jsonify(status)
