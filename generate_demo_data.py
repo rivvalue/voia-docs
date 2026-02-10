@@ -34,6 +34,7 @@ CAMPAIGN_CONFIGS = {
         "survey_type": "conversational",
         "language_code": "en",
         "company_reuse_pct": 0,
+        "nps_bias": 0,
     },
     "Q2": {
         "name": "Client Loyalty Survey Q2 2025",
@@ -45,6 +46,7 @@ CAMPAIGN_CONFIGS = {
         "survey_type": "conversational",
         "language_code": "en",
         "company_reuse_pct": 45,
+        "nps_bias": 1,
     },
     "Q3": {
         "name": "Mesure de Fidélité Clients Q3 2025",
@@ -56,6 +58,7 @@ CAMPAIGN_CONFIGS = {
         "survey_type": "conversational",
         "language_code": "fr",
         "company_reuse_pct": 50,
+        "nps_bias": 2,
     },
     "CLASSIC": {
         "name": "ArcheloFlow Service Quality Assessment 2025",
@@ -67,6 +70,7 @@ CAMPAIGN_CONFIGS = {
         "survey_type": "classic",
         "language_code": "en",
         "company_reuse_pct": 40,
+        "nps_bias": 0,
     },
 }
 
@@ -124,6 +128,12 @@ TIERS_WEIGHTED = [
 ]
 
 REGIONS = ["North America", "EMEA", "APAC"]
+
+INDUSTRIES = [
+    "Technology", "Financial Services", "Healthcare", "Manufacturing",
+    "Retail & E-commerce", "Professional Services", "Education",
+    "Energy & Utilities", "Transportation & Logistics", "Media & Entertainment",
+]
 
 DRIVER_KEYS = [
     "product_features", "value_pricing", "professional_services",
@@ -248,11 +258,13 @@ def weighted_choice(items_with_weights):
     return random.choices(population, weights=weights, k=1)[0]
 
 
-def generate_nps_score():
+def generate_nps_score(nps_bias=0):
+    promoter_pct = 0.30 + (nps_bias * 0.08)
+    passive_pct = 0.40 - (nps_bias * 0.03)
     rand = random.random()
-    if rand < 0.30:
+    if rand < promoter_pct:
         return random.choice([9, 9, 10, 10])
-    elif rand < 0.70:
+    elif rand < promoter_pct + passive_pct:
         return random.choice([7, 7, 8, 8])
     else:
         return random.choice([3, 4, 5, 5, 6, 6])
@@ -349,12 +361,68 @@ def generate_churn_risk_factors(nps_category, lang="en"):
 
 def generate_key_themes(nps_category, lang="en"):
     themes = KEY_THEMES_EN if lang == "en" else KEY_THEMES_FR
+    sentiment_map = {"Promoter": "positive", "Passive": "neutral", "Detractor": "negative"}
+    sentiment = sentiment_map.get(nps_category, "neutral")
     if nps_category == "Promoter":
-        return random.sample(themes[:8], random.randint(2, 3))
+        raw = random.sample(themes[:8], random.randint(2, 3))
     elif nps_category == "Passive":
-        return random.sample(themes[4:14], random.randint(2, 3))
+        raw = random.sample(themes[4:14], random.randint(2, 3))
     else:
-        return random.sample(themes[6:], random.randint(2, 4))
+        raw = random.sample(themes[6:], random.randint(2, 4))
+    return [{"theme": t, "sentiment": sentiment} for t in raw]
+
+
+GROWTH_OPPORTUNITIES_EN = [
+    {"type": "upselling", "description": "Client expressed interest in additional modules", "action": "Schedule product demo for advanced features"},
+    {"type": "expansion", "description": "Growing headcount creates need for more licenses", "action": "Propose enterprise tier upgrade"},
+    {"type": "referral", "description": "High satisfaction indicates referral potential", "action": "Enroll in referral program"},
+    {"type": "cross_sell", "description": "Interest in complementary workforce analytics", "action": "Present analytics add-on package"},
+    {"type": "advocacy", "description": "Promoter willing to provide testimonial", "action": "Invite to case study program"},
+    {"type": "renewal", "description": "Strong satisfaction supports multi-year renewal", "action": "Propose multi-year contract with incentive"},
+]
+
+GROWTH_OPPORTUNITIES_FR = [
+    {"type": "upselling", "description": "Le client a exprimé un intérêt pour des modules supplémentaires", "action": "Planifier une démo des fonctionnalités avancées"},
+    {"type": "expansion", "description": "La croissance des effectifs crée un besoin de licences supplémentaires", "action": "Proposer une mise à niveau entreprise"},
+    {"type": "referral", "description": "Satisfaction élevée indiquant un potentiel de recommandation", "action": "Inscrire au programme de parrainage"},
+    {"type": "cross_sell", "description": "Intérêt pour des analyses RH complémentaires", "action": "Présenter le module analytique"},
+    {"type": "advocacy", "description": "Promoteur disposé à fournir un témoignage", "action": "Inviter au programme d'études de cas"},
+    {"type": "renewal", "description": "Forte satisfaction favorisant un renouvellement pluriannuel", "action": "Proposer un contrat pluriannuel avec incentive"},
+]
+
+ACCOUNT_RISKS_EN = [
+    {"type": "churn_risk", "description": "Dissatisfaction with platform performance and reliability", "action": "Escalate to engineering for priority fix", "severity": "High"},
+    {"type": "competitor_threat", "description": "Client evaluating competing HRIS platforms", "action": "Schedule executive business review", "severity": "Critical"},
+    {"type": "pricing_concern", "description": "Renewal pricing perceived as too high for value delivered", "action": "Prepare custom retention pricing proposal", "severity": "High"},
+    {"type": "support_failure", "description": "Repeated support tickets with slow resolution", "action": "Assign dedicated support engineer", "severity": "Medium"},
+    {"type": "adoption_risk", "description": "Low platform adoption across employee base", "action": "Conduct adoption workshop with client HR team", "severity": "Medium"},
+    {"type": "integration_issue", "description": "Persistent integration failures with client ERP", "action": "Deploy integration specialist for on-site audit", "severity": "High"},
+]
+
+ACCOUNT_RISKS_FR = [
+    {"type": "churn_risk", "description": "Insatisfaction face à la performance et la fiabilité de la plateforme", "action": "Escalader à l'ingénierie pour correction prioritaire", "severity": "High"},
+    {"type": "competitor_threat", "description": "Le client évalue des plateformes SIRH concurrentes", "action": "Planifier une revue d'affaires exécutive", "severity": "Critical"},
+    {"type": "pricing_concern", "description": "Prix de renouvellement perçu comme trop élevé pour la valeur livrée", "action": "Préparer une proposition tarifaire de rétention", "severity": "High"},
+    {"type": "support_failure", "description": "Tickets de support répétés avec résolution lente", "action": "Assigner un ingénieur de support dédié", "severity": "Medium"},
+    {"type": "adoption_risk", "description": "Faible adoption de la plateforme par les employés", "action": "Organiser un atelier d'adoption avec l'équipe RH", "severity": "Medium"},
+    {"type": "integration_issue", "description": "Échecs d'intégration persistants avec l'ERP du client", "action": "Déployer un spécialiste d'intégration", "severity": "High"},
+]
+
+
+def generate_growth_opportunities(nps_category, lang="en"):
+    pool = GROWTH_OPPORTUNITIES_EN if lang == "en" else GROWTH_OPPORTUNITIES_FR
+    if nps_category == "Promoter":
+        return random.sample(pool, random.randint(2, 3))
+    else:
+        return random.sample(pool[:4], random.randint(1, 2))
+
+
+def generate_account_risk_factors(nps_category, lang="en"):
+    pool = ACCOUNT_RISKS_EN if lang == "en" else ACCOUNT_RISKS_FR
+    if nps_category == "Detractor":
+        return random.sample(pool, random.randint(2, 3))
+    else:
+        return random.sample(pool[3:], random.randint(1, 2))
 
 
 def generate_feedback(nps_category, lang="en"):
@@ -431,6 +499,7 @@ def get_or_create_participant(business_account_id, company, campaign_id, company
     role = weighted_choice(ROLES_WEIGHTED)
     tier = weighted_choice(TIERS_WEIGHTED)
     region = random.choice(REGIONS)
+    industry = random.choice(INDUSTRIES)
     tenure = round(random.uniform(1.0, 10.0), 1)
     name = f"{first_name} {last_name}"
     email = f"{first_name.lower()}.{last_name.lower()}@{company.lower().replace(' ', '').replace(',', '')}.com"
@@ -453,6 +522,7 @@ def get_or_create_participant(business_account_id, company, campaign_id, company
             role=role,
             region=region,
             customer_tier=tier,
+            client_industry=industry,
             language='en',
             tenure_years=tenure,
             company_commercial_value=commercial_value,
@@ -467,6 +537,7 @@ def get_or_create_participant(business_account_id, company, campaign_id, company
         participant.role = role
         participant.region = region
         participant.customer_tier = tier
+        participant.client_industry = industry
         participant.tenure_years = tenure
         participant.company_commercial_value = commercial_value
 
@@ -588,8 +659,9 @@ def generate_campaign(campaign_key, dry_run=False):
             company_commercial_values = {}
             nps_dist = {"Promoter": 0, "Passive": 0, "Detractor": 0}
             lang = config['language_code']
+            nps_bias = config.get('nps_bias', 0)
 
-            print(f"\n  Generating {config['responses']} responses...")
+            print(f"\n  Generating {config['responses']} responses (NPS bias: {nps_bias})...")
 
             for i in range(config['responses']):
                 company = random.choice(campaign_companies)
@@ -597,7 +669,7 @@ def generate_campaign(campaign_key, dry_run=False):
                     ba.id, company, campaign.id, company_commercial_values
                 )
 
-                nps_score = generate_nps_score()
+                nps_score = generate_nps_score(nps_bias=nps_bias)
                 scores = generate_coherent_scores(nps_score)
                 nps_category = scores["nps_category"]
                 feedback = generate_feedback(nps_category, lang)
@@ -609,13 +681,11 @@ def generate_campaign(campaign_key, dry_run=False):
 
                 growth_opps = None
                 if nps_score >= 7:
-                    themes = KEY_THEMES_EN if lang == "en" else KEY_THEMES_FR
-                    growth_opps = json.dumps(random.sample(themes[:8], random.randint(1, 3)))
+                    growth_opps = json.dumps(generate_growth_opportunities(nps_category, lang))
 
                 account_risks = None
                 if nps_score < 7:
-                    themes = KEY_THEMES_EN if lang == "en" else KEY_THEMES_FR
-                    account_risks = json.dumps(random.sample(themes[6:16], random.randint(1, 3)))
+                    account_risks = json.dumps(generate_account_risk_factors(nps_category, lang))
 
                 response_ts = generate_random_timestamp(config['start_date'], config['end_date'])
 

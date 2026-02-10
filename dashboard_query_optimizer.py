@@ -320,8 +320,6 @@ def get_optimized_dashboard_data(campaign_id=None, business_account_id=None):
         x['nps_score']
     ))
     
-    # Build unified account intelligence (simplified version - full logic in data_storage.py)
-    account_intelligence = []
     growth_opportunities = []
     account_risk_factors = []
     
@@ -363,6 +361,48 @@ def get_optimized_dashboard_data(campaign_id=None, business_account_id=None):
                 'company_name': company_data['display_name'],
                 'risk_factors': consolidated_risk_factors
             })
+    
+    # Build unified account intelligence by merging opportunities and risks per company
+    all_company_keys = set(list(growth_opportunities_by_company.keys()) + list(account_risk_factors_by_company.keys()))
+    account_intelligence = []
+    for company_key in all_company_keys:
+        opp_data = growth_opportunities_by_company.get(company_key)
+        risk_data = account_risk_factors_by_company.get(company_key)
+        display_name = (opp_data or risk_data or {}).get('display_name', company_key)
+        
+        opps_list = []
+        if opp_data and opp_data.get('opportunities_by_type'):
+            for type_key, type_info in opp_data['opportunities_by_type'].items():
+                opps_list.append({
+                    'type': type_info['type'],
+                    'description': '; '.join(type_info['descriptions'][:2]),
+                    'action': '; '.join(type_info['actions'][:2]),
+                    'count': type_info['count']
+                })
+        
+        risks_list = []
+        if risk_data and risk_data.get('risk_factors_by_type'):
+            for type_key, type_info in risk_data['risk_factors_by_type'].items():
+                severity_priority = {'Critical': 4, 'High': 3, 'Medium': 2, 'Low': 1}
+                highest_sev = max(type_info['severities'], 
+                                key=lambda s: severity_priority.get(s, 0)) if type_info.get('severities') else 'Medium'
+                risks_list.append({
+                    'type': type_info['type'],
+                    'description': '; '.join(type_info['descriptions'][:2]),
+                    'action': '; '.join(type_info['actions'][:2]),
+                    'severity': highest_sev,
+                    'count': type_info['count']
+                })
+        
+        account_intelligence.append({
+            'company_name': display_name,
+            'opportunities': opps_list,
+            'risk_factors': risks_list,
+            'has_opportunities': len(opps_list) > 0,
+            'has_risks': len(risks_list) > 0,
+        })
+    
+    account_intelligence.sort(key=lambda x: (-len(x['risk_factors']), -len(x['opportunities'])))
     
     # ============================================================================
     # COMPILE FINAL RESPONSE
