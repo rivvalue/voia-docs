@@ -1081,7 +1081,19 @@ def convert_snapshot_to_dashboard_format(snapshot):
             },
             'segmentation_analytics': json.loads(snapshot.segmentation_analytics) if snapshot.segmentation_analytics else {}
         }
-        
+
+        seg_data = result.get('segmentation_analytics', {})
+        if 'churn_risk_by_segment' not in seg_data:
+            try:
+                fresh_seg = calculate_segmentation_analytics(campaign_id, business_account_id)
+                if fresh_seg:
+                    for key in ['churn_risk_by_segment', 'tenure_cohorts', 'sub_metrics_by_role', 'sub_metrics_by_region', 'sub_metrics_by_tier']:
+                        if key in fresh_seg:
+                            seg_data[key] = fresh_seg[key]
+                    result['segmentation_analytics'] = seg_data
+            except Exception as e:
+                logger.warning(f"Fallback segmentation recalc failed for campaign {campaign_id}: {e}")
+
         snapshot_survey_type = getattr(snapshot, 'survey_type', None) or 'conversational'
         if snapshot_survey_type == 'classic':
             result['classic_analytics_snapshot'] = {
@@ -1347,11 +1359,15 @@ def calculate_segmentation_analytics(campaign_id, business_account_id=None):
             if campaign:
                 business_account_id = campaign.business_account_id
         
-        # Build query with LEFT OUTER JOINs to preserve responses without participant data
-        # Note: Table name is campaign_participants (plural), model is CampaignParticipants
         segmentation_query = db.session.query(
             SurveyResponse.nps_score,
             SurveyResponse.satisfaction_rating,
+            SurveyResponse.churn_risk_level,
+            SurveyResponse.tenure_with_fc,
+            SurveyResponse.product_value_rating,
+            SurveyResponse.service_rating,
+            SurveyResponse.pricing_rating,
+            SurveyResponse.support_rating,
             Participant.role,
             Participant.region,
             Participant.customer_tier,
@@ -1387,13 +1403,40 @@ def calculate_segmentation_analytics(campaign_id, business_account_id=None):
             logger.warning(f"⚠️ SEGMENTATION DEBUG: No data found for campaign_id={campaign_id}, business_account_id={business_account_id}")
             return {}
         
-        # Initialize segment collectors
         role_segments = {}
         region_segments = {}
         tier_segments = {}
         industry_segments = {}
-        
-        # Process each response
+
+        churn_by_tier = {}
+        churn_by_role = {}
+        churn_by_region = {}
+
+        tenure_cohorts = {}
+
+        def _empty_seg():
+            return {'nps_scores': [], 'satisfaction_scores': [], 'product': [], 'service': [], 'pricing': [], 'support': []}
+
+        def _tenure_band(tenure_str):
+            if not tenure_str:
+                return None
+            try:
+                import re
+                nums = re.findall(r'\d+', str(tenure_str))
+                if not nums:
+                    return None
+                years = int(nums[0])
+            except (ValueError, TypeError):
+                return None
+            if years <= 2:
+                return '1-2 years'
+            elif years <= 5:
+                return '3-5 years'
+            elif years <= 8:
+                return '6-8 years'
+            else:
+                return '9+ years'
+
         for response in segmentation_results:
             nps_score = response.nps_score
             satisfaction = response.satisfaction_rating
@@ -1401,34 +1444,44 @@ def calculate_segmentation_analytics(campaign_id, business_account_id=None):
             region = response.region or 'Unspecified'
             tier = response.customer_tier or 'Unspecified'
             industry = response.client_industry or 'Unspecified'
-            
-            # Collect by role
-            if role not in role_segments:
-                role_segments[role] = {'nps_scores': [], 'satisfaction_scores': []}
-            role_segments[role]['nps_scores'].append(nps_score)
-            if satisfaction:
-                role_segments[role]['satisfaction_scores'].append(satisfaction)
-            
-            # Collect by region
-            if region not in region_segments:
-                region_segments[region] = {'nps_scores': [], 'satisfaction_scores': []}
-            region_segments[region]['nps_scores'].append(nps_score)
-            if satisfaction:
-                region_segments[region]['satisfaction_scores'].append(satisfaction)
-            
-            # Collect by tier
-            if tier not in tier_segments:
-                tier_segments[tier] = {'nps_scores': [], 'satisfaction_scores': []}
-            tier_segments[tier]['nps_scores'].append(nps_score)
-            if satisfaction:
-                tier_segments[tier]['satisfaction_scores'].append(satisfaction)
-            
-            # Collect by client industry
-            if industry not in industry_segments:
-                industry_segments[industry] = {'nps_scores': [], 'satisfaction_scores': []}
-            industry_segments[industry]['nps_scores'].append(nps_score)
-            if satisfaction:
-                industry_segments[industry]['satisfaction_scores'].append(satisfaction)
+            churn_level = response.churn_risk_level
+            tenure_str = response.tenure_with_fc
+
+            for dim_key, dim_val, segments in [
+                ('role', role, role_segments),
+                ('region', region, region_segments),
+                ('tier', tier, tier_segments),
+                ('industry', industry, industry_segments),
+            ]:
+                if dim_val not in segments:
+                    segments[dim_val] = _empty_seg()
+                seg = segments[dim_val]
+                seg['nps_scores'].append(nps_score)
+                if satisfaction:
+                    seg['satisfaction_scores'].append(satisfaction)
+                if response.product_value_rating is not None:
+                    seg['product'].append(response.product_value_rating)
+                if response.service_rating is not None:
+                    seg['service'].append(response.service_rating)
+                if response.pricing_rating is not None:
+                    seg['pricing'].append(response.pricing_rating)
+                if response.support_rating is not None:
+                    seg['support'].append(response.support_rating)
+
+            if churn_level:
+                for dim_store, dim_val in [(churn_by_tier, tier), (churn_by_role, role), (churn_by_region, region)]:
+                    if dim_val not in dim_store:
+                        dim_store[dim_val] = {'Minimal': 0, 'Low': 0, 'Medium': 0, 'High': 0}
+                    effective_level = churn_level if churn_level in ('Minimal', 'Low', 'Medium', 'High') else 'High'
+                    dim_store[dim_val][effective_level] += 1
+
+            band = _tenure_band(tenure_str)
+            if band:
+                if band not in tenure_cohorts:
+                    tenure_cohorts[band] = {'nps_scores': [], 'satisfaction_scores': []}
+                tenure_cohorts[band]['nps_scores'].append(nps_score)
+                if satisfaction:
+                    tenure_cohorts[band]['satisfaction_scores'].append(satisfaction)
         
         # Helper function to calculate NPS metrics
         def calculate_nps_metrics(nps_scores):
@@ -1450,13 +1503,22 @@ def calculate_segmentation_analytics(campaign_id, business_account_id=None):
                 'detractors': detractors
             }
         
-        # Helper function to calculate satisfaction metrics
         def calculate_satisfaction_metrics(satisfaction_scores):
             if not satisfaction_scores:
                 return None
             return round(sum(satisfaction_scores) / len(satisfaction_scores), 2)
-        
-        # Build analytics structure
+
+        def _avg_or_none(scores):
+            return round(sum(scores) / len(scores), 2) if scores else None
+
+        def _sub_metrics(seg_data):
+            return {
+                'product': _avg_or_none(seg_data.get('product', [])),
+                'service': _avg_or_none(seg_data.get('service', [])),
+                'pricing': _avg_or_none(seg_data.get('pricing', [])),
+                'support': _avg_or_none(seg_data.get('support', [])),
+            }
+
         analytics = {
             'nps_by_role': {},
             'nps_by_region': {},
@@ -1471,30 +1533,51 @@ def calculate_segmentation_analytics(campaign_id, business_account_id=None):
                 'by_region': {},
                 'by_tier': {},
                 'by_industry': {}
-            }
+            },
+            'churn_risk_by_segment': {
+                'by_tier': churn_by_tier,
+                'by_role': churn_by_role,
+                'by_region': churn_by_region,
+            },
+            'sub_metrics_by_role': {},
+            'sub_metrics_by_region': {},
+            'sub_metrics_by_tier': {},
+            'tenure_cohorts': {},
         }
-        
-        # Calculate metrics for each segment
+
         for role, data in role_segments.items():
             analytics['nps_by_role'][role] = calculate_nps_metrics(data['nps_scores'])
             analytics['satisfaction_by_role'][role] = calculate_satisfaction_metrics(data['satisfaction_scores'])
             analytics['response_distribution']['by_role'][role] = len(data['nps_scores'])
-        
+            analytics['sub_metrics_by_role'][role] = _sub_metrics(data)
+
         for region, data in region_segments.items():
             analytics['nps_by_region'][region] = calculate_nps_metrics(data['nps_scores'])
             analytics['satisfaction_by_region'][region] = calculate_satisfaction_metrics(data['satisfaction_scores'])
             analytics['response_distribution']['by_region'][region] = len(data['nps_scores'])
-        
+            analytics['sub_metrics_by_region'][region] = _sub_metrics(data)
+
         for tier, data in tier_segments.items():
             analytics['nps_by_tier'][tier] = calculate_nps_metrics(data['nps_scores'])
             analytics['satisfaction_by_tier'][tier] = calculate_satisfaction_metrics(data['satisfaction_scores'])
             analytics['response_distribution']['by_tier'][tier] = len(data['nps_scores'])
-        
+            analytics['sub_metrics_by_tier'][tier] = _sub_metrics(data)
+
         for industry, data in industry_segments.items():
             analytics['nps_by_industry'][industry] = calculate_nps_metrics(data['nps_scores'])
             analytics['satisfaction_by_industry'][industry] = calculate_satisfaction_metrics(data['satisfaction_scores'])
             analytics['response_distribution']['by_industry'][industry] = len(data['nps_scores'])
-        
+
+        tenure_order = ['1-2 years', '3-5 years', '6-8 years', '9+ years']
+        for band in tenure_order:
+            if band in tenure_cohorts:
+                tc = tenure_cohorts[band]
+                analytics['tenure_cohorts'][band] = {
+                    'nps_score': calculate_nps_metrics(tc['nps_scores']).get('nps_score', 0),
+                    'avg_satisfaction': calculate_satisfaction_metrics(tc['satisfaction_scores']),
+                    'total_responses': len(tc['nps_scores']),
+                }
+
         return analytics
         
     except Exception as e:

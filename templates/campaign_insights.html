@@ -893,91 +893,68 @@
                     </div>
                 </div>
 
-                <!-- Row 3: Dimension-Specific Tabs -->
-                <div class="row mb-4">
-                    <div class="col-12">
-                        <div class="data-table">
-                            <div class="table-header" style="padding: 1rem 1.5rem;">
-                                <h5 class="mb-1">{{ _('Segment Detail Tables') }}</h5>
-                                <small class="text-muted">{{ _('Detailed metrics by dimension — sorted by NPS score') }}</small>
+                <!-- Row 3: Cross-Dimensional Analysis Charts -->
+                <div class="row mb-4 g-3">
+                    <div class="col-lg-6">
+                        <div class="chart-card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-shield-alt me-2" style="color: #E13A44;"></i>{{ _('Churn Risk by Segment') }}</h5>
+                                <small class="text-muted">{{ _('Distribution of churn risk levels across customer tiers, roles, and regions') }}</small>
                             </div>
-                            <div style="padding: 0 1.5rem;">
-                                <ul class="nav nav-pills nav-fill mb-3" id="segDimensionTabs" role="tablist" style="font-size: 0.85rem;">
+                            <div style="padding: 0 1rem;">
+                                <ul class="nav nav-pills nav-fill mb-2" id="churnDimTabs" role="tablist" style="font-size: 0.8rem;">
                                     <li class="nav-item" role="presentation">
-                                        <button class="nav-link active py-1 px-2" id="segTabRole" data-bs-toggle="pill" data-bs-target="#segPanelRole" type="button" role="tab" aria-controls="segPanelRole" aria-selected="true">
-                                            <i class="fas fa-user-tie me-1"></i>{{ _('Role') }}
-                                        </button>
+                                        <button class="nav-link active py-1 px-2" data-churn-dim="by_tier" type="button">{{ _('Tier') }}</button>
                                     </li>
                                     <li class="nav-item" role="presentation">
-                                        <button class="nav-link py-1 px-2" id="segTabRegion" data-bs-toggle="pill" data-bs-target="#segPanelRegion" type="button" role="tab" aria-controls="segPanelRegion" aria-selected="false">
-                                            <i class="fas fa-globe me-1"></i>{{ _('Region') }}
-                                        </button>
+                                        <button class="nav-link py-1 px-2" data-churn-dim="by_role" type="button">{{ _('Role') }}</button>
                                     </li>
                                     <li class="nav-item" role="presentation">
-                                        <button class="nav-link py-1 px-2" id="segTabTier" data-bs-toggle="pill" data-bs-target="#segPanelTier" type="button" role="tab" aria-controls="segPanelTier" aria-selected="false">
-                                            <i class="fas fa-layer-group me-1"></i>{{ _('Tier') }}
-                                        </button>
-                                    </li>
-                                    <li class="nav-item" role="presentation">
-                                        <button class="nav-link py-1 px-2" id="segTabIndustry" data-bs-toggle="pill" data-bs-target="#segPanelIndustry" type="button" role="tab" aria-controls="segPanelIndustry" aria-selected="false">
-                                            <i class="fas fa-industry me-1"></i>{{ _('Industry') }}
-                                        </button>
+                                        <button class="nav-link py-1 px-2" data-churn-dim="by_region" type="button">{{ _('Region') }}</button>
                                     </li>
                                 </ul>
                             </div>
-                            <div class="tab-content" id="segDimensionTabContent">
-                                <div class="tab-pane fade show active" id="segPanelRole" role="tabpanel" aria-labelledby="segTabRole">
-                                    <div class="table-responsive">
-                                        <table class="table table-hover mb-0" data-seg-table="role">
-                                            <thead><tr>
-                                                <th class="seg-sortable" data-sort="name" data-order="asc" style="cursor:pointer;">{{ _('Segment Name') }} <i class="fas fa-sort ms-1" style="opacity:0.4;font-size:0.75em;"></i></th>
-                                                <th class="seg-sortable" data-sort="responses" data-order="asc" style="cursor:pointer;">{{ _('Responses') }} <i class="fas fa-sort ms-1" style="opacity:0.4;font-size:0.75em;"></i></th>
-                                                <th class="seg-sortable" data-sort="satisfaction" data-order="asc" style="cursor:pointer;">{{ _('Avg Satisfaction') }} <i class="fas fa-sort ms-1" style="opacity:0.4;font-size:0.75em;"></i></th>
-                                                <th class="seg-sortable" data-sort="nps" data-order="desc" style="cursor:pointer;">{{ _('NPS Score') }} <i class="fas fa-sort-down ms-1" style="opacity:0.7;font-size:0.75em;"></i></th>
-                                            </tr></thead>
-                                            <tbody id="segTableRole"></tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                                <div class="tab-pane fade" id="segPanelRegion" role="tabpanel" aria-labelledby="segTabRegion">
-                                    <div class="table-responsive">
-                                        <table class="table table-hover mb-0" data-seg-table="region">
-                                            <thead><tr>
-                                                <th class="seg-sortable" data-sort="name" data-order="asc" style="cursor:pointer;">{{ _('Segment Name') }} <i class="fas fa-sort ms-1" style="opacity:0.4;font-size:0.75em;"></i></th>
-                                                <th class="seg-sortable" data-sort="responses" data-order="asc" style="cursor:pointer;">{{ _('Responses') }} <i class="fas fa-sort ms-1" style="opacity:0.4;font-size:0.75em;"></i></th>
-                                                <th class="seg-sortable" data-sort="satisfaction" data-order="asc" style="cursor:pointer;">{{ _('Avg Satisfaction') }} <i class="fas fa-sort ms-1" style="opacity:0.4;font-size:0.75em;"></i></th>
-                                                <th class="seg-sortable" data-sort="nps" data-order="desc" style="cursor:pointer;">{{ _('NPS Score') }} <i class="fas fa-sort-down ms-1" style="opacity:0.7;font-size:0.75em;"></i></th>
-                                            </tr></thead>
-                                            <tbody id="segTableRegion"></tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                                <div class="tab-pane fade" id="segPanelTier" role="tabpanel" aria-labelledby="segTabTier">
-                                    <div class="table-responsive">
-                                        <table class="table table-hover mb-0" data-seg-table="tier">
-                                            <thead><tr>
-                                                <th class="seg-sortable" data-sort="name" data-order="asc" style="cursor:pointer;">{{ _('Segment Name') }} <i class="fas fa-sort ms-1" style="opacity:0.4;font-size:0.75em;"></i></th>
-                                                <th class="seg-sortable" data-sort="responses" data-order="asc" style="cursor:pointer;">{{ _('Responses') }} <i class="fas fa-sort ms-1" style="opacity:0.4;font-size:0.75em;"></i></th>
-                                                <th class="seg-sortable" data-sort="satisfaction" data-order="asc" style="cursor:pointer;">{{ _('Avg Satisfaction') }} <i class="fas fa-sort ms-1" style="opacity:0.4;font-size:0.75em;"></i></th>
-                                                <th class="seg-sortable" data-sort="nps" data-order="desc" style="cursor:pointer;">{{ _('NPS Score') }} <i class="fas fa-sort-down ms-1" style="opacity:0.7;font-size:0.75em;"></i></th>
-                                            </tr></thead>
-                                            <tbody id="segTableTier"></tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                                <div class="tab-pane fade" id="segPanelIndustry" role="tabpanel" aria-labelledby="segTabIndustry">
-                                    <div class="table-responsive">
-                                        <table class="table table-hover mb-0" data-seg-table="industry">
-                                            <thead><tr>
-                                                <th class="seg-sortable" data-sort="name" data-order="asc" style="cursor:pointer;">{{ _('Segment Name') }} <i class="fas fa-sort ms-1" style="opacity:0.4;font-size:0.75em;"></i></th>
-                                                <th class="seg-sortable" data-sort="responses" data-order="asc" style="cursor:pointer;">{{ _('Responses') }} <i class="fas fa-sort ms-1" style="opacity:0.4;font-size:0.75em;"></i></th>
-                                                <th class="seg-sortable" data-sort="satisfaction" data-order="asc" style="cursor:pointer;">{{ _('Avg Satisfaction') }} <i class="fas fa-sort ms-1" style="opacity:0.4;font-size:0.75em;"></i></th>
-                                                <th class="seg-sortable" data-sort="nps" data-order="desc" style="cursor:pointer;">{{ _('NPS Score') }} <i class="fas fa-sort-down ms-1" style="opacity:0.7;font-size:0.75em;"></i></th>
-                                            </tr></thead>
-                                            <tbody id="segTableIndustry"></tbody>
-                                        </table>
-                                    </div>
-                                </div>
+                            <div class="card-body" style="height: 280px;">
+                                <canvas id="churnRiskChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="chart-card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-clock me-2" style="color: #1A3C6E;"></i>{{ _('Tenure Cohort Analysis') }}</h5>
+                                <small class="text-muted">{{ _('How NPS and satisfaction evolve with client maturity') }}</small>
+                            </div>
+                            <div class="card-body" style="height: 310px;">
+                                <canvas id="tenureCohortChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 4: Sub-Metric Breakdown -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="chart-card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-radar me-2" style="color: #E13A44;"></i>{{ _('Sub-Metric Breakdown by Segment') }}</h5>
+                                <small class="text-muted">{{ _('Product, Service, Pricing, and Support ratings compared across segments — reveals why segments differ') }}</small>
+                            </div>
+                            <div style="padding: 0 1rem;">
+                                <ul class="nav nav-pills nav-fill mb-2" id="subMetricDimTabs" role="tablist" style="font-size: 0.8rem;">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active py-1 px-2" data-submetric-dim="role" type="button">{{ _('Role') }}</button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link py-1 px-2" data-submetric-dim="region" type="button">{{ _('Region') }}</button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link py-1 px-2" data-submetric-dim="tier" type="button">{{ _('Tier') }}</button>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="card-body" style="height: 320px;">
+                                <canvas id="subMetricChart"></canvas>
                             </div>
                         </div>
                     </div>
@@ -1803,7 +1780,7 @@ function renderSegmentationInsights(data) {
     renderSegHorizontalChart('npsByTierChart', 'tier', segmentationData.nps_by_tier || {}, segmentationData.satisfaction_by_tier || {}, '{{ _("Tier") }}');
     renderSegHorizontalChart('npsByClientIndustryChart', 'industry', segmentationData.nps_by_industry || {}, segmentationData.satisfaction_by_industry || {}, '{{ _("Industry") }}');
     renderCompositionChart('segCompositionChart', segmentationData);
-    renderSegmentationTabs(segmentationData);
+    renderCrossDimensionalCharts(segmentationData);
 }
 
 function renderSegHorizontalChart(canvasId, chartKey, npsData, satisfactionData, label) {
@@ -2014,67 +1991,6 @@ function renderCompositionChart(canvasId, segmentationData) {
     });
 }
 
-function renderSegmentationTabs(segmentationData) {
-    const tabConfigs = [
-        { dim: 'role', tbodyId: 'segTableRole', npsKey: 'nps_by_role', satKey: 'satisfaction_by_role' },
-        { dim: 'region', tbodyId: 'segTableRegion', npsKey: 'nps_by_region', satKey: 'satisfaction_by_region' },
-        { dim: 'tier', tbodyId: 'segTableTier', npsKey: 'nps_by_tier', satKey: 'satisfaction_by_tier' },
-        { dim: 'industry', tbodyId: 'segTableIndustry', npsKey: 'nps_by_industry', satKey: 'satisfaction_by_industry' }
-    ];
-
-    tabConfigs.forEach(cfg => {
-        const tbody = document.getElementById(cfg.tbodyId);
-        if (!tbody) return;
-
-        const npsData = segmentationData[cfg.npsKey] || {};
-        const satData = segmentationData[cfg.satKey] || {};
-
-        segTabDataStore[cfg.dim] = { tbodyId: cfg.tbodyId, npsData: npsData, satData: satData };
-        const keys = Object.keys(npsData);
-
-        if (keys.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-3">{{ _("No segmentation data available") }}</td></tr>';
-            return;
-        }
-
-        const sorted = keys.slice().sort((a, b) => (npsData[b].nps_score || 0) - (npsData[a].nps_score || 0));
-
-        let bestIdx = 0;
-        let worstIdx = sorted.length - 1;
-        let bestNPS = npsData[sorted[0]].nps_score || 0;
-        let worstNPS = npsData[sorted[sorted.length - 1]].nps_score || 0;
-
-        let html = '';
-        sorted.forEach((k, idx) => {
-            const m = npsData[k];
-            const sat = satData[k];
-            const nps = m.nps_score || 0;
-            const responses = m.total_responses || 0;
-            const satDisplay = (sat !== null && sat !== undefined) ? parseFloat(sat).toFixed(1) : 'N/A';
-
-            let rowStyle = '';
-            if (sorted.length > 1 && idx === 0) {
-                rowStyle = 'background-color: rgba(40, 167, 69, 0.08);';
-            } else if (sorted.length > 1 && idx === sorted.length - 1) {
-                rowStyle = 'background-color: rgba(220, 53, 69, 0.08);';
-            }
-
-            const lowN = responses < 10 ? ' <span class="badge bg-light text-muted border" style="font-size:0.7em;">Low N</span>' : '';
-
-            html += `<tr style="${rowStyle}">
-                <td>${k}${lowN}</td>
-                <td>${responses}</td>
-                <td>${satDisplay}</td>
-                <td><span class="badge ${getNPSBadgeClass(nps)}">${nps}</span></td>
-            </tr>`;
-        });
-
-        tbody.innerHTML = html;
-    });
-}
-
-let segTabDataStore = {};
-
 const segResponseCountPlugin = {
     id: 'segResponseCount',
     afterDatasetsDraw(chart) {
@@ -2083,8 +1999,6 @@ const segResponseCountPlugin = {
         if (!ds || !ds._responseLabels) return;
         const meta = chart.getDatasetMeta(0);
         const ctx = chart.ctx;
-        const xScale = chart.scales.x;
-        const zeroX = xScale.getPixelForValue(0);
         ctx.save();
         ctx.font = '10px Karla, sans-serif';
         ctx.fillStyle = '#888';
@@ -2094,13 +2008,8 @@ const segResponseCountPlugin = {
             if (label === undefined) return;
             const npsVal = ds.data[i] || 0;
             let x, align;
-            if (npsVal >= 0) {
-                x = bar.x + 5;
-                align = 'left';
-            } else {
-                x = bar.x - 5;
-                align = 'right';
-            }
+            if (npsVal >= 0) { x = bar.x + 5; align = 'left'; }
+            else { x = bar.x - 5; align = 'right'; }
             ctx.textAlign = align;
             ctx.fillText(`n=${label}`, x, bar.y);
         });
@@ -2116,64 +2025,234 @@ if (typeof Chart !== 'undefined') {
     });
 }
 
-function segSortTable(tbodyId, npsData, satData, sortField, sortOrder) {
-    const tbody = document.getElementById(tbodyId);
-    if (!tbody) return;
-    const keys = Object.keys(npsData);
-    if (keys.length === 0) return;
+let _cachedSegData = null;
 
-    keys.sort((a, b) => {
-        let va, vb;
-        if (sortField === 'name') { va = a.toLowerCase(); vb = b.toLowerCase(); }
-        else if (sortField === 'responses') { va = npsData[a].total_responses || 0; vb = npsData[b].total_responses || 0; }
-        else if (sortField === 'satisfaction') { va = satData[a] !== undefined ? parseFloat(satData[a]) : -999; vb = satData[b] !== undefined ? parseFloat(satData[b]) : -999; }
-        else { va = npsData[a].nps_score || 0; vb = npsData[b].nps_score || 0; }
-        if (sortField === 'name') return sortOrder === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
-        return sortOrder === 'asc' ? va - vb : vb - va;
+const churnColors = {
+    'Minimal': '#28a745',
+    'Low': '#ffc107',
+    'Medium': '#fd7e14',
+    'High': '#dc3545'
+};
+
+function renderChurnRiskChart(segmentationData, dimKey) {
+    const ctx = document.getElementById('churnRiskChart');
+    if (!ctx) return;
+    if (segmentationCharts['churnRisk']) segmentationCharts['churnRisk'].destroy();
+
+    const churnData = (segmentationData.churn_risk_by_segment || {})[dimKey] || {};
+    const segments = Object.keys(churnData);
+    if (segments.length === 0) return;
+
+    const levels = ['Minimal', 'Low', 'Medium', 'High'];
+    const datasets = levels.map(level => ({
+        label: level,
+        data: segments.map(s => churnData[s][level] || 0),
+        backgroundColor: hexToRgba(churnColors[level], 0.8),
+        borderColor: churnColors[level],
+        borderWidth: 1,
+        borderRadius: 3,
+    }));
+
+    segmentationCharts['churnRisk'] = new Chart(ctx, {
+        type: 'bar',
+        data: { labels: segments, datasets: datasets },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y',
+            scales: {
+                x: {
+                    stacked: true,
+                    title: { display: true, text: '{{ _("Number of Responses") }}', font: { family: 'Karla, sans-serif', size: 11 } },
+                    ticks: { font: { family: 'Karla, sans-serif', size: 10 } }
+                },
+                y: {
+                    stacked: true,
+                    ticks: { font: { family: 'Karla, sans-serif', size: 11, weight: 'bold' } }
+                }
+            },
+            plugins: {
+                legend: { position: 'bottom', labels: { font: { family: 'Karla, sans-serif', size: 11 }, usePointStyle: true, pointStyle: 'rectRounded', padding: 15 } },
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx) {
+                            const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                            const segTotal = datasets.reduce((sum, ds) => sum + (ds.data[ctx.dataIndex] || 0), 0);
+                            const pct = segTotal > 0 ? Math.round((ctx.raw / segTotal) * 100) : 0;
+                            return `${ctx.dataset.label}: ${ctx.raw} (${pct}%)`;
+                        }
+                    }
+                }
+            }
+        }
     });
+}
 
-    const bestNPS = Math.max(...keys.map(k => npsData[k].nps_score || 0));
-    const worstNPS = Math.min(...keys.map(k => npsData[k].nps_score || 0));
+function renderTenureCohortChart(segmentationData) {
+    const ctx = document.getElementById('tenureCohortChart');
+    if (!ctx) return;
+    if (segmentationCharts['tenureCohort']) segmentationCharts['tenureCohort'].destroy();
 
-    let html = '';
-    keys.forEach(k => {
-        const m = npsData[k];
-        const sat = satData[k];
-        const nps = m.nps_score || 0;
-        const responses = m.total_responses || 0;
-        const satDisplay = (sat !== null && sat !== undefined) ? parseFloat(sat).toFixed(1) : 'N/A';
-        let rowStyle = '';
-        if (keys.length > 1 && nps === bestNPS) rowStyle = 'background-color: rgba(40, 167, 69, 0.08);';
-        else if (keys.length > 1 && nps === worstNPS) rowStyle = 'background-color: rgba(220, 53, 69, 0.08);';
-        const lowN = responses < 10 ? ' <span class="badge bg-light text-muted border" style="font-size:0.7em;">Low N</span>' : '';
-        html += `<tr style="${rowStyle}"><td>${k}${lowN}</td><td>${responses}</td><td>${satDisplay}</td><td><span class="badge ${getNPSBadgeClass(nps)}">${nps}</span></td></tr>`;
+    const cohorts = segmentationData.tenure_cohorts || {};
+    const bands = ['1-2 years', '3-5 years', '6-8 years', '9+ years'];
+    const activeBands = bands.filter(b => cohorts[b]);
+    if (activeBands.length === 0) return;
+
+    const npsScores = activeBands.map(b => cohorts[b].nps_score || 0);
+    const satScores = activeBands.map(b => cohorts[b].avg_satisfaction || null);
+    const responseCounts = activeBands.map(b => cohorts[b].total_responses || 0);
+
+    segmentationCharts['tenureCohort'] = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: activeBands,
+            datasets: [
+                {
+                    label: '{{ _("NPS Score") }}',
+                    data: npsScores,
+                    _responseLabels: responseCounts,
+                    backgroundColor: npsScores.map(s => hexToRgba(getNPSColor(s), 0.8)),
+                    borderColor: npsScores.map(s => getNPSColor(s)),
+                    borderWidth: 1,
+                    borderRadius: 4,
+                    yAxisID: 'y',
+                    order: 2,
+                },
+                {
+                    label: '{{ _("Avg Satisfaction") }} (/ 5)',
+                    data: satScores,
+                    type: 'line',
+                    borderColor: segBrandColors.primary || '#1A3C6E',
+                    backgroundColor: hexToRgba(segBrandColors.primary || '#1A3C6E', 0.1),
+                    pointBackgroundColor: segBrandColors.primary || '#1A3C6E',
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3,
+                    yAxisID: 'y1',
+                    order: 1,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    position: 'left',
+                    title: { display: true, text: '{{ _("NPS Score") }}', font: { family: 'Karla, sans-serif', size: 11 } },
+                    ticks: { font: { family: 'Karla, sans-serif', size: 10 } },
+                    suggestedMin: -100,
+                    suggestedMax: 100,
+                },
+                y1: {
+                    position: 'right',
+                    title: { display: true, text: '{{ _("Satisfaction") }} (/ 5)', font: { family: 'Karla, sans-serif', size: 11 } },
+                    min: 0,
+                    max: 5,
+                    grid: { drawOnChartArea: false },
+                    ticks: { font: { family: 'Karla, sans-serif', size: 10 } },
+                },
+                x: {
+                    ticks: { font: { family: 'Karla, sans-serif', size: 11, weight: 'bold' } }
+                }
+            },
+            plugins: {
+                legend: { position: 'bottom', labels: { font: { family: 'Karla, sans-serif', size: 11 }, usePointStyle: true, padding: 15 } },
+                tooltip: {
+                    callbacks: {
+                        afterLabel: function(ctx) {
+                            if (ctx.datasetIndex === 0) {
+                                return `n=${responseCounts[ctx.dataIndex]}`;
+                            }
+                            return '';
+                        }
+                    }
+                }
+            }
+        }
     });
-    tbody.innerHTML = html;
+}
+
+function renderSubMetricChart(segmentationData, dim) {
+    const ctx = document.getElementById('subMetricChart');
+    if (!ctx) return;
+    if (segmentationCharts['subMetric']) segmentationCharts['subMetric'].destroy();
+
+    const subData = segmentationData['sub_metrics_by_' + dim] || {};
+    const segments = Object.keys(subData);
+    if (segments.length === 0) return;
+
+    const metricKeys = [
+        { key: 'product', label: '{{ _("Product") }}', color: '#1A3C6E' },
+        { key: 'service', label: '{{ _("Service") }}', color: '#28a745' },
+        { key: 'pricing', label: '{{ _("Pricing") }}', color: '#fd7e14' },
+        { key: 'support', label: '{{ _("Support") }}', color: '#6f42c1' },
+    ];
+
+    const datasets = metricKeys.map(mk => ({
+        label: mk.label,
+        data: segments.map(s => subData[s][mk.key] || 0),
+        backgroundColor: hexToRgba(mk.color, 0.75),
+        borderColor: mk.color,
+        borderWidth: 1,
+        borderRadius: 3,
+    }));
+
+    segmentationCharts['subMetric'] = new Chart(ctx, {
+        type: 'bar',
+        data: { labels: segments, datasets: datasets },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 5,
+                    title: { display: true, text: '{{ _("Average Rating") }} (/ 5)', font: { family: 'Karla, sans-serif', size: 11 } },
+                    ticks: { font: { family: 'Karla, sans-serif', size: 10 }, stepSize: 1 }
+                },
+                x: {
+                    ticks: { font: { family: 'Karla, sans-serif', size: 11, weight: 'bold' } }
+                }
+            },
+            plugins: {
+                legend: { position: 'bottom', labels: { font: { family: 'Karla, sans-serif', size: 11 }, usePointStyle: true, pointStyle: 'rectRounded', padding: 15 } },
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx) {
+                            return `${ctx.dataset.label}: ${ctx.raw !== null ? ctx.raw.toFixed(2) : 'N/A'} / 5`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function renderCrossDimensionalCharts(segmentationData) {
+    _cachedSegData = segmentationData;
+    renderChurnRiskChart(segmentationData, 'by_tier');
+    renderTenureCohortChart(segmentationData);
+    renderSubMetricChart(segmentationData, 'role');
 }
 
 document.addEventListener('click', function(e) {
-    const th = e.target.closest('.seg-sortable');
-    if (!th) return;
-    const table = th.closest('table');
-    if (!table) return;
-    const dim = table.dataset.segTable;
-    const store = segTabDataStore[dim];
-    if (!store) return;
-
-    const sortField = th.dataset.sort;
-    const currentOrder = th.dataset.order;
-    const newOrder = currentOrder === 'desc' ? 'asc' : 'desc';
-
-    table.querySelectorAll('.seg-sortable').forEach(h => {
-        h.dataset.order = 'asc';
-        const icon = h.querySelector('i');
-        if (icon) { icon.className = 'fas fa-sort ms-1'; icon.style.opacity = '0.4'; }
-    });
-    th.dataset.order = newOrder;
-    const icon = th.querySelector('i');
-    if (icon) { icon.className = newOrder === 'desc' ? 'fas fa-sort-down ms-1' : 'fas fa-sort-up ms-1'; icon.style.opacity = '0.7'; }
-
-    segSortTable(store.tbodyId, store.npsData, store.satData, sortField, newOrder);
+    const churnBtn = e.target.closest('[data-churn-dim]');
+    if (churnBtn && _cachedSegData) {
+        churnBtn.closest('ul').querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
+        churnBtn.classList.add('active');
+        renderChurnRiskChart(_cachedSegData, churnBtn.dataset.churnDim);
+        return;
+    }
+    const subBtn = e.target.closest('[data-submetric-dim]');
+    if (subBtn && _cachedSegData) {
+        subBtn.closest('ul').querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
+        subBtn.classList.add('active');
+        renderSubMetricChart(_cachedSegData, subBtn.dataset.submetricDim);
+        return;
+    }
 });
 
 if (typeof window.originalRenderDashboard === 'undefined' && typeof renderDashboard !== 'undefined') {
