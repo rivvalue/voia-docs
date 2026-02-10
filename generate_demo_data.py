@@ -614,12 +614,11 @@ def generate_campaign(campaign_key, dry_run=False):
                 description=config['description'],
                 start_date=config['start_date'],
                 end_date=config['end_date'],
-                status='completed',
+                status='active',
                 survey_type=config['survey_type'],
                 language_code=config['language_code'],
                 client_identifier=ba.name,
                 created_at=datetime.combine(config['start_date'] - timedelta(days=7), datetime.min.time()),
-                completed_at=config['completed_at'],
             )
             db.session.add(campaign)
             db.session.flush()
@@ -747,7 +746,19 @@ def generate_campaign(campaign_key, dry_run=False):
             print(f"    Passives:   {nps_dist['Passive']:>4} ({pa_pct:.1f}%)")
             print(f"    Detractors: {nps_dist['Detractor']:>4} ({d_pct:.1f}%)")
             print(f"    NPS Score:  {nps:.1f}")
-            print(f"\n  Campaign status: completed (completed_at: {config['completed_at']})")
+
+            from data_storage import generate_campaign_kpi_snapshot
+            print(f"\n  Generating KPI snapshot (campaign is active)...")
+            snapshot = generate_campaign_kpi_snapshot(campaign.id)
+            if snapshot:
+                print(f"    KPI snapshot generated successfully (ID: {snapshot.id})")
+            else:
+                print(f"    WARNING: KPI snapshot generation returned None")
+
+            campaign.status = 'completed'
+            campaign.completed_at = config['completed_at']
+            db.session.commit()
+            print(f"  Campaign status transitioned: active → completed")
             print()
             return True
 
