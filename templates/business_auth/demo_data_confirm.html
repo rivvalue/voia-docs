@@ -179,12 +179,14 @@
 
             {% if action == 'generate' %}
             <form method="POST" action="{{ url_for('business_auth.demo_data_generate', campaign_key=campaign_key) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <button type="submit" class="btn-confirm btn-confirm-generate">
                     <i class="fas fa-play"></i> Generate Data
                 </button>
             </form>
             {% else %}
             <form method="POST" action="{{ url_for('business_auth.demo_data_delete', campaign_key=campaign_key) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <button type="submit" class="btn-confirm btn-confirm-delete">
                     <i class="fas fa-trash"></i> Delete Data
                 </button>
