@@ -1085,14 +1085,17 @@ def convert_snapshot_to_dashboard_format(snapshot):
         seg_data = result.get('segmentation_analytics', {})
         if 'churn_risk_by_segment' not in seg_data:
             try:
-                fresh_seg = calculate_segmentation_analytics(campaign_id, business_account_id)
-                if fresh_seg:
-                    for key in ['churn_risk_by_segment', 'tenure_cohorts', 'sub_metrics_by_role', 'sub_metrics_by_region', 'sub_metrics_by_tier']:
-                        if key in fresh_seg:
-                            seg_data[key] = fresh_seg[key]
-                    result['segmentation_analytics'] = seg_data
+                snap_campaign_id = snapshot.campaign_id
+                snap_business_account_id = snapshot.campaign.business_account_id if snapshot.campaign else None
+                if snap_campaign_id and snap_business_account_id:
+                    fresh_seg = calculate_segmentation_analytics(snap_campaign_id, snap_business_account_id)
+                    if fresh_seg:
+                        for key in ['churn_risk_by_segment', 'tenure_cohorts', 'sub_metrics_by_role', 'sub_metrics_by_region', 'sub_metrics_by_tier']:
+                            if key in fresh_seg:
+                                seg_data[key] = fresh_seg[key]
+                        result['segmentation_analytics'] = seg_data
             except Exception as e:
-                logger.warning(f"Fallback segmentation recalc failed for campaign {campaign_id}: {e}")
+                logger.warning(f"Fallback segmentation recalc failed for snapshot {snapshot.id}: {e}")
 
         snapshot_survey_type = getattr(snapshot, 'survey_type', None) or 'conversational'
         if snapshot_survey_type == 'classic':
