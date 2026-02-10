@@ -1,46 +1,77 @@
 #!/usr/bin/env python3
 """
-Bulk Demo Data Generator for Archelo Group
-Generates realistic survey responses for demo campaigns with transaction safety
+Demo Data Generator for Archelo Group — ArcheloFlow HRIS SaaS
+Generates realistic, coherent survey responses for demo campaigns.
+
+Usage:
+    python generate_demo_data.py --campaign Q1 --dry-run
+    python generate_demo_data.py --campaign Q1
+    python generate_demo_data.py --campaign Q1 --delete
 """
 
 import os
 import sys
 import random
 import json
+import uuid
+import argparse
 from datetime import datetime, timedelta, date
 from app import app, db
 from models import (
-    BusinessAccount, Campaign, Participant, CampaignParticipant, 
-    SurveyResponse
+    BusinessAccount, Campaign, Participant, CampaignParticipant,
+    SurveyResponse, ClassicSurveyConfig, SurveyTemplate
 )
 
-# Campaign configurations - Updated for high-volume testing
-CAMPAIGNS = {
-    "Q1 2025": {
-        "name": "Loyalty measurement Q1 2025",
-        "start_date": date(2025, 1, 1),
-        "end_date": date(2025, 3, 31),
-        "responses": 1000,
-        "company_reuse": 0  # First campaign, no reuse
+
+CAMPAIGN_CONFIGS = {
+    "Q1": {
+        "name": "Client Loyalty Survey Q1 2025",
+        "description": "Quarterly ArcheloFlow client loyalty measurement and feedback collection — Q1 2025",
+        "start_date": date(2025, 1, 6),
+        "end_date": date(2025, 3, 28),
+        "completed_at": datetime(2025, 4, 2, 10, 0, 0),
+        "responses": 500,
+        "survey_type": "conversational",
+        "language_code": "en",
+        "company_reuse_pct": 0,
     },
-    "Q2 2025": {
-        "name": "Loyalty measurement Q2 2025",
+    "Q2": {
+        "name": "Client Loyalty Survey Q2 2025",
+        "description": "Quarterly ArcheloFlow client loyalty measurement and feedback collection — Q2 2025",
         "start_date": date(2025, 4, 1),
-        "end_date": date(2025, 6, 30),
-        "responses": 1000,
-        "company_reuse": 40  # 40% companies from Q1
+        "end_date": date(2025, 6, 27),
+        "completed_at": datetime(2025, 7, 3, 10, 0, 0),
+        "responses": 500,
+        "survey_type": "conversational",
+        "language_code": "en",
+        "company_reuse_pct": 45,
     },
-    "Q3 2025": {
-        "name": "Loyalty measurement Q3 2025",
-        "start_date": date(2025, 7, 1),
-        "end_date": date(2025, 9, 30),
-        "responses": 1000,
-        "company_reuse": 50  # 50% companies from Q1+Q2
-    }
+    "Q3": {
+        "name": "Mesure de Fidélité Clients Q3 2025",
+        "description": "Mesure trimestrielle de la fidélité et collecte de feedback clients ArcheloFlow — Q3 2025",
+        "start_date": date(2025, 6, 2),
+        "end_date": date(2025, 9, 26),
+        "completed_at": datetime(2025, 10, 1, 10, 0, 0),
+        "responses": 500,
+        "survey_type": "conversational",
+        "language_code": "fr",
+        "company_reuse_pct": 50,
+    },
+    "CLASSIC": {
+        "name": "ArcheloFlow Service Quality Assessment 2025",
+        "description": "Structured service quality assessment survey for ArcheloFlow clients — 2025",
+        "start_date": date(2025, 3, 3),
+        "end_date": date(2025, 5, 30),
+        "completed_at": datetime(2025, 6, 4, 10, 0, 0),
+        "responses": 500,
+        "survey_type": "classic",
+        "language_code": "en",
+        "company_reuse_pct": 40,
+    },
 }
 
-# Demo company pool - Expanded to 70 companies
+BUSINESS_ACCOUNT_NAME = "Archelo Group inc"
+
 COMPANIES = [
     "CloudSync Technologies", "DataFlow Solutions", "API Masters Inc", "TechVision Corp",
     "SecureBank Financial", "FinanceFirst Ltd", "InvestPro Group", "PaymentHub",
@@ -60,17 +91,15 @@ COMPANIES = [
     "ConsultPro Partners", "AdvisoryTech Inc", "StrategyFlow Systems", "ExpertHub",
     "CyberDefense Corp", "NetworkGuard Solutions", "CloudShield Technologies", "DataVault Inc",
     "Analytics360 Group", "InsightPro Systems", "MetricsHub Technologies", "ReportFlow Inc",
-    "DevOps Masters", "CodePipeline Solutions", "DeployFast Technologies", "BuildSync Pro"
 ]
 
-# Name pool for participants
 FIRST_NAMES = [
     "Sarah", "Michael", "Jennifer", "David", "Lisa", "James", "Emily", "Robert",
     "Jessica", "John", "Amanda", "William", "Michelle", "Richard", "Elizabeth", "Thomas",
     "Ashley", "Christopher", "Stephanie", "Daniel", "Nicole", "Matthew", "Rebecca", "Mark",
     "Laura", "Donald", "Karen", "Paul", "Nancy", "Andrew", "Betty", "Joshua",
     "Margaret", "Kenneth", "Sandra", "Kevin", "Angela", "Brian", "Donna", "George",
-    "Carol", "Edward", "Ruth", "Ronald", "Sharon", "Timothy", "Helen", "Jason"
+    "Carol", "Edward", "Ruth", "Ronald", "Sharon", "Timothy", "Helen", "Jason",
 ]
 
 LAST_NAMES = [
@@ -79,175 +108,342 @@ LAST_NAMES = [
     "Moore", "Jackson", "Martin", "Lee", "Thompson", "White", "Harris", "Clark",
     "Lewis", "Robinson", "Walker", "Young", "Allen", "King", "Wright", "Scott",
     "Torres", "Nguyen", "Hill", "Flores", "Green", "Adams", "Nelson", "Baker",
-    "Hall", "Rivera", "Campbell", "Mitchell", "Carter", "Roberts", "Turner", "Phillips"
+    "Hall", "Rivera", "Campbell", "Mitchell", "Carter", "Roberts", "Turner", "Phillips",
 ]
 
-ROLES = ["CEO", "CTO", "CFO", "COO", "VP Operations", "VP Sales", "Director", "Manager"]
+ROLES_WEIGHTED = [
+    ("End User", 50),
+    ("Director", 25),
+    ("VP", 25),
+]
 
-# Segmentation attributes for participant personalization
+TIERS_WEIGHTED = [
+    ("T1: Key Account", 20),
+    ("T2: Strategic", 30),
+    ("T3: Low Revenue", 50),
+]
+
 REGIONS = ["North America", "EMEA", "APAC"]
 
-CUSTOMER_TIERS = ["T1: Strategic", "T2: Managed", "T3: Self-serve"]
-
-LANGUAGES = ["en", "en", "en", "en", "en", "es", "fr"]  # 70% English, 15% Spanish, 15% French
-
-# Feedback templates by NPS category
-PROMOTER_FEEDBACK = [
-    "Excellent service and product quality. The team is very responsive and professional.",
-    "Outstanding support experience. They truly understand our business needs.",
-    "Best-in-class solution. The ROI has exceeded our expectations significantly.",
-    "Fantastic product with great features. Customer success team is always helpful.",
-    "Superior quality and reliability. Would highly recommend to other businesses.",
-    "Exceptional service delivery. The platform has transformed our operations.",
-    "Great partnership with excellent communication and support throughout.",
-    "Top-tier solution that delivers consistent value. Very satisfied overall.",
+DRIVER_KEYS = [
+    "product_features", "value_pricing", "professional_services",
+    "customer_support", "communication", "onboarding",
+    "ease_of_use", "reliability", "integration",
 ]
 
-PASSIVE_FEEDBACK = [
-    "Good product overall, but pricing could be more competitive for our scale.",
-    "Solid service, though some features we need are still missing from the platform.",
-    "Works well for most needs, but documentation could be more comprehensive.",
-    "Decent solution with room for improvement in user experience and interface.",
-    "Satisfactory performance, but competitors offer similar features at lower cost.",
-    "Product meets our basic requirements, but lacks some advanced capabilities.",
-    "Generally positive experience, though support response times vary significantly.",
-    "Adequate solution for now, but evaluating alternatives for future expansion.",
+DEFAULT_DRIVER_LABELS = [
+    {'key': 'product_features', 'label_en': 'Product features & functionality', 'label_fr': 'Fonctionnalités du produit'},
+    {'key': 'value_pricing', 'label_en': 'Product value/pricing', 'label_fr': 'Rapport qualité/prix'},
+    {'key': 'professional_services', 'label_en': 'Professional services & support team', 'label_fr': 'Services professionnels et équipe de support'},
+    {'key': 'customer_support', 'label_en': 'Customer support & after-sales service', 'label_fr': 'Support client et service après-vente'},
+    {'key': 'communication', 'label_en': 'Communication & transparency', 'label_fr': 'Communication et transparence'},
+    {'key': 'onboarding', 'label_en': 'Onboarding & implementation experience', 'label_fr': "Expérience d'intégration et de mise en œuvre"},
+    {'key': 'ease_of_use', 'label_en': 'Ease of use', 'label_fr': "Facilité d'utilisation"},
+    {'key': 'reliability', 'label_en': 'Reliability & performance', 'label_fr': 'Fiabilité et performance'},
+    {'key': 'integration', 'label_en': 'Integration capabilities', 'label_fr': "Capacités d'intégration"},
 ]
 
-DETRACTOR_FEEDBACK = [
-    "Pricing is too high for the value received. Support response is often slow.",
-    "Product has frequent bugs and stability issues. Very frustrating experience.",
-    "Poor customer service and lack of responsiveness to critical issues.",
-    "System downtime is unacceptable. Missing key features we were promised.",
-    "Implementation was problematic and took much longer than expected.",
-    "Integration challenges persist. Technical support lacks necessary expertise.",
-    "Not meeting our needs. Considering switching to competitor solutions.",
-    "Disappointed with overall experience. Product doesn't deliver as advertised.",
+
+PROMOTER_FEEDBACK_EN = [
+    "ArcheloFlow has completely transformed how we manage onboarding and payroll. The HR team saves at least 10 hours per week on administrative tasks.",
+    "The leave management and time tracking modules are incredibly intuitive. Our employees adopted ArcheloFlow within days, minimal training required.",
+    "Outstanding platform for managing our growing workforce. The employee self-service portal has drastically reduced HR ticket volume.",
+    "ArcheloFlow's performance review module is excellent. The 360-degree feedback feature gives managers actionable insights they never had before.",
+    "Best HRIS investment we've made. The compliance tracking and document management features keep us audit-ready at all times.",
+    "The recruitment pipeline in ArcheloFlow is seamless. From job posting to offer letter, everything flows naturally. Our time-to-hire dropped by 30%.",
+    "Exceptional customer success team. They understood our SMB challenges and configured ArcheloFlow perfectly for our 200-person organization.",
+    "ArcheloFlow's reporting dashboard gives our leadership real-time visibility into headcount, turnover, and compensation metrics. Game-changer for strategic planning.",
+    "The benefits administration module simplified open enrollment dramatically. What used to take weeks now takes days.",
+    "We evaluated several HRIS platforms and ArcheloFlow stood out for SMBs. The pricing is fair and the feature set rivals enterprise solutions.",
 ]
 
-# Key themes pool
-KEY_THEMES = [
-    "Service Quality", "Pricing Concerns", "Product Features", "Support Responsiveness",
-    "Integration Capabilities", "User Experience", "System Reliability", "Documentation Quality",
-    "Implementation Process", "Value for Money", "Technical Support", "Account Management",
-    "Performance Issues", "Feature Requests", "Training Resources", "Communication",
-    "Innovation", "Scalability", "Security", "Customization Options"
+PASSIVE_FEEDBACK_EN = [
+    "ArcheloFlow handles our core HR needs well, but the learning management module feels underdeveloped compared to dedicated LMS solutions.",
+    "Decent platform overall. Payroll processing works reliably, though the reporting customization options could be more flexible.",
+    "The employee directory and org chart features are solid, but we wish the mobile app had more functionality for approvals on the go.",
+    "ArcheloFlow meets our basic HRIS requirements. However, the pricing feels steep for a company our size when we only use half the modules.",
+    "Good product for time tracking and attendance. The integration with our accounting software works, but required more manual setup than expected.",
+    "The platform is stable and the support team is helpful, but response times for non-critical issues can stretch to several days.",
+    "Onboarding workflows are configurable, which is nice, but the performance management module lacks goal-setting features our managers want.",
+    "ArcheloFlow's compensation management is adequate, though competitors offer more sophisticated benchmarking tools at a similar price point.",
+    "Works well for US-based employees, but multi-country payroll support is limited. We need better localization for our Canadian offices.",
+    "The document management and e-signature features are convenient, but the storage limits on our plan are restrictive for a growing team.",
 ]
+
+DETRACTOR_FEEDBACK_EN = [
+    "ArcheloFlow's implementation took four months instead of the promised six weeks. The data migration from our old system was riddled with errors.",
+    "The payroll module has had two calculation errors this year that affected employee trust. For an HRIS, payroll accuracy should be non-negotiable.",
+    "Customer support is frustratingly slow. We submitted a critical bug report about incorrect tax withholdings and waited 8 days for a response.",
+    "The user interface feels dated compared to newer HRIS platforms. Our employees constantly complain about the clunky self-service portal.",
+    "Pricing increases every renewal without corresponding feature improvements. We're paying 40% more than two years ago for essentially the same product.",
+    "Integration with our ERP system has been a persistent headache. The API documentation is incomplete and the sync breaks regularly.",
+    "The reporting engine is extremely limited. We can't build custom reports without exporting to Excel, which defeats the purpose of having an HRIS.",
+    "The mobile experience is subpar. Employees can't complete time-off requests or view pay stubs on their phones without issues.",
+    "We were promised a dedicated account manager when we signed up, but turnover on their side means we've had four different contacts in two years.",
+    "System downtime during our last open enrollment period was unacceptable. Several employees missed benefits deadlines because of platform outages.",
+]
+
+PROMOTER_FEEDBACK_FR = [
+    "ArcheloFlow a complètement transformé notre gestion des RH. L'équipe gagne au moins 10 heures par semaine sur les tâches administratives.",
+    "Les modules de gestion des congés et du suivi du temps sont incroyablement intuitifs. Nos employés ont adopté la solution en quelques jours.",
+    "Plateforme exceptionnelle pour gérer notre effectif croissant. Le portail libre-service a drastiquement réduit le volume de tickets RH.",
+    "Le module d'évaluation de performance d'ArcheloFlow est excellent. Le feedback 360° donne aux managers des informations exploitables.",
+    "Le meilleur investissement SIRH que nous ayons fait. Le suivi de conformité nous maintient prêts pour les audits en permanence.",
+    "Le pipeline de recrutement dans ArcheloFlow est fluide. De la publication d'offre à la lettre d'embauche, tout s'enchaîne naturellement.",
+    "L'équipe de support client est exceptionnelle. Ils ont compris nos défis de PME et configuré ArcheloFlow parfaitement pour notre organisation.",
+    "Le tableau de bord de reporting donne à notre direction une visibilité en temps réel sur les effectifs et les indicateurs de rémunération.",
+    "Le module d'administration des avantages sociaux a simplifié considérablement les campagnes d'adhésion annuelles.",
+    "Nous avons évalué plusieurs plateformes SIRH et ArcheloFlow se démarque pour les PME. Le prix est juste et les fonctionnalités rivalisent avec les solutions entreprise.",
+]
+
+PASSIVE_FEEDBACK_FR = [
+    "ArcheloFlow gère bien nos besoins RH de base, mais le module de formation semble sous-développé par rapport aux solutions LMS dédiées.",
+    "Plateforme correcte dans l'ensemble. La paie fonctionne de manière fiable, mais les options de personnalisation des rapports pourraient être plus flexibles.",
+    "L'annuaire des employés et l'organigramme sont solides, mais nous aimerions que l'application mobile ait plus de fonctionnalités.",
+    "ArcheloFlow répond à nos besoins SIRH de base. Cependant, le prix semble élevé pour une entreprise de notre taille.",
+    "Bon produit pour le suivi du temps et des présences. L'intégration avec notre logiciel comptable fonctionne, mais a nécessité plus de configuration que prévu.",
+    "La plateforme est stable et l'équipe de support est serviable, mais les délais de réponse pour les problèmes non critiques peuvent s'étendre.",
+    "Les flux d'intégration sont configurables, ce qui est bien, mais le module de gestion de la performance manque de fonctionnalités de définition d'objectifs.",
+    "La gestion de la rémunération d'ArcheloFlow est adéquate, mais les concurrents offrent des outils de benchmarking plus sophistiqués.",
+    "Fonctionne bien pour les employés basés en France, mais le support multi-pays est limité pour nos bureaux au Québec.",
+    "Les fonctionnalités de gestion documentaire et de signature électronique sont pratiques, mais les limites de stockage sont restrictives.",
+]
+
+DETRACTOR_FEEDBACK_FR = [
+    "La mise en œuvre d'ArcheloFlow a pris quatre mois au lieu des six semaines promises. La migration des données était truffée d'erreurs.",
+    "Le module de paie a eu deux erreurs de calcul cette année qui ont affecté la confiance des employés. La précision de la paie devrait être non négociable.",
+    "Le support client est frustrément lent. Nous avons soumis un rapport de bug critique et attendu 8 jours pour une réponse.",
+    "L'interface utilisateur semble datée par rapport aux nouvelles plateformes SIRH. Nos employés se plaignent constamment du portail libre-service.",
+    "Les augmentations de prix à chaque renouvellement sans améliorations correspondantes. Nous payons 40% de plus qu'il y a deux ans.",
+    "L'intégration avec notre ERP est un casse-tête persistant. La documentation API est incomplète et la synchronisation casse régulièrement.",
+    "Le moteur de reporting est extrêmement limité. Nous ne pouvons pas créer de rapports personnalisés sans exporter vers Excel.",
+    "L'expérience mobile est insuffisante. Les employés ne peuvent pas compléter les demandes de congés sur leur téléphone sans problèmes.",
+    "On nous avait promis un gestionnaire de compte dédié, mais le turnover chez eux fait que nous avons eu quatre contacts différents en deux ans.",
+    "Les temps d'arrêt du système pendant notre dernière période d'adhésion aux avantages étaient inacceptables.",
+]
+
+KEY_THEMES_EN = [
+    "Payroll Accuracy", "Onboarding Experience", "Employee Self-Service", "Performance Management",
+    "Compliance & Reporting", "Recruitment Pipeline", "Mobile Experience", "Customer Support",
+    "Pricing & Value", "Integration Capabilities", "User Interface", "System Reliability",
+    "Data Migration", "Benefits Administration", "Training & LMS", "Compensation Management",
+    "API & Integrations", "Implementation Process", "Account Management", "Time Tracking",
+]
+
+KEY_THEMES_FR = [
+    "Précision de la Paie", "Expérience d'Intégration", "Libre-Service Employé", "Gestion de la Performance",
+    "Conformité et Reporting", "Pipeline de Recrutement", "Expérience Mobile", "Support Client",
+    "Prix et Valeur", "Capacités d'Intégration", "Interface Utilisateur", "Fiabilité du Système",
+    "Migration de Données", "Administration des Avantages", "Formation et LMS", "Gestion de la Rémunération",
+    "API et Intégrations", "Processus de Mise en Œuvre", "Gestion de Compte", "Suivi du Temps",
+]
+
+
+def weighted_choice(items_with_weights):
+    population = []
+    weights = []
+    for item, weight in items_with_weights:
+        population.append(item)
+        weights.append(weight)
+    return random.choices(population, weights=weights, k=1)[0]
+
+
+def generate_nps_score():
+    rand = random.random()
+    if rand < 0.30:
+        return random.choice([9, 9, 10, 10])
+    elif rand < 0.70:
+        return random.choice([7, 7, 8, 8])
+    else:
+        return random.choice([3, 4, 5, 5, 6, 6])
 
 
 def get_nps_category(score):
-    """Get NPS category from score"""
     if score >= 9:
         return "Promoter"
     elif score >= 7:
         return "Passive"
+    return "Detractor"
+
+
+def generate_coherent_scores(nps_score):
+    nps_category = get_nps_category(nps_score)
+
+    if nps_category == "Promoter":
+        satisfaction = random.choice([8, 9, 9, 10])
+        product_value = random.choice([8, 9, 9, 10])
+        service = random.choice([8, 9, 10])
+        pricing = random.choice([7, 8, 8, 9])
+        support = random.choice([8, 9, 9, 10])
+        csat = random.choice([4, 4, 5, 5])
+        ces = random.choice([1, 2, 2, 3])
+        sentiment_score = round(random.uniform(0.55, 0.92), 2)
+        sentiment_label = "positive"
+        churn_risk_score = round(random.uniform(0.03, 0.20), 2)
+        churn_risk_level = "Minimal"
+        recommendation_status = "recommended"
+        promoter_drivers = ["product_features", "ease_of_use", "reliability", "professional_services", "customer_support"]
+        loyalty_drivers = random.sample(promoter_drivers, random.randint(2, 4))
+    elif nps_category == "Passive":
+        satisfaction = random.choice([6, 6, 7, 7, 8])
+        product_value = random.choice([5, 6, 7, 7])
+        service = random.choice([6, 7, 7, 8])
+        pricing = random.choice([5, 5, 6, 7])
+        support = random.choice([6, 6, 7, 7])
+        csat = random.choice([3, 3, 3, 4])
+        ces = random.choice([3, 4, 4, 5])
+        sentiment_score = round(random.uniform(-0.15, 0.25), 2)
+        sentiment_label = "neutral"
+        churn_risk_score = round(random.uniform(0.30, 0.55), 2)
+        churn_risk_level = random.choice(["Low", "Medium"])
+        recommendation_status = "would_consider"
+        passive_drivers = ["value_pricing", "communication", "onboarding", "integration"]
+        loyalty_drivers = random.sample(passive_drivers, random.randint(1, 3))
     else:
-        return "Detractor"
-
-
-def generate_nps_score(distribution="realistic"):
-    """Generate NPS score with realistic distribution"""
-    rand = random.random()
-    if distribution == "realistic":
-        # Realistic B2B distribution: 30% Promoters, 40% Passives, 30% Detractors
-        if rand < 0.30:  # 30% Promoters
-            return random.choice([9, 9, 10])
-        elif rand < 0.70:  # 40% Passives
-            return random.choice([7, 7, 8, 8])
-        else:  # 30% Detractors
-            return random.choice([3, 4, 5, 6])
-    return random.randint(0, 10)
-
-
-def generate_sentiment(nps_score):
-    """Generate sentiment based on NPS score"""
-    if nps_score >= 9:
-        return random.uniform(0.6, 0.9), "positive"
-    elif nps_score >= 7:
-        return random.uniform(-0.2, 0.2), "neutral"
-    else:
-        return random.uniform(-0.8, -0.3), "negative"
-
-
-def generate_churn_risk(nps_score, sentiment_score):
-    """Generate churn risk based on NPS and sentiment"""
-    if nps_score >= 9:
-        return random.uniform(0.05, 0.25), "Minimal"
-    elif nps_score >= 7:
-        if sentiment_score > 0:
-            return random.uniform(0.25, 0.45), "Low"
-        else:
-            return random.uniform(0.45, 0.65), "Medium"
-    else:
+        satisfaction = random.choice([2, 3, 3, 4, 5])
+        product_value = random.choice([2, 3, 3, 4])
+        service = random.choice([2, 3, 4, 4])
+        pricing = random.choice([2, 2, 3, 3, 4])
+        support = random.choice([2, 3, 3, 4])
+        csat = random.choice([1, 1, 2, 2])
+        ces = random.choice([5, 6, 6, 7, 7, 8])
+        sentiment_score = round(random.uniform(-0.85, -0.25), 2)
+        sentiment_label = "negative"
         if nps_score <= 4:
-            return random.uniform(0.75, 0.95), "High"
+            churn_risk_score = round(random.uniform(0.70, 0.95), 2)
+            churn_risk_level = "High"
         else:
-            return random.uniform(0.55, 0.75), "Medium"
+            churn_risk_score = round(random.uniform(0.50, 0.75), 2)
+            churn_risk_level = "Medium"
+        recommendation_status = "would_not_recommend"
+        detractor_drivers = ["value_pricing", "customer_support", "reliability", "onboarding"]
+        loyalty_drivers = random.sample(detractor_drivers, random.randint(1, 2))
+
+    return {
+        "nps_category": nps_category,
+        "satisfaction_rating": satisfaction,
+        "product_value_rating": product_value,
+        "service_rating": service,
+        "pricing_rating": pricing,
+        "support_rating": support,
+        "csat_score": csat,
+        "ces_score": ces,
+        "sentiment_score": sentiment_score,
+        "sentiment_label": sentiment_label,
+        "churn_risk_score": churn_risk_score,
+        "churn_risk_level": churn_risk_level,
+        "recommendation_status": recommendation_status,
+        "loyalty_drivers": loyalty_drivers,
+    }
 
 
-def generate_feedback(nps_category):
-    """Generate realistic feedback based on NPS category"""
+def generate_churn_risk_factors(nps_category, lang="en"):
+    themes = KEY_THEMES_EN if lang == "en" else KEY_THEMES_FR
     if nps_category == "Promoter":
-        return random.choice(PROMOTER_FEEDBACK)
+        return random.sample(themes[:6], random.randint(1, 2))
     elif nps_category == "Passive":
-        return random.choice(PASSIVE_FEEDBACK)
+        return random.sample(themes[4:12], random.randint(2, 3))
     else:
-        return random.choice(DETRACTOR_FEEDBACK)
+        return random.sample(themes[6:16], random.randint(2, 4))
 
 
-def generate_key_themes(nps_category):
-    """Generate key themes based on NPS category"""
+def generate_key_themes(nps_category, lang="en"):
+    themes = KEY_THEMES_EN if lang == "en" else KEY_THEMES_FR
     if nps_category == "Promoter":
-        themes = random.sample(["Service Quality", "Product Features", "Support Responsiveness", 
-                               "Innovation", "Account Management"], random.randint(2, 3))
+        return random.sample(themes[:8], random.randint(2, 3))
     elif nps_category == "Passive":
-        themes = random.sample(["Pricing Concerns", "User Experience", "Feature Requests",
-                               "Documentation Quality", "Value for Money"], random.randint(2, 3))
+        return random.sample(themes[4:14], random.randint(2, 3))
     else:
-        themes = random.sample(["Pricing Concerns", "Support Responsiveness", "System Reliability",
-                               "Integration Capabilities", "Performance Issues"], random.randint(2, 4))
-    return json.dumps(themes)
+        return random.sample(themes[6:], random.randint(2, 4))
+
+
+def generate_feedback(nps_category, lang="en"):
+    if lang == "fr":
+        if nps_category == "Promoter":
+            return random.choice(PROMOTER_FEEDBACK_FR)
+        elif nps_category == "Passive":
+            return random.choice(PASSIVE_FEEDBACK_FR)
+        return random.choice(DETRACTOR_FEEDBACK_FR)
+    else:
+        if nps_category == "Promoter":
+            return random.choice(PROMOTER_FEEDBACK_EN)
+        elif nps_category == "Passive":
+            return random.choice(PASSIVE_FEEDBACK_EN)
+        return random.choice(DETRACTOR_FEEDBACK_EN)
+
+
+def generate_growth_data(nps_score, commercial_value):
+    if nps_score >= 9:
+        growth_factor = round(random.uniform(1.15, 1.30), 2)
+        growth_rate = f"{int((growth_factor - 1) * 100)}%"
+        growth_range = "80-100" if nps_score == 10 else "70-89"
+    elif nps_score >= 7:
+        growth_factor = round(random.uniform(1.02, 1.12), 2)
+        growth_rate = f"{int((growth_factor - 1) * 100)}%"
+        growth_range = "50-69" if nps_score == 8 else "40-59"
+    else:
+        growth_factor = round(random.uniform(0.85, 1.00), 2)
+        factor_val = growth_factor - 1
+        growth_rate = f"{int(factor_val * 100)}%"
+        growth_range = "0-39"
+    return growth_factor, growth_rate, growth_range
 
 
 def generate_random_timestamp(start_date, end_date):
-    """Generate random timestamp within date range"""
-    time_between = end_date - start_date
-    days_between = time_between.days
-    random_days = random.randint(0, days_between)
-    random_hours = random.randint(9, 18)  # Business hours
-    random_minutes = random.randint(0, 59)
-    
+    days_between = (end_date - start_date).days
+    random_days = random.randint(0, max(days_between, 1))
     result_date = start_date + timedelta(days=random_days)
     return datetime.combine(result_date, datetime.min.time()).replace(
-        hour=random_hours, minute=random_minutes
+        hour=random.randint(8, 18), minute=random.randint(0, 59),
+        second=random.randint(0, 59)
     )
 
 
-def get_or_create_participant(business_account_id, company, campaign_id, existing_companies, company_commercial_values):
-    """Get existing participant or create new one with segmentation attributes"""
-    # Generate participant details
+def get_or_create_survey_template():
+    template = SurveyTemplate.query.filter_by(
+        name='Comprehensive CX Survey', is_system=True
+    ).first()
+    if template:
+        return template
+    template = SurveyTemplate()
+    template.name = 'Comprehensive CX Survey'
+    template.version = '1.0'
+    template.is_system = True
+    template.description_en = 'Complete customer experience survey with NPS, driver attribution, feature evaluation, and open feedback'
+    template.description_fr = "Enquête complète sur l'expérience client avec NPS, attribution des facteurs, évaluation des fonctionnalités et feedback ouvert"
+    template.estimated_duration_minutes = 10
+    template.sections_config = {
+        'section_1': {'name_en': 'NPS & Driver Attribution', 'name_fr': 'NPS et attribution des facteurs', 'required': True},
+        'section_2': {'name_en': 'Feature Evaluation', 'name_fr': 'Évaluation des fonctionnalités', 'required': False},
+        'section_3': {'name_en': 'Additional Insights', 'name_fr': 'Informations complémentaires', 'required': False},
+    }
+    template.default_driver_labels = DEFAULT_DRIVER_LABELS
+    template.default_feature_count = 5
+    template.max_features = 9
+    db.session.add(template)
+    db.session.flush()
+    return template
+
+
+def get_or_create_participant(business_account_id, company, campaign_id, company_commercial_values):
     first_name = random.choice(FIRST_NAMES)
     last_name = random.choice(LAST_NAMES)
-    role = random.choice(ROLES)
-    name = f"{first_name} {last_name}"
-    email = f"{first_name.lower()}.{last_name.lower()}@{company.lower().replace(' ', '')}.com"
-    
-    # Segmentation attributes
+    role = weighted_choice(ROLES_WEIGHTED)
+    tier = weighted_choice(TIERS_WEIGHTED)
     region = random.choice(REGIONS)
-    customer_tier = random.choice(CUSTOMER_TIERS)
-    language = random.choice(LANGUAGES)
-    
-    # Company-level commercial value (consistent across all participants from same company)
+    tenure = round(random.uniform(1.0, 10.0), 1)
+    name = f"{first_name} {last_name}"
+    email = f"{first_name.lower()}.{last_name.lower()}@{company.lower().replace(' ', '').replace(',', '')}.com"
+
     if company not in company_commercial_values:
-        company_commercial_values[company] = random.uniform(10000, 500000)
+        company_commercial_values[company] = round(random.uniform(25000, 750000), 2)
     commercial_value = company_commercial_values[company]
-    
-    # Check if participant exists
+
     participant = Participant.query.filter_by(
         business_account_id=business_account_id,
         email=email
     ).first()
-    
+
     if not participant:
         participant = Participant(
             business_account_id=business_account_id,
@@ -256,225 +452,322 @@ def get_or_create_participant(business_account_id, company, campaign_id, existin
             company_name=company,
             role=role,
             region=region,
-            customer_tier=customer_tier,
-            language=language,
+            customer_tier=tier,
+            language='en',
+            tenure_years=tenure,
             company_commercial_value=commercial_value,
             source='admin_bulk',
-            status='created',
-            created_at=datetime.utcnow()
+            status='completed',
+            token=str(uuid.uuid4()),
+            created_at=datetime.utcnow(),
         )
-        participant.token = str(__import__('uuid').uuid4())
         db.session.add(participant)
         db.session.flush()
     else:
-        # Update segmentation fields and sync company commercial value if participant already exists
         participant.role = role
         participant.region = region
-        participant.customer_tier = customer_tier
-        participant.language = language
+        participant.customer_tier = tier
+        participant.tenure_years = tenure
         participant.company_commercial_value = commercial_value
-    
-    # Create campaign participant association if not exists
-    campaign_participant = CampaignParticipant.query.filter_by(
+
+    cp = CampaignParticipant.query.filter_by(
         campaign_id=campaign_id,
         participant_id=participant.id
     ).first()
-    
-    if not campaign_participant:
-        campaign_participant = CampaignParticipant(
+
+    if not cp:
+        cp = CampaignParticipant(
             campaign_id=campaign_id,
             participant_id=participant.id,
             business_account_id=business_account_id,
-            status='created',
-            created_at=datetime.utcnow()
+            status='completed',
+            token=str(uuid.uuid4()),
+            created_at=datetime.utcnow(),
+            completed_at=datetime.utcnow(),
         )
-        campaign_participant.token = str(__import__('uuid').uuid4())
-        db.session.add(campaign_participant)
+        db.session.add(cp)
         db.session.flush()
-    
-    return participant, campaign_participant
+
+    return participant, cp
 
 
-def generate_campaign_data(campaign_key, dry_run=False):
-    """Generate demo data for a specific campaign"""
-    config = CAMPAIGNS[campaign_key]
-    
-    print(f"\n{'='*70}")
-    print(f"Generating Demo Data for: {config['name']}")
-    print(f"{'='*70}")
-    print(f"Date Range: {config['start_date']} to {config['end_date']}")
-    print(f"Target Responses: {config['responses']}")
-    print(f"Company Reuse: {config['company_reuse']}%")
-    print(f"Mode: {'DRY RUN' if dry_run else 'LIVE EXECUTION'}")
-    print(f"{'='*70}\n")
-    
+def generate_campaign(campaign_key, dry_run=False):
+    config = CAMPAIGN_CONFIGS[campaign_key]
+
+    print(f"\n{'=' * 70}")
+    print(f"  Campaign: {config['name']}")
+    print(f"  Type: {config['survey_type']} | Language: {config['language_code']}")
+    print(f"  Dates: {config['start_date']} to {config['end_date']}")
+    print(f"  Target responses: {config['responses']}")
+    print(f"  Mode: {'DRY RUN' if dry_run else 'LIVE'}")
+    print(f"{'=' * 70}\n")
+
     with app.app_context():
         try:
-            # Get Archelo Group business account
-            business_account = BusinessAccount.query.filter_by(name="Archelo Group inc").first()
-            if not business_account:
-                print("❌ Error: Archelo Group inc business account not found!")
+            ba = BusinessAccount.query.filter_by(name=BUSINESS_ACCOUNT_NAME).first()
+            if not ba:
+                print(f"  ERROR: Business account '{BUSINESS_ACCOUNT_NAME}' not found!")
                 return False
-            
-            print(f"✓ Business Account: {business_account.name} (ID: {business_account.id})")
-            
-            # Find or create campaign
-            campaign = Campaign.query.filter_by(
-                business_account_id=business_account.id,
+
+            print(f"  Business Account: {ba.name} (ID: {ba.id})")
+
+            existing = Campaign.query.filter_by(
+                business_account_id=ba.id,
                 name=config['name']
             ).first()
-            
-            if not campaign:
-                campaign = Campaign(
-                    business_account_id=business_account.id,
-                    name=config['name'],
-                    description=f"Quarterly customer loyalty measurement and feedback collection for Q{campaign_key[1]} 2025",
-                    start_date=config['start_date'],
-                    end_date=config['end_date'],
-                    status='active',
-                    client_identifier='archelo_group',
-                    created_at=datetime.utcnow()
-                )
-                db.session.add(campaign)
-                db.session.flush()
-                print(f"✓ Created Campaign: {campaign.name} (ID: {campaign.id})")
-            else:
-                print(f"✓ Found Campaign: {campaign.name} (ID: {campaign.id}, Status: {campaign.status})")
-                if campaign.status != 'active':
-                    print(f"❌ Error: Campaign status is '{campaign.status}', must be 'active' to add responses")
-                    return False
-            
-            # Get existing companies from previous campaigns
-            existing_companies = []
-            if config['company_reuse'] > 0:
-                previous_responses = SurveyResponse.query.filter(
-                    SurveyResponse.campaign_id != campaign.id,
-                    SurveyResponse.campaign.has(business_account_id=business_account.id)
-                ).all()
-                existing_companies = list(set([r.company_name for r in previous_responses]))
-                print(f"✓ Found {len(existing_companies)} companies from previous campaigns")
-            
-            # Determine companies for this campaign
-            num_reuse = int(len(existing_companies) * (config['company_reuse'] / 100))
-            num_new = config['responses'] - num_reuse
-            
-            reused_companies = random.sample(existing_companies, min(num_reuse, len(existing_companies))) if existing_companies else []
-            available_new = [c for c in COMPANIES if c not in existing_companies]
-            new_companies = random.sample(available_new, min(num_new, len(available_new)))
-            
-            campaign_companies = reused_companies + new_companies
-            random.shuffle(campaign_companies)
-            
-            print(f"✓ Company Mix: {len(reused_companies)} reused + {len(new_companies)} new = {len(campaign_companies)} total")
-            
+            if existing:
+                print(f"  Campaign '{config['name']}' already exists (ID: {existing.id}, status: {existing.status})")
+                print(f"  Use --delete to remove it first if you want to regenerate.")
+                return False
+
             if dry_run:
-                print("\n📋 DRY RUN SUMMARY:")
-                print(f"   - Would create {config['responses']} survey responses")
-                print(f"   - For campaign: {campaign.name}")
-                print(f"   - Date range: {config['start_date']} to {config['end_date']}")
-                print(f"   - Companies: {', '.join(campaign_companies[:5])}..." if len(campaign_companies) > 5 else f"   - Companies: {', '.join(campaign_companies)}")
-                print("\n✓ Dry run completed successfully. Run without --dry-run to execute.\n")
+                existing_companies = _get_existing_companies(ba.id, None)
+                num_reuse = int(len(existing_companies) * (config['company_reuse_pct'] / 100)) if existing_companies else 0
+                available_new = [c for c in COMPANIES if c not in existing_companies]
+                num_new = min(config['responses'] - num_reuse, len(available_new))
+                print(f"\n  DRY RUN SUMMARY:")
+                print(f"    Would create 1 campaign: '{config['name']}'")
+                print(f"    Would generate {config['responses']} survey responses")
+                print(f"    Company mix: {num_reuse} reused + {num_new} new")
+                print(f"    Survey type: {config['survey_type']}")
+                print(f"    Language: {config['language_code']}")
+                if config['survey_type'] == 'classic':
+                    print(f"    Would create ClassicSurveyConfig with 9 driver labels")
+                print(f"\n  Dry run passed. Run without --dry-run to execute.\n")
                 return True
-            
-            # Generate responses
-            responses_created = 0
-            nps_distribution = {"Promoter": 0, "Passive": 0, "Detractor": 0}
-            company_commercial_values = {}  # Track company-level commercial values for consistency
-            
-            print(f"\nGenerating {config['responses']} responses...")
-            
+
+            campaign = Campaign(
+                business_account_id=ba.id,
+                name=config['name'],
+                description=config['description'],
+                start_date=config['start_date'],
+                end_date=config['end_date'],
+                status='completed',
+                survey_type=config['survey_type'],
+                language_code=config['language_code'],
+                client_identifier=ba.name,
+                created_at=datetime.combine(config['start_date'] - timedelta(days=7), datetime.min.time()),
+                completed_at=config['completed_at'],
+            )
+            db.session.add(campaign)
+            db.session.flush()
+            print(f"  Created campaign: {campaign.name} (ID: {campaign.id})")
+
+            if config['survey_type'] == 'classic':
+                template = get_or_create_survey_template()
+                classic_config = ClassicSurveyConfig(
+                    campaign_id=campaign.id,
+                    template_id=template.id,
+                    sections_enabled={'section_1': True, 'section_2': True, 'section_3': True},
+                    feature_count=5,
+                    features=[
+                        {'key': 'payroll', 'label_en': 'Payroll Processing', 'label_fr': 'Traitement de la Paie'},
+                        {'key': 'leave_mgmt', 'label_en': 'Leave Management', 'label_fr': 'Gestion des Congés'},
+                        {'key': 'performance', 'label_en': 'Performance Reviews', 'label_fr': 'Évaluations de Performance'},
+                        {'key': 'recruitment', 'label_en': 'Recruitment Pipeline', 'label_fr': 'Pipeline de Recrutement'},
+                        {'key': 'self_service', 'label_en': 'Employee Self-Service Portal', 'label_fr': 'Portail Libre-Service Employé'},
+                    ],
+                    driver_labels=DEFAULT_DRIVER_LABELS,
+                    custom_prompts={},
+                    frozen_at=config['completed_at'],
+                )
+                db.session.add(classic_config)
+                db.session.flush()
+                print(f"  Created ClassicSurveyConfig (ID: {classic_config.id})")
+
+            existing_companies = _get_existing_companies(ba.id, campaign.id)
+            num_reuse = int(len(existing_companies) * (config['company_reuse_pct'] / 100))
+            reused = random.sample(existing_companies, min(num_reuse, len(existing_companies))) if existing_companies else []
+            available_new = [c for c in COMPANIES if c not in existing_companies]
+            needed_new = config['responses'] - len(reused)
+            new_cos = random.sample(available_new, min(needed_new, len(available_new)))
+            campaign_companies = reused + new_cos
+            random.shuffle(campaign_companies)
+            print(f"  Companies: {len(reused)} reused + {len(new_cos)} new = {len(campaign_companies)} total")
+
+            company_commercial_values = {}
+            nps_dist = {"Promoter": 0, "Passive": 0, "Detractor": 0}
+            lang = config['language_code']
+
+            print(f"\n  Generating {config['responses']} responses...")
+
             for i in range(config['responses']):
                 company = random.choice(campaign_companies)
-                
-                # Get or create participant
-                participant, campaign_participant = get_or_create_participant(
-                    business_account.id, company, campaign.id, existing_companies, company_commercial_values
+                participant, cp = get_or_create_participant(
+                    ba.id, company, campaign.id, company_commercial_values
                 )
-                
-                # Generate response data
+
                 nps_score = generate_nps_score()
-                nps_category = get_nps_category(nps_score)
-                sentiment_score, sentiment_label = generate_sentiment(nps_score)
-                churn_risk_score, churn_risk_level = generate_churn_risk(nps_score, sentiment_score)
-                
-                # Create survey response
+                scores = generate_coherent_scores(nps_score)
+                nps_category = scores["nps_category"]
+                feedback = generate_feedback(nps_category, lang)
+                key_themes = generate_key_themes(nps_category, lang)
+                churn_factors = generate_churn_risk_factors(nps_category, lang)
+                growth_factor, growth_rate, growth_range = generate_growth_data(
+                    nps_score, company_commercial_values[company]
+                )
+
+                growth_opps = None
+                if nps_score >= 7:
+                    themes = KEY_THEMES_EN if lang == "en" else KEY_THEMES_FR
+                    growth_opps = json.dumps(random.sample(themes[:8], random.randint(1, 3)))
+
+                account_risks = None
+                if nps_score < 7:
+                    themes = KEY_THEMES_EN if lang == "en" else KEY_THEMES_FR
+                    account_risks = json.dumps(random.sample(themes[6:16], random.randint(1, 3)))
+
+                response_ts = generate_random_timestamp(config['start_date'], config['end_date'])
+
                 response = SurveyResponse(
                     campaign_id=campaign.id,
-                    campaign_participant_id=campaign_participant.id,
+                    campaign_participant_id=cp.id,
                     company_name=company,
                     respondent_name=participant.name,
                     respondent_email=participant.email,
-                    tenure_with_fc=random.choice(["< 1 year", "1-2 years", "2-3 years", "3-5 years", "> 5 years"]),
+                    tenure_with_fc=f"{participant.tenure_years:.0f} years" if participant.tenure_years else "< 1 year",
                     nps_score=nps_score,
                     nps_category=nps_category,
-                    satisfaction_rating=random.randint(1, 10),
-                    product_value_rating=random.randint(1, 10),
-                    service_rating=random.randint(1, 10),
-                    pricing_rating=random.randint(1, 10),
-                    improvement_feedback=generate_feedback(nps_category),
-                    recommendation_reason=generate_feedback(nps_category),
-                    additional_comments=generate_feedback(nps_category) if random.random() > 0.5 else None,
-                    sentiment_score=sentiment_score,
-                    sentiment_label=sentiment_label,
-                    key_themes=generate_key_themes(nps_category),
-                    churn_risk_score=churn_risk_score,
-                    churn_risk_level=churn_risk_level,
-                    churn_risk_factors=json.dumps([random.choice(KEY_THEMES) for _ in range(random.randint(1, 3))]),
-                    growth_opportunities=json.dumps([random.choice(KEY_THEMES) for _ in range(random.randint(1, 2))]) if nps_score >= 7 else None,
-                    account_risk_factors=json.dumps([random.choice(KEY_THEMES) for _ in range(random.randint(1, 3))]) if nps_score < 7 else None,
-                    source_type='conversational',
-                    created_at=generate_random_timestamp(config['start_date'], config['end_date']),
-                    analyzed_at=datetime.utcnow()
+                    satisfaction_rating=scores["satisfaction_rating"],
+                    product_value_rating=scores["product_value_rating"],
+                    service_rating=scores["service_rating"],
+                    pricing_rating=scores["pricing_rating"],
+                    support_rating=scores["support_rating"],
+                    csat_score=scores["csat_score"],
+                    ces_score=scores["ces_score"],
+                    loyalty_drivers=scores["loyalty_drivers"],
+                    recommendation_status=scores["recommendation_status"],
+                    improvement_feedback=feedback,
+                    recommendation_reason=generate_feedback(nps_category, lang),
+                    additional_comments=generate_feedback(nps_category, lang) if random.random() > 0.4 else None,
+                    sentiment_score=scores["sentiment_score"],
+                    sentiment_label=scores["sentiment_label"],
+                    key_themes=json.dumps(key_themes),
+                    churn_risk_score=scores["churn_risk_score"],
+                    churn_risk_level=scores["churn_risk_level"],
+                    churn_risk_factors=json.dumps(churn_factors),
+                    growth_opportunities=growth_opps,
+                    account_risk_factors=account_risks,
+                    growth_factor=growth_factor,
+                    growth_rate=growth_rate,
+                    growth_range=growth_range,
+                    commercial_value=company_commercial_values[company],
+                    source_type=config['survey_type'],
+                    created_at=response_ts,
+                    analyzed_at=response_ts + timedelta(minutes=random.randint(1, 30)),
                 )
-                
                 db.session.add(response)
-                responses_created += 1
-                nps_distribution[nps_category] += 1
-                
-                if (i + 1) % 50 == 0:
-                    print(f"   Progress: {i + 1}/{config['responses']} responses created...")
-            
-            # Commit transaction
+                nps_dist[nps_category] += 1
+
+                if (i + 1) % 100 == 0:
+                    print(f"    Progress: {i + 1}/{config['responses']}")
+
             db.session.commit()
-            
-            # Calculate NPS
-            total = sum(nps_distribution.values())
-            promoter_pct = (nps_distribution["Promoter"] / total * 100) if total > 0 else 0
-            detractor_pct = (nps_distribution["Detractor"] / total * 100) if total > 0 else 0
-            nps_score = promoter_pct - detractor_pct
-            
-            print(f"\n✅ SUCCESS! Generated {responses_created} responses for {campaign.name}")
-            print(f"\n📊 NPS Distribution:")
-            print(f"   Promoters: {nps_distribution['Promoter']} ({promoter_pct:.1f}%)")
-            print(f"   Passives: {nps_distribution['Passive']} ({nps_distribution['Passive']/total*100:.1f}%)")
-            print(f"   Detractors: {nps_distribution['Detractor']} ({detractor_pct:.1f}%)")
-            print(f"   NPS Score: {nps_score:.1f}")
-            print(f"\n✓ Next Step: Manually complete the campaign '{campaign.name}' to generate snapshot\n")
-            
+
+            total = sum(nps_dist.values())
+            p_pct = nps_dist["Promoter"] / total * 100
+            pa_pct = nps_dist["Passive"] / total * 100
+            d_pct = nps_dist["Detractor"] / total * 100
+            nps = p_pct - d_pct
+
+            print(f"\n  SUCCESS: Generated {total} responses for '{campaign.name}'")
+            print(f"\n  NPS Distribution:")
+            print(f"    Promoters:  {nps_dist['Promoter']:>4} ({p_pct:.1f}%)")
+            print(f"    Passives:   {nps_dist['Passive']:>4} ({pa_pct:.1f}%)")
+            print(f"    Detractors: {nps_dist['Detractor']:>4} ({d_pct:.1f}%)")
+            print(f"    NPS Score:  {nps:.1f}")
+            print(f"\n  Campaign status: completed (completed_at: {config['completed_at']})")
+            print()
             return True
-            
+
         except Exception as e:
             db.session.rollback()
-            print(f"\n❌ ERROR: {str(e)}")
-            print(f"   Transaction rolled back. No data was modified.\n")
+            print(f"\n  ERROR: {e}")
             import traceback
             traceback.print_exc()
             return False
 
 
+def delete_campaign(campaign_key):
+    config = CAMPAIGN_CONFIGS[campaign_key]
+
+    print(f"\n{'=' * 70}")
+    print(f"  Deleting campaign: {config['name']}")
+    print(f"{'=' * 70}\n")
+
+    with app.app_context():
+        try:
+            ba = BusinessAccount.query.filter_by(name=BUSINESS_ACCOUNT_NAME).first()
+            if not ba:
+                print(f"  ERROR: Business account '{BUSINESS_ACCOUNT_NAME}' not found!")
+                return False
+
+            campaign = Campaign.query.filter_by(
+                business_account_id=ba.id,
+                name=config['name']
+            ).first()
+
+            if not campaign:
+                print(f"  Campaign '{config['name']}' not found. Nothing to delete.")
+                return True
+
+            response_count = SurveyResponse.query.filter_by(campaign_id=campaign.id).count()
+            cp_count = CampaignParticipant.query.filter_by(campaign_id=campaign.id).count()
+
+            print(f"  Found campaign: {campaign.name} (ID: {campaign.id})")
+            print(f"    Responses: {response_count}")
+            print(f"    Campaign participants: {cp_count}")
+
+            SurveyResponse.query.filter_by(campaign_id=campaign.id).delete()
+            print(f"    Deleted {response_count} responses")
+
+            CampaignParticipant.query.filter_by(campaign_id=campaign.id).delete()
+            print(f"    Deleted {cp_count} campaign participants")
+
+            if config['survey_type'] == 'classic':
+                ClassicSurveyConfig.query.filter_by(campaign_id=campaign.id).delete()
+                print(f"    Deleted ClassicSurveyConfig")
+
+            db.session.delete(campaign)
+            db.session.commit()
+            print(f"\n  SUCCESS: Campaign '{config['name']}' and all related data deleted.")
+            print()
+            return True
+
+        except Exception as e:
+            db.session.rollback()
+            print(f"\n  ERROR: {e}")
+            import traceback
+            traceback.print_exc()
+            return False
+
+
+def _get_existing_companies(business_account_id, exclude_campaign_id):
+    query = db.session.query(SurveyResponse.company_name).join(
+        Campaign, SurveyResponse.campaign_id == Campaign.id
+    ).filter(Campaign.business_account_id == business_account_id)
+    if exclude_campaign_id:
+        query = query.filter(SurveyResponse.campaign_id != exclude_campaign_id)
+    results = query.distinct().all()
+    return [r[0] for r in results if r[0]]
+
+
 def main():
-    """Main execution function"""
-    import argparse
-    
-    parser = argparse.ArgumentParser(description='Generate demo data for Archelo Group campaigns')
-    parser.add_argument('--campaign', choices=['Q1 2025', 'Q2 2025', 'Q3 2025'], required=True,
-                       help='Campaign to generate data for')
+    parser = argparse.ArgumentParser(description='Generate demo data for Archelo Group — ArcheloFlow HRIS')
+    parser.add_argument('--campaign', choices=['Q1', 'Q2', 'Q3', 'CLASSIC'], required=True,
+                        help='Campaign to generate: Q1 (EN conv), Q2 (EN conv), Q3 (FR conv), CLASSIC (EN classic)')
     parser.add_argument('--dry-run', action='store_true',
-                       help='Preview what would be generated without making changes')
-    
+                        help='Preview what would be generated without making changes')
+    parser.add_argument('--delete', action='store_true',
+                        help='Delete a previously generated campaign and all its data')
+
     args = parser.parse_args()
-    
-    success = generate_campaign_data(args.campaign, dry_run=args.dry_run)
+
+    if args.delete:
+        success = delete_campaign(args.campaign)
+    else:
+        success = generate_campaign(args.campaign, dry_run=args.dry_run)
+
     sys.exit(0 if success else 1)
 
 
