@@ -363,6 +363,7 @@ def get_optimized_dashboard_data(campaign_id=None, business_account_id=None):
             })
     
     # Build unified account intelligence by merging opportunities and risks per company
+    from data_storage import calculate_weighted_account_balance
     all_company_keys = set(list(growth_opportunities_by_company.keys()) + list(account_risk_factors_by_company.keys()))
     account_intelligence = []
     for company_key in all_company_keys:
@@ -394,15 +395,33 @@ def get_optimized_dashboard_data(campaign_id=None, business_account_id=None):
                     'count': type_info['count']
                 })
         
+        balance, opp_score, risk_score_val, health_ratio = calculate_weighted_account_balance(
+            opps_list, risks_list
+        )
+        critical_risk_count = sum(1 for r in risks_list if r.get('severity') == 'Critical')
+
         account_intelligence.append({
             'company_name': display_name,
             'opportunities': opps_list,
             'risk_factors': risks_list,
+            'balance': balance,
+            'opportunity_count': len(opps_list),
+            'risk_count': len(risks_list),
+            'critical_risks': critical_risk_count,
             'has_opportunities': len(opps_list) > 0,
             'has_risks': len(risks_list) > 0,
+            'opportunity_score': round(opp_score, 1),
+            'risk_score': round(risk_score_val, 1),
+            'health_ratio': round(health_ratio, 2),
         })
     
-    account_intelligence.sort(key=lambda x: (-len(x['risk_factors']), -len(x['opportunities'])))
+    priority_order = {'risk_heavy': 0, 'balanced': 1, 'opportunity_heavy': 2}
+    account_intelligence.sort(key=lambda x: (
+        priority_order.get(x['balance'], 1),
+        -x['critical_risks'],
+        -x['risk_count'],
+        -x['opportunity_count']
+    ))
     
     # ============================================================================
     # COMPILE FINAL RESPONSE

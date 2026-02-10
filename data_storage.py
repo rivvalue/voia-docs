@@ -171,6 +171,76 @@ def normalize_risk_factor_type(risk_type):
     # If no mapping found, return the normalized version
     return normalized
 
+
+OPPORTUNITY_WEIGHTS = {
+    'upsell': 3.0,
+    'expansion': 3.0,
+    'cross_sell': 2.0,
+    'cross sell': 2.0,
+    'referral': 1.5,
+    'advocacy': 1.5,
+    'renewal': 1.0,
+}
+
+RISK_SEVERITY_WEIGHTS = {
+    'Critical': 3.0,
+    'High': 2.0,
+    'Medium': 1.0,
+    'Low': 0.5,
+}
+
+HEALTH_RATIO_HIGH_POTENTIAL = 0.65
+HEALTH_RATIO_RISK_HEAVY = 0.35
+
+
+def calculate_weighted_account_balance(opportunities, risk_factors):
+    """
+    Weighted scoring for account health balance classification.
+
+    Opportunity score: each opportunity type is weighted by business impact
+    (upsell/expansion=3, cross-sell=2, referral/advocacy=1.5, renewal=1,
+    unknown defaults to 1).  When an opportunity entry carries a ``count``
+    field the weight is multiplied by that count.
+
+    Risk score: each risk factor is weighted by severity
+    (Critical=3, High=2, Medium=1, Low=0.5).  ``count`` is honoured the
+    same way.
+
+    Health ratio = opportunity_score / (opportunity_score + risk_score).
+    * > 0.65 → opportunity_heavy  (High Potential)
+    * 0.35 – 0.65 → balanced
+    * < 0.35 → risk_heavy
+
+    Returns (balance, opportunity_score, risk_score, health_ratio).
+    """
+
+    opp_score = 0.0
+    for opp in opportunities:
+        opp_type = opp.get('type', '').lower().replace('-', '_')
+        weight = OPPORTUNITY_WEIGHTS.get(opp_type, 1.0)
+        count = opp.get('count', 1) or 1
+        opp_score += weight * count
+
+    risk_score = 0.0
+    for risk in risk_factors:
+        severity = risk.get('severity', 'Medium')
+        weight = RISK_SEVERITY_WEIGHTS.get(severity, 1.0)
+        count = risk.get('count', 1) or 1
+        risk_score += weight * count
+
+    total = opp_score + risk_score
+    health_ratio = (opp_score / total) if total > 0 else 0.5
+
+    if health_ratio >= HEALTH_RATIO_HIGH_POTENTIAL:
+        balance = 'opportunity_heavy'
+    elif health_ratio <= HEALTH_RATIO_RISK_HEAVY:
+        balance = 'risk_heavy'
+    else:
+        balance = 'balanced'
+
+    return balance, opp_score, risk_score, health_ratio
+
+
 @cache.memoize(timeout=cache_config.get_timeout())
 def get_dashboard_data_cached(campaign_id=None, business_account_id=None):
     """
@@ -654,34 +724,14 @@ def get_dashboard_data(campaign_id=None, business_account_id=None):
                     else:
                         company_confidence_level = 'low'
             
-            # Only include companies with either opportunities or risk factors
             if opportunities or risk_factors:
-                # Calculate account balance
                 opportunity_count = len(opportunities)
                 critical_risk_count = sum(1 for r in risk_factors if r['severity'] == 'Critical')
-                high_risk_count = sum(1 for r in risk_factors if r['severity'] == 'High')
-                total_risk_score = critical_risk_count * 3 + high_risk_count * 2 + sum(1 for r in risk_factors if r['severity'] in ['Medium', 'Low'])
-                
-                # Check for critical business risks that prevent "High Potential" classification
-                critical_business_risks = sum(1 for r in risk_factors if any(
-                    risk_type in r.get('type', '').lower() 
-                    for risk_type in ['churn', 'pricing', 'product_problems', 'service_issues']
-                ))
-                
-                # Determine balance with stricter criteria for High Potential
-                if critical_risk_count > 0 or total_risk_score > opportunity_count * 2:
-                    balance = 'risk_heavy'
-                elif critical_business_risks > 0:
-                    # Accounts with churn risk, pricing issues, product problems, or service issues cannot be High Potential
-                    balance = 'balanced' if opportunity_count > total_risk_score else 'risk_heavy'
-                elif opportunity_count > 1 and total_risk_score == 0:
-                    # Only accounts with multiple opportunities and NO risk factors can be High Potential
-                    balance = 'opportunity_heavy'
-                elif opportunity_count > 0 and total_risk_score == 0:
-                    # Single opportunity with no risks = Balanced
-                    balance = 'balanced'
-                else:
-                    balance = 'balanced'
+                risk_count = len(risk_factors)
+
+                balance, opp_score, risk_score, health_ratio = calculate_weighted_account_balance(
+                    opportunities, risk_factors
+                )
                 
                 account_intelligence.append({
                     'company_name': company_name,
@@ -689,7 +739,7 @@ def get_dashboard_data(campaign_id=None, business_account_id=None):
                     'risk_factors': risk_factors,
                     'balance': balance,
                     'opportunity_count': opportunity_count,
-                    'risk_count': len(risk_factors),
+                    'risk_count': risk_count,
                     'critical_risks': critical_risk_count,
                     'max_tenure': max_tenure,
                     'commercial_value': commercial_value,
@@ -697,7 +747,10 @@ def get_dashboard_data(campaign_id=None, business_account_id=None):
                     'invited_count': company_invited_count,
                     'responded_count': total_company_responses,
                     'response_rate': company_response_rate,
-                    'confidence_level': company_confidence_level
+                    'confidence_level': company_confidence_level,
+                    'opportunity_score': round(opp_score, 1),
+                    'risk_score': round(risk_score, 1),
+                    'health_ratio': round(health_ratio, 2)
                 })
         
         # Sort accounts by priority (most critical risks first, then by balance)
