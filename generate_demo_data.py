@@ -19,7 +19,8 @@ from datetime import datetime, timedelta, date
 from app import app, db
 from models import (
     BusinessAccount, Campaign, Participant, CampaignParticipant,
-    SurveyResponse, ClassicSurveyConfig, SurveyTemplate
+    SurveyResponse, ClassicSurveyConfig, SurveyTemplate,
+    ExecutiveReport, EmailDelivery, ActiveConversation, ExportJob
 )
 
 
@@ -781,18 +782,31 @@ def delete_campaign(campaign_key):
                 print(f"  Campaign '{config['name']}' not found. Nothing to delete.")
                 return True
 
-            response_count = SurveyResponse.query.filter_by(campaign_id=campaign.id).count()
-            cp_count = CampaignParticipant.query.filter_by(campaign_id=campaign.id).count()
-
             print(f"  Found campaign: {campaign.name} (ID: {campaign.id})")
-            print(f"    Responses: {response_count}")
-            print(f"    Campaign participants: {cp_count}")
 
-            SurveyResponse.query.filter_by(campaign_id=campaign.id).delete()
-            print(f"    Deleted {response_count} responses")
+            fk_tables = [
+                ("survey responses", SurveyResponse, campaign.id),
+                ("campaign participants", CampaignParticipant, campaign.id),
+                ("executive reports", ExecutiveReport, campaign.id),
+                ("email deliveries", EmailDelivery, campaign.id),
+                ("active conversations", ActiveConversation, campaign.id),
+                ("export jobs", ExportJob, campaign.id),
+            ]
 
-            CampaignParticipant.query.filter_by(campaign_id=campaign.id).delete()
-            print(f"    Deleted {cp_count} campaign participants")
+            for label, model, cid in fk_tables:
+                count = model.query.filter_by(campaign_id=cid).count()
+                if count > 0:
+                    model.query.filter_by(campaign_id=cid).delete()
+                    print(f"    Deleted {count} {label}")
+
+            from sqlalchemy import text
+            for raw_table in ['campaign_kpi_snapshots']:
+                result = db.session.execute(
+                    text(f"DELETE FROM {raw_table} WHERE campaign_id = :cid"),
+                    {"cid": campaign.id}
+                )
+                if result.rowcount > 0:
+                    print(f"    Deleted {result.rowcount} {raw_table}")
 
             if config['survey_type'] == 'classic':
                 ClassicSurveyConfig.query.filter_by(campaign_id=campaign.id).delete()
