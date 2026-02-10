@@ -389,7 +389,7 @@ def inject_csrf():
             context['branding_context'] = get_branding_context(business_account_id)
     else:
         # For trial/demo mode (unauthenticated users), show Archelo demo branding ONLY on trial pages
-        trial_pages = ['demo_intro', 'dashboard']
+        trial_pages = ['demo_intro', 'dashboard', 'campaign_insights', 'executive_summary', 'survey_form', 'classic_survey', 'survey', 'conversational_survey']
         if request.endpoint in trial_pages:
             from routes import get_branding_context
             context['branding_context'] = get_branding_context(business_account_id=1)
