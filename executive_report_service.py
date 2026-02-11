@@ -1154,7 +1154,7 @@ class ExecutiveReportGenerator:
         fig, ax1 = plt.subplots(figsize=(8, 4))
         
         tenure_data = seg_data.get('tenure_cohorts', {})
-        band_order = ['1-2yr', '3-5yr', '6-8yr', '9+yr']
+        band_order = ['1-2 years', '3-5 years', '6-8 years', '9+ years']
         ordered_bands = [b for b in band_order if b in tenure_data]
         
         if not ordered_bands:

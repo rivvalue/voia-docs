@@ -1812,7 +1812,11 @@ def executive_summary():
 def campaign_insights():
     """Campaign Insights - Operational analytics with campaign filtering (Business users only)"""
     # Store this page as the last BI page for back navigation
-    session['last_bi_page'] = url_for('campaign_insights')
+    campaign_id = request.args.get('campaign_id')
+    if campaign_id:
+        session['last_bi_page'] = url_for('campaign_insights') + f'?campaign_id={campaign_id}'
+    else:
+        session['last_bi_page'] = url_for('campaign_insights')
     
     try:
         from data_storage import get_company_nps_data
