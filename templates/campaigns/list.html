@@ -635,9 +635,7 @@ function generateExecutiveReport(campaignId, campaignName) {
         }
     })
     .then(result => {
-        if (result.success) {
-            alert(`Executive report generation started for "${campaignName}". You will be able to download it in a few minutes.`);
-        } else {
+        if (!result.success) {
             alert('Failed to start executive report generation: ' + (result.data.error || 'Unknown error'));
         }
     })
@@ -684,12 +682,8 @@ function confirmRegenerateReport(campaignId, campaignName) {
     })
     .then(result => {
         if (result.success) {
-            alert(`Executive report regeneration started for "${campaignName}". The updated report will be ready in a few minutes.`);
-            
-            // Keep checking status until regeneration is complete
             setTimeout(() => checkReport{{ _('Status') }}(campaignId), 5000);
         } else {
-            // Reset button text on error
             if (textElement) {
                 textElement.textContent = '{{ _('Executive Report') }} Available';
             }
