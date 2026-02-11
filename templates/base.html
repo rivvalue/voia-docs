@@ -469,6 +469,17 @@
         // Function to mark notification as read
         async function markAsRead(notificationId) {
             try {
+                const item = document.querySelector(`.notification-item[data-id="${notificationId}"]`);
+                if (item && item.classList.contains('notification-unread')) {
+                    item.classList.remove('notification-unread');
+                    previousCount = Math.max(0, previousCount - 1);
+                    if (previousCount > 0) {
+                        notificationBadge.textContent = previousCount;
+                    } else {
+                        notificationBadge.style.display = 'none';
+                    }
+                }
+                
                 const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
                 await fetch(`/api/notifications/${notificationId}/read`, {
                     method: 'POST',
@@ -479,9 +490,10 @@
                     credentials: 'same-origin'
                 });
                 await updateNotificationCount();
-                await loadNotifications();
             } catch (error) {
                 console.error('Error marking notification as read:', error);
+                await updateNotificationCount();
+                await loadNotifications();
             }
         }
         
@@ -489,11 +501,14 @@
         if (markAllReadBtn) {
             markAllReadBtn.addEventListener('click', async function(e) {
                 e.preventDefault();
-                console.log('🔔 Mark all as read clicked');
                 try {
-                    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
-                    console.log('🔔 CSRF token:', csrfToken ? 'present' : 'MISSING');
+                    document.querySelectorAll('.notification-item.notification-unread').forEach(item => {
+                        item.classList.remove('notification-unread');
+                    });
+                    previousCount = 0;
+                    notificationBadge.style.display = 'none';
                     
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
                     const response = await fetch('/api/notifications/mark-all-read', {
                         method: 'POST',
                         headers: {
@@ -503,22 +518,17 @@
                         credentials: 'same-origin'
                     });
                     
-                    console.log('🔔 Mark all response status:', response.status);
-                    
                     if (!response.ok) {
-                        const errorText = await response.text();
-                        console.error('Failed to mark all as read:', response.status, response.statusText, errorText);
+                        await updateNotificationCount();
+                        await loadNotifications();
                         return;
                     }
                     
-                    const data = await response.json();
-                    console.log('🔔 Mark all response:', data);
-                    
                     await updateNotificationCount();
-                    await loadNotifications();
-                    console.log('🔔 Mark all as read completed');
                 } catch (error) {
                     console.error('Error marking all as read:', error);
+                    await updateNotificationCount();
+                    await loadNotifications();
                 }
             });
         }
@@ -548,9 +558,9 @@
             notificationBell.addEventListener('click', loadNotifications);
         }
         
-        // Poll for new notifications every 30 seconds
+        // Poll for new notifications every 15 seconds
         updateNotificationCount(); // Initial load
-        setInterval(updateNotificationCount, 30000); // Every 30 seconds
+        setInterval(updateNotificationCount, 15000); // Every 15 seconds
     })();
     </script>
     {% endif %}
