@@ -470,6 +470,12 @@ function populateCampaignFilterDropdown() {
     const newSelect = select.cloneNode(true);
     select.parentNode.replaceChild(newSelect, select);
     
+    // Re-apply selected value after cloneNode (cloneNode may not preserve programmatic .selected property)
+    if (defaultCampaign) {
+        newSelect.value = String(defaultCampaign.id);
+        selectedCampaignId = defaultCampaign.id;
+    }
+    
     // Attach the event listener
     newSelect.addEventListener('change', () => {
         console.log('📍 Campaign filter changed via dropdown');
@@ -505,6 +511,15 @@ async function applyCampaignFilter() {
         sessionStorage.removeItem('selectedCampaignDates');
         sessionStorage.removeItem('selectedCampaignStatus');
     }
+    
+    // Update URL query parameter so bookmarking/sharing preserves campaign selection
+    const url = new URL(window.location);
+    if (selectedCampaignId) {
+        url.searchParams.set('campaign_id', selectedCampaignId);
+    } else {
+        url.searchParams.delete('campaign_id');
+    }
+    window.history.replaceState({}, '', url);
     
     // Update global campaign indicator if on filtered pages
     updateGlobalCampaignIndicator();
