@@ -193,7 +193,7 @@
                     
                     <!-- Notification Bell Icon (business users only) -->
                     <div class="notification-center">
-                        <button class="btn btn-link position-relative notification-bell" id="notificationBell" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.5rem;">
+                        <button class="btn btn-link position-relative notification-bell" id="notificationBell" type="button" data-bs-toggle="dropdown" data-bs-auto-close="true" aria-expanded="false" style="padding: 0.5rem;">
                             <i class="fas fa-bell"></i>
                             <span class="notification-badge badge bg-danger position-absolute" id="notificationBadge" style="display: none; top: 4px; right: 4px; font-size: 0.65rem; padding: 0.25em 0.5em;">0</span>
                         </button>
@@ -497,42 +497,44 @@
             }
         }
         
-        // Function to mark all as read
-        if (markAllReadBtn) {
-            markAllReadBtn.addEventListener('click', async function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                try {
-                    document.querySelectorAll('.notification-item.notification-unread').forEach(item => {
-                        item.classList.remove('notification-unread');
-                    });
-                    previousCount = 0;
-                    notificationBadge.style.display = 'none';
-                    
-                    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
-                    const response = await fetch('/api/notifications/mark-all-read', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': csrfToken
-                        },
-                        credentials: 'same-origin'
-                    });
-                    
-                    if (!response.ok) {
-                        await updateNotificationCount();
-                        await loadNotifications();
-                        return;
-                    }
-                    
-                    await updateNotificationCount();
-                } catch (error) {
-                    console.error('Error marking all as read:', error);
+        // Function to mark all as read (using document-level delegation for Bootstrap dropdown compatibility)
+        document.addEventListener('click', async function(e) {
+            const target = e.target.closest('#markAllRead');
+            if (!target) return;
+            
+            e.preventDefault();
+            e.stopPropagation();
+            
+            try {
+                document.querySelectorAll('.notification-item.notification-unread').forEach(item => {
+                    item.classList.remove('notification-unread');
+                });
+                previousCount = 0;
+                notificationBadge.style.display = 'none';
+                
+                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+                const response = await fetch('/api/notifications/mark-all-read', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    credentials: 'same-origin'
+                });
+                
+                if (!response.ok) {
                     await updateNotificationCount();
                     await loadNotifications();
+                    return;
                 }
-            });
-        }
+                
+                await updateNotificationCount();
+            } catch (error) {
+                console.error('Error marking all as read:', error);
+                await updateNotificationCount();
+                await loadNotifications();
+            }
+        });
         
         // Helper: Get time ago string
         function getTimeAgo(date) {
