@@ -501,6 +501,7 @@
         if (markAllReadBtn) {
             markAllReadBtn.addEventListener('click', async function(e) {
                 e.preventDefault();
+                e.stopPropagation();
                 try {
                     document.querySelectorAll('.notification-item.notification-unread').forEach(item => {
                         item.classList.remove('notification-unread');
