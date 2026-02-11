@@ -4,12 +4,14 @@ Generates comprehensive PDF reports for completed campaigns with KPI deltas and 
 """
 
 import os
+import re
 import json
 import logging
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Tuple
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+import numpy as np
 from io import BytesIO
 import base64
 from jinja2 import Template
@@ -81,7 +83,7 @@ class ExecutiveReportGenerator:
         ).filter(
             CampaignParticipant.campaign_id == campaign.id
         ).options(
-            joinedload(SurveyResponse.campaign_participant)
+            joinedload(SurveyResponse.campaign_participant).joinedload(CampaignParticipant.participant)
         ).all()
         
         current_kpis = self._calculate_campaign_kpis(responses, campaign)
@@ -99,6 +101,10 @@ class ExecutiveReportGenerator:
         key_themes = self._calculate_key_themes(responses)
         average_ratings = self._calculate_average_ratings(responses)
         
+        seg_data = self._calculate_segmentation_data(responses)
+        seg_charts = self._generate_segmentation_charts(seg_data, chart_colors)
+        recommendations = self._generate_recommendations(seg_data, current_kpis, average_ratings)
+        
         report_data = {
             'campaign': campaign,
             'business_account': business_account,
@@ -112,7 +118,10 @@ class ExecutiveReportGenerator:
             'key_themes': key_themes,
             'average_ratings': average_ratings,
             'generated_at': datetime.utcnow(),
-            'survey_type': survey_type
+            'survey_type': survey_type,
+            'segmentation_data': seg_data,
+            'segmentation_charts': seg_charts,
+            'recommendations': recommendations
         }
         
         if survey_type == 'classic':
@@ -418,8 +427,7 @@ class ExecutiveReportGenerator:
         try:
             charts['nps_distribution'] = self._create_nps_distribution_chart(responses, chart_colors)
             
-            if survey_type != 'classic':
-                charts['sentiment_breakdown'] = self._create_sentiment_chart(kpis['sentiment_breakdown'], chart_colors)
+            charts['sentiment_breakdown'] = self._create_sentiment_chart(kpis['sentiment_breakdown'], chart_colors)
             
             charts['response_timeline'] = self._create_response_timeline_chart(responses, chart_colors[0])
             
@@ -844,6 +852,447 @@ class ExecutiveReportGenerator:
             'pricing': round(float(avg_pricing), 1)
         }
     
+    def _calculate_segmentation_data(self, responses: List) -> Dict:
+        """Calculate segmentation analytics from participant data"""
+        dimensions = {
+            'role': {}, 'region': {}, 'customer_tier': {}, 'client_industry': {}
+        }
+        churn_risk_by_segment = {'tier': {}, 'role': {}, 'region': {}}
+        tenure_cohorts = {}
+        
+        for response in responses:
+            cp = getattr(response, 'campaign_participant', None)
+            if cp is None:
+                continue
+            participant = getattr(cp, 'participant', None)
+            if participant is None:
+                continue
+            
+            role = getattr(participant, 'role', None) or 'Unknown'
+            region = getattr(participant, 'region', None) or 'Unknown'
+            tier = getattr(participant, 'customer_tier', None) or 'Unknown'
+            industry = getattr(participant, 'client_industry', None) or 'Unknown'
+            
+            metrics = {
+                'nps_score': getattr(response, 'nps_score', None),
+                'satisfaction_rating': getattr(response, 'satisfaction_rating', None),
+                'product_value_rating': getattr(response, 'product_value_rating', None),
+                'service_rating': getattr(response, 'service_rating', None),
+                'pricing_rating': getattr(response, 'pricing_rating', None),
+                'support_rating': getattr(response, 'support_rating', None),
+            }
+            
+            dim_values = {'role': role, 'region': region, 'customer_tier': tier, 'client_industry': industry}
+            for dim_key, seg_val in dim_values.items():
+                if seg_val not in dimensions[dim_key]:
+                    dimensions[dim_key][seg_val] = []
+                dimensions[dim_key][seg_val].append(metrics)
+            
+            churn_level = getattr(response, 'churn_risk_level', None) or 'Minimal'
+            for seg_key, seg_val in [('tier', tier), ('role', role), ('region', region)]:
+                if seg_val not in churn_risk_by_segment[seg_key]:
+                    churn_risk_by_segment[seg_key][seg_val] = {'Minimal': 0, 'Low': 0, 'Medium': 0, 'High': 0}
+                if churn_level in churn_risk_by_segment[seg_key][seg_val]:
+                    churn_risk_by_segment[seg_key][seg_val][churn_level] += 1
+            
+            tenure_str = getattr(response, 'tenure_with_fc', None)
+            if tenure_str:
+                match = re.search(r'(\d+)', str(tenure_str))
+                if match:
+                    years = int(match.group(1))
+                    if years <= 2:
+                        band = '1-2 years'
+                    elif years <= 5:
+                        band = '3-5 years'
+                    elif years <= 8:
+                        band = '6-8 years'
+                    else:
+                        band = '9+ years'
+                    if band not in tenure_cohorts:
+                        tenure_cohorts[band] = []
+                    tenure_cohorts[band].append(metrics)
+        
+        def calc_nps(scores_list):
+            nps_scores = [m['nps_score'] for m in scores_list if m['nps_score'] is not None]
+            if not nps_scores:
+                return 0, 0
+            promoters = sum(1 for s in nps_scores if s >= 9)
+            detractors = sum(1 for s in nps_scores if s <= 6)
+            return round((promoters - detractors) / len(nps_scores) * 100, 1), len(nps_scores)
+        
+        def calc_avg(scores_list, key):
+            vals = [m[key] for m in scores_list if m.get(key) is not None]
+            if not vals:
+                return None
+            return round(sum(vals) / len(vals), 2)
+        
+        def build_segment_dict(dim_data):
+            result = {}
+            for seg_name, metrics_list in dim_data.items():
+                nps, n = calc_nps(metrics_list)
+                result[seg_name] = {
+                    'nps': nps, 'count': n,
+                    'satisfaction': calc_avg(metrics_list, 'satisfaction_rating'),
+                    'product_value': calc_avg(metrics_list, 'product_value_rating'),
+                    'service': calc_avg(metrics_list, 'service_rating'),
+                    'pricing': calc_avg(metrics_list, 'pricing_rating'),
+                    'support': calc_avg(metrics_list, 'support_rating'),
+                }
+            return result
+        
+        nps_by_role = build_segment_dict(dimensions['role'])
+        nps_by_region = build_segment_dict(dimensions['region'])
+        nps_by_tier = build_segment_dict(dimensions['customer_tier'])
+        nps_by_industry = build_segment_dict(dimensions['client_industry'])
+        
+        response_distribution = {
+            'by_role': {k: v['count'] for k, v in nps_by_role.items()},
+            'by_region': {k: v['count'] for k, v in nps_by_region.items()},
+            'by_tier': {k: v['count'] for k, v in nps_by_tier.items()},
+            'by_industry': {k: v['count'] for k, v in nps_by_industry.items()},
+        }
+        
+        tenure_order = ['1-2 years', '3-5 years', '6-8 years', '9+ years']
+        tenure_cohorts_result = {}
+        for band in tenure_order:
+            if band in tenure_cohorts:
+                metrics_list = tenure_cohorts[band]
+                nps, n = calc_nps(metrics_list)
+                tenure_cohorts_result[band] = {
+                    'nps': nps, 'count': n,
+                    'total_responses': n,
+                    'satisfaction': calc_avg(metrics_list, 'satisfaction_rating'),
+                    'avg_satisfaction': calc_avg(metrics_list, 'satisfaction_rating'),
+                }
+        
+        sub_metrics_by_role = {k: {sk: v[sk] for sk in ['product_value', 'service', 'pricing', 'support']} for k, v in nps_by_role.items()}
+        sub_metrics_by_tier = {k: {sk: v[sk] for sk in ['product_value', 'service', 'pricing', 'support']} for k, v in nps_by_tier.items()}
+        sub_metrics_by_region = {k: {sk: v[sk] for sk in ['product_value', 'service', 'pricing', 'support']} for k, v in nps_by_region.items()}
+        sub_metrics_by_industry = {k: {sk: v[sk] for sk in ['product_value', 'service', 'pricing', 'support']} for k, v in nps_by_industry.items()}
+        
+        all_metrics_flat = dimensions.get('role', {})
+        total_resp = sum(len(v) for v in all_metrics_flat.values())
+        sub_metric_counts = {}
+        for key in ['product_value_rating', 'service_rating', 'pricing_rating', 'support_rating']:
+            count = 0
+            for seg_metrics in dimensions.get('role', {}).values():
+                count += sum(1 for m in seg_metrics if m.get(key) is not None)
+            sub_metric_counts[key.replace('_rating', '')] = count
+        sub_metric_counts['_total'] = total_resp
+        
+        return {
+            'nps_by_role': nps_by_role,
+            'nps_by_region': nps_by_region,
+            'nps_by_tier': nps_by_tier,
+            'nps_by_industry': nps_by_industry,
+            'satisfaction_by_role': {k: v.get('satisfaction') for k, v in nps_by_role.items()},
+            'satisfaction_by_region': {k: v.get('satisfaction') for k, v in nps_by_region.items()},
+            'satisfaction_by_tier': {k: v.get('satisfaction') for k, v in nps_by_tier.items()},
+            'satisfaction_by_industry': {k: v.get('satisfaction') for k, v in nps_by_industry.items()},
+            'response_distribution': response_distribution,
+            'churn_risk_by_segment': churn_risk_by_segment,
+            'sub_metrics_by_role': sub_metrics_by_role,
+            'sub_metrics_by_tier': sub_metrics_by_tier,
+            'sub_metrics_by_region': sub_metrics_by_region,
+            'sub_metrics_by_industry': sub_metrics_by_industry,
+            'tenure_cohorts': tenure_cohorts_result,
+            'sub_metric_response_counts': sub_metric_counts,
+        }
+    
+    def _generate_segmentation_charts(self, seg_data: Dict, chart_colors: List) -> Dict:
+        """Generate segmentation analytics charts"""
+        charts = {}
+        
+        try:
+            charts['nps_by_segment'] = self._create_nps_by_segment_chart(seg_data, chart_colors)
+        except Exception as e:
+            logger.error(f"Error generating NPS by segment chart: {e}")
+        
+        try:
+            charts['churn_heatmap'] = self._create_churn_heatmap_chart(seg_data, chart_colors)
+        except Exception as e:
+            logger.error(f"Error generating churn heatmap chart: {e}")
+        
+        try:
+            charts['tenure_cohort'] = self._create_tenure_cohort_chart(seg_data, chart_colors)
+        except Exception as e:
+            logger.error(f"Error generating tenure cohort chart: {e}")
+        
+        return charts
+    
+    def _create_nps_by_segment_chart(self, seg_data: Dict, chart_colors: List) -> str:
+        """Create side-by-side subplot chart showing NPS by role and tier"""
+        role_data = seg_data.get('nps_by_role', {})
+        tier_data = seg_data.get('nps_by_tier', {})
+        
+        role_data = {k: v for k, v in role_data.items() if k != 'Unknown' and v.get('count', 0) > 0}
+        tier_data = {k: v for k, v in tier_data.items() if k != 'Unknown' and v.get('count', 0) > 0}
+        
+        if not role_data and not tier_data:
+            fig, ax = plt.subplots(figsize=(9, 4))
+            ax.text(0.5, 0.5, 'No segmentation data available', ha='center', va='center', transform=ax.transAxes)
+            plt.tight_layout()
+            return self._fig_to_base64(fig)
+        
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, max(4, max(len(role_data), len(tier_data)) * 0.6 + 1)))
+        
+        role_color = chart_colors[0] if len(chart_colors) > 0 else '#4a90e2'
+        tier_color = chart_colors[1] if len(chart_colors) > 1 else '#28a745'
+        
+        if role_data:
+            sorted_roles = sorted(role_data.items(), key=lambda x: x[1].get('nps', 0))
+            labels = [k for k, v in sorted_roles]
+            values = [v.get('nps', 0) for k, v in sorted_roles]
+            counts = [v.get('count', 0) for k, v in sorted_roles]
+            y_pos = range(len(labels))
+            bars = ax1.barh(y_pos, values, color=role_color, alpha=0.85, edgecolor='white', linewidth=0.5)
+            ax1.set_yticks(y_pos)
+            ax1.set_yticklabels(labels, fontsize=9)
+            ax1.set_xlabel('NPS Score', fontsize=10)
+            ax1.set_title('NPS by Role', fontsize=11, fontweight='bold')
+            ax1.axvline(x=0, color='#333', linewidth=0.8, linestyle='--')
+            ax1.grid(axis='x', alpha=0.3)
+            for bar, val, n in zip(bars, values, counts):
+                x_pos = bar.get_width() + 1 if val >= 0 else bar.get_width() - 8
+                ax1.text(x_pos, bar.get_y() + bar.get_height()/2, f'{val:.0f} (n={n})',
+                        va='center', fontsize=8, fontweight='bold')
+        else:
+            ax1.text(0.5, 0.5, 'No role data', ha='center', va='center', transform=ax1.transAxes)
+            ax1.set_title('NPS by Role', fontsize=11, fontweight='bold')
+        
+        if tier_data:
+            sorted_tiers = sorted(tier_data.items(), key=lambda x: x[1].get('nps', 0))
+            labels = [k for k, v in sorted_tiers]
+            values = [v.get('nps', 0) for k, v in sorted_tiers]
+            counts = [v.get('count', 0) for k, v in sorted_tiers]
+            y_pos = range(len(labels))
+            bars = ax2.barh(y_pos, values, color=tier_color, alpha=0.85, edgecolor='white', linewidth=0.5)
+            ax2.set_yticks(y_pos)
+            ax2.set_yticklabels(labels, fontsize=9)
+            ax2.set_xlabel('NPS Score', fontsize=10)
+            ax2.set_title('NPS by Tier', fontsize=11, fontweight='bold')
+            ax2.axvline(x=0, color='#333', linewidth=0.8, linestyle='--')
+            ax2.grid(axis='x', alpha=0.3)
+            for bar, val, n in zip(bars, values, counts):
+                x_pos = bar.get_width() + 1 if val >= 0 else bar.get_width() - 8
+                ax2.text(x_pos, bar.get_y() + bar.get_height()/2, f'{val:.0f} (n={n})',
+                        va='center', fontsize=8, fontweight='bold')
+        else:
+            ax2.text(0.5, 0.5, 'No tier data', ha='center', va='center', transform=ax2.transAxes)
+            ax2.set_title('NPS by Tier', fontsize=11, fontweight='bold')
+        
+        plt.tight_layout()
+        return self._fig_to_base64(fig)
+    
+    def _create_churn_heatmap_chart(self, seg_data: Dict, chart_colors: List) -> str:
+        """Create stacked horizontal bar chart for churn risk by tier"""
+        fig, ax = plt.subplots(figsize=(8, 4))
+        
+        churn_data = seg_data.get('churn_risk_by_segment', {}).get('tier', {})
+        churn_data = {k: v for k, v in churn_data.items() if k != 'Unknown'}
+        
+        if not churn_data:
+            ax.text(0.5, 0.5, 'No churn risk data available', ha='center', va='center', transform=ax.transAxes)
+            plt.tight_layout()
+            return self._fig_to_base64(fig)
+        
+        labels = list(churn_data.keys())
+        minimal = [churn_data[l].get('Minimal', 0) for l in labels]
+        low = [churn_data[l].get('Low', 0) for l in labels]
+        medium = [churn_data[l].get('Medium', 0) for l in labels]
+        high = [churn_data[l].get('High', 0) for l in labels]
+        
+        y_pos = range(len(labels))
+        
+        ax.barh(y_pos, minimal, color='#28a745', alpha=0.85, label='Minimal', edgecolor='white', linewidth=0.5)
+        ax.barh(y_pos, low, left=minimal, color='#17a2b8', alpha=0.85, label='Low', edgecolor='white', linewidth=0.5)
+        left2 = [m + l for m, l in zip(minimal, low)]
+        ax.barh(y_pos, medium, left=left2, color='#ffc107', alpha=0.85, label='Medium', edgecolor='white', linewidth=0.5)
+        left3 = [l2 + md for l2, md in zip(left2, medium)]
+        ax.barh(y_pos, high, left=left3, color='#dc3545', alpha=0.85, label='High', edgecolor='white', linewidth=0.5)
+        
+        ax.set_yticks(y_pos)
+        ax.set_yticklabels(labels, fontsize=9)
+        ax.set_xlabel('Number of Responses', fontsize=10)
+        ax.set_title('Churn Risk Distribution by Tier', fontsize=12, fontweight='bold')
+        ax.legend(loc='lower right', fontsize=8)
+        ax.grid(axis='x', alpha=0.3)
+        
+        plt.tight_layout()
+        return self._fig_to_base64(fig)
+    
+    def _create_tenure_cohort_chart(self, seg_data: Dict, chart_colors: List) -> str:
+        """Create grouped bar chart with NPS and satisfaction by tenure band"""
+        fig, ax1 = plt.subplots(figsize=(8, 4))
+        
+        tenure_data = seg_data.get('tenure_cohorts', {})
+        band_order = ['1-2yr', '3-5yr', '6-8yr', '9+yr']
+        ordered_bands = [b for b in band_order if b in tenure_data]
+        
+        if not ordered_bands:
+            ax1.text(0.5, 0.5, 'No tenure data available', ha='center', va='center', transform=ax1.transAxes)
+            plt.tight_layout()
+            return self._fig_to_base64(fig)
+        
+        x = np.arange(len(ordered_bands))
+        width = 0.35
+        
+        nps_vals = [tenure_data[b].get('nps', 0) for b in ordered_bands]
+        sat_vals = [tenure_data[b].get('satisfaction', 0) or 0 for b in ordered_bands]
+        
+        bars1 = ax1.bar(x - width/2, nps_vals, width, label='NPS', color=chart_colors[0] if chart_colors else '#dc3545', alpha=0.85)
+        ax1.set_xlabel('Tenure Cohort', fontsize=10)
+        ax1.set_ylabel('NPS Score', fontsize=10, color=chart_colors[0] if chart_colors else '#dc3545')
+        ax1.set_xticks(x)
+        ax1.set_xticklabels(ordered_bands, fontsize=9)
+        ax1.axhline(y=0, color='#333', linewidth=0.5, linestyle='--')
+        
+        ax2 = ax1.twinx()
+        bars2 = ax2.bar(x + width/2, sat_vals, width, label='Satisfaction', color=chart_colors[1] if len(chart_colors) > 1 else '#28a745', alpha=0.85)
+        ax2.set_ylabel('Satisfaction (1-5)', fontsize=10, color=chart_colors[1] if len(chart_colors) > 1 else '#28a745')
+        ax2.set_ylim(0, 5.5)
+        
+        lines1, labels1 = ax1.get_legend_handles_labels()
+        lines2, labels2 = ax2.get_legend_handles_labels()
+        ax1.legend(lines1 + lines2, labels1 + labels2, loc='upper right', fontsize=8)
+        
+        ax1.set_title('Tenure Cohort Analysis: NPS & Satisfaction', fontsize=12, fontweight='bold')
+        ax1.grid(axis='y', alpha=0.3)
+        
+        plt.tight_layout()
+        return self._fig_to_base64(fig)
+    
+    def _generate_recommendations(self, seg_data: Dict, current_kpis: Dict, average_ratings: Dict) -> List[Dict]:
+        """Generate confidence-scored recommendations from segmentation data"""
+        recommendations = []
+        
+        if not seg_data:
+            return recommendations
+        
+        campaign_nps = current_kpis.get('nps_score', 0)
+        total_responses = current_kpis.get('total_responses', 0)
+        
+        for dim_key, dim_label in [('nps_by_role', 'Role'), ('nps_by_tier', 'Tier'), ('nps_by_region', 'Region'), ('nps_by_industry', 'Industry')]:
+            dim_data = seg_data.get(dim_key, {})
+            for seg_name, seg_info in dim_data.items():
+                if seg_name == 'Unknown':
+                    continue
+                seg_nps = seg_info.get('nps', 0)
+                n = seg_info.get('count', 0)
+                gap = campaign_nps - seg_nps
+                if gap >= 15 and n >= 3:
+                    if n >= 20:
+                        confidence = 'High'
+                    elif n >= 10:
+                        confidence = 'Medium'
+                    else:
+                        confidence = 'Low'
+                    completeness = round(n / total_responses * 100, 0) if total_responses > 0 else 0
+                    recommendations.append({
+                        'title': f'NPS Gap in {dim_label}: {seg_name}',
+                        'description': f'{seg_name} ({dim_label.lower()}) shows an NPS of {seg_nps:.0f}, which is {gap:.0f} points below the campaign average of {campaign_nps:.0f}. This segment has {n} responses and may require targeted engagement.',
+                        'confidence': confidence,
+                        'sample_size': n,
+                        'gap_magnitude': round(gap, 1),
+                        'data_completeness_pct': completeness,
+                    })
+        
+        sub_metrics = {}
+        sub_counts = seg_data.get('sub_metric_response_counts', {})
+        total_for_completeness = sub_counts.get('_total', total_responses) or total_responses
+        for key, label in [('product_value', 'Product Value'), ('service', 'Service Quality'), ('pricing', 'Pricing'), ('support', 'Support')]:
+            val = average_ratings.get(key, 0)
+            if key == 'support' and val == 0:
+                support_vals = []
+                for r in seg_data.get('nps_by_role', {}).values():
+                    sv = r.get('support')
+                    if sv is not None:
+                        support_vals.append(sv)
+                val = round(sum(support_vals) / len(support_vals), 2) if support_vals else 0
+            resp_with_metric = sub_counts.get(key, 0)
+            pct = round(resp_with_metric / total_for_completeness * 100, 0) if total_for_completeness > 0 else 0
+            sub_metrics[key] = {'value': val, 'label': label, 'completeness': pct, 'response_count': resp_with_metric}
+        
+        sorted_subs = sorted(sub_metrics.items(), key=lambda x: x[1]['value'])
+        if len(sorted_subs) >= 2:
+            lowest_key, lowest_info = sorted_subs[0]
+            next_key, next_info = sorted_subs[1]
+            gap = next_info['value'] - lowest_info['value']
+            if gap >= 0.5 and lowest_info['value'] > 0:
+                completeness = lowest_info['completeness']
+                
+                if completeness >= 80:
+                    confidence = 'High'
+                elif completeness >= 60:
+                    confidence = 'Medium'
+                else:
+                    confidence = 'Low'
+                
+                recommendations.append({
+                    'title': f'Lowest Sub-Metric: {lowest_info["label"]}',
+                    'description': f'{lowest_info["label"]} has the lowest rating at {lowest_info["value"]:.1f}/5.0, which is {gap:.1f} points below the next lowest metric ({next_info["label"]} at {next_info["value"]:.1f}/5.0). Consider prioritizing improvements in this area.',
+                    'confidence': confidence,
+                    'sample_size': total_responses,
+                    'gap_magnitude': round(gap, 1),
+                    'data_completeness_pct': completeness,
+                })
+        
+        for seg_key in ['tier', 'role', 'region']:
+            churn_data = seg_data.get('churn_risk_by_segment', {}).get(seg_key, {})
+            for seg_name, levels in churn_data.items():
+                if seg_name == 'Unknown':
+                    continue
+                total = sum(levels.values())
+                high_count = levels.get('High', 0)
+                if total >= 5 and high_count > 0:
+                    high_pct = high_count / total * 100
+                    if high_pct > 30:
+                        if total >= 15 and high_pct > 40:
+                            confidence = 'High'
+                        elif total >= 8 and high_pct > 30:
+                            confidence = 'Medium'
+                        else:
+                            confidence = 'Low'
+                        recommendations.append({
+                            'title': f'Churn Concentration: {seg_name} ({seg_key.title()})',
+                            'description': f'{high_pct:.0f}% of responses from {seg_name} ({seg_key}) show High churn risk ({high_count} of {total} responses). This concentration suggests systemic issues affecting this segment.',
+                            'confidence': confidence,
+                            'sample_size': total,
+                            'gap_magnitude': round(high_pct, 1),
+                            'data_completeness_pct': 100,
+                        })
+        
+        tenure = seg_data.get('tenure_cohorts', {})
+        mid_nps = tenure.get('3-5 years', {}).get('nps')
+        for long_band in ['6-8 years', '9+ years']:
+            long_data = tenure.get(long_band, {})
+            long_nps = long_data.get('nps')
+            if mid_nps is not None and long_nps is not None:
+                gap = mid_nps - long_nps
+                if gap >= 10:
+                    mid_n = tenure.get('3-5 years', {}).get('count', 0)
+                    long_n = long_data.get('count', 0)
+                    min_n = min(mid_n, long_n)
+                    if min_n >= 20:
+                        confidence = 'High'
+                    elif min_n >= 10:
+                        confidence = 'Medium'
+                    else:
+                        confidence = 'Low'
+                    recommendations.append({
+                        'title': f'Tenure Fatigue: {long_band} Cohort',
+                        'description': f'Long-tenure clients ({long_band}) show NPS of {long_nps:.0f}, which is {gap:.0f} points below mid-tenure (3-5 years) clients at {mid_nps:.0f}. This may indicate declining satisfaction among established accounts.',
+                        'confidence': confidence,
+                        'sample_size': long_n,
+                        'gap_magnitude': round(gap, 1),
+                        'data_completeness_pct': round(min_n / max(mid_n, 1) * 100, 0) if mid_n > 0 else 0,
+                    })
+        
+        confidence_order = {'High': 0, 'Medium': 1, 'Low': 2}
+        recommendations.sort(key=lambda x: (confidence_order.get(x['confidence'], 3), -x['gap_magnitude']))
+        
+        return recommendations[:5]
+    
     def _generate_pdf_report(self, report_data: Dict, campaign, business_account) -> str:
         """Generate the final PDF report"""
         # Add branding data to report
@@ -1136,10 +1585,6 @@ class ExecutiveReportGenerator:
                         <div class="kpi-label">Responses Completed</div>
                     </div>
                     <div class="kpi-card">
-                        <div class="kpi-value">{{ current_kpis.transcripts_count }}</div>
-                        <div class="kpi-label">Transcripts Analyzed</div>
-                    </div>
-                    <div class="kpi-card">
                         <div class="kpi-value">{{ current_kpis.response_rate }}%</div>
                         <div class="kpi-label">Response Rate</div>
                         {% if delta_kpis.response_rate_delta is not none %}
@@ -1180,6 +1625,7 @@ class ExecutiveReportGenerator:
                 
                 <p><strong>Campaign Duration:</strong> {{ campaign.start_date.strftime('%B %d, %Y') }} - {{ campaign.end_date.strftime('%B %d, %Y') }}</p>
                 <p><strong>Status:</strong> {{ campaign.status.title() }}</p>
+                {% if current_kpis.transcripts_count > 0 %}<p style="color: #888; font-size: 0.85em;"><em>Includes {{ current_kpis.transcripts_count }} transcript-sourced responses.</em></p>{% endif %}
             </div>
 
             <!-- Key Performance Indicators -->
@@ -1193,7 +1639,7 @@ class ExecutiveReportGenerator:
                 </div>
                 {% endif %}
                 
-                {% if survey_type != 'classic' and charts.sentiment_breakdown %}
+                {% if charts.sentiment_breakdown %}
                 <div class="chart-container">
                     <h3>Sentiment Analysis</h3>
                     <img src="{{ charts.sentiment_breakdown }}" alt="Sentiment Breakdown" class="chart-image">
@@ -1337,17 +1783,6 @@ class ExecutiveReportGenerator:
             <div class="section page-break">
                 <h2 class="section-title">💡 Strategic Insights</h2>
                 
-                {% if ai_insights.top_themes %}
-                <h3>Top Themes Identified</h3>
-                <div class="insights-list">
-                    {% for theme_name, theme_data in ai_insights.top_themes %}
-                    <div class="insight-item">
-                        <strong>{{ theme_name }}</strong> - Mentioned by {{ theme_data.count }} respondent{{ 's' if theme_data.count != 1 else '' }}
-                    </div>
-                    {% endfor %}
-                </div>
-                {% endif %}
-                
                 {% if ai_insights.critical_issues %}
                 <h3>Critical Issues Requiring Attention</h3>
                 <div class="insights-list">
@@ -1356,13 +1791,6 @@ class ExecutiveReportGenerator:
                         <strong>{{ issue.respondent }}:</strong> {{ issue.issue }} (Risk Score: {{ issue.score }}/10)
                     </div>
                     {% endfor %}
-                </div>
-                {% endif %}
-                
-                {% if charts.response_timeline %}
-                <div class="chart-container">
-                    <h3>Response Timeline</h3>
-                    <img src="{{ charts.response_timeline }}" alt="Response Timeline" class="chart-image">
                 </div>
                 {% endif %}
             </div>
@@ -1412,6 +1840,69 @@ class ExecutiveReportGenerator:
                 {% endif %}
             </div>
 
+            {% if segmentation_charts and segmentation_charts.nps_by_segment %}
+            <!-- Segmentation Analytics -->
+            <div class="section page-break">
+                <h2 class="section-title">📊 Segmentation Analytics</h2>
+                <p style="color: #666; margin-bottom: 15px;">NPS performance broken down by participant role and customer tier, revealing which segments are driving or dragging overall scores.</p>
+                
+                <div class="chart-container">
+                    <img src="{{ segmentation_charts.nps_by_segment }}" alt="NPS by Segment" class="chart-image">
+                </div>
+            </div>
+            {% endif %}
+
+            {% if segmentation_charts and segmentation_charts.churn_heatmap %}
+            <!-- Churn Risk Distribution -->
+            <div class="section page-break">
+                <h2 class="section-title">⚠️ Churn Risk Distribution</h2>
+                <p style="color: #666; margin-bottom: 15px;">Distribution of churn risk levels across customer tiers, highlighting segments with concentrated retention risk.</p>
+                
+                <div class="chart-container">
+                    <img src="{{ segmentation_charts.churn_heatmap }}" alt="Churn Risk Heatmap" class="chart-image">
+                </div>
+            </div>
+            {% endif %}
+
+            {% if segmentation_charts and segmentation_charts.tenure_cohort %}
+            <!-- Tenure Cohort Analysis -->
+            <div class="section page-break">
+                <h2 class="section-title">📅 Tenure Cohort Analysis</h2>
+                <p style="color: #666; margin-bottom: 15px;">How NPS and satisfaction evolve across client tenure bands, identifying potential loyalty fatigue patterns.</p>
+                
+                <div class="chart-container">
+                    <img src="{{ segmentation_charts.tenure_cohort }}" alt="Tenure Cohort Analysis" class="chart-image">
+                </div>
+            </div>
+            {% endif %}
+
+            {% if recommendations %}
+            <!-- Recommended Actions -->
+            <div class="section page-break">
+                <h2 class="section-title">🎯 Recommended Actions</h2>
+                <p style="color: #666; margin-bottom: 15px;">Data-driven recommendations based on pattern analysis across segmentation data.</p>
+                
+                {% for rec in recommendations %}
+                <div style="border-left: 4px solid {% if rec.confidence == 'High' %}#28a745{% elif rec.confidence == 'Medium' %}#ffc107{% else %}#dc3545{% endif %}; padding: 12px 15px; margin-bottom: 15px; background: #f8f9fa; border-radius: 0 8px 8px 0;">
+                    <div style="font-weight: bold; font-size: 1em; margin-bottom: 6px;">{{ rec.title }}</div>
+                    <div style="color: #444; font-size: 0.9em; margin-bottom: 8px;">{{ rec.description }}</div>
+                    <div style="color: #888; font-size: 0.8em;">
+                        Confidence: <strong style="color: {% if rec.confidence == 'High' %}#28a745{% elif rec.confidence == 'Medium' %}#ffc107{% else %}#dc3545{% endif %};">{{ rec.confidence }}</strong>
+                        (n={{ rec.sample_size }}, {{ rec.gap_magnitude }}-pt gap, {{ rec.data_completeness_pct|int }}% data completeness)
+                    </div>
+                </div>
+                {% endfor %}
+                
+                <div style="margin-top: 20px; padding: 12px; background: #f0f0f0; border-radius: 6px; font-size: 0.8em; color: #666;">
+                    <strong>Methodology:</strong> Confidence levels are determined by three factors:<br>
+                    &bull; <strong>High:</strong> 20+ responses, statistically significant gap (15+ NPS points or 0.5+ rating points), 80%+ data completeness<br>
+                    &bull; <strong>Medium:</strong> 10-19 responses OR moderate gap OR 60-79% completeness<br>
+                    &bull; <strong>Low:</strong> Under 10 responses OR small gap OR under 60% completeness<br><br>
+                    <em>Recommendations are generated from rule-based pattern detection across segment data. They reflect observed patterns in survey responses, not predictive models.</em>
+                </div>
+            </div>
+            {% endif %}
+
             {% if survey_type != 'classic' %}
             <!-- Average Ratings (Conversational surveys only) -->
             <div class="section">
@@ -1454,22 +1945,15 @@ class ExecutiveReportGenerator:
             </div>
             {% endif %}
 
-            <!-- Report Details -->
-            <div class="section page-break">
-                <h2 class="section-title">📋 Report Details</h2>
-                <p><strong>Report Generated:</strong> {{ generated_at.strftime('%B %d, %Y at %I:%M %p UTC') }}</p>
-                <p><strong>Business Account:</strong> {{ business_account.name }}</p>
-                <p><strong>Campaign:</strong> {{ campaign.name }}</p>
-                <p><strong>Survey Type:</strong> {{ survey_type|title }}</p>
-                <p><strong>Data Period:</strong> {{ campaign.start_date.strftime('%B %d, %Y') }} - {{ campaign.end_date.strftime('%B %d, %Y') }}</p>
-                <p><strong>Total Responses Analyzed:</strong> {{ current_kpis.total_responses }}</p>
-                <p><strong>AI Insights Generated:</strong> {{ ai_insights.insights_available }} responses</p>
-                
+            <!-- Report Footer -->
+            <div style="margin-top: 30px; padding: 15px 20px; background: #f5f5f5; border-top: 2px solid #ddd; border-radius: 4px; font-size: 0.85em; color: #666;">
+                <strong>Survey Type:</strong> {{ survey_type|title }} &nbsp;|&nbsp;
+                <strong>Data Period:</strong> {{ campaign.start_date.strftime('%b %d, %Y') }} – {{ campaign.end_date.strftime('%b %d, %Y') }} &nbsp;|&nbsp;
+                <strong>Responses Analyzed:</strong> {{ current_kpis.total_responses }}
                 {% if delta_kpis.comparison_count > 0 %}
-                <p><strong>Historical Comparison:</strong> Compared against {{ delta_kpis.comparison_count }} previous campaign{{ 's' if delta_kpis.comparison_count != 1 else '' }} in current license period</p>
+                <br><strong>Historical Comparison:</strong> Compared against {{ delta_kpis.comparison_count }} previous campaign{{ 's' if delta_kpis.comparison_count != 1 else '' }} in current license period.
                 {% endif %}
-                
-                <p><em>This report was automatically generated by VOÏA - Voice Of Client system.</em></p>
+                <br><em>This report was automatically generated by VOÏA – Voice Of Client system.</em>
             </div>
         </body>
         </html>
