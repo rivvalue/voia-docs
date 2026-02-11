@@ -200,7 +200,7 @@
                         <ul class="dropdown-menu dropdown-menu-end notification-dropdown" id="notificationDropdown">
                             <li class="notification-header d-flex justify-content-between align-items-center px-3 py-2">
                                 <span class="fw-bold">{{ _('Notifications') }}</span>
-                                <a href="#" id="markAllRead" class="small text-decoration-none">{{ _('Mark all read') }}</a>
+                                <a href="javascript:void(0)" id="markAllRead" class="small text-decoration-none" onclick="markAllNotificationsRead(event)">{{ _('Mark all read') }}</a>
                             </li>
                             <li><hr class="dropdown-divider"></li>
                             <li id="notificationsList" class="notification-list">
@@ -443,7 +443,7 @@
                         const unreadClass = n.unread ? 'notification-unread' : '';
                         
                         return `
-                            <li class="notification-item ${unreadClass}" data-id="${n.id}">
+                            <li class="notification-item ${unreadClass}" data-id="${n.id}" onclick="markNotificationRead(${n.id}, this)">
                                 <div class="notification-content">
                                     <i class="${categoryIcon} me-2"></i>
                                     <span>${n.message}</span>
@@ -452,26 +452,17 @@
                             </li>
                         `;
                     }).join('');
-                    
-                    // Add click handlers to mark as read
-                    document.querySelectorAll('.notification-item').forEach(item => {
-                        item.addEventListener('click', function() {
-                            const notifId = this.getAttribute('data-id');
-                            markAsRead(notifId);
-                        });
-                    });
                 }
             } catch (error) {
                 console.error('Error loading notifications:', error);
             }
         }
         
-        // Function to mark notification as read
-        async function markAsRead(notificationId) {
+        // Expose mark-as-read as global function for inline onclick handler
+        window.markNotificationRead = async function(notificationId, element) {
             try {
-                const item = document.querySelector(`.notification-item[data-id="${notificationId}"]`);
-                if (item && item.classList.contains('notification-unread')) {
-                    item.classList.remove('notification-unread');
+                if (element && element.classList.contains('notification-unread')) {
+                    element.classList.remove('notification-unread');
                     previousCount = Math.max(0, previousCount - 1);
                     if (previousCount > 0) {
                         notificationBadge.textContent = previousCount;
@@ -495,15 +486,11 @@
                 await updateNotificationCount();
                 await loadNotifications();
             }
-        }
+        };
         
-        // Function to mark all as read (using document-level delegation for Bootstrap dropdown compatibility)
-        document.addEventListener('click', async function(e) {
-            const target = e.target.closest('#markAllRead');
-            if (!target) return;
-            
-            e.preventDefault();
-            e.stopPropagation();
+        // Expose mark-all-read as a global function for inline onclick handler
+        window.markAllNotificationsRead = async function(e) {
+            if (e) { e.preventDefault(); e.stopPropagation(); }
             
             try {
                 document.querySelectorAll('.notification-item.notification-unread').forEach(item => {
@@ -534,7 +521,7 @@
                 await updateNotificationCount();
                 await loadNotifications();
             }
-        });
+        };
         
         // Helper: Get time ago string
         function getTimeAgo(date) {
