@@ -718,11 +718,39 @@ class ExecutiveReportGenerator:
         # Sort themes by frequency and impact
         sorted_themes = sorted(themes.items(), key=lambda x: x[1]['count'], reverse=True)[:5]
         
+        promoter_themes = {}
+        detractor_themes = {}
+        for response in responses:
+            nps = getattr(response, 'nps_score', None)
+            if nps is None or not response.key_themes:
+                continue
+            try:
+                theme_list = json.loads(response.key_themes) if isinstance(response.key_themes, str) else response.key_themes
+                for theme in theme_list:
+                    theme_name = theme if isinstance(theme, str) else theme.get('theme', 'Unknown')
+                    if nps >= 9:
+                        promoter_themes[theme_name] = promoter_themes.get(theme_name, 0) + 1
+                    elif nps <= 6:
+                        detractor_themes[theme_name] = detractor_themes.get(theme_name, 0) + 1
+            except (json.JSONDecodeError, TypeError):
+                continue
+        
+        growth_signals = []
+        for theme_name, p_count in sorted(promoter_themes.items(), key=lambda x: x[1], reverse=True):
+            if p_count >= 2:
+                growth_signals.append({
+                    'theme': theme_name,
+                    'promoter_count': p_count,
+                    'detractor_count': detractor_themes.get(theme_name, 0),
+                })
+        growth_signals = growth_signals[:5]
+        
         return {
             'top_themes': sorted_themes,
-            'critical_issues': critical_issues[:3],  # Top 3 critical issues
+            'critical_issues': critical_issues[:3],
             'total_themes': len(themes),
-            'insights_available': len([r for r in responses if r.sentiment_label or r.key_themes or r.churn_risk_score is not None])
+            'insights_available': len([r for r in responses if r.sentiment_label or r.key_themes or r.churn_risk_score is not None]),
+            'growth_signals': growth_signals,
         }
     
     def _calculate_high_risk_accounts(self, responses: List) -> List[Dict]:
@@ -1180,10 +1208,12 @@ class ExecutiveReportGenerator:
                 seg_nps = seg_info.get('nps', 0)
                 n = seg_info.get('count', 0)
                 gap = campaign_nps - seg_nps
-                if gap >= 15 and n >= 3:
-                    if n >= 20:
+                if gap >= 5 and n >= 3:
+                    if n >= 20 and gap >= 15:
                         confidence = 'High'
-                    elif n >= 10:
+                    elif n >= 10 and gap >= 10:
+                        confidence = 'Medium'
+                    elif n >= 10 or gap >= 10:
                         confidence = 'Medium'
                     else:
                         confidence = 'Low'
@@ -1218,12 +1248,12 @@ class ExecutiveReportGenerator:
             lowest_key, lowest_info = sorted_subs[0]
             next_key, next_info = sorted_subs[1]
             gap = next_info['value'] - lowest_info['value']
-            if gap >= 0.5 and lowest_info['value'] > 0:
+            if gap >= 0.2 and lowest_info['value'] > 0:
                 completeness = lowest_info['completeness']
                 
-                if completeness >= 80:
+                if completeness >= 80 and gap >= 0.5:
                     confidence = 'High'
-                elif completeness >= 60:
+                elif completeness >= 60 and gap >= 0.3:
                     confidence = 'Medium'
                 else:
                     confidence = 'Low'
@@ -1246,7 +1276,7 @@ class ExecutiveReportGenerator:
                 high_count = levels.get('High', 0)
                 if total >= 5 and high_count > 0:
                     high_pct = high_count / total * 100
-                    if high_pct > 30:
+                    if high_pct > 15:
                         if total >= 15 and high_pct > 40:
                             confidence = 'High'
                         elif total >= 8 and high_pct > 30:
@@ -1269,13 +1299,15 @@ class ExecutiveReportGenerator:
             long_nps = long_data.get('nps')
             if mid_nps is not None and long_nps is not None:
                 gap = mid_nps - long_nps
-                if gap >= 10:
+                if gap >= 5:
                     mid_n = tenure.get('3-5 years', {}).get('count', 0)
                     long_n = long_data.get('count', 0)
                     min_n = min(mid_n, long_n)
-                    if min_n >= 20:
+                    if min_n >= 20 and gap >= 10:
                         confidence = 'High'
-                    elif min_n >= 10:
+                    elif min_n >= 10 and gap >= 7:
+                        confidence = 'Medium'
+                    elif min_n >= 10 or gap >= 10:
                         confidence = 'Medium'
                     else:
                         confidence = 'Low'
@@ -1287,6 +1319,29 @@ class ExecutiveReportGenerator:
                         'gap_magnitude': round(gap, 1),
                         'data_completeness_pct': round(min_n / max(mid_n, 1) * 100, 0) if mid_n > 0 else 0,
                     })
+        
+        if not recommendations and total_responses >= 5:
+            overall_satisfaction = average_ratings.get('satisfaction', 0)
+            lowest_sub = sorted_subs[0] if sorted_subs else None
+            if lowest_sub:
+                lowest_key, lowest_info = lowest_sub
+                recommendations.append({
+                    'title': 'Monitor Lowest-Rated Dimension',
+                    'description': f'{lowest_info["label"]} is the lowest-rated sub-metric at {lowest_info["value"]:.1f}/5.0. While no statistically significant gaps were detected across segments, this area may benefit from proactive attention.',
+                    'confidence': 'Low',
+                    'sample_size': total_responses,
+                    'gap_magnitude': round(sorted_subs[1][1]['value'] - lowest_info['value'], 1) if len(sorted_subs) >= 2 else 0,
+                    'data_completeness_pct': lowest_info.get('completeness', 0),
+                })
+            
+            recommendations.append({
+                'title': 'Maintain Current Trajectory',
+                'description': f'No significant risk patterns were detected across {total_responses} responses. Segment-level NPS variation is within normal range and churn risk indicators are stable. Continue monitoring key metrics for emerging trends.',
+                'confidence': 'Low',
+                'sample_size': total_responses,
+                'gap_magnitude': 0,
+                'data_completeness_pct': 100,
+            })
         
         confidence_order = {'High': 0, 'Medium': 1, 'Low': 2}
         recommendations.sort(key=lambda x: (confidence_order.get(x['confidence'], 3), -x['gap_magnitude']))
@@ -1785,12 +1840,47 @@ class ExecutiveReportGenerator:
                 
                 {% if ai_insights.critical_issues %}
                 <h3>Critical Issues Requiring Attention</h3>
+                <p style="color: #666; margin-bottom: 10px;">{{ ai_insights.critical_issues|length }} respondent{{ 's' if ai_insights.critical_issues|length != 1 else '' }} flagged with churn risk score ≥ 7.0/10, indicating elevated likelihood of disengagement.</p>
                 <div class="insights-list">
                     {% for issue in ai_insights.critical_issues %}
-                    <div class="insight-item">
+                    <div class="insight-item" style="border-left: 4px solid #dc3545; padding-left: 12px; margin-bottom: 10px;">
                         <strong>{{ issue.respondent }}:</strong> {{ issue.issue }} (Risk Score: {{ issue.score }}/10)
                     </div>
                     {% endfor %}
+                </div>
+                {% else %}
+                <div style="padding: 12px 15px; background: #d4edda; border-radius: 8px; border-left: 4px solid #28a745; margin-bottom: 15px;">
+                    <strong style="color: #155724;">No High-Risk Respondents Identified</strong>
+                    <p style="color: #155724; margin: 5px 0 0 0; font-size: 0.9em;">None of the {{ current_kpis.total_responses }} responses in this campaign exceeded the churn risk threshold (≥ 7.0/10). Overall relationship health appears stable across the respondent base.</p>
+                </div>
+                {% endif %}
+                
+                {% if ai_insights.top_themes %}
+                <h3 style="margin-top: 20px;">Top Themes at a Glance</h3>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px;">
+                    {% for theme_name, theme_data in ai_insights.top_themes %}
+                    <span style="background: #e9ecef; padding: 6px 12px; border-radius: 20px; font-size: 0.85em;">
+                        {{ theme_name }} <strong style="color: var(--primary-color, #dc3545);">({{ theme_data.count }})</strong>
+                    </span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                {% if ai_insights.growth_signals %}
+                <h3 style="margin-top: 20px;">Growth Signals</h3>
+                <p style="color: #666; font-size: 0.9em; margin-bottom: 10px;">Patterns detected from promoter feedback (NPS 9-10) that suggest organic growth opportunities.</p>
+                <div class="insights-list">
+                    {% for signal in ai_insights.growth_signals %}
+                    <div class="insight-item" style="border-left: 4px solid #28a745; padding-left: 12px; margin-bottom: 8px;">
+                        <strong>{{ signal.theme }}</strong> — mentioned by {{ signal.promoter_count }} promoter{{ 's' if signal.promoter_count != 1 else '' }}
+                        {% if signal.detractor_count > 0 %}<span style="color: #888; font-size: 0.85em;">(also {{ signal.detractor_count }} detractor{{ 's' if signal.detractor_count != 1 else '' }})</span>{% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% elif current_kpis.promoters is defined and current_kpis.promoters > 0 %}
+                <h3 style="margin-top: 20px;">Growth Signals</h3>
+                <div style="padding: 12px 15px; background: #f8f9fa; border-radius: 8px; margin-bottom: 15px;">
+                    <p style="color: #666; font-size: 0.9em; margin: 0;">{{ current_kpis.promoters }} promoter{{ 's' if current_kpis.promoters != 1 else '' }} identified (NPS 9-10). Qualitative theme analysis did not isolate promoter-specific patterns distinct from the overall feedback.</p>
                 </div>
                 {% endif %}
             </div>
@@ -1894,10 +1984,10 @@ class ExecutiveReportGenerator:
                 {% endfor %}
                 
                 <div style="margin-top: 20px; padding: 12px; background: #f0f0f0; border-radius: 6px; font-size: 0.8em; color: #666;">
-                    <strong>Methodology:</strong> Confidence levels are determined by three factors:<br>
-                    &bull; <strong>High:</strong> 20+ responses, statistically significant gap (15+ NPS points or 0.5+ rating points), 80%+ data completeness<br>
-                    &bull; <strong>Medium:</strong> 10-19 responses OR moderate gap OR 60-79% completeness<br>
-                    &bull; <strong>Low:</strong> Under 10 responses OR small gap OR under 60% completeness<br><br>
+                    <strong>Methodology:</strong> Confidence levels are determined by three factors: sample size, gap magnitude, and data completeness.<br>
+                    &bull; <strong>High:</strong> 20+ responses with large gap (15+ NPS points or 0.5+ rating points) and 80%+ data completeness<br>
+                    &bull; <strong>Medium:</strong> 10+ responses with moderate gap (10+ NPS points or 0.3+ rating points) and 60%+ completeness<br>
+                    &bull; <strong>Low:</strong> Smaller samples, narrower gaps, or lower completeness — pattern noted but warrants further investigation<br><br>
                     <em>Recommendations are generated from rule-based pattern detection across segment data. They reflect observed patterns in survey responses, not predictive models.</em>
                 </div>
             </div>
