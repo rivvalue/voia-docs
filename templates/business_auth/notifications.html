@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Notifications') }} - VOÏA{% endblock %}
+
+{% block page_class %}page-notifications{% endblock %}
+
+{% block content %}
+<style>
+.notifications-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.notifications-header {
+    background: var(--primary-white, #fff);
+    border-bottom: 1px solid var(--border-light, #e9ecef);
+    padding: 2rem 0 1.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.notifications-header h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-primary, #1a1a2e);
+}
+
+.notification-card {
+    background: var(--primary-white, #fff);
+    border: 1px solid var(--border-light, #e9ecef);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    transition: background-color 0.2s ease;
+}
+
+.notification-card.unread {
+    background: #f0f4ff;
+    border-left: 4px solid var(--primary-blue, #0d6efd);
+}
+
+.notification-card:hover {
+    background: #f8f9fa;
+}
+
+.notification-card .notif-icon {
+    font-size: 1.1rem;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.notification-card .notif-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.notification-card .notif-message {
+    font-size: 0.95rem;
+    color: var(--text-primary, #1a1a2e);
+    margin-bottom: 0.25rem;
+    word-wrap: break-word;
+}
+
+.notification-card .notif-time {
+    font-size: 0.8rem;
+    color: var(--text-muted, #6c757d);
+}
+
+.notification-card .notif-actions {
+    flex-shrink: 0;
+}
+
+.empty-notifications {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text-muted, #6c757d);
+}
+
+.empty-notifications i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.4;
+}
+
+.empty-notifications p {
+    font-size: 1.1rem;
+}
+</style>
+
+{# Breadcrumb Navigation #}
+{% set breadcrumb_items = [
+    {'label': _('Notifications'), 'current': true}
+] %}
+{% include 'components/breadcrumb.html' %}
+
+<div class="notifications-container">
+    <div class="notifications-header">
+        <div>
+            <h1><i class="fas fa-bell me-2"></i>{{ _('Notifications') }}</h1>
+            {% if unread_count > 0 %}
+            <small class="text-muted">{{ _('%(count)d unread', count=unread_count) }}</small>
+            {% endif %}
+        </div>
+        {% if unread_count > 0 %}
+        <form method="POST" action="{{ url_for('business_auth.mark_all_notifications_read') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-check-double me-1"></i>{{ _('Mark all as read') }}
+            </button>
+        </form>
+        {% endif %}
+    </div>
+    
+    {% if notifications %}
+        {% for n in notifications %}
+        <div class="notification-card {% if n.unread %}unread{% endif %}">
+            <div class="notif-icon">
+                {% if n.category == 'success' %}
+                    <i class="fas fa-check-circle text-success"></i>
+                {% elif n.category == 'error' %}
+                    <i class="fas fa-exclamation-circle text-danger"></i>
+                {% elif n.category == 'warning' %}
+                    <i class="fas fa-exclamation-triangle text-warning"></i>
+                {% else %}
+                    <i class="fas fa-info-circle text-info"></i>
+                {% endif %}
+            </div>
+            <div class="notif-body">
+                <div class="notif-message">{{ n.message }}</div>
+                <div class="notif-time">{{ n.created_at.strftime('%b %d, %Y at %H:%M') }}</div>
+            </div>
+            {% if n.unread %}
+            <div class="notif-actions">
+                <form method="POST" action="{{ url_for('business_auth.mark_notification_read_page', notification_id=n.id) }}" style="display:inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-sm btn-outline-primary" title="{{ _('Mark as read') }}">
+                        <i class="fas fa-check"></i>
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-notifications">
+            <i class="fas fa-bell-slash d-block"></i>
+            <p>{{ _('No notifications yet') }}</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

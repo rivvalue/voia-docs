@@ -191,22 +191,12 @@
                         </div>
                     </div>
                     
-                    <!-- Notification Bell Icon (business users only) -->
+                    <!-- Notification Bell Icon (links to notifications page) -->
                     <div class="notification-center">
-                        <button class="btn btn-link position-relative notification-bell" id="notificationBell" type="button" data-bs-toggle="dropdown" data-bs-auto-close="true" aria-expanded="false" style="padding: 0.5rem;">
+                        <a href="{{ url_for('business_auth.notifications_page') }}" class="btn btn-link position-relative notification-bell" id="notificationBell" style="padding: 0.5rem; text-decoration: none;">
                             <i class="fas fa-bell"></i>
                             <span class="notification-badge badge bg-danger position-absolute" id="notificationBadge" style="display: none; top: 4px; right: 4px; font-size: 0.65rem; padding: 0.25em 0.5em;">0</span>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end notification-dropdown" id="notificationDropdown">
-                            <li class="notification-header d-flex justify-content-between align-items-center px-3 py-2">
-                                <span class="fw-bold">{{ _('Notifications') }}</span>
-                                <a href="javascript:void(0)" id="markAllRead" class="small text-decoration-none" onclick="markAllNotificationsRead(event)">{{ _('Mark all read') }}</a>
-                            </li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li id="notificationsList" class="notification-list">
-                                <div class="text-center text-muted py-3">{{ _('No notifications') }}</div>
-                            </li>
-                        </ul>
+                        </a>
                     </div>
                     {% endif %}
                     
@@ -389,150 +379,17 @@
     });
     </script>
     
-    <!-- Notification Center Polling Script -->
+    <!-- Toast Notification Container -->
     {% if is_business_authenticated %}
+    <div class="toast-container position-fixed top-0 end-0 p-3" id="toastContainer" style="z-index: 1090;"></div>
+    
     <script>
     (function() {
-        const notificationBell = document.getElementById('notificationBell');
         const notificationBadge = document.getElementById('notificationBadge');
-        const notificationsList = document.getElementById('notificationsList');
-        const markAllReadBtn = document.getElementById('markAllRead');
+        const toastContainer = document.getElementById('toastContainer');
+        let previousCount = -1;
+        let shownToastIds = new Set();
         
-        let previousCount = 0;
-        
-        // Function to update notification count
-        async function updateNotificationCount() {
-            try {
-                const response = await fetch(`/api/notifications/count?_=${Date.now()}`, {
-                    cache: 'no-store'
-                });
-                const data = await response.json();
-                
-                if (data.unread_count > 0) {
-                    notificationBadge.textContent = data.unread_count;
-                    notificationBadge.style.display = 'inline-block';
-                } else {
-                    notificationBadge.style.display = 'none';
-                }
-                
-                // If count increased, fetch new notifications
-                if (data.unread_count > previousCount) {
-                    await loadNotifications();
-                }
-                
-                previousCount = data.unread_count;
-            } catch (error) {
-                console.error('Error fetching notification count:', error);
-            }
-        }
-        
-        // Function to load notifications
-        async function loadNotifications() {
-            try {
-                const response = await fetch(`/api/notifications?limit=10&_=${Date.now()}`, {
-                    cache: 'no-store'
-                });
-                const data = await response.json();
-                
-                if (data.notifications.length === 0) {
-                    notificationsList.innerHTML = '<div class="text-center text-muted py-3">{{ _("No notifications") }}</div>';
-                } else {
-                    notificationsList.innerHTML = data.notifications.map(n => {
-                        const timeAgo = getTimeAgo(new Date(n.created_at));
-                        const categoryIcon = getCategoryIcon(n.category);
-                        const unreadClass = n.unread ? 'notification-unread' : '';
-                        
-                        return `
-                            <li class="notification-item ${unreadClass}" data-id="${n.id}" onclick="markNotificationRead(${n.id}, this)">
-                                <div class="notification-content">
-                                    <i class="${categoryIcon} me-2"></i>
-                                    <span>${n.message}</span>
-                                </div>
-                                <div class="notification-time text-muted small">${timeAgo}</div>
-                            </li>
-                        `;
-                    }).join('');
-                }
-            } catch (error) {
-                console.error('Error loading notifications:', error);
-            }
-        }
-        
-        // Expose mark-as-read as global function for inline onclick handler
-        window.markNotificationRead = async function(notificationId, element) {
-            try {
-                if (element && element.classList.contains('notification-unread')) {
-                    element.classList.remove('notification-unread');
-                    previousCount = Math.max(0, previousCount - 1);
-                    if (previousCount > 0) {
-                        notificationBadge.textContent = previousCount;
-                    } else {
-                        notificationBadge.style.display = 'none';
-                    }
-                }
-                
-                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
-                await fetch(`/api/notifications/${notificationId}/read`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': csrfToken
-                    },
-                    credentials: 'same-origin'
-                });
-                await updateNotificationCount();
-            } catch (error) {
-                console.error('Error marking notification as read:', error);
-                await updateNotificationCount();
-                await loadNotifications();
-            }
-        };
-        
-        // Expose mark-all-read as a global function for inline onclick handler
-        window.markAllNotificationsRead = async function(e) {
-            if (e) { e.preventDefault(); e.stopPropagation(); }
-            
-            try {
-                document.querySelectorAll('.notification-item.notification-unread').forEach(item => {
-                    item.classList.remove('notification-unread');
-                });
-                previousCount = 0;
-                notificationBadge.style.display = 'none';
-                
-                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
-                const response = await fetch('/api/notifications/mark-all-read', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': csrfToken
-                    },
-                    credentials: 'same-origin'
-                });
-                
-                if (!response.ok) {
-                    await updateNotificationCount();
-                    await loadNotifications();
-                    return;
-                }
-                
-                await updateNotificationCount();
-            } catch (error) {
-                console.error('Error marking all as read:', error);
-                await updateNotificationCount();
-                await loadNotifications();
-            }
-        };
-        
-        // Helper: Get time ago string
-        function getTimeAgo(date) {
-            const seconds = Math.floor((new Date() - date) / 1000);
-            if (seconds < 60) return '{{ _("just now") }}';
-            if (seconds < 3600) return Math.floor(seconds / 60) + '{{ _("m ago") }}';
-            if (seconds < 86400) return Math.floor(seconds / 3600) + '{{ _("h ago") }}';
-            return Math.floor(seconds / 86400) + '{{ _("d ago") }}';
-        }
-        
-        // Helper: Get icon for category
         function getCategoryIcon(category) {
             const icons = {
                 'success': 'fas fa-check-circle text-success',
@@ -543,14 +400,77 @@
             return icons[category] || icons['info'];
         }
         
-        // Load notifications when dropdown is opened
-        if (notificationBell) {
-            notificationBell.addEventListener('click', loadNotifications);
+        function getCategoryColor(category) {
+            const colors = {
+                'success': '#198754',
+                'error': '#dc3545',
+                'warning': '#ffc107',
+                'info': '#0d6efd'
+            };
+            return colors[category] || colors['info'];
         }
         
-        // Poll for new notifications every 15 seconds
-        updateNotificationCount(); // Initial load
-        setInterval(updateNotificationCount, 15000); // Every 15 seconds
+        function showToast(notification) {
+            if (shownToastIds.has(notification.id)) return;
+            shownToastIds.add(notification.id);
+            
+            const toastEl = document.createElement('div');
+            toastEl.className = 'toast';
+            toastEl.setAttribute('role', 'alert');
+            toastEl.setAttribute('aria-live', 'assertive');
+            toastEl.setAttribute('aria-atomic', 'true');
+            toastEl.innerHTML = `
+                <div class="toast-header" style="border-left: 4px solid ${getCategoryColor(notification.category)};">
+                    <i class="${getCategoryIcon(notification.category)} me-2"></i>
+                    <strong class="me-auto">{{ _('Notification') }}</strong>
+                    <small class="text-muted">{{ _('just now') }}</small>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    ${notification.message}
+                </div>
+            `;
+            toastContainer.appendChild(toastEl);
+            
+            const bsToast = new bootstrap.Toast(toastEl, { delay: 8000 });
+            bsToast.show();
+            
+            toastEl.addEventListener('hidden.bs.toast', function() {
+                toastEl.remove();
+            });
+        }
+        
+        async function pollNotifications() {
+            try {
+                const response = await fetch('/api/notifications/count?_=' + Date.now(), { cache: 'no-store' });
+                const data = await response.json();
+                
+                if (data.unread_count > 0) {
+                    notificationBadge.textContent = data.unread_count;
+                    notificationBadge.style.display = 'inline-block';
+                } else {
+                    notificationBadge.style.display = 'none';
+                }
+                
+                if (previousCount >= 0 && data.unread_count > previousCount) {
+                    const listResponse = await fetch('/api/notifications?limit=5&_=' + Date.now(), { cache: 'no-store' });
+                    const listData = await listResponse.json();
+                    
+                    listData.notifications.forEach(function(n) {
+                        if (n.unread) {
+                            showToast(n);
+                        }
+                    });
+                }
+                
+                previousCount = data.unread_count;
+            } catch (error) {
+                console.error('Notification poll error:', error);
+            }
+        }
+        
+        pollNotifications();
+        setInterval(pollNotifications, 15000);
     })();
     </script>
     {% endif %}

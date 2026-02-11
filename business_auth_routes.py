@@ -6874,3 +6874,67 @@ def demo_data_status(campaign_key):
     """Check the status of a demo data generation/deletion task"""
     status = _get_demo_task_status(campaign_key)
     return jsonify(status)
+
+
+@business_auth_bp.route('/notifications')
+@require_business_auth
+def notifications_page():
+    """Full notifications page with history and mark-as-read"""
+    from models import Notification
+    from notification_utils import get_unread_count
+    
+    current_account = get_current_business_account()
+    if not current_account:
+        flash(_('Business account not found.'), 'error')
+        return redirect(url_for('business_auth.login'))
+    
+    user_id = session.get('business_user_id')
+    
+    query = Notification.query.filter_by(business_account_id=current_account.id)
+    if user_id:
+        query = query.filter(
+            (Notification.user_id == user_id) | (Notification.user_id.is_(None))
+        )
+    
+    notifications = query.order_by(Notification.created_at.desc()).limit(50).all()
+    unread_count = get_unread_count(current_account.id, user_id)
+    
+    return render_template('business_auth/notifications.html',
+                         notifications=notifications,
+                         unread_count=unread_count,
+                         business_account=current_account)
+
+
+@business_auth_bp.route('/notifications/<int:notification_id>/mark-read', methods=['POST'])
+@require_business_auth
+def mark_notification_read_page(notification_id):
+    """Mark a single notification as read (form POST from notifications page)"""
+    from notification_utils import mark_as_read
+    
+    current_account = get_current_business_account()
+    if not current_account:
+        flash(_('Business account not found.'), 'error')
+        return redirect(url_for('business_auth.login'))
+    
+    mark_as_read(notification_id, current_account.id)
+    return redirect(url_for('business_auth.notifications_page'))
+
+
+@business_auth_bp.route('/notifications/mark-all-read', methods=['POST'])
+@require_business_auth
+def mark_all_notifications_read():
+    """Mark all notifications as read (form POST from notifications page)"""
+    from notification_utils import mark_all_as_read
+    
+    current_account = get_current_business_account()
+    if not current_account:
+        flash(_('Business account not found.'), 'error')
+        return redirect(url_for('business_auth.login'))
+    
+    user_id = session.get('business_user_id')
+    count = mark_all_as_read(current_account.id, user_id)
+    
+    if count > 0:
+        flash(_('%(count)d notifications marked as read.', count=count), 'success')
+    
+    return redirect(url_for('business_auth.notifications_page'))
