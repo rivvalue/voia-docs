@@ -510,7 +510,7 @@
     </style>
     
     <!-- Toast Notification Container -->
-    <div class="toast-container position-fixed top-0 end-0 p-3" id="toastContainer" style="z-index: 1090;"></div>
+    <div class="toast-container position-fixed end-0 p-3" id="toastContainer" style="z-index: 10001;"></div>
     
     <script>
     (function() {
@@ -533,12 +533,20 @@
                 const navbarHeight = navbar.offsetHeight;
                 panelEl.style.top = navbarHeight + 'px';
                 panelEl.style.height = (window.innerHeight - navbarHeight) + 'px';
+                toastContainer.style.top = navbarHeight + 'px';
                 if (customBackdrop) {
                     customBackdrop.style.top = navbarHeight + 'px';
                     customBackdrop.style.height = (window.innerHeight - navbarHeight) + 'px';
                 }
             }
         }
+        
+        (function positionToastOnLoad() {
+            const navbar = document.querySelector('.navbar');
+            if (navbar) {
+                toastContainer.style.top = navbar.offsetHeight + 'px';
+            }
+        })();
         
         function showCustomBackdrop() {
             customBackdrop = document.createElement('div');
@@ -569,6 +577,8 @@
         });
         
         window.addEventListener('resize', function() {
+            const navbar = document.querySelector('.navbar');
+            if (navbar) toastContainer.style.top = navbar.offsetHeight + 'px';
             if (panelOpen) positionPanel();
         });
         
