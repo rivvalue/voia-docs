@@ -191,12 +191,12 @@
                         </div>
                     </div>
                     
-                    <!-- Notification Bell Icon (links to notifications page) -->
+                    <!-- Notification Bell Icon (opens offcanvas panel) -->
                     <div class="notification-center">
-                        <a href="{{ url_for('business_auth.notifications_page') }}" class="btn btn-link position-relative notification-bell" id="notificationBell" style="padding: 0.5rem; text-decoration: none;">
+                        <button type="button" class="btn btn-link position-relative notification-bell" id="notificationBell" data-bs-toggle="offcanvas" data-bs-target="#notificationPanel" aria-controls="notificationPanel" style="padding: 0.5rem; text-decoration: none; border: none;">
                             <i class="fas fa-bell"></i>
                             <span class="notification-badge badge bg-danger position-absolute" id="notificationBadge" style="display: none; top: 4px; right: 4px; font-size: 0.65rem; padding: 0.25em 0.5em;">0</span>
-                        </a>
+                        </button>
                     </div>
                     {% endif %}
                     
@@ -379,16 +379,114 @@
     });
     </script>
     
-    <!-- Toast Notification Container -->
+    <!-- Notification Offcanvas Panel -->
     {% if is_business_authenticated %}
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="notificationPanel" aria-labelledby="notificationPanelLabel" style="width: 400px; z-index: 1060;">
+        <div class="offcanvas-header border-bottom" style="background: #f8f9fb;">
+            <h5 class="offcanvas-title" id="notificationPanelLabel">
+                <i class="fas fa-bell me-2"></i>{{ _('Notifications') }}
+                <span class="badge bg-danger ms-2" id="panelUnreadBadge" style="display: none; font-size: 0.7rem;">0</span>
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body p-0" id="notificationPanelBody">
+            <div class="text-center py-5 text-muted">
+                <div class="spinner-border spinner-border-sm" role="status"></div>
+                <p class="mt-2 mb-0">{{ _('Loading...') }}</p>
+            </div>
+        </div>
+        <div class="offcanvas-footer border-top p-2 text-center" id="panelFooter" style="display: none; background: #f8f9fb;">
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="markAllReadBtn">
+                <i class="fas fa-check-double me-1"></i>{{ _('Mark all as read') }}
+            </button>
+            <a href="{{ url_for('business_auth.notifications_page') }}" class="btn btn-sm btn-link text-muted ms-2">
+                {{ _('View all') }}
+            </a>
+        </div>
+    </div>
+    
+    <style>
+    #notificationPanel .notif-item {
+        padding: 0.85rem 1rem;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.65rem;
+        transition: background-color 0.15s ease;
+        cursor: default;
+    }
+    #notificationPanel .notif-item:hover {
+        background: #f8f9fa;
+    }
+    #notificationPanel .notif-item.unread {
+        background: #f0f4ff;
+        border-left: 3px solid #0d6efd;
+    }
+    #notificationPanel .notif-item .notif-icon {
+        font-size: 1rem;
+        margin-top: 2px;
+        flex-shrink: 0;
+    }
+    #notificationPanel .notif-item .notif-content {
+        flex: 1;
+        min-width: 0;
+    }
+    #notificationPanel .notif-item .notif-msg {
+        font-size: 0.88rem;
+        color: #1a1a2e;
+        margin-bottom: 0.15rem;
+        word-wrap: break-word;
+    }
+    #notificationPanel .notif-item .notif-time {
+        font-size: 0.75rem;
+        color: #6c757d;
+    }
+    #notificationPanel .notif-item .notif-mark-btn {
+        flex-shrink: 0;
+        opacity: 0.5;
+        transition: opacity 0.15s;
+    }
+    #notificationPanel .notif-item:hover .notif-mark-btn {
+        opacity: 1;
+    }
+    #notificationPanel .notif-empty {
+        text-align: center;
+        padding: 3rem 1.5rem;
+        color: #6c757d;
+    }
+    #notificationPanel .notif-empty i {
+        font-size: 2.5rem;
+        opacity: 0.3;
+        margin-bottom: 0.75rem;
+    }
+    .offcanvas-footer {
+        flex-shrink: 0;
+    }
+    </style>
+    
+    <!-- Toast Notification Container -->
     <div class="toast-container position-fixed top-0 end-0 p-3" id="toastContainer" style="z-index: 1090;"></div>
     
     <script>
     (function() {
         const notificationBadge = document.getElementById('notificationBadge');
+        const panelUnreadBadge = document.getElementById('panelUnreadBadge');
         const toastContainer = document.getElementById('toastContainer');
+        const panelBody = document.getElementById('notificationPanelBody');
+        const panelFooter = document.getElementById('panelFooter');
+        const markAllReadBtn = document.getElementById('markAllReadBtn');
+        const panelEl = document.getElementById('notificationPanel');
         let previousCount = -1;
         let shownToastIds = new Set();
+        let panelOpen = false;
+        
+        panelEl.addEventListener('show.bs.offcanvas', function() {
+            panelOpen = true;
+            loadPanelNotifications();
+        });
+        panelEl.addEventListener('hidden.bs.offcanvas', function() {
+            panelOpen = false;
+        });
         
         function getCategoryIcon(category) {
             const icons = {
@@ -410,6 +508,136 @@
             return colors[category] || colors['info'];
         }
         
+        function formatTimeAgo(dateStr) {
+            const date = new Date(dateStr);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            if (diffMins < 1) return '{{ _("just now") }}';
+            if (diffMins < 60) return diffMins + ' min';
+            const diffHrs = Math.floor(diffMins / 60);
+            if (diffHrs < 24) return diffHrs + 'h';
+            const diffDays = Math.floor(diffHrs / 24);
+            if (diffDays < 7) return diffDays + 'd';
+            return date.toLocaleDateString();
+        }
+        
+        function renderNotifications(notifications, unreadCount) {
+            if (!notifications || notifications.length === 0) {
+                panelBody.innerHTML = '<div class="notif-empty"><i class="fas fa-bell-slash d-block"></i><p>{{ _("No notifications yet") }}</p></div>';
+                panelFooter.style.display = 'none';
+                return;
+            }
+            
+            let html = '';
+            notifications.forEach(function(n) {
+                html += '<div class="notif-item ' + (n.unread ? 'unread' : '') + '" data-id="' + n.id + '">';
+                html += '<div class="notif-icon"><i class="' + getCategoryIcon(n.category) + '"></i></div>';
+                html += '<div class="notif-content">';
+                html += '<div class="notif-msg">' + n.message + '</div>';
+                html += '<div class="notif-time">' + formatTimeAgo(n.created_at) + '</div>';
+                html += '</div>';
+                if (n.unread) {
+                    html += '<button class="btn btn-sm btn-outline-primary notif-mark-btn" onclick="markNotifRead(' + n.id + ', this)" title="{{ _("Mark as read") }}"><i class="fas fa-check"></i></button>';
+                }
+                html += '</div>';
+            });
+            panelBody.innerHTML = html;
+            
+            panelFooter.style.display = 'block';
+            if (unreadCount > 0) {
+                panelUnreadBadge.textContent = unreadCount;
+                panelUnreadBadge.style.display = 'inline';
+                markAllReadBtn.style.display = 'inline-block';
+                markAllReadBtn.disabled = false;
+                markAllReadBtn.innerHTML = '<i class="fas fa-check-double me-1"></i>{{ _("Mark all as read") }}';
+            } else {
+                panelUnreadBadge.style.display = 'none';
+                markAllReadBtn.style.display = 'none';
+            }
+        }
+        
+        async function loadPanelNotifications() {
+            try {
+                const response = await fetch('/api/notifications?limit=30&_=' + Date.now(), { cache: 'no-store' });
+                const data = await response.json();
+                const countResp = await fetch('/api/notifications/count?_=' + Date.now(), { cache: 'no-store' });
+                const countData = await countResp.json();
+                renderNotifications(data.notifications, countData.unread_count);
+            } catch (err) {
+                panelBody.innerHTML = '<div class="notif-empty"><i class="fas fa-exclamation-triangle d-block text-warning"></i><p>{{ _("Could not load notifications") }}</p></div>';
+            }
+        }
+        
+        function getCsrfToken() {
+            const meta = document.querySelector('meta[name="csrf-token"]');
+            return meta ? meta.getAttribute('content') : '';
+        }
+        
+        window.markNotifRead = async function(notificationId, btnEl) {
+            try {
+                btnEl.disabled = true;
+                btnEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                const resp = await fetch('/api/notifications/' + notificationId + '/read', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() }
+                });
+                if (resp.ok) {
+                    const item = btnEl.closest('.notif-item');
+                    item.classList.remove('unread');
+                    btnEl.remove();
+                    updateBadgeCount(-1);
+                }
+            } catch (err) {
+                btnEl.disabled = false;
+                btnEl.innerHTML = '<i class="fas fa-check"></i>';
+            }
+        };
+        
+        markAllReadBtn.addEventListener('click', async function() {
+            try {
+                markAllReadBtn.disabled = true;
+                markAllReadBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>{{ _("Marking...") }}';
+                const resp = await fetch('/api/notifications/mark-all-read', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() }
+                });
+                if (resp.ok) {
+                    document.querySelectorAll('#notificationPanel .notif-item.unread').forEach(function(el) {
+                        el.classList.remove('unread');
+                        const btn = el.querySelector('.notif-mark-btn');
+                        if (btn) btn.remove();
+                    });
+                    notificationBadge.style.display = 'none';
+                    panelUnreadBadge.style.display = 'none';
+                    markAllReadBtn.style.display = 'none';
+                    previousCount = 0;
+                }
+            } catch (err) {
+                markAllReadBtn.disabled = false;
+                markAllReadBtn.innerHTML = '<i class="fas fa-check-double me-1"></i>{{ _("Mark all as read") }}';
+            }
+        });
+        
+        function updateBadgeCount(delta) {
+            let current = parseInt(notificationBadge.textContent) || 0;
+            current = Math.max(0, current + delta);
+            if (current > 0) {
+                notificationBadge.textContent = current;
+                notificationBadge.style.display = 'inline-block';
+                panelUnreadBadge.textContent = current;
+                panelUnreadBadge.style.display = 'inline';
+                markAllReadBtn.style.display = 'inline-block';
+                markAllReadBtn.disabled = false;
+                markAllReadBtn.innerHTML = '<i class="fas fa-check-double me-1"></i>{{ _("Mark all as read") }}';
+            } else {
+                notificationBadge.style.display = 'none';
+                panelUnreadBadge.style.display = 'none';
+                markAllReadBtn.style.display = 'none';
+            }
+            previousCount = current;
+        }
+        
         function showToast(notification) {
             if (shownToastIds.has(notification.id)) return;
             shownToastIds.add(notification.id);
@@ -419,17 +647,7 @@
             toastEl.setAttribute('role', 'alert');
             toastEl.setAttribute('aria-live', 'assertive');
             toastEl.setAttribute('aria-atomic', 'true');
-            toastEl.innerHTML = `
-                <div class="toast-header" style="border-left: 4px solid ${getCategoryColor(notification.category)};">
-                    <i class="${getCategoryIcon(notification.category)} me-2"></i>
-                    <strong class="me-auto">{{ _('Notification') }}</strong>
-                    <small class="text-muted">{{ _('just now') }}</small>
-                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                </div>
-                <div class="toast-body">
-                    ${notification.message}
-                </div>
-            `;
+            toastEl.innerHTML = '<div class="toast-header" style="border-left: 4px solid ' + getCategoryColor(notification.category) + ';"><i class="' + getCategoryIcon(notification.category) + ' me-2"></i><strong class="me-auto">{{ _("Notification") }}</strong><small class="text-muted">{{ _("just now") }}</small><button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button></div><div class="toast-body">' + notification.message + '</div>';
             toastContainer.appendChild(toastEl);
             
             const bsToast = new bootstrap.Toast(toastEl, { delay: 8000 });
@@ -461,6 +679,10 @@
                             showToast(n);
                         }
                     });
+                    
+                    if (panelOpen) {
+                        loadPanelNotifications();
+                    }
                 }
                 
                 previousCount = data.unread_count;
