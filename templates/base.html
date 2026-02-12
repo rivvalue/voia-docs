@@ -381,7 +381,7 @@
     
     <!-- Notification Offcanvas Panel -->
     {% if is_business_authenticated %}
-    <div class="offcanvas offcanvas-end" tabindex="-1" id="notificationPanel" aria-labelledby="notificationPanelLabel" style="width: 400px; z-index: 1060;">
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="notificationPanel" aria-labelledby="notificationPanelLabel" data-bs-backdrop="false" data-bs-scroll="true">
         <div class="offcanvas-header border-bottom" style="background: #f8f9fb;">
             <h5 class="offcanvas-title" id="notificationPanelLabel">
                 <i class="fas fa-bell me-2"></i>{{ _('Notifications') }}
@@ -406,6 +406,22 @@
     </div>
     
     <style>
+    #notificationPanel {
+        width: 400px;
+        z-index: 9999;
+        border-left: 1px solid #dee2e6;
+        box-shadow: -4px 0 20px rgba(0,0,0,0.1);
+    }
+    @media (max-width: 576px) {
+        #notificationPanel {
+            width: 100%;
+        }
+    }
+    @media (min-width: 577px) and (max-width: 768px) {
+        #notificationPanel {
+            width: 85%;
+        }
+    }
     #notificationPanel .notif-item {
         padding: 0.85rem 1rem;
         border-bottom: 1px solid #eee;
@@ -419,8 +435,35 @@
         background: #f8f9fa;
     }
     #notificationPanel .notif-item.unread {
-        background: #f0f4ff;
-        border-left: 3px solid #0d6efd;
+        background: linear-gradient(135deg, #eef3ff 0%, #f0f4ff 100%);
+        border-left: 4px solid #0d6efd;
+        position: relative;
+    }
+    #notificationPanel .notif-item.unread::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        right: 12px;
+        transform: translateY(-50%);
+        width: 8px;
+        height: 8px;
+        background: #0d6efd;
+        border-radius: 50%;
+    }
+    #notificationPanel .notif-item.unread .notif-msg {
+        font-weight: 600;
+        color: #0f172a;
+    }
+    #notificationPanel .notif-item.read {
+        background: #fff;
+        border-left: 4px solid transparent;
+    }
+    #notificationPanel .notif-item.read .notif-msg {
+        font-weight: 400;
+        color: #6c757d;
+    }
+    #notificationPanel .notif-item.read .notif-icon {
+        opacity: 0.5;
     }
     #notificationPanel .notif-item .notif-icon {
         font-size: 1rem;
@@ -436,6 +479,7 @@
         color: #1a1a2e;
         margin-bottom: 0.15rem;
         word-wrap: break-word;
+        line-height: 1.4;
     }
     #notificationPanel .notif-item .notif-time {
         font-size: 0.75rem;
@@ -443,8 +487,9 @@
     }
     #notificationPanel .notif-item .notif-mark-btn {
         flex-shrink: 0;
-        opacity: 0.5;
+        opacity: 0.6;
         transition: opacity 0.15s;
+        margin-right: 14px;
     }
     #notificationPanel .notif-item:hover .notif-mark-btn {
         opacity: 1;
@@ -480,12 +525,51 @@
         let shownToastIds = new Set();
         let panelOpen = false;
         
+        let customBackdrop = null;
+        
+        function positionPanel() {
+            const navbar = document.querySelector('.navbar');
+            if (navbar) {
+                const navbarHeight = navbar.offsetHeight;
+                panelEl.style.top = navbarHeight + 'px';
+                panelEl.style.height = (window.innerHeight - navbarHeight) + 'px';
+                if (customBackdrop) {
+                    customBackdrop.style.top = navbarHeight + 'px';
+                    customBackdrop.style.height = (window.innerHeight - navbarHeight) + 'px';
+                }
+            }
+        }
+        
+        function showCustomBackdrop() {
+            customBackdrop = document.createElement('div');
+            customBackdrop.id = 'notifPanelBackdrop';
+            customBackdrop.style.cssText = 'position:fixed;left:0;right:0;background:rgba(0,0,0,0.25);z-index:9998;transition:opacity 0.15s;';
+            customBackdrop.addEventListener('click', function() {
+                bootstrap.Offcanvas.getInstance(panelEl).hide();
+            });
+            document.body.appendChild(customBackdrop);
+        }
+        
+        function removeCustomBackdrop() {
+            if (customBackdrop) {
+                customBackdrop.remove();
+                customBackdrop = null;
+            }
+        }
+        
         panelEl.addEventListener('show.bs.offcanvas', function() {
             panelOpen = true;
+            showCustomBackdrop();
+            positionPanel();
             loadPanelNotifications();
         });
         panelEl.addEventListener('hidden.bs.offcanvas', function() {
             panelOpen = false;
+            removeCustomBackdrop();
+        });
+        
+        window.addEventListener('resize', function() {
+            if (panelOpen) positionPanel();
         });
         
         function getCategoryIcon(category) {
@@ -531,7 +615,7 @@
             
             let html = '';
             notifications.forEach(function(n) {
-                html += '<div class="notif-item ' + (n.unread ? 'unread' : '') + '" data-id="' + n.id + '">';
+                html += '<div class="notif-item ' + (n.unread ? 'unread' : 'read') + '" data-id="' + n.id + '">';
                 html += '<div class="notif-icon"><i class="' + getCategoryIcon(n.category) + '"></i></div>';
                 html += '<div class="notif-content">';
                 html += '<div class="notif-msg">' + n.message + '</div>';
@@ -585,6 +669,7 @@
                 if (resp.ok) {
                     const item = btnEl.closest('.notif-item');
                     item.classList.remove('unread');
+                    item.classList.add('read');
                     btnEl.remove();
                     updateBadgeCount(-1);
                 }
@@ -605,6 +690,7 @@
                 if (resp.ok) {
                     document.querySelectorAll('#notificationPanel .notif-item.unread').forEach(function(el) {
                         el.classList.remove('unread');
+                        el.classList.add('read');
                         const btn = el.querySelector('.notif-mark-btn');
                         if (btn) btn.remove();
                     });
