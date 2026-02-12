@@ -1,0 +1,587 @@
+{% extends "base.html" %}
+
+{% block title %}Task Manager - VOÏA Platform Admin{% endblock %}
+
+{% block page_class %}page-task-manager{% endblock %}
+
+{% block content %}
+{# Breadcrumb Navigation #}
+{% set breadcrumb_items = [
+    {'label': 'Settings', 'url': url_for('business_auth.admin_panel')},
+    {'label': 'Task Manager', 'current': true}
+] %}
+{% include 'components/breadcrumb.html' %}
+
+<style>
+.task-manager-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-lg);
+}
+.task-header {
+    margin-bottom: var(--spacing-xl);
+}
+.task-header h1 {
+    font-size: var(--font-size-3xl);
+    font-weight: 700;
+    color: var(--primary-black);
+    font-family: var(--font-family-headings);
+    margin: 0;
+}
+.task-header p {
+    color: var(--gray-dark);
+    margin: var(--spacing-xs) 0 0 0;
+}
+.task-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+}
+.task-stat-card {
+    background: var(--primary-white);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-lg);
+    text-align: center;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--light-gray);
+    transition: transform 0.2s ease;
+}
+.task-stat-card:hover {
+    transform: translateY(-2px);
+}
+.task-stat-card.active {
+    border-color: var(--primary-red);
+    background: rgba(var(--primary-red-rgb, 220, 53, 69), 0.03);
+}
+.task-stat-number {
+    font-size: var(--font-size-3xl);
+    font-weight: 700;
+    color: var(--primary-black);
+    font-family: var(--font-family-headings);
+}
+.task-stat-label {
+    font-size: var(--font-size-sm);
+    color: var(--gray-dark);
+    margin-top: 2px;
+    text-transform: capitalize;
+}
+.task-filters {
+    background: var(--primary-white);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--light-gray);
+}
+.task-filters-grid {
+    display: flex;
+    gap: var(--spacing-md);
+    align-items: end;
+    flex-wrap: wrap;
+}
+.task-filter-group {
+    flex: 1;
+    min-width: 160px;
+}
+.task-filter-group label {
+    display: block;
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--gray-dark);
+    margin-bottom: 4px;
+}
+.task-filter-group .form-select {
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--medium-gray);
+    font-size: var(--font-size-sm);
+}
+.task-filter-btn {
+    background: var(--primary-red);
+    color: var(--primary-white);
+    border: none;
+    border-radius: var(--radius-lg);
+    padding: 0.5rem 1.25rem;
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: background 0.2s ease;
+    white-space: nowrap;
+}
+.task-filter-btn:hover {
+    background: var(--red-hover);
+}
+.task-bulk-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+    flex-wrap: wrap;
+}
+.task-bulk-btn {
+    padding: 0.4rem 1rem;
+    border-radius: var(--radius-lg);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    border: 1.5px solid;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+.task-bulk-btn.warning {
+    border-color: #e67e22;
+    color: #e67e22;
+    background: transparent;
+}
+.task-bulk-btn.warning:hover {
+    background: #e67e22;
+    color: white;
+}
+.task-bulk-btn.danger {
+    border-color: var(--primary-red);
+    color: var(--primary-red);
+    background: transparent;
+}
+.task-bulk-btn.danger:hover {
+    background: var(--primary-red);
+    color: white;
+}
+.task-table-container {
+    background: var(--primary-white);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--light-gray);
+    overflow: hidden;
+}
+.task-table-wrapper {
+    overflow-x: auto;
+}
+.task-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--font-size-sm);
+}
+.task-table thead th {
+    background: var(--light-gray);
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--gray-dark);
+    white-space: nowrap;
+    border-bottom: 2px solid var(--medium-gray);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+.task-table tbody td {
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid var(--light-gray);
+    vertical-align: middle;
+}
+.task-table tbody tr:hover {
+    background: rgba(var(--primary-red-rgb, 220, 53, 69), 0.02);
+}
+.task-table tbody tr.stuck-row {
+    background: rgba(231, 76, 60, 0.06);
+}
+.task-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0.25rem 0.65rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.task-status-badge.pending {
+    background: rgba(52, 152, 219, 0.12);
+    color: #2980b9;
+}
+.task-status-badge.processing {
+    background: rgba(243, 156, 18, 0.12);
+    color: #e67e22;
+}
+.task-status-badge.completed {
+    background: rgba(46, 204, 113, 0.12);
+    color: #27ae60;
+}
+.task-status-badge.failed {
+    background: rgba(231, 76, 60, 0.12);
+    color: #e74c3c;
+}
+.task-status-badge.stuck {
+    background: rgba(231, 76, 60, 0.2);
+    color: #c0392b;
+    animation: pulse-stuck 2s infinite;
+}
+@keyframes pulse-stuck {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+.task-type-label {
+    font-weight: 500;
+    color: var(--primary-black);
+}
+.task-user-info {
+    line-height: 1.3;
+}
+.task-user-name {
+    font-weight: 500;
+    color: var(--primary-black);
+}
+.task-user-email {
+    font-size: 0.75rem;
+    color: var(--gray-dark);
+}
+.task-ba-name {
+    font-weight: 500;
+    color: var(--primary-black);
+}
+.task-campaign-name {
+    font-size: 0.75rem;
+    color: var(--gray-dark);
+}
+.task-error-text {
+    max-width: 250px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #e74c3c;
+    font-size: 0.78rem;
+    cursor: pointer;
+}
+.task-error-text:hover {
+    white-space: normal;
+    word-break: break-word;
+}
+.task-time {
+    font-size: 0.78rem;
+    color: var(--gray-dark);
+    white-space: nowrap;
+}
+.task-duration {
+    font-weight: 500;
+    color: var(--primary-black);
+}
+.task-actions-cell {
+    white-space: nowrap;
+}
+.task-action-btn {
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 1.5px solid;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+.task-action-btn.force-fail {
+    border-color: #e74c3c;
+    color: #e74c3c;
+    background: transparent;
+}
+.task-action-btn.force-fail:hover {
+    background: #e74c3c;
+    color: white;
+}
+.task-action-btn.retry {
+    border-color: #3498db;
+    color: #3498db;
+    background: transparent;
+}
+.task-action-btn.retry:hover {
+    background: #3498db;
+    color: white;
+}
+.task-empty-state {
+    text-align: center;
+    padding: var(--spacing-3xl);
+    color: var(--gray-dark);
+}
+.task-empty-state i {
+    font-size: 3rem;
+    margin-bottom: var(--spacing-lg);
+    opacity: 0.4;
+}
+.task-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-xl) 0;
+}
+.task-pagination-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--medium-gray);
+    border-radius: var(--radius-lg);
+    background: var(--primary-white);
+    color: var(--primary-black);
+    text-decoration: none;
+    font-size: var(--font-size-sm);
+    transition: all 0.2s ease;
+}
+.task-pagination-btn:hover {
+    border-color: var(--primary-red);
+    color: var(--primary-red);
+}
+.task-pagination-info {
+    font-size: var(--font-size-sm);
+    color: var(--gray-dark);
+}
+.task-retry-badge {
+    font-size: 0.7rem;
+    color: var(--gray-dark);
+}
+</style>
+
+<div class="task-manager-container">
+    <div class="task-header" style="display: flex; justify-content: space-between; align-items: start;">
+        <div>
+            <h1>
+                <i class="fas fa-tasks me-2" aria-hidden="true"></i>
+                Task Manager
+            </h1>
+            <p>Monitor and manage background tasks across all business accounts</p>
+        </div>
+        <button class="btn btn-sm btn-link text-muted p-1" 
+                onclick="location.reload()" 
+                title="Refresh"
+                aria-label="Refresh task list">
+            <i class="fas fa-sync-alt"></i>
+        </button>
+    </div>
+
+    <div class="task-stats-grid">
+        <a href="?status=" class="task-stat-card {% if not current_filters.status %}active{% endif %}" style="text-decoration:none;">
+            <div class="task-stat-number">{{ total_count }}</div>
+            <div class="task-stat-label">Total</div>
+        </a>
+        <a href="?status=pending" class="task-stat-card {% if current_filters.status == 'pending' %}active{% endif %}" style="text-decoration:none;">
+            <div class="task-stat-number" style="color: #2980b9;">{{ status_counts.get('pending', 0) }}</div>
+            <div class="task-stat-label">Pending</div>
+        </a>
+        <a href="?status=processing" class="task-stat-card {% if current_filters.status == 'processing' %}active{% endif %}" style="text-decoration:none;">
+            <div class="task-stat-number" style="color: #e67e22;">{{ status_counts.get('processing', 0) }}</div>
+            <div class="task-stat-label">Processing</div>
+        </a>
+        <a href="?status=completed" class="task-stat-card {% if current_filters.status == 'completed' %}active{% endif %}" style="text-decoration:none;">
+            <div class="task-stat-number" style="color: #27ae60;">{{ status_counts.get('completed', 0) }}</div>
+            <div class="task-stat-label">Completed</div>
+        </a>
+        <a href="?status=failed" class="task-stat-card {% if current_filters.status == 'failed' %}active{% endif %}" style="text-decoration:none;">
+            <div class="task-stat-number" style="color: #e74c3c;">{{ status_counts.get('failed', 0) }}</div>
+            <div class="task-stat-label">Failed</div>
+        </a>
+    </div>
+
+    <div class="task-filters">
+        <form method="GET" class="task-filters-grid">
+            <div class="task-filter-group">
+                <label for="task_type">Task Type</label>
+                <select id="task_type" name="task_type" class="form-select">
+                    <option value="">All Types</option>
+                    {% for t in available_types %}
+                        <option value="{{ t }}" {% if current_filters.task_type == t %}selected{% endif %}>
+                            {{ t.replace('_', ' ').title() }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="task-filter-group">
+                <label for="status">Status</label>
+                <select id="status" name="status" class="form-select">
+                    <option value="">All Statuses</option>
+                    <option value="pending" {% if current_filters.status == 'pending' %}selected{% endif %}>Pending</option>
+                    <option value="processing" {% if current_filters.status == 'processing' %}selected{% endif %}>Processing</option>
+                    <option value="completed" {% if current_filters.status == 'completed' %}selected{% endif %}>Completed</option>
+                    <option value="failed" {% if current_filters.status == 'failed' %}selected{% endif %}>Failed</option>
+                </select>
+            </div>
+            <div class="task-filter-group">
+                <label for="business_account_id">Business Account</label>
+                <select id="business_account_id" name="business_account_id" class="form-select">
+                    <option value="">All Accounts</option>
+                    {% for acct in available_accounts %}
+                        <option value="{{ acct[0] }}" {% if current_filters.business_account_id == acct[0]|string %}selected{% endif %}>
+                            {{ acct[1] }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="task-filter-group" style="flex: 0;">
+                <label>&nbsp;</label>
+                <button type="submit" class="task-filter-btn">
+                    <i class="fas fa-filter me-1"></i> Filter
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="task-bulk-actions">
+        <form method="POST" action="{{ url_for('business_auth.task_manager_reset_all_stuck') }}" 
+              onsubmit="return confirm('Reset all tasks stuck in processing for over 30 minutes back to pending?');" style="display:inline;">
+            <button type="submit" class="task-bulk-btn warning">
+                <i class="fas fa-redo-alt"></i> Reset All Stuck
+            </button>
+        </form>
+        <form method="POST" action="{{ url_for('business_auth.task_manager_clear_completed') }}" 
+              onsubmit="return confirm('Delete all completed tasks older than 7 days? This cannot be undone.');" style="display:inline;">
+            <button type="submit" class="task-bulk-btn danger">
+                <i class="fas fa-trash-alt"></i> Clear Old Completed
+            </button>
+        </form>
+    </div>
+
+    <div class="task-table-container">
+        {% if tasks %}
+        <div class="task-table-wrapper">
+            <table class="task-table" role="table" aria-label="Task queue table">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Business Account</th>
+                        <th scope="col">Triggered By</th>
+                        <th scope="col">Created</th>
+                        <th scope="col">Duration</th>
+                        <th scope="col">Retries</th>
+                        <th scope="col">Error</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for task in tasks %}
+                    <tr class="{% if task.is_stuck %}stuck-row{% endif %}">
+                        <td>{{ task.id }}</td>
+                        <td>
+                            <span class="task-type-label">{{ task.task_type_label }}</span>
+                            {% if task.campaign_name %}
+                                <br><span class="task-campaign-name">{{ task.campaign_name }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if task.is_stuck %}
+                                <span class="task-status-badge stuck">
+                                    <i class="fas fa-exclamation-triangle"></i> Stuck
+                                </span>
+                            {% else %}
+                                <span class="task-status-badge {{ task.status }}">
+                                    {% if task.status == 'pending' %}<i class="fas fa-clock"></i>
+                                    {% elif task.status == 'processing' %}<i class="fas fa-spinner fa-spin"></i>
+                                    {% elif task.status == 'completed' %}<i class="fas fa-check"></i>
+                                    {% elif task.status == 'failed' %}<i class="fas fa-times"></i>
+                                    {% endif %}
+                                    {{ task.status|title }}
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="task-ba-name">{{ task.business_account_name }}</span>
+                        </td>
+                        <td>
+                            <div class="task-user-info">
+                                {% if task.user_name %}
+                                    <span class="task-user-name">{{ task.user_name }}</span><br>
+                                {% endif %}
+                                {% if task.user_email %}
+                                    <span class="task-user-email">{{ task.user_email }}</span>
+                                {% elif not task.user_name %}
+                                    <span class="task-user-email">System</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td>
+                            <span class="task-time">
+                                {{ task.created_at.strftime('%b %d, %H:%M') if task.created_at else '-' }}
+                            </span>
+                            {% if task.time_in_status %}
+                                <br><span class="task-time" style="font-size: 0.7rem;">{{ task.time_in_status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if task.duration %}
+                                <span class="task-duration">{{ task.duration }}</span>
+                            {% else %}
+                                <span class="task-time">-</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if task.retry_count > 0 %}
+                                <span class="task-retry-badge">{{ task.retry_count }}/{{ task.max_retries }}</span>
+                            {% else %}
+                                <span class="task-time">-</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if task.error_message %}
+                                <div class="task-error-text" title="{{ task.error_message }}">
+                                    {{ task.error_message[:80] }}{% if task.error_message|length > 80 %}...{% endif %}
+                                </div>
+                            {% else %}
+                                <span class="task-time">-</span>
+                            {% endif %}
+                        </td>
+                        <td class="task-actions-cell">
+                            {% if task.status == 'processing' %}
+                                <form method="POST" action="{{ url_for('business_auth.task_manager_force_fail', task_id=task.id) }}" 
+                                      onsubmit="return confirm('Force-fail task #{{ task.id }}? This marks it as failed so it can be retried.');" 
+                                      style="display:inline;">
+                                    <button type="submit" class="task-action-btn force-fail" title="Force-fail this task">
+                                        <i class="fas fa-stop-circle"></i> Fail
+                                    </button>
+                                </form>
+                            {% elif task.status == 'failed' %}
+                                <form method="POST" action="{{ url_for('business_auth.task_manager_retry', task_id=task.id) }}" 
+                                      onsubmit="return confirm('Retry task #{{ task.id }}? This will re-queue it for processing.');" 
+                                      style="display:inline;">
+                                    <button type="submit" class="task-action-btn retry" title="Retry this task">
+                                        <i class="fas fa-redo"></i> Retry
+                                    </button>
+                                </form>
+                            {% else %}
+                                <span class="task-time">-</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="task-empty-state">
+            <i class="fas fa-tasks" aria-hidden="true"></i>
+            <h3>No Tasks Found</h3>
+            <p>No tasks match the current filters. Try adjusting your filters or check back later.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if pagination.has_prev or pagination.has_next %}
+    <div class="task-pagination" role="navigation" aria-label="Task list pagination">
+        {% if pagination.has_prev %}
+            <a href="?page={{ pagination.page - 1 }}&status={{ current_filters.status }}&task_type={{ current_filters.task_type }}&business_account_id={{ current_filters.business_account_id }}" 
+               class="task-pagination-btn">
+                <i class="fas fa-chevron-left me-1"></i> Previous
+            </a>
+        {% endif %}
+        <span class="task-pagination-info">
+            Page {{ pagination.page }} of {{ pagination.total_pages }}
+        </span>
+        {% if pagination.has_next %}
+            <a href="?page={{ pagination.page + 1 }}&status={{ current_filters.status }}&task_type={{ current_filters.task_type }}&business_account_id={{ current_filters.business_account_id }}" 
+               class="task-pagination-btn">
+                Next <i class="fas fa-chevron-right ms-1"></i>
+            </a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

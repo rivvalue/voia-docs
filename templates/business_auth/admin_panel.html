@@ -497,6 +497,13 @@
                                         <i class="fas fa-clipboard-list me-2 text-secondary"></i>Audit Trail
                                     </a>
                                 </li>
+                                {% if current_user.role == 'platform_admin' %}
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('business_auth.task_manager') }}" title="Monitor and manage background tasks">
+                                        <i class="fas fa-tasks me-2 text-warning"></i>Task Manager
+                                    </a>
+                                </li>
+                                {% endif %}
                                 <li><hr class="dropdown-divider"></li>
                                 
                                 <!-- Logout -->

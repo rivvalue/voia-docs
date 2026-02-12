@@ -6947,3 +6947,346 @@ def mark_all_notifications_read():
         flash(_('%(count)d notifications marked as read.', count=count), 'success')
     
     return redirect(url_for('business_auth.notifications_page'))
+
+
+@business_auth_bp.route('/admin/task-manager')
+@require_business_auth
+def task_manager():
+    """Platform admin task queue manager for monitoring and resolving stuck tasks"""
+    current_account = get_current_business_account()
+    if not current_account:
+        flash(_('Business account not found.'), 'error')
+        return redirect(url_for('business_auth.login'))
+
+    user_id = session.get('business_user_id')
+    current_user = BusinessAccountUser.query.get(user_id)
+    if not current_user or not current_user.is_platform_admin():
+        flash(_('Platform admin access required.'), 'error')
+        return redirect(url_for('business_auth.admin_panel'))
+
+    from sqlalchemy import func, distinct, text as sa_text
+
+    status_filter = request.args.get('status', '')
+    type_filter = request.args.get('task_type', '')
+    ba_filter = request.args.get('business_account_id', '')
+    try:
+        page = max(1, int(request.args.get('page', '1')))
+    except (ValueError, TypeError):
+        page = 1
+    per_page = 25
+
+    base_query = sa_text("""
+        SELECT tq.id, tq.task_type, tq.status, tq.priority, tq.retry_count, tq.max_retries,
+               tq.created_at, tq.started_at, tq.completed_at, tq.claimed_by, tq.claimed_at,
+               tq.error_message, tq.task_data, tq.business_account_id, tq.campaign_id,
+               ba.name as business_account_name,
+               c.name as campaign_name
+        FROM task_queue tq
+        LEFT JOIN business_accounts ba ON tq.business_account_id = ba.id
+        LEFT JOIN campaigns c ON tq.campaign_id = c.id
+        WHERE 1=1
+    """)
+
+    count_query_str = """
+        SELECT COUNT(*) FROM task_queue tq WHERE 1=1
+    """
+    query_str = str(base_query.text)
+    params = {}
+
+    if status_filter:
+        query_str += " AND tq.status = :status"
+        count_query_str += " AND tq.status = :status"
+        params['status'] = status_filter
+    if type_filter:
+        query_str += " AND tq.task_type = :task_type"
+        count_query_str += " AND tq.task_type = :task_type"
+        params['task_type'] = type_filter
+    if ba_filter:
+        try:
+            params['ba_id'] = int(ba_filter)
+            query_str += " AND tq.business_account_id = :ba_id"
+            count_query_str += " AND tq.business_account_id = :ba_id"
+        except (ValueError, TypeError):
+            ba_filter = ''
+
+    query_str += " ORDER BY tq.created_at DESC LIMIT :limit OFFSET :offset"
+
+    total_count = db.session.execute(sa_text(count_query_str), params).scalar()
+    total_pages = max(1, (total_count + per_page - 1) // per_page)
+    page = min(page, total_pages)
+
+    params['limit'] = per_page
+    params['offset'] = (page - 1) * per_page
+    rows = db.session.execute(sa_text(query_str), params).fetchall()
+
+    tasks = []
+    for row in rows:
+        task_data = row[12] if row[12] else {}
+        if isinstance(task_data, str):
+            try:
+                task_data = json.loads(task_data)
+            except Exception:
+                task_data = {}
+
+        duration = None
+        if row[7]:
+            end_time = row[8] if row[8] else datetime.utcnow()
+            delta = end_time - row[7]
+            total_secs = int(delta.total_seconds())
+            if total_secs < 60:
+                duration = f"{total_secs}s"
+            elif total_secs < 3600:
+                duration = f"{total_secs // 60}m {total_secs % 60}s"
+            else:
+                duration = f"{total_secs // 3600}h {(total_secs % 3600) // 60}m"
+
+        time_in_status = None
+        ref_time = row[8] or row[7] or row[6]
+        if ref_time:
+            delta = datetime.utcnow() - ref_time
+            total_secs = int(delta.total_seconds())
+            if total_secs < 60:
+                time_in_status = f"{total_secs}s ago"
+            elif total_secs < 3600:
+                time_in_status = f"{total_secs // 60}m ago"
+            elif total_secs < 86400:
+                time_in_status = f"{total_secs // 3600}h ago"
+            else:
+                time_in_status = f"{total_secs // 86400}d ago"
+
+        type_labels = {
+            'ai_analysis': 'AI Analysis',
+            'send_email': 'Send Email',
+            'send_reminder_email': 'Reminder Email',
+            'audit_log': 'Audit Log',
+            'executive_report': 'Executive Report',
+            'export_campaign': 'Campaign Export',
+            'transcript_analysis': 'Transcript Analysis',
+            'bulk_participant_add': 'Bulk Add Participants',
+            'bulk_participant_remove': 'Bulk Remove Participants',
+        }
+
+        tasks.append({
+            'id': row[0],
+            'task_type': row[1],
+            'task_type_label': type_labels.get(row[1], row[1].replace('_', ' ').title()),
+            'status': row[2],
+            'priority': row[3],
+            'retry_count': row[4],
+            'max_retries': row[5],
+            'created_at': row[6],
+            'started_at': row[7],
+            'completed_at': row[8],
+            'claimed_by': row[9],
+            'claimed_at': row[10],
+            'error_message': row[11],
+            'user_email': task_data.get('user_email', ''),
+            'user_name': task_data.get('user_name', ''),
+            'business_account_id': row[13],
+            'business_account_name': row[15] or 'Unknown',
+            'campaign_id': row[14],
+            'campaign_name': row[16] or '',
+            'duration': duration,
+            'time_in_status': time_in_status,
+            'is_stuck': row[2] == 'processing' and row[7] and (datetime.utcnow() - row[7]).total_seconds() > 1800,
+        })
+
+    status_counts = dict(db.session.execute(sa_text(
+        "SELECT status, COUNT(*) FROM task_queue GROUP BY status"
+    )).fetchall())
+
+    available_types = [r[0] for r in db.session.execute(sa_text(
+        "SELECT DISTINCT task_type FROM task_queue ORDER BY task_type"
+    )).fetchall()]
+
+    available_accounts = db.session.execute(sa_text(
+        """SELECT DISTINCT ba.id, ba.name 
+           FROM task_queue tq 
+           JOIN business_accounts ba ON tq.business_account_id = ba.id 
+           ORDER BY ba.name"""
+    )).fetchall()
+
+    return render_template('business_auth/task_manager.html',
+                         tasks=tasks,
+                         status_counts=status_counts,
+                         total_count=total_count,
+                         available_types=available_types,
+                         available_accounts=available_accounts,
+                         current_filters={
+                             'status': status_filter,
+                             'task_type': type_filter,
+                             'business_account_id': ba_filter,
+                         },
+                         pagination={
+                             'page': page,
+                             'per_page': per_page,
+                             'total_pages': total_pages,
+                             'has_next': page < total_pages,
+                             'has_prev': page > 1,
+                         },
+                         business_account=current_account)
+
+
+@business_auth_bp.route('/admin/task-manager/force-fail/<int:task_id>', methods=['POST'])
+@require_business_auth
+def task_manager_force_fail(task_id):
+    """Force-fail a stuck processing task"""
+    current_account = get_current_business_account()
+    user_id = session.get('business_user_id')
+    current_user = BusinessAccountUser.query.get(user_id)
+    if not current_user or not current_user.is_platform_admin():
+        flash(_('Platform admin access required.'), 'error')
+        return redirect(url_for('business_auth.admin_panel'))
+
+    from sqlalchemy import text as sa_text
+    result = db.session.execute(sa_text("""
+        UPDATE task_queue 
+        SET status = 'failed',
+            completed_at = NOW(),
+            error_message = COALESCE(error_message, '') || ' [Force-failed by admin: ' || :admin_email || ']',
+            updated_at = NOW(),
+            claimed_by = NULL
+        WHERE id = :task_id AND status = 'processing'
+        RETURNING id, task_type
+    """), {'task_id': task_id, 'admin_email': current_user.email})
+    
+    row = result.fetchone()
+    db.session.commit()
+    
+    if row:
+        queue_audit_log(
+            action_type='task_force_fail',
+            user_email=current_user.email,
+            user_name=current_user.full_name,
+            business_account_id=current_account.id if current_account else None,
+            details={'task_id': task_id, 'task_type': row[1]}
+        )
+        flash(f'Task #{task_id} ({row[1]}) has been force-failed.', 'success')
+    else:
+        flash(f'Task #{task_id} could not be force-failed (may not be in processing status).', 'warning')
+
+    return redirect(url_for('business_auth.task_manager', **request.args))
+
+
+@business_auth_bp.route('/admin/task-manager/retry/<int:task_id>', methods=['POST'])
+@require_business_auth
+def task_manager_retry(task_id):
+    """Retry a failed task by resetting it to pending"""
+    current_account = get_current_business_account()
+    user_id = session.get('business_user_id')
+    current_user = BusinessAccountUser.query.get(user_id)
+    if not current_user or not current_user.is_platform_admin():
+        flash(_('Platform admin access required.'), 'error')
+        return redirect(url_for('business_auth.admin_panel'))
+
+    from sqlalchemy import text as sa_text
+    result = db.session.execute(sa_text("""
+        UPDATE task_queue 
+        SET status = 'pending',
+            retry_count = 0,
+            claimed_by = NULL,
+            claimed_at = NULL,
+            started_at = NULL,
+            completed_at = NULL,
+            scheduled_at = NOW(),
+            error_message = NULL,
+            updated_at = NOW()
+        WHERE id = :task_id AND status = 'failed'
+        RETURNING id, task_type
+    """), {'task_id': task_id})
+    
+    row = result.fetchone()
+    db.session.commit()
+    
+    if row:
+        queue_audit_log(
+            action_type='task_retry',
+            user_email=current_user.email,
+            user_name=current_user.full_name,
+            business_account_id=current_account.id if current_account else None,
+            details={'task_id': task_id, 'task_type': row[1]}
+        )
+        flash(f'Task #{task_id} ({row[1]}) has been re-queued for processing.', 'success')
+    else:
+        flash(f'Task #{task_id} could not be retried (may not be in failed status).', 'warning')
+
+    return redirect(url_for('business_auth.task_manager', **request.args))
+
+
+@business_auth_bp.route('/admin/task-manager/reset-all-stuck', methods=['POST'])
+@require_business_auth
+def task_manager_reset_all_stuck():
+    """Reset all tasks stuck in processing for more than 30 minutes"""
+    current_account = get_current_business_account()
+    user_id = session.get('business_user_id')
+    current_user = BusinessAccountUser.query.get(user_id)
+    if not current_user or not current_user.is_platform_admin():
+        flash(_('Platform admin access required.'), 'error')
+        return redirect(url_for('business_auth.admin_panel'))
+
+    from sqlalchemy import text as sa_text
+    result = db.session.execute(sa_text("""
+        UPDATE task_queue 
+        SET status = 'pending',
+            claimed_by = NULL,
+            claimed_at = NULL,
+            started_at = NULL,
+            error_message = '[Reset by admin: ' || :admin_email || ']',
+            updated_at = NOW()
+        WHERE status = 'processing'
+          AND started_at < NOW() - INTERVAL '30 minutes'
+        RETURNING id, task_type
+    """), {'admin_email': current_user.email})
+    
+    recovered = result.fetchall()
+    db.session.commit()
+    
+    if recovered:
+        queue_audit_log(
+            action_type='task_bulk_reset',
+            user_email=current_user.email,
+            user_name=current_user.full_name,
+            business_account_id=current_account.id if current_account else None,
+            details={'count': len(recovered), 'task_ids': [r[0] for r in recovered]}
+        )
+        flash(f'{len(recovered)} stuck task(s) have been reset to pending.', 'success')
+    else:
+        flash('No stuck tasks found (processing > 30 minutes).', 'info')
+
+    return redirect(url_for('business_auth.task_manager'))
+
+
+@business_auth_bp.route('/admin/task-manager/clear-completed', methods=['POST'])
+@require_business_auth
+def task_manager_clear_completed():
+    """Delete completed tasks older than 7 days"""
+    current_account = get_current_business_account()
+    user_id = session.get('business_user_id')
+    current_user = BusinessAccountUser.query.get(user_id)
+    if not current_user or not current_user.is_platform_admin():
+        flash(_('Platform admin access required.'), 'error')
+        return redirect(url_for('business_auth.admin_panel'))
+
+    from sqlalchemy import text as sa_text
+    result = db.session.execute(sa_text("""
+        DELETE FROM task_queue 
+        WHERE status = 'completed'
+          AND completed_at < NOW() - INTERVAL '7 days'
+    """))
+    
+    deleted_count = result.rowcount
+    db.session.commit()
+    
+    if deleted_count > 0:
+        queue_audit_log(
+            action_type='task_bulk_clear',
+            user_email=current_user.email,
+            user_name=current_user.full_name,
+            business_account_id=current_account.id if current_account else None,
+            details={'deleted_count': deleted_count}
+        )
+        flash(f'{deleted_count} completed task(s) older than 7 days have been cleared.', 'success')
+    else:
+        flash('No completed tasks older than 7 days to clear.', 'info')
+
+    return redirect(url_for('business_auth.task_manager'))
