@@ -729,8 +729,9 @@ def generate_campaign(campaign_key, dry_run=False):
                 db.session.add(response)
                 nps_dist[nps_category] += 1
 
-                if (i + 1) % 100 == 0:
-                    print(f"    Progress: {i + 1}/{config['responses']}")
+                if (i + 1) % 50 == 0:
+                    db.session.commit()
+                    print(f"    Progress: {i + 1}/{config['responses']} (batch committed)")
 
             db.session.commit()
 
