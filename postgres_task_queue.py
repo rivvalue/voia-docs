@@ -317,14 +317,13 @@ class PostgresTaskQueue:
             max_retries = row[1]
             
             if retry_count < max_retries:
-                # Retry with exponential backoff
                 retry_delay_minutes = 2 ** retry_count  # 1, 2, 4 minutes
                 db.session.execute(
                     text("""
                         UPDATE task_queue 
                         SET status = 'pending',
                             retry_count = retry_count + 1,
-                            scheduled_at = NOW() + INTERVAL ':delay minutes',
+                            scheduled_at = NOW() + :delay * INTERVAL '1 minute',
                             error_message = :error,
                             updated_at = NOW()
                         WHERE id = :task_id
