@@ -43,8 +43,27 @@
 }
 
 .notification-card.unread {
-    background: #f0f4ff;
+    background: linear-gradient(135deg, #eef3ff 0%, #f0f4ff 100%);
     border-left: 4px solid var(--primary-blue, #0d6efd);
+}
+
+.notification-card.unread .notif-message {
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.notification-card.read {
+    background: #fff;
+    border-left: 4px solid transparent;
+}
+
+.notification-card.read .notif-message {
+    font-weight: 400;
+    color: var(--text-muted, #6c757d);
+}
+
+.notification-card.read .notif-icon {
+    opacity: 0.5;
 }
 
 .notification-card:hover {
@@ -67,6 +86,7 @@
     color: var(--text-primary, #1a1a2e);
     margin-bottom: 0.25rem;
     word-wrap: break-word;
+    line-height: 1.4;
 }
 
 .notification-card .notif-time {
@@ -93,6 +113,21 @@
 .empty-notifications p {
     font-size: 1.1rem;
 }
+
+.notifications-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    padding: 1rem 0;
+}
+
+.notifications-pagination .page-info {
+    font-size: 0.85rem;
+    color: var(--text-muted, #6c757d);
+    margin: 0 1rem;
+}
 </style>
 
 {# Breadcrumb Navigation #}
@@ -105,9 +140,12 @@
     <div class="notifications-header">
         <div>
             <h1><i class="fas fa-bell me-2"></i>{{ _('Notifications') }}</h1>
-            {% if unread_count > 0 %}
-            <small class="text-muted">{{ _('%(count)d unread', count=unread_count) }}</small>
-            {% endif %}
+            <small class="text-muted">
+                {% if unread_count > 0 %}
+                    {{ _('%(count)d unread', count=unread_count) }} &middot;
+                {% endif %}
+                {{ _('%(count)d total', count=total_count) }}
+            </small>
         </div>
         {% if unread_count > 0 %}
         <form method="POST" action="{{ url_for('business_auth.mark_all_notifications_read') }}">
@@ -121,7 +159,7 @@
     
     {% if notifications %}
         {% for n in notifications %}
-        <div class="notification-card {% if n.unread %}unread{% endif %}">
+        <div class="notification-card {% if n.unread %}unread{% else %}read{% endif %}">
             <div class="notif-icon">
                 {% if n.category == 'success' %}
                     <i class="fas fa-check-circle text-success"></i>
@@ -149,6 +187,24 @@
             {% endif %}
         </div>
         {% endfor %}
+        
+        {% if total_pages > 1 %}
+        <nav class="notifications-pagination" aria-label="{{ _('Notification pages') }}">
+            {% if page > 1 %}
+            <a href="{{ url_for('business_auth.notifications_page', page=page-1) }}" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-chevron-left me-1"></i>{{ _('Previous') }}
+            </a>
+            {% endif %}
+            
+            <span class="page-info">{{ _('Page %(page)d of %(total)d', page=page, total=total_pages) }}</span>
+            
+            {% if page < total_pages %}
+            <a href="{{ url_for('business_auth.notifications_page', page=page+1) }}" class="btn btn-sm btn-outline-secondary">
+                {{ _('Next') }}<i class="fas fa-chevron-right ms-1"></i>
+            </a>
+            {% endif %}
+        </nav>
+        {% endif %}
     {% else %}
         <div class="empty-notifications">
             <i class="fas fa-bell-slash d-block"></i>

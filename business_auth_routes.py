@@ -6879,7 +6879,7 @@ def demo_data_status(campaign_key):
 @business_auth_bp.route('/notifications')
 @require_business_auth
 def notifications_page():
-    """Full notifications page with history and mark-as-read"""
+    """Full notifications page with history, pagination, and mark-as-read"""
     from models import Notification
     from notification_utils import get_unread_count
     
@@ -6889,6 +6889,8 @@ def notifications_page():
         return redirect(url_for('business_auth.login'))
     
     user_id = session.get('business_user_id')
+    page = request.args.get('page', 1, type=int)
+    per_page = 25
     
     query = Notification.query.filter_by(business_account_id=current_account.id)
     if user_id:
@@ -6896,13 +6898,20 @@ def notifications_page():
             (Notification.user_id == user_id) | (Notification.user_id.is_(None))
         )
     
-    notifications = query.order_by(Notification.created_at.desc()).limit(50).all()
+    query = query.order_by(Notification.created_at.desc())
+    total_count = query.count()
+    total_pages = max(1, (total_count + per_page - 1) // per_page)
+    page = max(1, min(page, total_pages))
+    notifications = query.offset((page - 1) * per_page).limit(per_page).all()
     unread_count = get_unread_count(current_account.id, user_id)
     
     return render_template('business_auth/notifications.html',
                          notifications=notifications,
                          unread_count=unread_count,
-                         business_account=current_account)
+                         business_account=current_account,
+                         page=page,
+                         total_pages=total_pages,
+                         total_count=total_count)
 
 
 @business_auth_bp.route('/notifications/<int:notification_id>/mark-read', methods=['POST'])

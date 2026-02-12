@@ -4308,6 +4308,8 @@ def get_notifications():
     """Get recent notifications"""
     try:
         from models import Notification
+        from datetime import timedelta
+        from notification_utils import cleanup_old_notifications
         
         current_account = get_current_business_account()
         if not current_account:
@@ -4315,17 +4317,24 @@ def get_notifications():
         
         user_id = session.get('business_user_id')
         limit = int(request.args.get('limit', 20))
+        since_days = request.args.get('since_days', type=int)
         
-        # Get notifications for this business account
+        import random
+        if random.random() < 0.01:
+            cleanup_old_notifications(days=90)
+        
         query = Notification.query.filter_by(
             business_account_id=current_account.id
         )
         
-        # Filter by user if specified (or show account-wide notifications)
         if user_id:
             query = query.filter(
                 (Notification.user_id == user_id) | (Notification.user_id.is_(None))
             )
+        
+        if since_days:
+            cutoff = datetime.utcnow() - timedelta(days=since_days)
+            query = query.filter(Notification.created_at >= cutoff)
         
         notifications = query.order_by(
             Notification.created_at.desc()

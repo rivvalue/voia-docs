@@ -386,6 +386,7 @@
             <h5 class="offcanvas-title" id="notificationPanelLabel">
                 <i class="fas fa-bell me-2"></i>{{ _('Notifications') }}
                 <span class="badge bg-danger ms-2" id="panelUnreadBadge" style="display: none; font-size: 0.7rem;">0</span>
+                <small class="d-block text-muted" style="font-size: 0.7rem; font-weight: 400; margin-top: 2px;">{{ _('Last 7 days') }}</small>
             </h5>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
@@ -653,7 +654,7 @@
         
         async function loadPanelNotifications() {
             try {
-                const response = await fetch('/api/notifications?limit=30&_=' + Date.now(), { cache: 'no-store' });
+                const response = await fetch('/api/notifications?limit=30&since_days=7&_=' + Date.now(), { cache: 'no-store' });
                 const data = await response.json();
                 const countResp = await fetch('/api/notifications/count?_=' + Date.now(), { cache: 'no-store' });
                 const countData = await countResp.json();
