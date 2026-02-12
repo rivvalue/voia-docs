@@ -491,6 +491,26 @@ with app.app_context():
         else:
             # Re-raise unexpected errors
             raise
+
+    try:
+        from sqlalchemy import text as sa_text, inspect as sa_inspect
+        inspector = sa_inspect(db.engine)
+        available_tables = inspector.get_table_names()
+        for table_name in ['audit_logs', 'business_user_sessions']:
+            if table_name not in available_tables:
+                continue
+            columns = {c['name']: c for c in inspector.get_columns(table_name)}
+            if 'ip_address' in columns:
+                col_type_obj = columns['ip_address'].get('type')
+                if col_type_obj is not None:
+                    max_len = getattr(col_type_obj, 'length', None)
+                    if max_len is not None and max_len < 255:
+                        db.session.execute(sa_text(f"ALTER TABLE {table_name} ALTER COLUMN ip_address TYPE VARCHAR(255)"))
+                        db.session.commit()
+                        logger.info(f"Migrated {table_name}.ip_address from VARCHAR({max_len}) to VARCHAR(255)")
+    except Exception as e:
+        logger.warning(f"ip_address column migration check: {e}")
+        db.session.rollback()
     
     from task_queue import start_task_queue
     from business_accounts import business_account_manager

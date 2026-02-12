@@ -2304,7 +2304,7 @@ class UserSession(db.Model):
     session_data = db.Column(db.Text, nullable=True)  # JSON session data
     
     # Session tracking
-    ip_address = db.Column(db.String(45), nullable=True)  # IPv6 support
+    ip_address = db.Column(db.String(255), nullable=True)  # Supports multiple proxy IPs
     user_agent = db.Column(db.Text, nullable=True)
     
     # Session status
@@ -2653,7 +2653,7 @@ class AuditLog(db.Model):
     details = db.Column(db.Text, nullable=True)  # JSON string for additional details
     
     # Request context (minimal, client-relevant)
-    ip_address = db.Column(db.String(45), nullable=True)  # For security audit purposes
+    ip_address = db.Column(db.String(255), nullable=True)  # Supports multiple proxy IPs
     
     # Timestamps
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
