@@ -1007,6 +1007,40 @@
             </div>
         </div>
 
+        {% if current_user.role == 'platform_admin' %}
+        <!-- Platform Administration -->
+        <div class="admin-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <i class="fas fa-user-shield"></i>
+                    Platform Administration
+                </h3>
+            </div>
+            <div class="quick-actions">
+                <a href="{{ url_for('business_auth.task_manager') }}" class="quick-action-btn">
+                    <i class="fas fa-tasks d-block mb-2"></i>
+                    <strong>Task Manager</strong><br>
+                    <small>Monitor & resolve stuck tasks</small>
+                </a>
+                <a href="{{ url_for('business_auth.audit_logs') }}" class="quick-action-btn">
+                    <i class="fas fa-clipboard-list d-block mb-2"></i>
+                    <strong>Audit Trail</strong><br>
+                    <small>Activity & change history</small>
+                </a>
+                <a href="{{ url_for('business_auth.license_dashboard') }}" class="quick-action-btn">
+                    <i class="fas fa-tachometer-alt d-block mb-2"></i>
+                    <strong>License Dashboard</strong><br>
+                    <small>License management overview</small>
+                </a>
+                <a href="{{ url_for('business_auth.industry_hints_config') }}" class="quick-action-btn">
+                    <i class="fas fa-industry d-block mb-2"></i>
+                    <strong>Industry Hints</strong><br>
+                    <small>AI survey topic config</small>
+                </a>
+            </div>
+        </div>
+        {% endif %}
+
         <!-- Session Info -->
         <div class="admin-section">
             <div class="section-header">
