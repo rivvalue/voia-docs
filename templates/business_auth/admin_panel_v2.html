@@ -1178,6 +1178,22 @@ body.modal-open {
                         </a>
                     </div>
 
+                    <!-- Task Manager -->
+                    <div class="settings-item">
+                        <div class="settings-item-header">
+                            <div class="settings-item-icon">
+                                <i class="fas fa-tasks"></i>
+                            </div>
+                            <div class="settings-item-info">
+                                <h4 class="settings-item-title">Task Manager</h4>
+                                <p class="settings-item-desc">Monitor and manage background tasks, resolve stuck jobs, retry failed operations</p>
+                            </div>
+                        </div>
+                        <a href="{{ url_for('business_auth.task_manager') }}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-external-link-alt me-1"></i>View Tasks
+                        </a>
+                    </div>
+
                     <!-- Industry Topic Hints -->
                     <div class="settings-item">
                         <div class="settings-item-header">
