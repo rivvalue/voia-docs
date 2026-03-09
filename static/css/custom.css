@@ -10536,6 +10536,10 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
     font-size: var(--font-size-lg);
 }
 
+.conv-hero-section .conv-voia-brand .voia-red-accent {
+    color: var(--primary-white);
+}
+
 .conv-hero-section .conv-voia-tagline {
     opacity: 0.75;
     font-weight: 300;
