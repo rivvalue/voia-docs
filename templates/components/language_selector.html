@@ -16,14 +16,14 @@
         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
             <li>
                 <a class="dropdown-item {% if session.get('language', 'en') == 'en' %}active{% endif %}" 
-                   href="{{ url_for('language.set_language', lang='en') }}">
+                   href="{{ url_for('language.set_language', lang='en', next=request.path) }}">
                     <i class="fas fa-check me-2 {% if session.get('language', 'en') != 'en' %}invisible{% endif %}"></i>
                     English
                 </a>
             </li>
             <li>
                 <a class="dropdown-item {% if session.get('language') == 'fr' %}active{% endif %}" 
-                   href="{{ url_for('language.set_language', lang='fr') }}">
+                   href="{{ url_for('language.set_language', lang='fr', next=request.path) }}">
                     <i class="fas fa-check me-2 {% if session.get('language') != 'fr' %}invisible{% endif %}"></i>
                     Français
                 </a>

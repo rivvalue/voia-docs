@@ -1466,6 +1466,11 @@ small, .small {
         font-size: 1rem !important;
         line-height: 1.2 !important;
     }
+
+    .navbar-welcome-text span {
+        font-size: inherit !important;
+        line-height: inherit !important;
+    }
     
     .navbar-nav {
         margin-top: 1rem !important;

@@ -10063,3 +10063,12 @@ msgstr "Télécharger le modèle de fichier CSV"
 #~ msgid "Confidence levels indicate data reliability"
 #~ msgstr "Les niveaux de confiance indiquent la fiabilité des données"
 
+
+msgid "Archelo Group helps mid-sized companies improve remote onboarding, internal communication, and employee engagement through its flagship platform, ArcheloFlow."
+msgstr "Archelo Group aide les entreprises de taille intermédiaire à améliorer l'intégration à distance, la communication interne et l'engagement des employés grâce à sa plateforme phare, ArcheloFlow."
+
+msgid "As part of their continuous improvement process, they've launched a feedback initiative using Rivvalue's VoC agent — VOÏA — and you've been invited to participate."
+msgstr "Dans le cadre de leur démarche d'amélioration continue, ils ont lancé une initiative de retour d'expérience à l'aide de l'agent VoC de Rivvalue — VOÏA — et vous avez été invité(e) à y participer."
+
+msgid "Continue"
+msgstr "Continuer"

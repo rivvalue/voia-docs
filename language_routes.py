@@ -4,6 +4,7 @@ Language switching routes for VOÏA bilingual support
 
 from flask import Blueprint, session, redirect, request, url_for, jsonify
 from flask_babel import refresh
+from urllib.parse import urlparse
 
 language_bp = Blueprint('language', __name__, url_prefix='/language')
 
@@ -50,7 +51,16 @@ def set_language(lang):
     refresh()
     
     # Redirect back to where the user came from
-    return redirect(request.referrer or url_for('index'))
+    # Prefer explicit 'next' param (set by language selector links) over Referer header
+    # which is unreliable when stripped by proxies or browser Referrer-Policy
+    next_url = request.args.get('next') or request.referrer
+    if next_url:
+        parsed = urlparse(next_url)
+        if parsed.netloc and parsed.netloc != request.host:
+            next_url = url_for('index')
+    else:
+        next_url = url_for('index')
+    return redirect(next_url)
 
 @language_bp.route('/current')
 def get_current_language():
