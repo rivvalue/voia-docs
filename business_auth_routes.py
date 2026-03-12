@@ -6714,6 +6714,7 @@ def _set_demo_task_status(campaign_key, status, message='', config=None):
                     VALUES (:key, :status, :message, :config_json, :now, :now)
                     ON CONFLICT (campaign_key)
                     DO UPDATE SET status = :status, message = :message, config_json = :config_json, updated_at = :now,
+                        started_at = CASE WHEN :status = 'running' THEN :now ELSE demo_data_tasks.started_at END,
                         completed_at = CASE WHEN :status IN ('completed', 'error', 'deleted') THEN :now ELSE demo_data_tasks.completed_at END
                 """),
                 {'key': campaign_key, 'status': status, 'message': message, 'config_json': config_json, 'now': now}
@@ -6725,6 +6726,7 @@ def _set_demo_task_status(campaign_key, status, message='', config=None):
                     VALUES (:key, :status, :message, :now, :now)
                     ON CONFLICT (campaign_key)
                     DO UPDATE SET status = :status, message = :message, updated_at = :now,
+                        started_at = CASE WHEN :status = 'running' THEN :now ELSE demo_data_tasks.started_at END,
                         completed_at = CASE WHEN :status IN ('completed', 'error', 'deleted') THEN :now ELSE demo_data_tasks.completed_at END
                 """),
                 {'key': campaign_key, 'status': status, 'message': message, 'now': now}
@@ -7093,9 +7095,33 @@ def demo_data_custom_create():
     }
 
     campaign_key = f"CUSTOM_{uuid.uuid4().hex[:8].upper()}"
-    _set_demo_task_status(campaign_key, 'idle', 'Custom campaign defined.', config=custom_config)
+    _set_demo_task_status(campaign_key, 'running', 'Generation started...', config=custom_config)
 
-    flash(f'Custom campaign "{name}" created as {campaign_key}. Click Generate to start.', 'info')
+    import threading
+    from generate_demo_data import generate_campaign
+
+    def run_custom_generation(app_instance, key, cfg):
+        try:
+            with app_instance.app_context():
+                success = generate_campaign(key, dry_run=False, config=cfg)
+                if success:
+                    _set_demo_task_status(key, 'completed', f'{key} campaign generated successfully.')
+                else:
+                    _set_demo_task_status(key, 'error', f'{key} generation failed. Campaign may already exist.')
+        except Exception as e:
+            try:
+                with app_instance.app_context():
+                    _set_demo_task_status(key, 'error', f'Error: {str(e)[:200]}')
+            except Exception:
+                pass
+            logger.error(f"Custom demo data generation error for {key}: {e}")
+
+    from flask import current_app
+    app_instance = current_app._get_current_object()
+    thread = threading.Thread(target=run_custom_generation, args=(app_instance, campaign_key, custom_config), daemon=True)
+    thread.start()
+
+    flash(f'Custom campaign "{name}" ({campaign_key}) generation started in the background.', 'info')
     return redirect(url_for('business_auth.demo_data_index'))
 
 
