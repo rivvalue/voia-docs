@@ -17,15 +17,35 @@
     border-radius: 12px;
     padding: 2rem;
     margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
-.demo-header h1 {
+.demo-header-text h1 {
     font-size: 1.5rem;
     margin-bottom: 0.5rem;
 }
-.demo-header p {
+.demo-header-text p {
     opacity: 0.85;
     font-size: 0.95rem;
     margin: 0;
+}
+.btn-create-custom {
+    background: rgba(255,255,255,0.15);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 0.5rem 1.25rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+.btn-create-custom:hover {
+    background: rgba(255,255,255,0.25);
+    color: white;
+    text-decoration: none;
 }
 .campaign-card {
     background: white;
@@ -34,6 +54,9 @@
     margin-bottom: 1rem;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     border: 1px solid #e2e8f0;
+}
+.campaign-card.is-custom {
+    border-left: 4px solid #805ad5;
 }
 .campaign-card-header {
     display: flex;
@@ -68,6 +91,11 @@
 .badge-error {
     background: #fed7d7;
     color: #822727;
+}
+.badge-custom {
+    background: #e9d8fd;
+    color: #553c9a;
+    margin-left: 0.5rem;
 }
 .campaign-meta {
     display: flex;
@@ -119,6 +147,22 @@
     color: white;
     text-decoration: none;
 }
+.btn-retry {
+    background: white;
+    color: #d69e2e;
+    border: 1px solid #d69e2e;
+    padding: 0.5rem 1.25rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-retry:hover {
+    background: #d69e2e;
+    color: white;
+    text-decoration: none;
+}
 .btn-disabled {
     opacity: 0.5;
     pointer-events: none;
@@ -167,6 +211,14 @@
     font-size: 0.85rem;
     margin-top: 1rem;
 }
+.section-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #718096;
+    margin: 1.5rem 0 0.75rem 0;
+}
 </style>
 
 <div class="demo-data-container">
@@ -175,8 +227,13 @@
     </a>
 
     <div class="demo-header">
-        <h1><i class="fas fa-database"></i> Demo Data Generator</h1>
-        <p>Generate realistic survey data for {{ business_account.name if business_account else 'Archelo Group inc' }} — ArcheloFlow HRIS</p>
+        <div class="demo-header-text">
+            <h1><i class="fas fa-database"></i> Demo Data Generator</h1>
+            <p>Generate realistic survey data for {{ business_account.name if business_account else 'Archelo Group inc' }} — ArcheloFlow HRIS</p>
+        </div>
+        <a href="{{ url_for('business_auth.demo_data_custom_create') }}" class="btn-create-custom">
+            <i class="fas fa-plus"></i> Custom Campaign
+        </a>
     </div>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -190,7 +247,14 @@
     {% endif %}
     {% endwith %}
 
-    {% for campaign in campaigns %}
+    {% set has_presets = campaigns|selectattr('is_custom', 'equalto', false)|list|length > 0 %}
+    {% set has_custom = campaigns|selectattr('is_custom', 'equalto', true)|list|length > 0 %}
+
+    {% if has_presets %}
+    <div class="section-label">Preset Campaigns</div>
+    {% endif %}
+
+    {% for campaign in campaigns if not campaign.is_custom %}
     <div class="campaign-card">
         <div class="campaign-card-header">
             <div>
@@ -200,6 +264,8 @@
             <div>
                 {% if campaign.task_status == 'running' %}
                     <span class="campaign-badge badge-running"><i class="fas fa-spinner fa-spin"></i> Running</span>
+                {% elif campaign.task_status == 'error' %}
+                    <span class="campaign-badge badge-error"><i class="fas fa-exclamation-circle"></i> Error</span>
                 {% elif campaign.exists %}
                     <span class="campaign-badge badge-exists"><i class="fas fa-check"></i> Generated ({{ campaign.response_count }} responses)</span>
                 {% else %}
@@ -218,11 +284,83 @@
         <div class="campaign-actions">
             {% if campaign.task_status == 'running' %}
                 <span class="btn-generate btn-disabled"><i class="fas fa-spinner fa-spin"></i> In Progress...</span>
+            {% elif campaign.task_status == 'error' %}
+                <form method="POST" action="{{ url_for('business_auth.demo_data_retry', campaign_key=campaign.key) }}" style="display:inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <button type="submit" class="btn-retry"><i class="fas fa-redo"></i> Retry</button>
+                </form>
             {% elif not campaign.exists %}
                 <a href="{{ url_for('business_auth.demo_data_confirm', campaign_key=campaign.key) }}" class="btn-generate">
                     <i class="fas fa-plus"></i> Generate
                 </a>
             {% else %}
+                <a href="{{ url_for('business_auth.demo_data_delete_confirm', campaign_key=campaign.key) }}" class="btn-delete">
+                    <i class="fas fa-trash"></i> Delete
+                </a>
+            {% endif %}
+        </div>
+
+        {% if campaign.task_status in ['completed', 'error', 'deleted', 'running'] %}
+        <div class="status-message status-{{ campaign.task_status }}">
+            {% if campaign.task_status == 'running' %}
+                <i class="fas fa-spinner fa-spin"></i>
+            {% elif campaign.task_status == 'completed' %}
+                <i class="fas fa-check-circle"></i>
+            {% elif campaign.task_status == 'deleted' %}
+                <i class="fas fa-trash-alt"></i>
+            {% elif campaign.task_status == 'error' %}
+                <i class="fas fa-exclamation-circle"></i>
+            {% endif %}
+            {{ campaign.task_message }}
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+
+    {% if has_custom %}
+    <div class="section-label">Custom Campaigns</div>
+    {% endif %}
+
+    {% for campaign in campaigns if campaign.is_custom %}
+    <div class="campaign-card is-custom">
+        <div class="campaign-card-header">
+            <div>
+                <div class="campaign-name">{{ campaign.name }} <span class="campaign-badge badge-custom">Custom</span></div>
+                <div style="font-size: 0.85rem; color: #718096; margin-top: 0.25rem;">Campaign key: {{ campaign.key }}</div>
+            </div>
+            <div>
+                {% if campaign.task_status == 'running' %}
+                    <span class="campaign-badge badge-running"><i class="fas fa-spinner fa-spin"></i> Running</span>
+                {% elif campaign.task_status == 'error' %}
+                    <span class="campaign-badge badge-error"><i class="fas fa-exclamation-circle"></i> Error</span>
+                {% elif campaign.exists %}
+                    <span class="campaign-badge badge-exists"><i class="fas fa-check"></i> Generated ({{ campaign.response_count }} responses)</span>
+                {% else %}
+                    <span class="campaign-badge badge-not-exists">Not generated</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="campaign-meta">
+            <span><i class="fas fa-comments"></i> {{ campaign.survey_type|capitalize }}</span>
+            <span><i class="fas fa-language"></i> {{ 'English' if campaign.language == 'en' else 'French' }}</span>
+            <span><i class="fas fa-chart-bar"></i> {{ campaign.target_responses }} target responses</span>
+            <span><i class="fas fa-calendar"></i> {{ campaign.dates }}</span>
+        </div>
+
+        <div class="campaign-actions">
+            {% if campaign.task_status == 'running' %}
+                <span class="btn-generate btn-disabled"><i class="fas fa-spinner fa-spin"></i> In Progress...</span>
+            {% elif campaign.task_status == 'error' %}
+                <form method="POST" action="{{ url_for('business_auth.demo_data_retry', campaign_key=campaign.key) }}" style="display:inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <button type="submit" class="btn-retry"><i class="fas fa-redo"></i> Retry</button>
+                </form>
+            {% elif not campaign.exists and campaign.task_status not in ['completed'] %}
+                <a href="{{ url_for('business_auth.demo_data_confirm', campaign_key=campaign.key) }}" class="btn-generate">
+                    <i class="fas fa-plus"></i> Generate
+                </a>
+            {% elif campaign.exists %}
                 <a href="{{ url_for('business_auth.demo_data_delete_confirm', campaign_key=campaign.key) }}" class="btn-delete">
                     <i class="fas fa-trash"></i> Delete
                 </a>

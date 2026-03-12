@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+
+{% block title %}Create Custom Campaign - Demo Data{% endblock %}
+
+{% block page_class %}page-admin-panel{% endblock %}
+
+{% block content %}
+<style>
+.custom-container {
+    max-width: 650px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+.custom-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+    border: 1px solid #e2e8f0;
+}
+.custom-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #1a365d;
+    margin-bottom: 0.5rem;
+}
+.custom-subtitle {
+    color: #718096;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+}
+.form-group {
+    margin-bottom: 1.25rem;
+}
+.form-group label {
+    display: block;
+    font-weight: 600;
+    color: #4a5568;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.4rem;
+}
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid #cbd5e0;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    color: #2d3748;
+    background: #f7fafc;
+    transition: border-color 0.2s;
+}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #2d5a87;
+    background: white;
+}
+.form-group .help-text {
+    font-size: 0.8rem;
+    color: #a0aec0;
+    margin-top: 0.25rem;
+}
+.form-row {
+    display: flex;
+    gap: 1rem;
+}
+.form-row .form-group {
+    flex: 1;
+}
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e2e8f0;
+}
+.btn-submit {
+    background: #2d5a87;
+    color: white;
+    border: none;
+    padding: 0.6rem 1.5rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.btn-submit:hover {
+    background: #1a365d;
+}
+.btn-back {
+    padding: 0.6rem 1.5rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    border: 1px solid #cbd5e0;
+    background: white;
+    color: #4a5568;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-back:hover {
+    background: #f7fafc;
+    color: #2d3748;
+    text-decoration: none;
+}
+</style>
+
+<div class="custom-container">
+    <a href="{{ url_for('business_auth.demo_data_index') }}" class="back-link" style="display:inline-flex;align-items:center;gap:0.5rem;color:#4a5568;text-decoration:none;margin-bottom:1rem;font-size:0.9rem;">
+        <i class="fas fa-arrow-left"></i> Back to Demo Data
+    </a>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert" style="margin-bottom:1rem;">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <div class="custom-card">
+        <div class="custom-title"><i class="fas fa-plus-circle"></i> Create Custom Campaign</div>
+        <div class="custom-subtitle">Define a custom demo campaign with your own parameters.</div>
+
+        <form method="POST" action="{{ url_for('business_auth.demo_data_custom_create') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+            <div class="form-group">
+                <label for="name">Campaign Name</label>
+                <input type="text" id="name" name="name" required placeholder="e.g. Q4 2025 Client Survey" maxlength="100">
+            </div>
+
+            <div class="form-group">
+                <label for="description">Description (optional)</label>
+                <textarea id="description" name="description" rows="2" placeholder="Brief description of this campaign"></textarea>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="start_date">Start Date</label>
+                    <input type="date" id="start_date" name="start_date" required>
+                </div>
+                <div class="form-group">
+                    <label for="end_date">End Date</label>
+                    <input type="date" id="end_date" name="end_date" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="survey_type">Survey Type</label>
+                    <select id="survey_type" name="survey_type">
+                        <option value="conversational">Conversational (AI)</option>
+                        <option value="classic">Classic (Structured)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="language_code">Language</label>
+                    <select id="language_code" name="language_code">
+                        <option value="en">English</option>
+                        <option value="fr">French</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="responses">Number of Responses</label>
+                    <input type="number" id="responses" name="responses" value="200" min="50" max="1000" required>
+                    <div class="help-text">Between 50 and 1000</div>
+                </div>
+                <div class="form-group">
+                    <label for="nps_trend">NPS Trend</label>
+                    <select id="nps_trend" name="nps_trend">
+                        <option value="flat">Flat (neutral mix)</option>
+                        <option value="improving">Improving (+1 bias)</option>
+                        <option value="strong">Strong (+2 bias)</option>
+                        <option value="declining">Declining (-1 bias)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="company_reuse_pct">Company Carryover %</label>
+                <input type="number" id="company_reuse_pct" name="company_reuse_pct" value="30" min="0" max="80">
+                <div class="help-text">Percentage of companies to reuse from existing campaigns (0-80)</div>
+            </div>
+
+            <div class="form-actions">
+                <a href="{{ url_for('business_auth.demo_data_index') }}" class="btn-back">Cancel</a>
+                <button type="submit" class="btn-submit"><i class="fas fa-plus"></i> Create Campaign</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

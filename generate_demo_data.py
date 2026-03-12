@@ -563,8 +563,23 @@ def get_or_create_participant(business_account_id, company, campaign_id, company
     return participant, cp
 
 
-def generate_campaign(campaign_key, dry_run=False):
-    config = CAMPAIGN_CONFIGS[campaign_key]
+def _normalize_config_dates(config):
+    """Ensure config date fields are proper date/datetime objects (not strings from JSON)."""
+    config = dict(config)
+    for field in ('start_date', 'end_date'):
+        if isinstance(config.get(field), str):
+            config[field] = date.fromisoformat(config[field])
+    if isinstance(config.get('completed_at'), str):
+        config['completed_at'] = datetime.fromisoformat(config['completed_at'])
+    elif 'completed_at' not in config or config['completed_at'] is None:
+        config['completed_at'] = datetime.combine(config['end_date'] + timedelta(days=5), datetime.min.time().replace(hour=10))
+    return config
+
+
+def generate_campaign(campaign_key, dry_run=False, config=None):
+    if config is None:
+        config = CAMPAIGN_CONFIGS[campaign_key]
+    config = _normalize_config_dates(config)
 
     print(f"\n{'=' * 70}")
     print(f"  Campaign: {config['name']}")
@@ -771,8 +786,10 @@ def generate_campaign(campaign_key, dry_run=False):
             return False
 
 
-def delete_campaign(campaign_key):
-    config = CAMPAIGN_CONFIGS[campaign_key]
+def delete_campaign(campaign_key, config=None):
+    if config is None:
+        config = CAMPAIGN_CONFIGS[campaign_key]
+    config = _normalize_config_dates(config)
 
     print(f"\n{'=' * 70}")
     print(f"  Deleting campaign: {config['name']}")

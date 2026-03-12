@@ -6649,13 +6649,32 @@ def _ensure_demo_data_table():
         db.session.execute(sa_text("""
             CREATE TABLE IF NOT EXISTS demo_data_tasks (
                 id SERIAL PRIMARY KEY,
-                campaign_key VARCHAR(20) NOT NULL UNIQUE,
+                campaign_key VARCHAR(100) NOT NULL UNIQUE,
                 status VARCHAR(20) NOT NULL DEFAULT 'idle',
                 message TEXT DEFAULT '',
+                config_json TEXT,
                 started_at TIMESTAMP,
                 completed_at TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT NOW()
             )
+        """))
+        db.session.execute(sa_text("""
+            DO $$
+            BEGIN
+                IF NOT EXISTS (
+                    SELECT 1 FROM information_schema.columns
+                    WHERE table_name = 'demo_data_tasks' AND column_name = 'config_json'
+                ) THEN
+                    ALTER TABLE demo_data_tasks ADD COLUMN config_json TEXT;
+                END IF;
+                IF EXISTS (
+                    SELECT 1 FROM information_schema.columns
+                    WHERE table_name = 'demo_data_tasks' AND column_name = 'campaign_key'
+                    AND character_maximum_length < 100
+                ) THEN
+                    ALTER TABLE demo_data_tasks ALTER COLUMN campaign_key TYPE VARCHAR(100);
+                END IF;
+            END $$;
         """))
         db.session.commit()
     except Exception:
@@ -6666,46 +6685,97 @@ def _get_demo_task_status(campaign_key):
     from sqlalchemy import text as sa_text
     try:
         result = db.session.execute(
-            sa_text("SELECT status, message FROM demo_data_tasks WHERE campaign_key = :key"),
+            sa_text("SELECT status, message, config_json, started_at FROM demo_data_tasks WHERE campaign_key = :key"),
             {'key': campaign_key}
         ).fetchone()
         if result:
-            return {'status': result[0], 'message': result[1] or ''}
-        return {'status': 'idle', 'message': ''}
+            config = None
+            if result[2]:
+                try:
+                    config = json.loads(result[2])
+                except (json.JSONDecodeError, TypeError):
+                    pass
+            return {'status': result[0], 'message': result[1] or '', 'config': config, 'started_at': result[3]}
+        return {'status': 'idle', 'message': '', 'config': None, 'started_at': None}
     except Exception:
         _ensure_demo_data_table()
-        return {'status': 'idle', 'message': ''}
+        return {'status': 'idle', 'message': '', 'config': None, 'started_at': None}
 
 
-def _set_demo_task_status(campaign_key, status, message=''):
+def _set_demo_task_status(campaign_key, status, message='', config=None):
     from sqlalchemy import text as sa_text
     try:
         now = datetime.utcnow()
-        db.session.execute(
-            sa_text("""
-                INSERT INTO demo_data_tasks (campaign_key, status, message, started_at, updated_at)
-                VALUES (:key, :status, :message, :now, :now)
-                ON CONFLICT (campaign_key)
-                DO UPDATE SET status = :status, message = :message, updated_at = :now,
-                    completed_at = CASE WHEN :status IN ('completed', 'error', 'deleted') THEN :now ELSE demo_data_tasks.completed_at END
-            """),
-            {'key': campaign_key, 'status': status, 'message': message, 'now': now}
-        )
+        config_json = json.dumps(config) if config else None
+        if config_json:
+            db.session.execute(
+                sa_text("""
+                    INSERT INTO demo_data_tasks (campaign_key, status, message, config_json, started_at, updated_at)
+                    VALUES (:key, :status, :message, :config_json, :now, :now)
+                    ON CONFLICT (campaign_key)
+                    DO UPDATE SET status = :status, message = :message, config_json = :config_json, updated_at = :now,
+                        completed_at = CASE WHEN :status IN ('completed', 'error', 'deleted') THEN :now ELSE demo_data_tasks.completed_at END
+                """),
+                {'key': campaign_key, 'status': status, 'message': message, 'config_json': config_json, 'now': now}
+            )
+        else:
+            db.session.execute(
+                sa_text("""
+                    INSERT INTO demo_data_tasks (campaign_key, status, message, started_at, updated_at)
+                    VALUES (:key, :status, :message, :now, :now)
+                    ON CONFLICT (campaign_key)
+                    DO UPDATE SET status = :status, message = :message, updated_at = :now,
+                        completed_at = CASE WHEN :status IN ('completed', 'error', 'deleted') THEN :now ELSE demo_data_tasks.completed_at END
+                """),
+                {'key': campaign_key, 'status': status, 'message': message, 'now': now}
+            )
         db.session.commit()
     except Exception as e:
         logger.error(f"Failed to update demo task status for {campaign_key}: {e}")
         db.session.rollback()
 
 
-@business_auth_bp.route('/admin/demo-data')
+def _auto_reset_stuck_demo_tasks():
+    from sqlalchemy import text as sa_text
+    try:
+        now = datetime.utcnow()
+        threshold = now - timedelta(minutes=30)
+        result = db.session.execute(
+            sa_text("""
+                UPDATE demo_data_tasks
+                SET status = 'error',
+                    message = 'Generation was interrupted (worker restarted). Click Retry to try again.',
+                    updated_at = :now,
+                    completed_at = :now
+                WHERE status = 'running' AND started_at < :threshold
+                RETURNING campaign_key
+            """),
+            {'now': now, 'threshold': threshold}
+        )
+        stuck_keys = [row[0] for row in result.fetchall()]
+        if stuck_keys:
+            db.session.commit()
+            logger.info(f"Auto-reset stuck demo tasks: {stuck_keys}")
+        else:
+            db.session.rollback()
+    except Exception as e:
+        logger.error(f"Failed to auto-reset stuck demo tasks: {e}")
+        db.session.rollback()
+
+
+@business_auth_bp.route('/admin/demo-data', strict_slashes=False)
 @require_platform_admin
 def demo_data_index():
     """Index page listing all demo data campaigns with status and actions"""
     from generate_demo_data import CAMPAIGN_CONFIGS, BUSINESS_ACCOUNT_NAME
-    from models import Campaign
+    from models import Campaign, SurveyResponse
+    from sqlalchemy import text as sa_text
+
+    _auto_reset_stuck_demo_tasks()
 
     ba = BusinessAccount.query.filter_by(name=BUSINESS_ACCOUNT_NAME).first()
     campaigns_info = []
+
     for key, config in CAMPAIGN_CONFIGS.items():
         existing = None
         response_count = 0
@@ -6715,7 +6785,6 @@ def demo_data_index():
                 name=config['name']
             ).first()
             if existing:
-                from models import SurveyResponse
                 response_count = SurveyResponse.query.filter_by(campaign_id=existing.id).count()
 
         task_status = _get_demo_task_status(key)
@@ -6732,7 +6801,58 @@ def demo_data_index():
             'response_count': response_count,
             'task_status': task_status.get('status', 'idle'),
             'task_message': task_status.get('message', ''),
+            'is_custom': False,
         })
+
+    try:
+        preset_keys = list(CAMPAIGN_CONFIGS.keys())
+        placeholders = ', '.join([f':k{i}' for i in range(len(preset_keys))])
+        params = {f'k{i}': k for i, k in enumerate(preset_keys)}
+        custom_rows = db.session.execute(
+            sa_text(f"SELECT campaign_key, status, message, config_json FROM demo_data_tasks WHERE campaign_key NOT IN ({placeholders})"),
+            params
+        ).fetchall()
+
+        for row in custom_rows:
+            custom_key = row[0]
+            task_status_val = row[1] or 'idle'
+            task_message_val = row[2] or ''
+            custom_config = None
+            if row[3]:
+                try:
+                    custom_config = json.loads(row[3])
+                except (json.JSONDecodeError, TypeError):
+                    pass
+
+            if not custom_config:
+                continue
+
+            existing = None
+            response_count = 0
+            if ba:
+                existing = Campaign.query.filter_by(
+                    business_account_id=ba.id,
+                    name=custom_config.get('name', '')
+                ).first()
+                if existing:
+                    response_count = SurveyResponse.query.filter_by(campaign_id=existing.id).count()
+
+            campaigns_info.append({
+                'key': custom_key,
+                'name': custom_config.get('name', custom_key),
+                'survey_type': custom_config.get('survey_type', 'conversational'),
+                'language': custom_config.get('language_code', 'en'),
+                'target_responses': custom_config.get('responses', 0),
+                'dates': f"{custom_config.get('start_date', '?')} to {custom_config.get('end_date', '?')}",
+                'exists': existing is not None,
+                'campaign_id': existing.id if existing else None,
+                'response_count': response_count,
+                'task_status': task_status_val,
+                'task_message': task_message_val,
+                'is_custom': True,
+            })
+    except Exception as e:
+        logger.warning(f"Failed to load custom demo campaigns: {e}")
 
     return render_template('business_auth/demo_data_index.html',
                            campaigns=campaigns_info,
@@ -6744,11 +6864,15 @@ def demo_data_index():
 def demo_data_confirm(campaign_key):
     """Confirmation page before generating demo data"""
     from generate_demo_data import CAMPAIGN_CONFIGS
-    if campaign_key not in CAMPAIGN_CONFIGS:
-        flash('Invalid campaign key.', 'error')
-        return redirect(url_for('business_auth.demo_data_index'))
+    if campaign_key in CAMPAIGN_CONFIGS:
+        config = CAMPAIGN_CONFIGS[campaign_key]
+    else:
+        task_info = _get_demo_task_status(campaign_key)
+        config = task_info.get('config')
+        if not config:
+            flash('Invalid campaign key.', 'error')
+            return redirect(url_for('business_auth.demo_data_index'))
 
-    config = CAMPAIGN_CONFIGS[campaign_key]
     return render_template('business_auth/demo_data_confirm.html',
                            campaign_key=campaign_key,
                            config=config,
@@ -6762,9 +6886,14 @@ def demo_data_generate(campaign_key):
     from generate_demo_data import CAMPAIGN_CONFIGS, generate_campaign
     import threading
 
-    if campaign_key not in CAMPAIGN_CONFIGS:
-        flash('Invalid campaign key.', 'error')
-        return redirect(url_for('business_auth.demo_data_index'))
+    if campaign_key in CAMPAIGN_CONFIGS:
+        gen_config = None
+    else:
+        task_info = _get_demo_task_status(campaign_key)
+        gen_config = task_info.get('config')
+        if not gen_config:
+            flash('Invalid campaign key.', 'error')
+            return redirect(url_for('business_auth.demo_data_index'))
 
     current_status = _get_demo_task_status(campaign_key).get('status', 'idle')
     if current_status == 'running':
@@ -6773,10 +6902,10 @@ def demo_data_generate(campaign_key):
 
     _set_demo_task_status(campaign_key, 'running', 'Generation started...')
 
-    def run_generation(app_instance, key):
+    def run_generation(app_instance, key, config_override):
         try:
             with app_instance.app_context():
-                success = generate_campaign(key, dry_run=False)
+                success = generate_campaign(key, dry_run=False, config=config_override)
                 if success:
                     _set_demo_task_status(key, 'completed', f'{key} campaign generated successfully.')
                 else:
@@ -6791,7 +6920,7 @@ def demo_data_generate(campaign_key):
 
     from flask import current_app
     app_instance = current_app._get_current_object()
-    thread = threading.Thread(target=run_generation, args=(app_instance, campaign_key), daemon=True)
+    thread = threading.Thread(target=run_generation, args=(app_instance, campaign_key, gen_config), daemon=True)
     thread.start()
 
     flash(f'{campaign_key} generation started in the background. Refresh this page to check progress.', 'info')
@@ -6803,11 +6932,15 @@ def demo_data_generate(campaign_key):
 def demo_data_delete_confirm(campaign_key):
     """Confirmation page before deleting demo data"""
     from generate_demo_data import CAMPAIGN_CONFIGS
-    if campaign_key not in CAMPAIGN_CONFIGS:
-        flash('Invalid campaign key.', 'error')
-        return redirect(url_for('business_auth.demo_data_index'))
+    if campaign_key in CAMPAIGN_CONFIGS:
+        config = CAMPAIGN_CONFIGS[campaign_key]
+    else:
+        task_info = _get_demo_task_status(campaign_key)
+        config = task_info.get('config')
+        if not config:
+            flash('Invalid campaign key.', 'error')
+            return redirect(url_for('business_auth.demo_data_index'))
 
-    config = CAMPAIGN_CONFIGS[campaign_key]
     return render_template('business_auth/demo_data_confirm.html',
                            campaign_key=campaign_key,
                            config=config,
@@ -6821,16 +6954,21 @@ def demo_data_delete(campaign_key):
     from generate_demo_data import CAMPAIGN_CONFIGS, delete_campaign
     import threading
 
-    if campaign_key not in CAMPAIGN_CONFIGS:
-        flash('Invalid campaign key.', 'error')
-        return redirect(url_for('business_auth.demo_data_index'))
+    if campaign_key in CAMPAIGN_CONFIGS:
+        del_config = None
+    else:
+        task_info = _get_demo_task_status(campaign_key)
+        del_config = task_info.get('config')
+        if not del_config:
+            flash('Invalid campaign key.', 'error')
+            return redirect(url_for('business_auth.demo_data_index'))
 
     _set_demo_task_status(campaign_key, 'running', 'Deletion started...')
 
-    def run_deletion(app_instance, key):
+    def run_deletion(app_instance, key, config_override):
         try:
             with app_instance.app_context():
-                success = delete_campaign(key)
+                success = delete_campaign(key, config=config_override)
                 if success:
                     _set_demo_task_status(key, 'deleted', f'{key} campaign deleted successfully.')
                 else:
@@ -6845,10 +6983,119 @@ def demo_data_delete(campaign_key):
 
     from flask import current_app
     app_instance = current_app._get_current_object()
-    thread = threading.Thread(target=run_deletion, args=(app_instance, campaign_key), daemon=True)
+    thread = threading.Thread(target=run_deletion, args=(app_instance, campaign_key, del_config), daemon=True)
     thread.start()
 
     flash(f'{campaign_key} deletion started in the background. Refresh this page to check progress.', 'info')
+    return redirect(url_for('business_auth.demo_data_index'))
+
+
+@business_auth_bp.route('/admin/demo-data/<campaign_key>/retry', methods=['POST'])
+@require_platform_admin
+def demo_data_retry(campaign_key):
+    """Reset a failed/stuck campaign status so it can be retried"""
+    task_info = _get_demo_task_status(campaign_key)
+    if task_info.get('status') in ('error', 'running'):
+        from sqlalchemy import text as sa_text
+        try:
+            db.session.execute(
+                sa_text("UPDATE demo_data_tasks SET status = 'idle', message = 'Reset for retry.', updated_at = NOW() WHERE campaign_key = :key"),
+                {'key': campaign_key}
+            )
+            db.session.commit()
+            flash(f'{campaign_key} has been reset. You can now generate it again.', 'info')
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Failed to reset {campaign_key}: {str(e)[:100]}', 'error')
+    else:
+        flash(f'{campaign_key} is not in a retryable state.', 'warning')
+    return redirect(url_for('business_auth.demo_data_index'))
+
+
+@business_auth_bp.route('/admin/demo-data/custom/create', methods=['GET', 'POST'])
+@require_platform_admin
+def demo_data_custom_create():
+    """Form to define and generate a custom demo campaign"""
+    from generate_demo_data import BUSINESS_ACCOUNT_NAME
+    import uuid
+
+    if request.method == 'GET':
+        return render_template('business_auth/demo_data_custom.html')
+
+    name = request.form.get('name', '').strip()
+    description = request.form.get('description', '').strip()
+    start_date = request.form.get('start_date', '').strip()
+    end_date = request.form.get('end_date', '').strip()
+    responses = request.form.get('responses', '200').strip()
+    survey_type = request.form.get('survey_type', 'conversational').strip()
+    language_code = request.form.get('language_code', 'en').strip()
+    nps_trend = request.form.get('nps_trend', 'flat').strip()
+    company_reuse_pct = request.form.get('company_reuse_pct', '30').strip()
+
+    errors = []
+    if not name:
+        errors.append('Campaign name is required.')
+    if not start_date or not end_date:
+        errors.append('Start date and end date are required.')
+    else:
+        try:
+            from datetime import date as dt_date
+            sd = dt_date.fromisoformat(start_date)
+            ed = dt_date.fromisoformat(end_date)
+            if ed <= sd:
+                errors.append('End date must be after start date.')
+        except ValueError:
+            errors.append('Invalid date format. Use YYYY-MM-DD.')
+    try:
+        responses_int = int(responses)
+        if responses_int < 50 or responses_int > 1000:
+            errors.append('Response count must be between 50 and 1000.')
+    except ValueError:
+        errors.append('Response count must be a number.')
+    if survey_type not in ('conversational', 'classic'):
+        errors.append('Invalid survey type.')
+    if language_code not in ('en', 'fr'):
+        errors.append('Invalid language.')
+    try:
+        reuse_int = int(company_reuse_pct)
+        if reuse_int < 0 or reuse_int > 80:
+            errors.append('Company carryover must be between 0 and 80.')
+    except ValueError:
+        errors.append('Company carryover must be a number.')
+
+    nps_bias_map = {'declining': -1, 'flat': 0, 'improving': 1, 'strong': 2}
+    if nps_trend not in nps_bias_map:
+        errors.append('Invalid NPS trend.')
+
+    if errors:
+        for err in errors:
+            flash(err, 'error')
+        return render_template('business_auth/demo_data_custom.html')
+
+    sd = date.fromisoformat(start_date)
+    ed = date.fromisoformat(end_date)
+    completed_at_dt = datetime.combine(ed + timedelta(days=5), datetime.min.time().replace(hour=10))
+
+    if not description:
+        description = f"Custom demo campaign: {name}"
+
+    custom_config = {
+        'name': name,
+        'description': description,
+        'start_date': start_date,
+        'end_date': end_date,
+        'completed_at': completed_at_dt.isoformat(),
+        'responses': int(responses),
+        'survey_type': survey_type,
+        'language_code': language_code,
+        'company_reuse_pct': int(company_reuse_pct),
+        'nps_bias': nps_bias_map[nps_trend],
+    }
+
+    campaign_key = f"CUSTOM_{uuid.uuid4().hex[:8].upper()}"
+    _set_demo_task_status(campaign_key, 'idle', 'Custom campaign defined.', config=custom_config)
+
+    flash(f'Custom campaign "{name}" created as {campaign_key}. Click Generate to start.', 'info')
     return redirect(url_for('business_auth.demo_data_index'))
 
 
