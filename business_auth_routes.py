@@ -84,7 +84,7 @@ def serve_logo(business_account_id):
 
     response = make_response(branding_config.logo_data)
     response.headers['Content-Type'] = branding_config.logo_content_type or 'image/png'
-    response.headers['Cache-Control'] = 'public, max-age=86400'
+    response.headers['Cache-Control'] = 'public, max-age=31536000'
     return response
 
 
