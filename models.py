@@ -3105,8 +3105,6 @@ class BrandingConfig(db.Model):
         """Get logo URL path — serves from database via /business/logo/<id> route"""
         if self.logo_data and self.business_account_id:
             return f'/business/logo/{self.business_account_id}'
-        if self.logo_filename and self.business_account_id:
-            return f'/static/uploads/logos/{self.business_account_id}/{self.logo_filename}'
         return None
     
     def has_logo(self):

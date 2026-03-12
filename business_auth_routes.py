@@ -4918,7 +4918,7 @@ def _process_logo_upload(logo_file, business_account_id, old_logo_filename=None)
     
     try:
         if image.mode in ('RGBA', 'P'):
-            if detected_format == 'png':
+            if detected_format == 'PNG':
                 pass
             else:
                 rgb_image = Image.new('RGB', image.size, (255, 255, 255))
