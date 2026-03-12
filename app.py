@@ -511,6 +511,41 @@ with app.app_context():
     except Exception as e:
         logger.warning(f"ip_address column migration check: {e}")
         db.session.rollback()
+
+    try:
+        from sqlalchemy import text as sa_text_logo
+        db.session.execute(sa_text_logo(
+            "ALTER TABLE branding_configs ADD COLUMN IF NOT EXISTS logo_data BYTEA"
+        ))
+        db.session.execute(sa_text_logo(
+            "ALTER TABLE branding_configs ADD COLUMN IF NOT EXISTS logo_content_type VARCHAR(50) DEFAULT 'image/png'"
+        ))
+        db.session.commit()
+        logger.info("Ensured logo_data and logo_content_type columns exist on branding_configs")
+    except Exception as e:
+        logger.warning(f"Logo column migration check: {e}")
+        db.session.rollback()
+
+    try:
+        from models import BrandingConfig
+        configs_to_migrate = BrandingConfig.query.filter(
+            BrandingConfig.logo_filename.isnot(None),
+            BrandingConfig.logo_data.is_(None)
+        ).all()
+        migrated = 0
+        for config in configs_to_migrate:
+            logo_path = config.get_logo_path()
+            if logo_path and os.path.exists(logo_path):
+                with open(logo_path, 'rb') as f:
+                    config.logo_data = f.read()
+                    config.logo_content_type = 'image/png'
+                    migrated += 1
+        if migrated:
+            db.session.commit()
+            logger.info(f"Migrated {migrated} logos from filesystem to database")
+    except Exception as e:
+        logger.warning(f"Logo data migration: {e}")
+        db.session.rollback()
     
     from task_queue import start_task_queue
     from business_accounts import business_account_manager

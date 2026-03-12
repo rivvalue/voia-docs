@@ -22,7 +22,7 @@ The system is a multi-tiered Flask web application. The frontend utilizes Jinja2
 -   **Performance & Scalability**: Utilizes a PostgreSQL-backed persistent task queue, database indexing, connection pooling, asynchronous background tasks for AI processing, IP-based rate limiting, optimized dashboard queries, and admin-configurable response caching with multi-tenant isolation.
 -   **Audit Trail System**: Comprehensive logging of system activities with accurate timestamp preservation.
 -   **Security**: Token-based authentication, duplicate response prevention, enhanced rate limiting, robust input validation, CSRF/XSS protection, and Sentry integration.
--   **Branding**: "VOÏA - Voice Of Client" with "AI Powered Client Insights" subtitle, a specific tagline, multi-tenant logo system, and selective trial branding.
+-   **Branding**: "VOÏA - Voice Of Client" with "AI Powered Client Insights" subtitle, a specific tagline, multi-tenant logo system (logos stored as binary data in PostgreSQL `branding_configs.logo_data` for persistence across container restarts, served via `/business/logo/<id>` route), and selective trial branding.
 -   **Multi-Tenant Architecture**: Supports Business Accounts, Campaigns, and Participants with strict tenant isolation, dual authentication, and a token system for survey access.
 -   **Participant Management**: Features individual and bulk editing, deletion protection, tenure tracking, audit logging, and advanced multi-value filtering.
 -   **Manual Commercial Value Tracking**: Company-level commercial value system stored on the Participant model, with CSV upload validation and synchronization.

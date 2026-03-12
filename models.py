@@ -3033,7 +3033,9 @@ class BrandingConfig(db.Model):
     
     # Branding Configuration
     company_display_name = db.Column(db.String(200), nullable=True)  # Fallback to business_account.name if empty
-    logo_filename = db.Column(db.String(255), nullable=True)  # Filename only, stored in /static/uploads/logos/{business_account_id}/
+    logo_filename = db.Column(db.String(255), nullable=True)  # Legacy: filename reference, kept for backward compat
+    logo_data = db.Column(db.LargeBinary, nullable=True)  # Binary image data stored in PostgreSQL
+    logo_content_type = db.Column(db.String(50), nullable=True, default='image/png')  # MIME type of stored logo
     
     # Color Palette Configuration
     primary_color = db.Column(db.String(7), nullable=True, default='#dc3545')  # Hex color code (e.g., #dc3545)
@@ -3100,30 +3102,40 @@ class BrandingConfig(db.Model):
         ]
     
     def get_logo_url(self):
-        """Get logo URL path with proper fallback"""
+        """Get logo URL path — serves from database via /business/logo/<id> route"""
+        if self.logo_data and self.business_account_id:
+            return f'/business/logo/{self.business_account_id}'
         if self.logo_filename and self.business_account_id:
             return f'/static/uploads/logos/{self.business_account_id}/{self.logo_filename}'
         return None
     
     def has_logo(self):
-        """Check if branding config has a logo configured"""
-        return bool(self.logo_filename and self.logo_filename.strip())
+        """Check if branding config has a logo stored in the database"""
+        return bool(self.logo_data)
     
     def get_logo_path(self):
-        """Get full filesystem path to logo file"""
+        """Get full filesystem path to logo file (legacy fallback)"""
         import os
         from flask import current_app
         
-        if not self.has_logo():
+        if not self.logo_filename:
             return None
         
-        # Construct full path: /static/uploads/logos/{business_account_id}/{filename}
         static_dir = os.path.join(current_app.root_path, 'static')
         logo_path = os.path.join(static_dir, 'uploads', 'logos', str(self.business_account_id), self.logo_filename)
         return logo_path
     
+    def get_logo_base64_data_uri(self):
+        """Get logo as a base64 data URI for embedding in HTML/PDF"""
+        import base64
+        if self.logo_data:
+            content_type = self.logo_content_type or 'image/png'
+            logo_b64 = base64.b64encode(self.logo_data).decode('utf-8')
+            return f"data:{content_type};base64,{logo_b64}"
+        return None
+    
     def logo_exists_on_filesystem(self):
-        """Check if logo file actually exists on filesystem"""
+        """Check if logo file actually exists on filesystem (legacy)"""
         import os
         logo_path = self.get_logo_path()
         return logo_path and os.path.exists(logo_path)

@@ -67,6 +67,27 @@ def get_branding_context(business_account_id=None):
     
     return branding_context
 
+
+@business_auth_bp.route('/logo/<int:business_account_id>')
+def serve_logo(business_account_id):
+    """Serve tenant logo from database. Public endpoint (no auth required for survey pages)."""
+    from models import BrandingConfig
+    from flask import make_response, abort
+    from io import BytesIO
+
+    branding_config = BrandingConfig.query.filter_by(
+        business_account_id=business_account_id
+    ).first()
+
+    if not branding_config or not branding_config.logo_data:
+        abort(404)
+
+    response = make_response(branding_config.logo_data)
+    response.headers['Content-Type'] = branding_config.logo_content_type or 'image/png'
+    response.headers['Cache-Control'] = 'public, max-age=86400'
+    return response
+
+
 # ==== TENANT SCOPING HELPERS (PHASE 2.5 MINIMAL ACCOUNT MANAGEMENT) ====
 
 def current_tenant_id():
@@ -4713,10 +4734,11 @@ def save_brand_config():
             logo_file = request.files['logo_file']
             if logo_file.filename:
                 try:
-                    # Process and validate the uploaded logo
-                    processed_filename = _process_logo_upload(logo_file, current_account.id, branding_config.logo_filename)
-                    if processed_filename:
-                        branding_config.logo_filename = processed_filename
+                    result = _process_logo_upload(logo_file, current_account.id, branding_config.logo_filename)
+                    if result:
+                        branding_config.logo_filename = result['filename']
+                        branding_config.logo_data = result['data']
+                        branding_config.logo_content_type = result['content_type']
                 except ValueError as ve:
                     flash(str(ve), 'error')
                     return redirect(url_for('business_auth.brand_config'))
@@ -4825,29 +4847,28 @@ def license_info():
 
 def _process_logo_upload(logo_file, business_account_id, old_logo_filename=None):
     """
-    Process and validate logo upload with secure handling and image resizing
+    Process and validate logo upload with secure handling and image resizing.
+    Returns processed image bytes and metadata for database storage.
     
     Args:
         logo_file: FileStorage object from request
         business_account_id: ID of the business account
-        old_logo_filename: Previous logo filename to clean up
+        old_logo_filename: Previous logo filename (kept for reference only)
     
     Returns:
-        str: New filename of the processed logo
+        dict: {'filename': str, 'data': bytes, 'content_type': str}
     
     Raises:
         ValueError: For validation errors that should be shown to user
         Exception: For system errors
     """
-    import os
     import io
     from werkzeug.utils import secure_filename
     from PIL import Image, ImageOps
     
-    # Validate file size first (5MB limit)
-    logo_file.seek(0, 2)  # Seek to end
+    logo_file.seek(0, 2)
     file_size = logo_file.tell()
-    logo_file.seek(0)  # Reset to beginning
+    logo_file.seek(0)
     
     if file_size > 5 * 1024 * 1024:
         raise ValueError('File too large. Please upload a file smaller than 5MB.')
@@ -4855,15 +4876,12 @@ def _process_logo_upload(logo_file, business_account_id, old_logo_filename=None)
     if file_size == 0:
         raise ValueError('File is empty. Please select a valid image file.')
     
-    # Read file content for validation
     file_content = logo_file.read()
-    logo_file.seek(0)  # Reset for later use
+    logo_file.seek(0)
     
-    # Allowed formats - only safe raster image formats
     allowed_formats = {'PNG', 'JPEG', 'GIF', 'WEBP'}
     allowed_extensions = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
     
-    # Get file extension
     if '.' not in logo_file.filename:
         raise ValueError('File must have a valid extension.')
     
@@ -4872,27 +4890,22 @@ def _process_logo_upload(logo_file, business_account_id, old_logo_filename=None)
     if file_extension not in allowed_extensions:
         raise ValueError('Invalid file type. Please upload PNG, JPG, JPEG, GIF, or WEBP files only.')
     
-    # Validate image using Pillow - more secure than imghdr
     try:
         file_stream = io.BytesIO(file_content)
         image = Image.open(file_stream)
         
-        # Verify the image can be loaded and get format
         detected_format = image.format
-        image.verify()  # Verify the image integrity
+        image.verify()
         
-        # Reset stream for processing
         file_stream.seek(0)
         image = Image.open(file_stream)
         
     except Exception as e:
         raise ValueError('Invalid or corrupted image file. Please upload a valid image.')
     
-    # Validate format is in allowed list
     if detected_format not in allowed_formats:
         raise ValueError(f'Unsupported image format: {detected_format}. Please upload PNG, JPG, JPEG, GIF, or WEBP files only.')
     
-    # Additional security check - ensure detected format matches extension
     format_extension_map = {
         'PNG': ['png'],
         'JPEG': ['jpg', 'jpeg'],
@@ -4904,30 +4917,21 @@ def _process_logo_upload(logo_file, business_account_id, old_logo_filename=None)
         raise ValueError(f'File extension .{file_extension} does not match the actual file format ({detected_format}).')
     
     try:
-        # Image already loaded and verified above, continue processing
-        
-        # Convert to RGB if necessary (for JPEG output)
         if image.mode in ('RGBA', 'P'):
-            # Keep transparency for PNG, convert to RGB for others
             if detected_format == 'png':
-                # Keep as RGBA for PNG
                 pass
             else:
-                # Convert to RGB for other formats
                 rgb_image = Image.new('RGB', image.size, (255, 255, 255))
                 if image.mode == 'P':
                     image = image.convert('RGBA')
                 rgb_image.paste(image, mask=image.split()[-1] if image.mode == 'RGBA' else None)
                 image = rgb_image
         
-        # Get original dimensions
         original_width, original_height = image.size
         
-        # Target dimensions for email compatibility
         max_width = 300
         max_height = 100
         
-        # Calculate new dimensions maintaining aspect ratio
         width_ratio = max_width / original_width
         height_ratio = max_height / original_height
         ratio = min(width_ratio, height_ratio)
@@ -4935,50 +4939,30 @@ def _process_logo_upload(logo_file, business_account_id, old_logo_filename=None)
         new_width = int(original_width * ratio)
         new_height = int(original_height * ratio)
         
-        # Only resize if image is larger than target dimensions
         if ratio < 1:
             image = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
             logger.info(f"Logo resized from {original_width}x{original_height} to {new_width}x{new_height}")
         
-        # Create upload directory
-        upload_dir = os.path.join('static', 'uploads', 'logos', str(business_account_id))
-        os.makedirs(upload_dir, exist_ok=True)
-        
-        # Generate secure filename - always save as PNG for consistency
         timestamp = datetime.utcnow().strftime('%Y%m%d_%H%M%S')
         base_filename = secure_filename(logo_file.filename)
-        # Remove extension and add .png
         if '.' in base_filename:
             base_filename = base_filename.rsplit('.', 1)[0]
         filename = f"{timestamp}_{base_filename}.png"
-        file_path = os.path.join(upload_dir, filename)
         
-        # Save the processed image as PNG
-        image.save(file_path, 'PNG', optimize=True)
+        output_buffer = io.BytesIO()
+        image.save(output_buffer, 'PNG', optimize=True)
+        logo_bytes = output_buffer.getvalue()
         
-        # Clean up old file
-        _cleanup_old_logo(upload_dir, old_logo_filename)
-        
-        logger.info(f"Logo uploaded and processed successfully: {filename}")
-        return filename
+        logger.info(f"Logo processed successfully: {filename} ({len(logo_bytes)} bytes)")
+        return {
+            'filename': filename,
+            'data': logo_bytes,
+            'content_type': 'image/png'
+        }
         
     except Exception as e:
         logger.error(f"Image processing error: {e}")
         raise Exception(f"Failed to process image: {str(e)}")
-
-
-def _cleanup_old_logo(upload_dir, old_logo_filename):
-    """Clean up old logo file"""
-    import os
-    
-    if old_logo_filename:
-        old_file_path = os.path.join(upload_dir, old_logo_filename)
-        if os.path.exists(old_file_path):
-            try:
-                os.remove(old_file_path)
-                logger.info(f"Old logo file removed: {old_logo_filename}")
-            except Exception as e:
-                logger.warning(f"Failed to remove old logo file {old_logo_filename}: {e}")
 
 
 # ==== SURVEY CUSTOMIZATION CONFIGURATION ROUTES ====

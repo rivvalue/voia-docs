@@ -1391,30 +1391,29 @@ class ExecutiveReportGenerator:
             # Get color palette
             branding_data['brand_colors'] = branding_config.get_color_palette()
             
-            # Convert logo to base64 for embedding
-            logo_path = branding_config.get_logo_path()
-            if logo_path and os.path.exists(logo_path):
-                try:
-                    with open(logo_path, 'rb') as logo_file:
-                        logo_data = logo_file.read()
-                        # Determine MIME type
-                        if logo_path.lower().endswith('.png'):
-                            mime_type = 'image/png'
-                        elif logo_path.lower().endswith('.jpg') or logo_path.lower().endswith('.jpeg'):
-                            mime_type = 'image/jpeg'
-                        elif logo_path.lower().endswith('.gif'):
-                            mime_type = 'image/gif'
-                        elif logo_path.lower().endswith('.svg'):
-                            mime_type = 'image/svg+xml'
-                        else:
-                            mime_type = 'image/png'  # Default
-                        
-                        # Create base64 data URL
-                        logo_base64 = base64.b64encode(logo_data).decode('utf-8')
-                        branding_data['company_logo_base64'] = f"data:{mime_type};base64,{logo_base64}"
-                        
-                except Exception as e:
-                    logger.warning(f"Failed to load logo file {logo_path}: {e}")
+            logo_data_uri = branding_config.get_logo_base64_data_uri()
+            if logo_data_uri:
+                branding_data['company_logo_base64'] = logo_data_uri
+            else:
+                logo_path = branding_config.get_logo_path()
+                if logo_path and os.path.exists(logo_path):
+                    try:
+                        with open(logo_path, 'rb') as logo_file:
+                            logo_bytes = logo_file.read()
+                            if logo_path.lower().endswith('.png'):
+                                mime_type = 'image/png'
+                            elif logo_path.lower().endswith('.jpg') or logo_path.lower().endswith('.jpeg'):
+                                mime_type = 'image/jpeg'
+                            elif logo_path.lower().endswith('.gif'):
+                                mime_type = 'image/gif'
+                            elif logo_path.lower().endswith('.svg'):
+                                mime_type = 'image/svg+xml'
+                            else:
+                                mime_type = 'image/png'
+                            logo_base64 = base64.b64encode(logo_bytes).decode('utf-8')
+                            branding_data['company_logo_base64'] = f"data:{mime_type};base64,{logo_base64}"
+                    except Exception as e:
+                        logger.warning(f"Failed to load logo file {logo_path}: {e}")
         
         return branding_data
     
