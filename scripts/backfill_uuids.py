@@ -2,10 +2,14 @@
 """
 Backfill UUID columns for existing database rows.
 
+Requires PostgreSQL 13+ (uses gen_random_uuid() which is built-in since PG 13).
+For PostgreSQL < 13, run: CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 This script:
-1. Adds the uuid column (nullable) if it doesn't exist on each table
+1. Adds the uuid column (nullable, no default) if it doesn't exist on each table
 2. Populates NULL uuid values with gen_random_uuid()
-3. Adds NOT NULL constraint and unique index
+3. Sets server default for future inserts
+4. Adds NOT NULL constraint and unique index
 
 Usage:
     python scripts/backfill_uuids.py --dry-run    # Show counts only
