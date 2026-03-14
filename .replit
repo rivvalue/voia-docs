@@ -62,3 +62,7 @@ DEFAULT_CLAUDE_PREMIUM_MODEL = "claude-opus-4-5"
 CLAUDE_ENABLED = "true"
 LLM_GATEWAY_ENABLED = "true"
 DEFAULT_LLM_PROVIDER = "anthropic"
+
+[postMerge]
+path = "scripts/post-merge.sh"
+timeoutMs = 60000
