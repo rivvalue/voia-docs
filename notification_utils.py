@@ -117,7 +117,7 @@ def mark_as_read(notification_id, business_account_id):
     Mark a notification as read
     
     Args:
-        notification_id: Notification ID
+        notification_id: Notification ID (integer)
         business_account_id: Business account ID (for security validation)
     
     Returns:
@@ -142,6 +142,39 @@ def mark_as_read(notification_id, business_account_id):
     except Exception as e:
         db.session.rollback()
         logger.error(f"Failed to mark notification as read: {e}")
+        return False
+
+
+def mark_notification_as_read_by_uuid(notification_uuid, business_account_id):
+    """
+    Mark a notification as read using its UUID.
+    
+    Args:
+        notification_uuid: Notification UUID string
+        business_account_id: Business account ID (integer, for security validation)
+    
+    Returns:
+        bool: True if marked successfully, False otherwise
+    """
+    try:
+        notification = Notification.query.filter_by(
+            uuid=notification_uuid,
+            business_account_id=business_account_id
+        ).first()
+        
+        if not notification:
+            logger.warning(f"Notification with uuid {notification_uuid} not found")
+            return False
+        
+        notification.unread = False
+        notification.read_at = datetime.utcnow()
+        db.session.commit()
+        
+        return True
+        
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Failed to mark notification as read by uuid: {e}")
         return False
 
 

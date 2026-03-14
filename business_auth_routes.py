@@ -392,18 +392,19 @@ def require_platform_admin(f):
 
 
 def validate_business_account_access(business_id, allow_platform_admin=False):
-    """Validate that current user can access the specified business account"""
-    try:
-        business_id = int(business_id)
-    except (ValueError, TypeError):
-        return False, None, "Invalid business account ID"
+    """Validate that current user can access the specified business account.
     
-    # Get target business account
-    target_account = BusinessAccount.query.get(business_id)
+    Accepts either a UUID string or integer ID for backward compatibility.
+    """
+    target_account = None
+    if isinstance(business_id, int):
+        target_account = BusinessAccount.query.get(business_id)
+    else:
+        target_account = BusinessAccount.query.filter_by(uuid=str(business_id)).first()
+    
     if not target_account:
         return False, None, "Business account not found"
     
-    # Get current user and account context
     current_user_id = session.get('business_user_id')
     current_account_id = session.get('business_account_id')
     
@@ -414,13 +415,11 @@ def validate_business_account_access(business_id, allow_platform_admin=False):
     if not current_user:
         return False, None, "User not found"
     
-    # Platform admins can access any business account
     if allow_platform_admin and current_user.is_platform_admin():
         return True, target_account, "Platform admin access"
     
-    # Regular users can only access their own business account
-    if current_account_id != business_id:
-        logger.warning(f"Cross-tenant access attempt: User {current_user.email} (account {current_account_id}) tried to access account {business_id}")
+    if current_account_id != target_account.id:
+        logger.warning(f"Cross-tenant access attempt: User {current_user.email} (account {current_account_id}) tried to access account {target_account.id}")
         return False, None, "Access denied - cannot access other business accounts"
     
     return True, target_account, "Same tenant access"
@@ -629,7 +628,7 @@ def add_user():
         return redirect(url_for('business_auth.manage_users'))
 
 
-@business_auth_bp.route('/users/<int:user_id>/edit', methods=['POST'])
+@business_auth_bp.route('/users/<string:user_id>/edit', methods=['POST'])
 @require_business_auth
 @require_permission('manage_users')
 def edit_user(user_id):
@@ -643,9 +642,8 @@ def edit_user(user_id):
             flash('Authentication required.', 'error')
             return redirect(url_for('business_auth.login'))
         
-        # Get user to edit
         user_to_edit = BusinessAccountUser.query.filter_by(
-            id=user_id, 
+            uuid=user_id, 
             business_account_id=current_account_id
         ).first()
         
@@ -653,18 +651,15 @@ def edit_user(user_id):
             flash('User not found.', 'error')
             return redirect(url_for('business_auth.manage_users'))
         
-        # Get form data
         email = request.form.get('email', '').strip().lower()
         first_name = request.form.get('first_name', '').strip()
         last_name = request.form.get('last_name', '').strip()
         role = request.form.get('role', '').strip()
         
-        # Validate input
         if not email or not first_name or not last_name:
             flash('All fields are required.', 'error')
             return redirect(url_for('business_auth.manage_users'))
         
-        # Validate email format
         from email_validator import validate_email, EmailNotValidError
         try:
             valid_email = validate_email(email)
@@ -673,23 +668,20 @@ def edit_user(user_id):
             flash(f'Invalid email address: {str(e)}', 'error')
             return redirect(url_for('business_auth.manage_users'))
         
-        # Check if email is already taken by another user
         existing_user = BusinessAccountUser.query.filter(
             BusinessAccountUser.email == email,
-            BusinessAccountUser.id != user_id
+            BusinessAccountUser.id != user_to_edit.id
         ).first()
         
         if existing_user:
             flash('A user with this email address already exists.', 'error')
             return redirect(url_for('business_auth.manage_users'))
         
-        # Validate role
         allowed_roles = ['business_account_admin', 'admin', 'manager', 'viewer']
         if role not in allowed_roles:
             flash('Invalid role selected.', 'error')
             return redirect(url_for('business_auth.manage_users'))
         
-        # Update user
         old_email = user_to_edit.email
         user_to_edit.email = email
         user_to_edit.first_name = first_name
@@ -699,7 +691,7 @@ def edit_user(user_id):
         
         db.session.commit()
         
-        logger.info(f"User {user_id} updated successfully. Email: {old_email} -> {email}, Role: {role}")
+        logger.info(f"User {user_to_edit.id} updated successfully. Email: {old_email} -> {email}, Role: {role}")
         flash(f'User {user_to_edit.get_full_name()} has been updated successfully.', 'success')
         
         return redirect(url_for('business_auth.manage_users'))
@@ -711,7 +703,7 @@ def edit_user(user_id):
         return redirect(url_for('business_auth.manage_users'))
 
 
-@business_auth_bp.route('/users/<int:user_id>/toggle-status', methods=['POST'])
+@business_auth_bp.route('/users/<string:user_id>/toggle-status', methods=['POST'])
 @require_business_auth
 @require_permission('manage_users')
 def toggle_user_status(user_id):
@@ -725,9 +717,8 @@ def toggle_user_status(user_id):
             flash('Authentication required.', 'error')
             return redirect(url_for('business_auth.login'))
         
-        # Get user to toggle
         user_to_toggle = BusinessAccountUser.query.filter_by(
-            id=user_id, 
+            uuid=user_id, 
             business_account_id=current_account_id
         ).first()
         
@@ -735,8 +726,7 @@ def toggle_user_status(user_id):
             flash('User not found.', 'error')
             return redirect(url_for('business_auth.manage_users'))
         
-        # Prevent self-deactivation
-        if user_id == current_user_id:
+        if user_to_toggle.id == current_user_id:
             flash('You cannot deactivate your own account.', 'error')
             return redirect(url_for('business_auth.manage_users'))
         
@@ -762,7 +752,7 @@ def toggle_user_status(user_id):
         db.session.commit()
         
         status_text = 'activated' if new_status else 'deactivated'
-        logger.info(f"User {user_id} ({user_to_toggle.email}) {status_text} by user {current_user_id}")
+        logger.info(f"User {user_to_toggle.id} ({user_to_toggle.email}) {status_text} by user {current_user_id}")
         flash(f'User {user_to_toggle.get_full_name()} has been {status_text}.', 'success')
         
         return redirect(url_for('business_auth.manage_users'))
@@ -774,7 +764,7 @@ def toggle_user_status(user_id):
         return redirect(url_for('business_auth.manage_users'))
 
 
-@business_auth_bp.route('/users/<int:user_id>/reset-password', methods=['POST'])
+@business_auth_bp.route('/users/<string:user_id>/reset-password', methods=['POST'])
 @require_business_auth
 @require_permission('manage_users')
 def reset_user_password(user_id):
@@ -788,9 +778,8 @@ def reset_user_password(user_id):
             flash('Authentication required.', 'error')
             return redirect(url_for('business_auth.login'))
         
-        # Get user to reset password for
         user_to_reset = BusinessAccountUser.query.filter_by(
-            id=user_id, 
+            uuid=user_id, 
             business_account_id=current_account_id
         ).first()
         
@@ -798,8 +787,7 @@ def reset_user_password(user_id):
             flash('User not found.', 'error')
             return redirect(url_for('business_auth.manage_users'))
         
-        # Prevent resetting own password through admin interface
-        if user_id == current_user_id:
+        if user_to_reset.id == current_user_id:
             flash('You cannot reset your own password through this interface. Use the account settings instead.', 'error')
             return redirect(url_for('business_auth.manage_users'))
         
@@ -809,7 +797,7 @@ def reset_user_password(user_id):
         # Save to database
         db.session.commit()
         
-        logger.info(f"Password reset token generated for user {user_id} ({user_to_reset.email}) by admin {current_user_id}")
+        logger.info(f"Password reset token generated for user {user_to_reset.id} ({user_to_reset.email}) by admin {current_user_id}")
         
         # TODO: Send password reset email (implement with email service)
         # For now, show the token to the admin
@@ -995,13 +983,12 @@ def create_business_account_with_admin():
         return redirect(url_for('business_auth.business_account_onboarding'))
 
 
-@business_auth_bp.route('/admin/onboarding/<int:user_id>/resend-invitation', methods=['POST'])
+@business_auth_bp.route('/admin/onboarding/<string:user_id>/resend-invitation', methods=['POST'])
 @require_platform_admin
 def resend_business_account_invitation(user_id):
     """Resend activation invitation to a business account administrator"""
     try:
-        # Get the user
-        user = BusinessAccountUser.query.get(user_id)
+        user = BusinessAccountUser.query.filter_by(uuid=user_id).first()
         if not user:
             flash('User not found.', 'error')
             return redirect(url_for('business_auth.business_account_onboarding'))
@@ -5452,6 +5439,7 @@ def admin_licenses():
             
             account_data = {
                 'id': account.id,
+                'uuid': account.uuid,
                 'name': account.name,
                 'account_type': account.account_type,
                 'status': account.status,
@@ -5470,6 +5458,7 @@ def admin_licenses():
                 'total_invitations': license_info.get('total_invitations', 0),
                 'has_unactivated_admin': unactivated_admin is not None,
                 'unactivated_admin_id': unactivated_admin.id if unactivated_admin else None,
+                'unactivated_admin_uuid': unactivated_admin.uuid if unactivated_admin else None,
                 'unactivated_admin_email': unactivated_admin.email if unactivated_admin else None,
                 'allow_parallel_campaigns': getattr(account, 'allow_parallel_campaigns', False),
                 'active_campaigns_count': active_campaigns_count
@@ -5505,12 +5494,11 @@ def admin_licenses():
         return redirect(url_for('business_auth.admin_panel'))
 
 
-@business_auth_bp.route('/admin/licenses/assign/<int:business_id>')
+@business_auth_bp.route('/admin/licenses/assign/<string:business_id>')
 @require_platform_admin
 def license_assignment_form(business_id):
     """Show license assignment form for specific business account (Platform Admin Only)"""
     try:
-        # Validate business account access (platform admin is allowed)
         is_valid, business_account, message = validate_business_account_access(business_id, allow_platform_admin=True)
         if not is_valid:
             logger.warning(f"Unauthorized license assignment form access attempt: {message}")
@@ -5521,28 +5509,25 @@ def license_assignment_form(business_id):
             flash('Business account not found.', 'error')
             return redirect(url_for('business_auth.admin_licenses'))
         
-        # Get current license information with error handling
         try:
-            current_license = LicenseService.get_current_license(business_id)
-            license_info = LicenseService.get_license_info(business_id)
+            current_license = LicenseService.get_current_license(business_account.id)
+            license_info = LicenseService.get_license_info(business_account.id)
         except Exception as license_error:
-            logger.error(f"Error retrieving license info for business_id {business_id}: {license_error}")
+            logger.error(f"Error retrieving license info for business_id {business_account.id}: {license_error}")
             current_license = None
             license_info = {'license_type': 'trial', 'license_status': 'error'}
         
-        # Get available license types
         try:
             available_types = LicenseService.get_available_license_types()
         except Exception as types_error:
             logger.error(f"Error retrieving available license types: {types_error}")
-            available_types = ['core', 'plus', 'pro']  # Fallback
+            available_types = ['core', 'plus', 'pro']
         
-        # Get current usage statistics with error handling
         try:
-            campaigns_used = LicenseService.get_campaigns_used_in_current_period(business_id)
+            campaigns_used = LicenseService.get_campaigns_used_in_current_period(business_account.id)
             users_count = getattr(business_account, 'current_users_count', 0)
         except Exception as usage_error:
-            logger.error(f"Error retrieving usage statistics for business_id {business_id}: {usage_error}")
+            logger.error(f"Error retrieving usage statistics for business_id {business_account.id}: {usage_error}")
             campaigns_used = 0
             users_count = 0
         
@@ -5579,7 +5564,7 @@ def license_assignment_form(business_id):
         
         # Log platform admin access for audit
         current_user = BusinessAccountUser.query.get(session.get('business_user_id'))
-        logger.info(f"Platform admin {current_user.email if current_user else 'unknown'} accessed license assignment form for business_id {business_id} ({business_account.name})")
+        logger.info(f"Platform admin {current_user.email if current_user else 'unknown'} accessed license assignment form for business_id {business_account.id} ({business_account.name})")
         
         return render_template('business_auth/licenses/assignment_form.html', **template_data)
         
@@ -5594,36 +5579,22 @@ def license_assignment_form(business_id):
 def process_license_assignment():
     """Process license assignment form submission (Platform Admin Only)"""
     try:
-        # Get form data with validation
-        business_id_str = request.form.get('business_id', '').strip()
+        business_uuid_str = request.form.get('business_id', '').strip()
         license_type = request.form.get('license_type', '').strip().lower()
         
-        # Comprehensive input validation
-        if not business_id_str or not license_type:
+        if not business_uuid_str or not license_type:
             flash('Business account and license type are required.', 'error')
             return redirect(url_for('business_auth.admin_licenses'))
         
-        # Validate business_id is numeric
-        try:
-            business_id = int(business_id_str)
-            if business_id <= 0:
-                raise ValueError("Business ID must be positive")
-        except ValueError:
-            logger.warning(f"Invalid business_id provided in license assignment: '{business_id_str}'")
-            flash('Invalid business account ID.', 'error')
-            return redirect(url_for('business_auth.admin_licenses'))
-        
-        # Validate license type
         valid_license_types = ['core', 'plus', 'pro', 'trial']
         if license_type not in valid_license_types:
             logger.warning(f"Invalid license_type provided: '{license_type}'")
             flash('Invalid license type selected.', 'error')
             return redirect(url_for('business_auth.admin_licenses'))
         
-        # Validate business account access (platform admin is allowed)
-        is_valid, business_account, message = validate_business_account_access(business_id, allow_platform_admin=True)
+        is_valid, business_account, message = validate_business_account_access(business_uuid_str, allow_platform_admin=True)
         if not is_valid:
-            logger.warning(f"Unauthorized license assignment attempt: {message} for business_id {business_id}")
+            logger.warning(f"Unauthorized license assignment attempt: {message} for business {business_uuid_str}")
             flash('Access denied. You cannot assign licenses to this business account.', 'error')
             return redirect(url_for('business_auth.admin_licenses'))
         
@@ -5631,7 +5602,8 @@ def process_license_assignment():
             flash('Business account not found.', 'error')
             return redirect(url_for('business_auth.admin_licenses'))
         
-        # Get current user for audit trail
+        business_id = business_account.id
+        
         current_user = BusinessAccountUser.query.get(session.get('business_user_id'))
         if not current_user:
             logger.error("License assignment attempted without valid user session")
@@ -5640,12 +5612,10 @@ def process_license_assignment():
         
         created_by = current_user.get_full_name()
         
-        # Handle custom configuration for Pro licenses with comprehensive validation
         custom_config = None
         if license_type == 'pro':
             custom_config = {}
             
-            # Get and validate custom limits from form
             try:
                 campaigns_limit = request.form.get('max_campaigns_per_year', '').strip()
                 users_limit = request.form.get('max_users', '').strip()
@@ -5655,21 +5625,21 @@ def process_license_assignment():
                     campaigns_value = int(campaigns_limit)
                     if campaigns_value < 1 or campaigns_value > 1000:
                         flash('Maximum campaigns per year must be between 1 and 1000.', 'error')
-                        return redirect(url_for('business_auth.license_assignment_form', business_id=business_id))
+                        return redirect(url_for('business_auth.license_assignment_form', business_id=business_account.uuid))
                     custom_config['max_campaigns_per_year'] = campaigns_value
                 
                 if users_limit:
                     users_value = int(users_limit)
                     if users_value < 1 or users_value > 10000:
                         flash('Maximum users must be between 1 and 10,000.', 'error')
-                        return redirect(url_for('business_auth.license_assignment_form', business_id=business_id))
+                        return redirect(url_for('business_auth.license_assignment_form', business_id=business_account.uuid))
                     custom_config['max_users'] = users_value
                 
                 if participants_limit:
                     participants_value = int(participants_limit)
                     if participants_value < 1 or participants_value > 1000000:
                         flash('Maximum target responses per campaign must be between 1 and 1,000,000.', 'error')
-                        return redirect(url_for('business_auth.license_assignment_form', business_id=business_id))
+                        return redirect(url_for('business_auth.license_assignment_form', business_id=business_account.uuid))
                     custom_config['max_participants_per_campaign'] = participants_value
                 
                 invitations_limit = request.form.get('max_invitations_per_campaign', '').strip()
@@ -5677,14 +5647,13 @@ def process_license_assignment():
                     invitations_value = int(invitations_limit)
                     if invitations_value < 1 or invitations_value > 5000000:
                         flash('Maximum invitations per campaign must be between 1 and 5,000,000.', 'error')
-                        return redirect(url_for('business_auth.license_assignment_form', business_id=business_id))
+                        return redirect(url_for('business_auth.license_assignment_form', business_id=business_account.uuid))
                     custom_config['max_invitations_per_campaign'] = invitations_value
                     
             except ValueError:
                 flash('Custom limit values must be valid positive numbers.', 'error')
-                return redirect(url_for('business_auth.license_assignment_form', business_id=business_id))
+                return redirect(url_for('business_auth.license_assignment_form', business_id=business_account.uuid))
         
-        # Additional security: Re-validate the business account hasn't changed
         fresh_business_account = BusinessAccount.query.get(business_id)
         if not fresh_business_account or fresh_business_account.name != business_account.name:
             logger.error(f"Business account validation failed during license assignment for business_id {business_id}")
@@ -5737,7 +5706,7 @@ def process_license_assignment():
         return redirect(url_for('business_auth.admin_licenses'))
 
 
-@business_auth_bp.route('/admin/licenses/<int:business_id>/toggle-parallel-campaigns', methods=['POST'])
+@business_auth_bp.route('/admin/licenses/<string:business_id>/toggle-parallel-campaigns', methods=['POST'])
 @require_platform_admin
 def toggle_parallel_campaigns(business_id):
     """Toggle allow_parallel_campaigns setting for a business account (Platform Admin Only)
@@ -5776,10 +5745,9 @@ def toggle_parallel_campaigns(business_id):
         current_state = business_account.allow_parallel_campaigns
         new_state = not current_state
         
-        # DOWNGRADE PROTECTION: If disabling, check for 2+ active campaigns
         if current_state and not new_state:
             active_campaign_count = Campaign.query.filter_by(
-                business_account_id=business_id,
+                business_account_id=business_account.id,
                 status='active'
             ).count()
             
@@ -5796,20 +5764,18 @@ def toggle_parallel_campaigns(business_id):
                 flash(error_msg, 'error')
                 return redirect(url_for('business_auth.admin_licenses'))
         
-        # Update the setting
         business_account.allow_parallel_campaigns = new_state
         db.session.commit()
         
         action = 'enabled' if new_state else 'disabled'
-        logger.info(f"Platform admin {current_user.email} {action} parallel campaigns for business_id {business_id} ({business_account.name})")
+        logger.info(f"Platform admin {current_user.email} {action} parallel campaigns for business_id {business_account.id} ({business_account.name})")
         
-        # Audit log the change
         try:
             queue_audit_log(
-                business_account_id=business_id,
+                business_account_id=business_account.id,
                 action_type='parallel_campaigns_toggle',
                 resource_type='business_account',
-                resource_id=business_id,
+                resource_id=business_account.id,
                 resource_name=business_account.name,
                 user_email=current_user.email,
                 user_name=getattr(current_user, 'get_full_name', lambda: current_user.email)(),
@@ -5842,12 +5808,11 @@ def toggle_parallel_campaigns(business_id):
         return redirect(url_for('business_auth.admin_licenses'))
 
 
-@business_auth_bp.route('/admin/licenses/history/<int:business_id>')
+@business_auth_bp.route('/admin/licenses/history/<string:business_id>')
 @require_platform_admin
 def license_history(business_id):
     """Show license history timeline for specific business account (Platform Admin Only)"""
     try:
-        # Validate business account access (platform admin is allowed)
         is_valid, business_account, message = validate_business_account_access(business_id, allow_platform_admin=True)
         if not is_valid:
             logger.warning(f"Unauthorized license history access attempt: {message}")
@@ -5858,20 +5823,18 @@ def license_history(business_id):
             flash('Business account not found.', 'error')
             return redirect(url_for('business_auth.admin_licenses'))
         
-        # Get license history with error handling
         try:
-            license_history_records = LicenseService.get_license_history(business_id)
+            license_history_records = LicenseService.get_license_history(business_account.id)
             if not license_history_records:
-                license_history_records = []  # Ensure we have an empty list instead of None
+                license_history_records = []
         except Exception as history_error:
-            logger.error(f"Error retrieving license history for business_id {business_id}: {history_error}")
+            logger.error(f"Error retrieving license history for business_id {business_account.id}: {history_error}")
             license_history_records = []
         
-        # Get current license for comparison with error handling
         try:
-            current_license = LicenseService.get_current_license(business_id)
+            current_license = LicenseService.get_current_license(business_account.id)
         except Exception as current_error:
-            logger.error(f"Error retrieving current license for business_id {business_id}: {current_error}")
+            logger.error(f"Error retrieving current license for business_id {business_account.id}: {current_error}")
             current_license = None
         
         # Sanitize and validate history records
@@ -6096,7 +6059,7 @@ def license_dashboard():
 
 # ==== EXECUTIVE REPORT API ROUTES ====
 
-@business_auth_bp.route('/api/campaigns/<int:campaign_id>/executive-reports', methods=['GET'])
+@business_auth_bp.route('/api/campaigns/<string:campaign_id>/executive-reports', methods=['GET'])
 @require_business_auth
 def get_executive_reports(campaign_id):
     """Get executive reports for a campaign"""
@@ -6105,20 +6068,18 @@ def get_executive_reports(campaign_id):
         if not current_account:
             return jsonify({'error': 'Business account context not found'}), 401
         
-        # Verify campaign belongs to current business account
         from models import Campaign
         campaign = Campaign.query.filter_by(
-            id=campaign_id,
+            uuid=campaign_id,
             business_account_id=current_account.id
         ).first()
         
         if not campaign:
             return jsonify({'error': 'Campaign not found'}), 404
         
-        # Get executive reports for this campaign
         from models import ExecutiveReport
         reports = ExecutiveReport.query.filter_by(
-            campaign_id=campaign_id,
+            campaign_id=campaign.id,
             business_account_id=current_account.id
         ).order_by(ExecutiveReport.created_at.desc()).all()
         
@@ -6131,7 +6092,7 @@ def get_executive_reports(campaign_id):
         return jsonify({'error': 'Failed to get executive reports'}), 500
 
 
-@business_auth_bp.route('/api/campaigns/<int:campaign_id>/executive-reports/download', methods=['GET'])
+@business_auth_bp.route('/api/campaigns/<string:campaign_id>/executive-reports/download', methods=['GET'])
 @require_business_auth
 def download_executive_report(campaign_id):
     """Download executive report for a campaign"""
@@ -6140,20 +6101,18 @@ def download_executive_report(campaign_id):
         if not current_account:
             return jsonify({'error': 'Business account context not found'}), 401
         
-        # Verify campaign belongs to current business account
         from models import Campaign
         campaign = Campaign.query.filter_by(
-            id=campaign_id,
+            uuid=campaign_id,
             business_account_id=current_account.id
         ).first()
         
         if not campaign:
             return jsonify({'error': 'Campaign not found'}), 404
         
-        # Get executive report for this campaign
         from models import ExecutiveReport
         report = ExecutiveReport.query.filter_by(
-            campaign_id=campaign_id,
+            campaign_id=campaign.id,
             business_account_id=current_account.id,
             status='completed'
         ).order_by(ExecutiveReport.created_at.desc()).first()
@@ -6205,7 +6164,7 @@ def download_executive_report(campaign_id):
         return jsonify({'error': 'Failed to download executive report'}), 500
 
 
-@business_auth_bp.route('/api/campaigns/<int:campaign_id>/executive-reports/generate', methods=['POST'])
+@business_auth_bp.route('/api/campaigns/<string:campaign_id>/executive-reports/generate', methods=['POST'])
 @require_business_auth
 def generate_executive_report_manually(campaign_id):
     """Manually trigger executive report generation for a campaign"""
@@ -6214,10 +6173,9 @@ def generate_executive_report_manually(campaign_id):
         if not current_account:
             return jsonify({'error': 'Business account context not found'}), 401
         
-        # Verify campaign belongs to current business account and user has admin permission
         from models import Campaign
         campaign = Campaign.query.filter_by(
-            id=campaign_id,
+            uuid=campaign_id,
             business_account_id=current_account.id
         ).first()
         
@@ -6257,7 +6215,7 @@ def generate_executive_report_manually(campaign_id):
         return jsonify({'error': 'Failed to start executive report generation'}), 500
 
 
-@business_auth_bp.route('/api/campaigns/<int:campaign_id>/executive-reports/regenerate', methods=['POST'])
+@business_auth_bp.route('/api/campaigns/<string:campaign_id>/executive-reports/regenerate', methods=['POST'])
 @require_business_auth
 def regenerate_executive_report(campaign_id):
     """Regenerate an existing executive report for a campaign"""
@@ -6266,10 +6224,9 @@ def regenerate_executive_report(campaign_id):
         if not current_account:
             return jsonify({'error': 'Business account context not found'}), 401
         
-        # Verify campaign belongs to current business account
         from models import Campaign
         campaign = Campaign.query.filter_by(
-            id=campaign_id,
+            uuid=campaign_id,
             business_account_id=current_account.id
         ).first()
         
@@ -6287,10 +6244,9 @@ def regenerate_executive_report(campaign_id):
         if not user:
             return jsonify({'error': 'User session invalid'}), 401
         
-        # Check if existing report exists
         from models import ExecutiveReport
         existing_report = ExecutiveReport.query.filter_by(
-            campaign_id=campaign_id,
+            campaign_id=campaign.id,
             business_account_id=current_account.id
         ).order_by(ExecutiveReport.created_at.desc()).first()
         
@@ -6332,7 +6288,7 @@ def regenerate_executive_report(campaign_id):
 
 # ==== TRANSCRIPT ANALYSIS ROUTES ====
 
-@business_auth_bp.route('/api/campaigns/<int:campaign_id>/transcripts/upload', methods=['POST'])
+@business_auth_bp.route('/api/campaigns/<string:campaign_id>/transcripts/upload', methods=['POST'])
 @require_business_auth
 def upload_transcript(campaign_id):
     """Upload and process transcript for a campaign"""
@@ -6341,17 +6297,15 @@ def upload_transcript(campaign_id):
         if not current_account:
             return jsonify({'error': 'Business account context not found'}), 401
         
-        # Get current user for audit trail (all authenticated users can upload transcripts)
         business_user_id = session.get('business_user_id')
         from models import BusinessAccountUser
         user = BusinessAccountUser.query.get(business_user_id)
         if not user:
             return jsonify({'error': 'User session invalid'}), 401
         
-        # Verify campaign belongs to current business account
         from models import Campaign
         campaign = Campaign.query.filter_by(
-            id=campaign_id,
+            uuid=campaign_id,
             business_account_id=current_account.id
         ).first()
         
@@ -6411,17 +6365,16 @@ def upload_transcript(campaign_id):
         
         from models import SurveyResponse
         existing_response = SurveyResponse.query.filter_by(
-            campaign_id=campaign_id,
+            campaign_id=campaign.id,
             transcript_hash=transcript_hash
         ).first()
         
         if existing_response:
             return jsonify({'error': 'This transcript has already been processed for this campaign'}), 409
         
-        # Queue transcript for AI analysis processing
         from task_queue import task_queue
-        task_queue.add_task('transcript_analysis', data_id=campaign_id, task_data={
-            'campaign_id': campaign_id,
+        task_queue.add_task('transcript_analysis', data_id=campaign.id, task_data={
+            'campaign_id': campaign.id,
             'business_account_id': current_account.id,
             'transcript_content': transcript_content,
             'transcript_hash': transcript_hash,
@@ -6446,7 +6399,7 @@ def upload_transcript(campaign_id):
         return jsonify({'error': 'Failed to upload transcript'}), 500
 
 
-@business_auth_bp.route('/api/campaigns/<int:campaign_id>/transcripts', methods=['GET'])
+@business_auth_bp.route('/api/campaigns/<string:campaign_id>/transcripts', methods=['GET'])
 @require_business_auth
 def get_campaign_transcripts(campaign_id):
     """Get list of transcript-sourced responses for a campaign"""
@@ -6455,27 +6408,25 @@ def get_campaign_transcripts(campaign_id):
         if not current_account:
             return jsonify({'error': 'Business account context not found'}), 401
         
-        # Verify campaign belongs to current business account
         from models import Campaign
         campaign = Campaign.query.filter_by(
-            id=campaign_id,
+            uuid=campaign_id,
             business_account_id=current_account.id
         ).first()
         
         if not campaign:
             return jsonify({'error': 'Campaign not found'}), 404
         
-        # Get transcript responses for this campaign
         from models import SurveyResponse
         transcript_responses = SurveyResponse.query.filter_by(
-            campaign_id=campaign_id,
+            campaign_id=campaign.id,
             source_type='transcript'
         ).order_by(SurveyResponse.created_at.desc()).all()
         
         responses_data = []
         for response in transcript_responses:
             responses_data.append({
-                'id': response.id,
+                'id': response.uuid,
                 'participant_name': response.respondent_name,
                 'participant_email': response.respondent_email,
                 'participant_company': response.company_name,
@@ -6497,7 +6448,7 @@ def get_campaign_transcripts(campaign_id):
         return jsonify({'error': 'Failed to get transcripts'}), 500
 
 
-@business_auth_bp.route('/api/transcripts/<int:response_id>/download', methods=['GET'])
+@business_auth_bp.route('/api/transcripts/<string:response_id>/download', methods=['GET'])
 @require_business_auth
 def download_transcript(response_id):
     """Download original transcript file"""
@@ -6506,10 +6457,9 @@ def download_transcript(response_id):
         if not current_account:
             return jsonify({'error': 'Business account context not found'}), 401
         
-        # Get transcript response and verify access
         from models import SurveyResponse, Campaign
         response = SurveyResponse.query.join(Campaign).filter(
-            SurveyResponse.id == response_id,
+            SurveyResponse.uuid == response_id,
             SurveyResponse.source_type == 'transcript',
             Campaign.business_account_id == current_account.id
         ).first()
@@ -7241,18 +7191,18 @@ def notifications_page():
                          total_count=total_count)
 
 
-@business_auth_bp.route('/notifications/<int:notification_id>/mark-read', methods=['POST'])
+@business_auth_bp.route('/notifications/<string:notification_id>/mark-read', methods=['POST'])
 @require_business_auth
 def mark_notification_read_page(notification_id):
     """Mark a single notification as read (form POST from notifications page)"""
-    from notification_utils import mark_as_read
+    from notification_utils import mark_notification_as_read_by_uuid
     
     current_account = get_current_business_account()
     if not current_account:
         flash(_('Business account not found.'), 'error')
         return redirect(url_for('business_auth.login'))
     
-    mark_as_read(notification_id, current_account.id)
+    mark_notification_as_read_by_uuid(notification_id, current_account.id)
     return redirect(url_for('business_auth.notifications_page'))
 
 

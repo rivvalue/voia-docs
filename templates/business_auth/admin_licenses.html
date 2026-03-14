@@ -148,7 +148,7 @@
                         <td>
                             <div class="parallel-toggle text-center">
                                 {% set can_disable = account.get('active_campaigns_count', 0) < 2 %}
-                                <form method="POST" action="{{ url_for('business_auth.toggle_parallel_campaigns', business_id=account.get('id', 0)) }}" style="display: inline;">
+                                <form method="POST" action="{{ url_for('business_auth.toggle_parallel_campaigns', business_id=account.get('uuid', '')) }}" style="display: inline;">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                     {% if account.get('allow_parallel_campaigns') %}
                                         <button type="submit" 
@@ -181,16 +181,16 @@
                         </td>
                         <td>
                             <div class="action-buttons">
-                                <a href="{{ url_for('business_auth.license_assignment_form', business_id=account.get('id', 0)) }}" 
+                                <a href="{{ url_for('business_auth.license_assignment_form', business_id=account.get('uuid', '')) }}" 
                                    class="btn btn-sm btn-outline-primary" title={{ _('Manage License') }}>
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <a href="{{ url_for('business_auth.license_history', business_id=account.get('id', 0)) }}" 
+                                <a href="{{ url_for('business_auth.license_history', business_id=account.get('uuid', '')) }}" 
                                    class="btn btn-sm btn-outline-info" title={{ _('View History') }}>
                                     <i class="fas fa-history"></i>
                                 </a>
                                 {% if account.get('has_unactivated_admin') %}
-                                <form method="POST" action="{{ url_for('business_auth.resend_business_account_invitation', user_id=account.get('unactivated_admin_id')) }}" style="display: inline;">
+                                <form method="POST" action="{{ url_for('business_auth.resend_business_account_invitation', user_id=account.get('unactivated_admin_uuid')) }}" style="display: inline;">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                     <button type="submit" class="btn btn-sm btn-outline-warning" title="Resend Activation Email to {{ account.get('unactivated_admin_email') }}">
                                         <i class="fas fa-envelope"></i>

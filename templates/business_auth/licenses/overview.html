@@ -387,11 +387,11 @@
                         </td>
                         <td>
                             <div class="action-buttons">
-                                <a href="{{ url_for('business_auth.license_assignment_form', business_id=account.id) }}" 
+                                <a href="{{ url_for('business_auth.license_assignment_form', business_id=account.uuid) }}" 
                                    class="action-btn action-btn-primary" title="{{ _('Assign License') }}">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <a href="{{ url_for('business_auth.license_history', business_id=account.id) }}" 
+                                <a href="{{ url_for('business_auth.license_history', business_id=account.uuid) }}" 
                                    class="action-btn action-btn-secondary" title="{{ _('View History') }}">
                                     <i class="fas fa-history"></i>
                                 </a>

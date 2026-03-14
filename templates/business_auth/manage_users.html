@@ -130,12 +130,12 @@
                             <button type="button" 
                                     class="users-action-btn primary" 
                                     title={{ _('Edit User') }} 
-                                    onclick="editUser({{ user.id }}, '{{ user.first_name }}', '{{ user.last_name }}', '{{ user.email }}', '{{ user.role }}')"
+                                    onclick="editUser('{{ user.uuid }}', '{{ user.first_name }}', '{{ user.last_name }}', '{{ user.email }}', '{{ user.role }}')"
                                     aria-label="Edit {{ user.get_full_name() }}">
                                 <i class="fas fa-edit" aria-hidden="true"></i>
                             </button>
                             <form method="POST" 
-                                  action="{{ url_for('business_auth.reset_user_password', user_id=user.id) }}" 
+                                  action="{{ url_for('business_auth.reset_user_password', user_id=user.uuid) }}" 
                                   style="display: inline;" 
                                   id="resetPasswordForm_{{ user.id }}">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
@@ -151,7 +151,7 @@
                                 </button>
                             </form>
                             <form method="POST" 
-                                  action="{{ url_for('business_auth.toggle_user_status', user_id=user.id) }}" 
+                                  action="{{ url_for('business_auth.toggle_user_status', user_id=user.uuid) }}" 
                                   style="display: inline;" 
                                   id="toggleStatusForm_{{ user.id }}">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>

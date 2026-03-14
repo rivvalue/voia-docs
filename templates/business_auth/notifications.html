@@ -177,7 +177,7 @@
             </div>
             {% if n.unread %}
             <div class="notif-actions">
-                <form method="POST" action="{{ url_for('business_auth.mark_notification_read_page', notification_id=n.id) }}" style="display:inline;">
+                <form method="POST" action="{{ url_for('business_auth.mark_notification_read_page', notification_id=n.uuid) }}" style="display:inline;">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <button type="submit" class="btn btn-sm btn-outline-primary" title="{{ _('Mark as read') }}">
                         <i class="fas fa-check"></i>

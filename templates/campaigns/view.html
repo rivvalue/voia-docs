@@ -912,7 +912,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const csrfToken = '{{ csrf_token() }}';
             
             // Upload transcript
-            fetch(`/business/api/campaigns/{{ campaign.id }}/transcripts/upload`, {
+            fetch(`/business/api/campaigns/{{ campaign.uuid }}/transcripts/upload`, {
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': csrfToken
@@ -973,7 +973,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function loadTranscripts() {
-        fetch(`/business/api/campaigns/{{ campaign.id }}/transcripts`)
+        fetch(`/business/api/campaigns/{{ campaign.uuid }}/transcripts`)
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
@@ -1045,7 +1045,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     window.viewResponse = function(transcriptId) {
         // Find the transcript response and navigate to individual response view
-        fetch(`/business/api/campaigns/{{ campaign.id }}/transcripts`)
+        fetch(`/business/api/campaigns/{{ campaign.uuid }}/transcripts`)
             .then(response => response.json())
             .then(data => {
                 if (data.success) {

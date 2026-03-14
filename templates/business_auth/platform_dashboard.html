@@ -622,7 +622,7 @@
                         </div>
                         <span class="text-muted">{{ "%.0f"|format(item.campaigns_usage) }}%</span>
                     </div>
-                    <a href="{{ url_for('business_auth.license_assignment_form', business_id=item.account.id) }}" 
+                    <a href="{{ url_for('business_auth.license_assignment_form', business_id=item.account.uuid) }}" 
                        class="action-btn action-btn-primary">
                         <i class="fas fa-arrow-up"></i>Upgrade
                     </a>

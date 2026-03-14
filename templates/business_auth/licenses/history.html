@@ -307,7 +307,7 @@
                     </div>
                 </div>
                 <div class="col-md-4 text-end">
-                    <a href="{{ url_for('business_auth.license_assignment_form', business_id=business_account.id) }}" class="btn btn-primary me-2">
+                    <a href="{{ url_for('business_auth.license_assignment_form', business_id=business_account.uuid) }}" class="btn btn-primary me-2">
                         <i class="fas fa-edit me-2"></i>Assign License
                     </a>
                     <a href="{{ url_for('business_auth.business_license_overview') }}" class="btn btn-outline-primary">
@@ -492,7 +492,7 @@
                 <i class="fas fa-history"></i>
                 <h4>No {{ _('License History') }}</h4>
                 <p>{{ _('This business account has no license assignment history.') }}</p>
-                <a href="{{ url_for('business_auth.license_assignment_form', business_id=business_account.id) }}" class="btn btn-primary mt-3">
+                <a href="{{ url_for('business_auth.license_assignment_form', business_id=business_account.uuid) }}" class="btn btn-primary mt-3">
                     <i class="fas fa-plus me-2"></i>Assign First License
                 </a>
             </div>
