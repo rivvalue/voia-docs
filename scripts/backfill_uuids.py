@@ -47,10 +47,10 @@ def check_column_exists(table_name):
 
 def add_uuid_column(table_name):
     db.session.execute(text(
-        f'ALTER TABLE {table_name} ADD COLUMN uuid VARCHAR(36) DEFAULT gen_random_uuid()::text'
+        f'ALTER TABLE {table_name} ADD COLUMN uuid VARCHAR(36)'
     ))
     db.session.commit()
-    print(f"  + Added uuid column to {table_name}")
+    print(f"  + Added uuid column to {table_name} (nullable, no default)")
 
 
 def count_nulls(table_name):
@@ -73,6 +73,14 @@ def backfill_table(table_name):
     ))
     db.session.commit()
     return result.rowcount
+
+
+def set_column_default(table_name):
+    db.session.execute(text(
+        f"ALTER TABLE {table_name} ALTER COLUMN uuid SET DEFAULT gen_random_uuid()::text"
+    ))
+    db.session.commit()
+    print(f"  + Set server default on {table_name}.uuid")
 
 
 def add_not_null_constraint(table_name):
@@ -134,6 +142,7 @@ def main():
                 else:
                     print(f"  {table}: all {total} rows already have UUIDs ✓")
 
+                set_column_default(table)
                 add_not_null_constraint(table)
                 add_unique_index(table)
 
