@@ -391,15 +391,23 @@ def require_platform_admin(f):
     return decorated_function
 
 
+def _is_valid_uuid(value):
+    """Check if a string looks like a valid UUID."""
+    import re
+    return bool(re.match(r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$', str(value).lower()))
+
+
 def validate_business_account_access(business_id, allow_platform_admin=False):
     """Validate that current user can access the specified business account.
     
     Accepts either a UUID string or integer ID for backward compatibility.
+    Returns (is_valid, business_account, message).
+    When business_account is None and message contains 'not found', callers should return 404.
     """
     target_account = None
     if isinstance(business_id, int):
         target_account = BusinessAccount.query.get(business_id)
-    else:
+    elif _is_valid_uuid(business_id):
         target_account = BusinessAccount.query.filter_by(uuid=str(business_id)).first()
     
     if not target_account:
@@ -642,14 +650,16 @@ def edit_user(user_id):
             flash('Authentication required.', 'error')
             return redirect(url_for('business_auth.login'))
         
+        if not _is_valid_uuid(user_id):
+            abort(404)
+        
         user_to_edit = BusinessAccountUser.query.filter_by(
             uuid=user_id, 
             business_account_id=current_account_id
         ).first()
         
         if not user_to_edit:
-            flash('User not found.', 'error')
-            return redirect(url_for('business_auth.manage_users'))
+            abort(404)
         
         email = request.form.get('email', '').strip().lower()
         first_name = request.form.get('first_name', '').strip()
@@ -717,14 +727,16 @@ def toggle_user_status(user_id):
             flash('Authentication required.', 'error')
             return redirect(url_for('business_auth.login'))
         
+        if not _is_valid_uuid(user_id):
+            abort(404)
+        
         user_to_toggle = BusinessAccountUser.query.filter_by(
             uuid=user_id, 
             business_account_id=current_account_id
         ).first()
         
         if not user_to_toggle:
-            flash('User not found.', 'error')
-            return redirect(url_for('business_auth.manage_users'))
+            abort(404)
         
         if user_to_toggle.id == current_user_id:
             flash('You cannot deactivate your own account.', 'error')
@@ -778,14 +790,16 @@ def reset_user_password(user_id):
             flash('Authentication required.', 'error')
             return redirect(url_for('business_auth.login'))
         
+        if not _is_valid_uuid(user_id):
+            abort(404)
+        
         user_to_reset = BusinessAccountUser.query.filter_by(
             uuid=user_id, 
             business_account_id=current_account_id
         ).first()
         
         if not user_to_reset:
-            flash('User not found.', 'error')
-            return redirect(url_for('business_auth.manage_users'))
+            abort(404)
         
         if user_to_reset.id == current_user_id:
             flash('You cannot reset your own password through this interface. Use the account settings instead.', 'error')
@@ -988,10 +1002,12 @@ def create_business_account_with_admin():
 def resend_business_account_invitation(user_id):
     """Resend activation invitation to a business account administrator"""
     try:
+        if not _is_valid_uuid(user_id):
+            abort(404)
+        
         user = BusinessAccountUser.query.filter_by(uuid=user_id).first()
         if not user:
-            flash('User not found.', 'error')
-            return redirect(url_for('business_auth.business_account_onboarding'))
+            abort(404)
         
         # Check if user is already activated
         if user.email_verified:
@@ -5501,12 +5517,10 @@ def license_assignment_form(business_id):
     try:
         is_valid, business_account, message = validate_business_account_access(business_id, allow_platform_admin=True)
         if not is_valid:
+            if business_account is None and 'not found' in message:
+                abort(404)
             logger.warning(f"Unauthorized license assignment form access attempt: {message}")
             flash('Access denied. You cannot access this business account.', 'error')
-            return redirect(url_for('business_auth.admin_licenses'))
-        
-        if not business_account:
-            flash('Business account not found.', 'error')
             return redirect(url_for('business_auth.admin_licenses'))
         
         try:
@@ -5720,6 +5734,8 @@ def toggle_parallel_campaigns(business_id):
         # Validate business account access (platform admin is allowed)
         is_valid, business_account, message = validate_business_account_access(business_id, allow_platform_admin=True)
         if not is_valid:
+            if business_account is None and 'not found' in message:
+                abort(404)
             logger.warning(f"Unauthorized parallel campaigns toggle attempt: {message}")
             if request.is_json:
                 return jsonify({'success': False, 'error': 'Access denied'}), 403
@@ -5815,12 +5831,10 @@ def license_history(business_id):
     try:
         is_valid, business_account, message = validate_business_account_access(business_id, allow_platform_admin=True)
         if not is_valid:
+            if business_account is None and 'not found' in message:
+                abort(404)
             logger.warning(f"Unauthorized license history access attempt: {message}")
             flash('Access denied. You cannot view this business account license history.', 'error')
-            return redirect(url_for('business_auth.admin_licenses'))
-        
-        if not business_account:
-            flash('Business account not found.', 'error')
             return redirect(url_for('business_auth.admin_licenses'))
         
         try:
@@ -7195,6 +7209,9 @@ def notifications_page():
 @require_business_auth
 def mark_notification_read_page(notification_id):
     """Mark a single notification as read (form POST from notifications page)"""
+    if not _is_valid_uuid(notification_id):
+        abort(404)
+    
     from notification_utils import mark_notification_as_read_by_uuid
     
     current_account = get_current_business_account()
