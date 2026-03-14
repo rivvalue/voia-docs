@@ -5842,10 +5842,10 @@ def license_history(business_id):
         for record in license_history_records:
             try:
                 # Ensure the record belongs to the correct business account
-                if hasattr(record, 'business_account_id') and record.business_account_id == business_id:
+                if hasattr(record, 'business_account_id') and record.business_account_id == business_account.id:
                     safe_history.append(record)
                 else:
-                    logger.warning(f"License history record {getattr(record, 'id', 'unknown')} does not belong to business_id {business_id}")
+                    logger.warning(f"License history record {getattr(record, 'id', 'unknown')} does not belong to business_id {business_account.id}")
             except Exception as record_error:
                 logger.error(f"Error processing license history record: {record_error}")
                 continue
