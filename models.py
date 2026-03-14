@@ -19,6 +19,7 @@ class SurveyResponse(db.Model):
     )
     
     id = db.Column(db.Integer, primary_key=True)
+    uuid = db.Column(db.String(36), unique=True, nullable=True, index=True, server_default=db.text("gen_random_uuid()::text"))
     company_name = db.Column(db.String(200), nullable=False, index=True)
     respondent_name = db.Column(db.String(200), nullable=False)
     respondent_email = db.Column(db.String(200), nullable=False, index=True)
@@ -213,6 +214,7 @@ class Campaign(db.Model):
     )
     
     id = db.Column(db.Integer, primary_key=True)
+    uuid = db.Column(db.String(36), unique=True, nullable=True, index=True, server_default=db.text("gen_random_uuid()::text"))
     name = db.Column(db.String(200), nullable=False, index=True)
     description = db.Column(db.Text, nullable=True)
     start_date = db.Column(db.Date, nullable=False, index=True)
@@ -887,6 +889,7 @@ class BusinessAccount(db.Model):
     __tablename__ = 'business_accounts'
     
     id = db.Column(db.Integer, primary_key=True)
+    uuid = db.Column(db.String(36), unique=True, nullable=True, index=True, server_default=db.text("gen_random_uuid()::text"))
     name = db.Column(db.String(200), nullable=False, index=True)
     account_type = db.Column(db.String(20), nullable=False, default='customer', index=True)  # customer, demo
     
@@ -1519,6 +1522,7 @@ class PlatformEmailSettings(db.Model):
     __tablename__ = 'platform_email_settings'
     
     id = db.Column(db.Integer, primary_key=True)
+    uuid = db.Column(db.String(36), unique=True, nullable=True, index=True, server_default=db.text("gen_random_uuid()::text"))
     
     # AWS SES credentials (used for ALL business accounts when use_platform_email=True)
     aws_region = db.Column(db.String(50), nullable=False)  # e.g., 'us-east-1'
@@ -1707,6 +1711,7 @@ class Participant(db.Model):
     )
     
     id = db.Column(db.Integer, primary_key=True)
+    uuid = db.Column(db.String(36), unique=True, nullable=True, index=True, server_default=db.text("gen_random_uuid()::text"))
     business_account_id = db.Column(db.Integer, db.ForeignKey('business_accounts.id'), nullable=True, index=True)  # NULL for trial users
     # Note: No direct campaign relationship - associations managed via CampaignParticipant table
     
@@ -1859,6 +1864,7 @@ class CampaignParticipant(db.Model):
     )
     
     id = db.Column(db.Integer, primary_key=True)
+    uuid = db.Column(db.String(36), unique=True, nullable=True, index=True, server_default=db.text("gen_random_uuid()::text"))
     campaign_id = db.Column(db.Integer, db.ForeignKey('campaigns.id'), nullable=False, index=True)
     participant_id = db.Column(db.Integer, db.ForeignKey('participants.id'), nullable=False, index=True)
     business_account_id = db.Column(db.Integer, db.ForeignKey('business_accounts.id'), nullable=False, index=True)
@@ -1933,6 +1939,7 @@ class BusinessAccountUser(UserMixin, db.Model):
     __tablename__ = 'business_account_users'
     
     id = db.Column(db.Integer, primary_key=True)
+    uuid = db.Column(db.String(36), unique=True, nullable=True, index=True, server_default=db.text("gen_random_uuid()::text"))
     business_account_id = db.Column(db.Integer, db.ForeignKey('business_accounts.id'), nullable=False, index=True)
     
     # User credentials
@@ -2435,6 +2442,7 @@ class EmailDelivery(db.Model):
     )
     
     id = db.Column(db.Integer, primary_key=True)
+    uuid = db.Column(db.String(36), unique=True, nullable=True, index=True, server_default=db.text("gen_random_uuid()::text"))
     
     # Relationships and scoping
     business_account_id = db.Column(db.Integer, db.ForeignKey('business_accounts.id'), nullable=False, index=True)
@@ -2629,6 +2637,7 @@ class AuditLog(db.Model):
     )
     
     id = db.Column(db.Integer, primary_key=True)
+    uuid = db.Column(db.String(36), unique=True, nullable=True, index=True, server_default=db.text("gen_random_uuid()::text"))
     
     def __init__(self, **kwargs):
         super(AuditLog, self).__init__(**kwargs)
@@ -3156,6 +3165,7 @@ class ExecutiveReport(db.Model):
     __tablename__ = 'executive_reports'
     
     id = db.Column(db.Integer, primary_key=True)
+    uuid = db.Column(db.String(36), unique=True, nullable=True, index=True, server_default=db.text("gen_random_uuid()::text"))
     campaign_id = db.Column(db.Integer, db.ForeignKey('campaigns.id'), nullable=False)
     business_account_id = db.Column(db.Integer, db.ForeignKey('business_accounts.id'), nullable=False)
     file_path = db.Column(db.String(500), nullable=False)
@@ -3232,6 +3242,7 @@ class Notification(db.Model):
     )
     
     id = db.Column(db.Integer, primary_key=True)
+    uuid = db.Column(db.String(36), unique=True, nullable=True, index=True, server_default=db.text("gen_random_uuid()::text"))
     business_account_id = db.Column(db.Integer, db.ForeignKey('business_accounts.id'), nullable=False, index=True)
     user_id = db.Column(db.Integer, nullable=True, index=True)
     
@@ -3269,6 +3280,7 @@ class BulkOperationJob(db.Model):
     )
     
     id = db.Column(db.Integer, primary_key=True)
+    uuid = db.Column(db.String(36), unique=True, nullable=True, index=True, server_default=db.text("gen_random_uuid()::text"))
     job_id = db.Column(db.String(50), unique=True, nullable=False, index=True)
     business_account_id = db.Column(db.Integer, db.ForeignKey('business_accounts.id'), nullable=False, index=True)
     user_id = db.Column(db.Integer, nullable=True)
