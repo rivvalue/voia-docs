@@ -75,7 +75,6 @@ CAMPAIGN_CONFIGS = {
     },
 }
 
-BUSINESS_ACCOUNT_NAME = "Archelo Group inc"
 
 COMPANIES = [
     "CloudSync Technologies", "DataFlow Solutions", "API Masters Inc", "TechVision Corp",
@@ -576,7 +575,7 @@ def _normalize_config_dates(config):
     return config
 
 
-def generate_campaign(campaign_key, dry_run=False, config=None):
+def generate_campaign(campaign_key, dry_run=False, config=None, business_account_id=None):
     if config is None:
         config = CAMPAIGN_CONFIGS[campaign_key]
     config = _normalize_config_dates(config)
@@ -591,10 +590,11 @@ def generate_campaign(campaign_key, dry_run=False, config=None):
 
     with app.app_context():
         try:
-            ba = BusinessAccount.query.filter_by(name=BUSINESS_ACCOUNT_NAME).first()
+            if not business_account_id:
+                raise ValueError("No business account ID provided")
+            ba = BusinessAccount.query.get(business_account_id)
             if not ba:
-                print(f"  ERROR: Business account '{BUSINESS_ACCOUNT_NAME}' not found!")
-                return False
+                raise ValueError(f"Business account with ID {business_account_id} not found")
 
             print(f"  Business Account: {ba.name} (ID: {ba.id})")
 
@@ -786,7 +786,7 @@ def generate_campaign(campaign_key, dry_run=False, config=None):
             return False
 
 
-def delete_campaign(campaign_key, config=None):
+def delete_campaign(campaign_key, config=None, business_account_id=None):
     if config is None:
         config = CAMPAIGN_CONFIGS[campaign_key]
     config = _normalize_config_dates(config)
@@ -797,10 +797,11 @@ def delete_campaign(campaign_key, config=None):
 
     with app.app_context():
         try:
-            ba = BusinessAccount.query.filter_by(name=BUSINESS_ACCOUNT_NAME).first()
+            if not business_account_id:
+                raise ValueError("No business account ID provided")
+            ba = BusinessAccount.query.get(business_account_id)
             if not ba:
-                print(f"  ERROR: Business account '{BUSINESS_ACCOUNT_NAME}' not found!")
-                return False
+                raise ValueError(f"Business account with ID {business_account_id} not found")
 
             campaign = Campaign.query.filter_by(
                 business_account_id=ba.id,
@@ -869,6 +870,8 @@ def main():
     parser = argparse.ArgumentParser(description='Generate demo data for Archelo Group — ArcheloFlow HRIS')
     parser.add_argument('--campaign', choices=['Q1', 'Q2', 'Q3', 'CLASSIC'], required=True,
                         help='Campaign to generate: Q1 (EN conv), Q2 (EN conv), Q3 (FR conv), CLASSIC (EN classic)')
+    parser.add_argument('--business-account-id', type=int, required=True,
+                        help='ID of the business account to generate demo data for')
     parser.add_argument('--dry-run', action='store_true',
                         help='Preview what would be generated without making changes')
     parser.add_argument('--delete', action='store_true',
@@ -877,9 +880,9 @@ def main():
     args = parser.parse_args()
 
     if args.delete:
-        success = delete_campaign(args.campaign)
+        success = delete_campaign(args.campaign, business_account_id=args.business_account_id)
     else:
-        success = generate_campaign(args.campaign, dry_run=args.dry_run)
+        success = generate_campaign(args.campaign, dry_run=args.dry_run, business_account_id=args.business_account_id)
 
     sys.exit(0 if success else 1)
 

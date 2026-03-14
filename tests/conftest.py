@@ -273,25 +273,58 @@ def sample_data(db_session):
     return SampleDataFactory()
 
 
+@pytest.fixture(scope='session')
+def shared_test_account(app):
+    """
+    Session-scoped fixture that creates a single shared business account and user
+    for the entire test run. Created once and reused by all tests.
+    """
+    from app import db
+    from models import BusinessAccount, BusinessAccountUser
+    from werkzeug.security import generate_password_hash
+
+    with app.app_context():
+        account = BusinessAccount(
+            name='Shared Test Company (pytest)',
+            account_type='customer',
+            status='active',
+        )
+        db.session.add(account)
+        db.session.flush()
+
+        user = BusinessAccountUser(
+            email='shared_test_user@pytest.example.com',
+            password_hash=generate_password_hash('testpassword123'),
+            first_name='Shared',
+            last_name='TestUser',
+            role='admin',
+            is_active_user=True,
+            email_verified=True,
+            business_account_id=account.id,
+        )
+        db.session.add(user)
+        db.session.commit()
+
+        yield account, user
+
+        db.session.delete(user)
+        db.session.delete(account)
+        db.session.commit()
+
+
 @pytest.fixture
-def authenticated_client(client, db_session, sample_data):
+def authenticated_client(client, db_session, shared_test_account):
     """
     Provide an authenticated test client.
-    Creates a business account and user, then logs in.
+    Reuses the session-scoped shared business account and user.
     """
-    import uuid
-    unique_email = f'test_{uuid.uuid4().hex[:8]}@example.com'
-    unique_name = f'Test Company {uuid.uuid4().hex[:8]}'
-    
-    account = sample_data.create_business_account(db_session, name=unique_name)
-    user = sample_data.create_business_user(db_session, account, email=unique_email)
-    db_session.commit()
-    
+    account, user = shared_test_account
+
     with client.session_transaction() as sess:
         sess['_user_id'] = str(user.id)
         sess['business_account_id'] = account.id
         sess['user_email'] = user.email
-    
+
     return client, user, account
 
 

@@ -229,7 +229,7 @@
     <div class="demo-header">
         <div class="demo-header-text">
             <h1><i class="fas fa-database"></i> Demo Data Generator</h1>
-            <p>Generate realistic survey data for {{ business_account.name if business_account else 'Archelo Group inc' }} — ArcheloFlow HRIS</p>
+            <p>Generate realistic survey data{% if business_account %} for {{ business_account.name }}{% endif %}</p>
         </div>
         <a href="{{ url_for('business_auth.demo_data_custom_create') }}" class="btn-create-custom">
             <i class="fas fa-plus"></i> Custom Campaign
@@ -246,6 +246,28 @@
     {% endfor %}
     {% endif %}
     {% endwith %}
+
+    <div class="campaign-card" style="margin-bottom: 1.5rem;">
+        <form method="POST" action="{{ url_for('business_auth.demo_data_set_account') }}" style="display: flex; align-items: flex-end; gap: 1rem; flex-wrap: wrap;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <div style="flex: 1; min-width: 200px;">
+                <label for="business_account_id" style="display: block; font-weight: 600; color: #4a5568; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.4rem;">Target Business Account ID</label>
+                <input type="text" id="business_account_id" name="business_account_id" value="{{ saved_ba_id }}" placeholder="Enter business account ID" style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #cbd5e0; border-radius: 8px; font-size: 0.95rem; background: #f7fafc;">
+            </div>
+            <button type="submit" class="btn-generate" style="white-space: nowrap;">
+                <i class="fas fa-check"></i> Set Account
+            </button>
+        </form>
+        {% if business_account %}
+        <div style="margin-top: 0.75rem; font-size: 0.9rem; color: #2d5a87;">
+            <i class="fas fa-building"></i> Current target: <strong>{{ business_account.name }}</strong> (ID: {{ business_account.id }})
+        </div>
+        {% elif saved_ba_id %}
+        <div style="margin-top: 0.75rem; font-size: 0.9rem; color: #e53e3e;">
+            <i class="fas fa-exclamation-triangle"></i> Account ID {{ saved_ba_id }} not found.
+        </div>
+        {% endif %}
+    </div>
 
     {% set has_presets = campaigns|selectattr('is_custom', 'equalto', false)|list|length > 0 %}
     {% set has_custom = campaigns|selectattr('is_custom', 'equalto', true)|list|length > 0 %}

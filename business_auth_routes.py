@@ -6765,17 +6765,45 @@ def _auto_reset_stuck_demo_tasks():
         db.session.rollback()
 
 
+@business_auth_bp.route('/admin/demo-data/set-account', methods=['POST'])
+@require_platform_admin
+def demo_data_set_account():
+    """Set the target business account ID for demo data generation"""
+    ba_id = request.form.get('business_account_id', '').strip()
+    if ba_id:
+        try:
+            ba_id_int = int(ba_id)
+            ba = BusinessAccount.query.get(ba_id_int)
+            if ba:
+                session['demo_business_account_id'] = ba_id
+                flash(f'Target account set to "{ba.name}" (ID: {ba.id}).', 'info')
+            else:
+                flash(f'No business account found with ID {ba_id}.', 'error')
+        except (ValueError, TypeError):
+            flash('Invalid business account ID. Please enter a number.', 'error')
+    else:
+        session.pop('demo_business_account_id', None)
+        flash('Business account ID cleared.', 'info')
+    return redirect(url_for('business_auth.demo_data_index'))
+
+
 @business_auth_bp.route('/admin/demo-data', strict_slashes=False)
 @require_platform_admin
 def demo_data_index():
     """Index page listing all demo data campaigns with status and actions"""
-    from generate_demo_data import CAMPAIGN_CONFIGS, BUSINESS_ACCOUNT_NAME
+    from generate_demo_data import CAMPAIGN_CONFIGS
     from models import Campaign, SurveyResponse
     from sqlalchemy import text as sa_text
 
     _auto_reset_stuck_demo_tasks()
 
-    ba = BusinessAccount.query.filter_by(name=BUSINESS_ACCOUNT_NAME).first()
+    saved_ba_id = session.get('demo_business_account_id', '')
+    ba = None
+    if saved_ba_id:
+        try:
+            ba = BusinessAccount.query.get(int(saved_ba_id))
+        except (ValueError, TypeError):
+            saved_ba_id = ''
     campaigns_info = []
 
     for key, config in CAMPAIGN_CONFIGS.items():
@@ -6858,7 +6886,8 @@ def demo_data_index():
 
     return render_template('business_auth/demo_data_index.html',
                            campaigns=campaigns_info,
-                           business_account=ba)
+                           business_account=ba,
+                           saved_ba_id=saved_ba_id)
 
 
 @business_auth_bp.route('/admin/demo-data/<campaign_key>/confirm')
@@ -6888,6 +6917,20 @@ def demo_data_generate(campaign_key):
     from generate_demo_data import CAMPAIGN_CONFIGS, generate_campaign
     import threading
 
+    ba_id = session.get('demo_business_account_id', '')
+    try:
+        ba_id_int = int(ba_id) if ba_id else None
+    except (ValueError, TypeError):
+        ba_id_int = None
+    if not ba_id_int:
+        flash('Please set a valid Business Account ID first.', 'error')
+        return redirect(url_for('business_auth.demo_data_index'))
+
+    ba = BusinessAccount.query.get(ba_id_int)
+    if not ba:
+        flash(f'Business account with ID {ba_id_int} not found. Please update the account ID.', 'error')
+        return redirect(url_for('business_auth.demo_data_index'))
+
     if campaign_key in CAMPAIGN_CONFIGS:
         gen_config = None
     else:
@@ -6904,10 +6947,10 @@ def demo_data_generate(campaign_key):
 
     _set_demo_task_status(campaign_key, 'running', 'Generation started...')
 
-    def run_generation(app_instance, key, config_override):
+    def run_generation(app_instance, key, config_override, account_id):
         try:
             with app_instance.app_context():
-                success = generate_campaign(key, dry_run=False, config=config_override)
+                success = generate_campaign(key, dry_run=False, config=config_override, business_account_id=account_id)
                 if success:
                     _set_demo_task_status(key, 'completed', f'{key} campaign generated successfully.')
                 else:
@@ -6922,7 +6965,7 @@ def demo_data_generate(campaign_key):
 
     from flask import current_app
     app_instance = current_app._get_current_object()
-    thread = threading.Thread(target=run_generation, args=(app_instance, campaign_key, gen_config), daemon=True)
+    thread = threading.Thread(target=run_generation, args=(app_instance, campaign_key, gen_config, ba_id_int), daemon=True)
     thread.start()
 
     flash(f'{campaign_key} generation started in the background. Refresh this page to check progress.', 'info')
@@ -6956,6 +6999,20 @@ def demo_data_delete(campaign_key):
     from generate_demo_data import CAMPAIGN_CONFIGS, delete_campaign
     import threading
 
+    ba_id = session.get('demo_business_account_id', '')
+    try:
+        ba_id_int = int(ba_id) if ba_id else None
+    except (ValueError, TypeError):
+        ba_id_int = None
+    if not ba_id_int:
+        flash('Please set a valid Business Account ID first.', 'error')
+        return redirect(url_for('business_auth.demo_data_index'))
+
+    ba = BusinessAccount.query.get(ba_id_int)
+    if not ba:
+        flash(f'Business account with ID {ba_id_int} not found. Please update the account ID.', 'error')
+        return redirect(url_for('business_auth.demo_data_index'))
+
     if campaign_key in CAMPAIGN_CONFIGS:
         del_config = None
     else:
@@ -6967,10 +7024,10 @@ def demo_data_delete(campaign_key):
 
     _set_demo_task_status(campaign_key, 'running', 'Deletion started...')
 
-    def run_deletion(app_instance, key, config_override):
+    def run_deletion(app_instance, key, config_override, account_id):
         try:
             with app_instance.app_context():
-                success = delete_campaign(key, config=config_override)
+                success = delete_campaign(key, config=config_override, business_account_id=account_id)
                 if success:
                     _set_demo_task_status(key, 'deleted', f'{key} campaign deleted successfully.')
                 else:
@@ -6985,7 +7042,7 @@ def demo_data_delete(campaign_key):
 
     from flask import current_app
     app_instance = current_app._get_current_object()
-    thread = threading.Thread(target=run_deletion, args=(app_instance, campaign_key, del_config), daemon=True)
+    thread = threading.Thread(target=run_deletion, args=(app_instance, campaign_key, del_config, ba_id_int), daemon=True)
     thread.start()
 
     flash(f'{campaign_key} deletion started in the background. Refresh this page to check progress.', 'info')
@@ -7018,7 +7075,6 @@ def demo_data_retry(campaign_key):
 @require_platform_admin
 def demo_data_custom_create():
     """Form to define and generate a custom demo campaign"""
-    from generate_demo_data import BUSINESS_ACCOUNT_NAME
     import uuid
 
     if request.method == 'GET':
@@ -7094,16 +7150,30 @@ def demo_data_custom_create():
         'nps_bias': nps_bias_map[nps_trend],
     }
 
+    ba_id = session.get('demo_business_account_id', '')
+    try:
+        ba_id_int = int(ba_id) if ba_id else None
+    except (ValueError, TypeError):
+        ba_id_int = None
+    if not ba_id_int:
+        flash('Please set a valid Business Account ID first.', 'error')
+        return redirect(url_for('business_auth.demo_data_index'))
+
+    ba = BusinessAccount.query.get(ba_id_int)
+    if not ba:
+        flash(f'Business account with ID {ba_id_int} not found. Please update the account ID.', 'error')
+        return redirect(url_for('business_auth.demo_data_index'))
+
     campaign_key = f"CUSTOM_{uuid.uuid4().hex[:8].upper()}"
     _set_demo_task_status(campaign_key, 'running', 'Generation started...', config=custom_config)
 
     import threading
     from generate_demo_data import generate_campaign
 
-    def run_custom_generation(app_instance, key, cfg):
+    def run_custom_generation(app_instance, key, cfg, account_id):
         try:
             with app_instance.app_context():
-                success = generate_campaign(key, dry_run=False, config=cfg)
+                success = generate_campaign(key, dry_run=False, config=cfg, business_account_id=account_id)
                 if success:
                     _set_demo_task_status(key, 'completed', f'{key} campaign generated successfully.')
                 else:
@@ -7118,7 +7188,7 @@ def demo_data_custom_create():
 
     from flask import current_app
     app_instance = current_app._get_current_object()
-    thread = threading.Thread(target=run_custom_generation, args=(app_instance, campaign_key, custom_config), daemon=True)
+    thread = threading.Thread(target=run_custom_generation, args=(app_instance, campaign_key, custom_config, ba_id_int), daemon=True)
     thread.start()
 
     flash(f'Custom campaign "{name}" ({campaign_key}) generation started in the background.', 'info')
