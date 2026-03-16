@@ -3121,14 +3121,13 @@ function loadSurveyResponses(page = 1, searchQuery = '', npsFilter = '') {
             
             const html = responses.map(response => {
                 const riskLevel = response.churn_risk_level || 'Minimal';
-                const riskClass = riskLevel === 'High' ? 'risk-high' : 
-                                 riskLevel === 'Medium' ? 'risk-medium' : 
-                                 riskLevel === 'Low' ? 'risk-low' : 'risk-minimal';
+                const riskColorClass = (riskLevel === 'High' || riskLevel === 'Critical') ? 'text-danger fw-semibold' : 
+                                 riskLevel === 'Medium' ? 'text-warning fw-semibold' : 
+                                 riskLevel === 'Low' ? 'text-success' : '';
                 
                 const sentimentClass = response.sentiment_label === 'positive' ? 'theme-positive' :
                                       response.sentiment_label === 'negative' ? 'theme-negative' : 'theme-neutral';
                 
-                // Use backend-provided can_view flag to determine access
                 const canView = response.can_view !== undefined ? response.can_view : false;
                 const detailsButton = canView ? 
                     `<a href="/survey-response/${response.id}" class="btn btn-outline-primary btn-sm" title="${translations.viewDetails}">
@@ -3138,21 +3137,21 @@ function loadSurveyResponses(page = 1, searchQuery = '', npsFilter = '') {
                         <i class="fas fa-lock"></i>
                     </span>`;
                 
+                const npsScore = parseFloat(response.nps_score) || 0;
+                const npsScoreClass = npsScore >= 9 ? 'si-nps-high' : npsScore >= 7 ? 'si-nps-mid' : 'si-nps-low';
+                
                 return `
                     <tr>
                         <td>${escapeHtml(response.company_name)}</td>
-                        <td>${escapeHtml(response.tenure_with_fc) || 'N/A'}</td>
+                        <td><span class="${riskColorClass}">${escapeHtml(riskLevel)}</span></td>
                         <td>
-                            <span class="badge ${response.nps_score >= 9 ? 'bg-success' : 
-                                                response.nps_score >= 7 ? 'bg-secondary' : 'bg-danger'}">
+                            <span class="si-nps-score ${npsScoreClass}">
                                 ${escapeHtml(response.nps_score)}
                             </span>
                         </td>
                         <td>${escapeHtml(response.nps_category)}</td>
                         <td class="${sentimentClass}">${escapeHtml(response.sentiment_label) || 'N/A'}</td>
-                        <td class="${riskClass}">
-                            ${escapeHtml(riskLevel)}
-                        </td>
+                        <td>${escapeHtml(response.tenure_with_fc) || 'N/A'}</td>
                         <td>${response.created_at ? new Date(response.created_at).toLocaleDateString() : 'N/A'}</td>
                         <td class="text-center">${detailsButton}</td>
                     </tr>
@@ -3465,36 +3464,44 @@ function populateTenureNpsTable(tenureData) {
     console.log('Rendering', tenureData.length, 'tenure groups to table');
     
     tbody.innerHTML = tenureData.map(tenure => {
-        // Risk level badge styling
-        let riskBadgeClass = 'bg-secondary';
-        if (tenure.risk_level === 'Low') riskBadgeClass = 'bg-success';
-        else if (tenure.risk_level === 'Medium') riskBadgeClass = 'bg-secondary';
-        else if (tenure.risk_level === 'High') riskBadgeClass = 'bg-danger';
-        else if (tenure.risk_level === 'Critical') riskBadgeClass = 'bg-dark';
-        else if (tenure.risk_level === 'Insufficient Data') riskBadgeClass = 'bg-secondary';
+        let riskBadgeClass = 'bg-warning text-dark';
+        let riskBorderClass = 'si-risk-medium';
+        if (tenure.risk_level === 'Low') { riskBadgeClass = 'bg-success'; riskBorderClass = 'si-risk-low'; }
+        else if (tenure.risk_level === 'Medium') { riskBadgeClass = 'bg-warning text-dark'; riskBorderClass = 'si-risk-medium'; }
+        else if (tenure.risk_level === 'High') { riskBadgeClass = 'bg-danger'; riskBorderClass = 'si-risk-high'; }
+        else if (tenure.risk_level === 'Critical') { riskBadgeClass = 'bg-dark'; riskBorderClass = 'si-risk-critical'; }
+        else if (tenure.risk_level === 'Insufficient Data') { riskBadgeClass = 'bg-secondary'; riskBorderClass = ''; }
         
-        // Tenure NPS badge styling
-        let npsBadgeClass = 'bg-secondary';
+        let npsBadgeClass = 'bg-warning text-dark';
         if (tenure.tenure_nps > 20) npsBadgeClass = 'bg-success';
-        else if (tenure.tenure_nps >= -20) npsBadgeClass = 'bg-secondary'; 
+        else if (tenure.tenure_nps >= -20) npsBadgeClass = 'bg-warning text-dark'; 
         else npsBadgeClass = 'bg-danger';
         
-        // Distribution breakdown
-        const distributionText = `${tenure.promoters}P / ${tenure.passives}Pa / ${tenure.detractors}D`;
+        const avgNps = parseFloat(tenure.avg_nps) || 0;
+        const avgNpsClass = avgNps >= 8 ? 'si-nps-high' : avgNps >= 6 ? 'si-nps-mid' : 'si-nps-low';
         
-        // Churn risk display
-        const churnRiskDisplay = tenure.latest_churn_risk || 'N/A';
+        const total = (tenure.promoters || 0) + (tenure.passives || 0) + (tenure.detractors || 0);
+        let distHtml = '<small class="text-muted">N/A</small>';
+        if (total > 0) {
+            const pPct = ((tenure.promoters / total) * 100).toFixed(1);
+            const paPct = ((tenure.passives / total) * 100).toFixed(1);
+            const dPct = ((tenure.detractors / total) * 100).toFixed(1);
+            distHtml = `<div class="si-dist-bar" title="${tenure.promoters}P / ${tenure.passives}Pa / ${tenure.detractors}D"><div class="si-dist-p" style="width:${pPct}%"></div><div class="si-dist-pa" style="width:${paPct}%"></div><div class="si-dist-d" style="width:${dPct}%"></div></div><small class="text-muted si-dist-label">${tenure.promoters}P · ${tenure.passives}Pa · ${tenure.detractors}D</small>`;
+        }
+        
+        const churnRisk = tenure.latest_churn_risk || 'N/A';
+        const churnClass = (churnRisk === 'High' || churnRisk === 'Critical') ? 'text-danger fw-semibold' : churnRisk === 'Medium' ? 'text-warning fw-semibold' : churnRisk === 'Low' ? 'text-success' : '';
         
         return `
-            <tr>
+            <tr class="${riskBorderClass}">
                 <td><strong>${escapeHtml(tenure.tenure_group)}</strong></td>
-                <td>${escapeHtml(tenure.total_responses)}</td>
-                <td>${escapeHtml(tenure.avg_nps)}</td>
-                <td><span class="badge ${npsBadgeClass}">${tenure.tenure_nps > 0 ? '+' : ''}${escapeHtml(tenure.tenure_nps)}</span></td>
-                <td><small>${distributionText}</small></td>
                 <td><span class="badge ${riskBadgeClass}">${escapeHtml(tenure.risk_level)}</span></td>
+                <td>${escapeHtml(tenure.total_responses)}</td>
+                <td><span class="si-nps-score ${avgNpsClass}">${escapeHtml(tenure.avg_nps)}</span></td>
+                <td><span class="badge ${npsBadgeClass}">${tenure.tenure_nps > 0 ? '+' : ''}${escapeHtml(tenure.tenure_nps)}</span></td>
+                <td>${distHtml}</td>
                 <td>${escapeHtml(tenure.latest_response) || 'N/A'}</td>
-                <td>${escapeHtml(churnRiskDisplay)}</td>
+                <td><span class="${churnClass}">${escapeHtml(churnRisk)}</span></td>
             </tr>
         `;
     }).join('');
