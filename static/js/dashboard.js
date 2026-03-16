@@ -3139,9 +3139,10 @@ function loadSurveyResponses(page = 1, searchQuery = '', npsFilter = '') {
                 
                 const npsScore = parseFloat(response.nps_score) || 0;
                 const npsScoreClass = npsScore >= 9 ? 'si-nps-high' : npsScore >= 7 ? 'si-nps-mid' : 'si-nps-low';
+                const riskBorderClass = (riskLevel === 'High' || riskLevel === 'Critical') ? 'si-risk-high' : riskLevel === 'Medium' ? 'si-risk-medium' : riskLevel === 'Low' ? 'si-risk-low' : '';
                 
                 return `
-                    <tr>
+                    <tr class="${riskBorderClass}">
                         <td>${escapeHtml(response.company_name)}</td>
                         <td><span class="${riskColorClass}">${escapeHtml(riskLevel)}</span></td>
                         <td>
