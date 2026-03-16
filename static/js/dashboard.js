@@ -3065,6 +3065,119 @@ function populateAccountRiskFactors() {
     });
 }
 
+// ============================================================================
+// SURVEY INSIGHTS — ACTIONABILITY LAYER
+// ============================================================================
+
+const SI_RISK_PRIORITY = { 'Critical': 0, 'High': 1, 'Medium': 2, 'Low': 3 };
+
+function siRiskSort(a, b) {
+    const pa = SI_RISK_PRIORITY[a.risk_level] !== undefined ? SI_RISK_PRIORITY[a.risk_level] : 4;
+    const pb = SI_RISK_PRIORITY[b.risk_level] !== undefined ? SI_RISK_PRIORITY[b.risk_level] : 4;
+    return pa - pb;
+}
+
+let _siLastCompanyData = [];
+let _siLastTenureData = [];
+
+function siUpdatePriorityPanel() {
+    const panel = document.getElementById('siPriorityPanel');
+    if (!panel) return;
+
+    const highRiskCount = _siLastCompanyData.filter(c =>
+        c.risk_level === 'Critical' || c.risk_level === 'High'
+    ).length;
+
+    const riskCountEl = document.getElementById('siRiskCount');
+    if (riskCountEl) riskCountEl.textContent = highRiskCount;
+
+    const showBtn = document.getElementById('siShowRiskBtn');
+    if (showBtn) showBtn.style.display = highRiskCount > 0 ? '' : 'none';
+
+    const weakestEl = document.getElementById('siWeakestTenure');
+    if (weakestEl) {
+        const validTenure = _siLastTenureData.filter(t => t.risk_level !== 'Insufficient Data' && t.total_responses >= 2);
+        if (validTenure.length > 0) {
+            const worst = validTenure.reduce((a, b) => (a.tenure_nps < b.tenure_nps ? a : b));
+            const npsDisplay = (worst.tenure_nps > 0 ? '+' : '') + worst.tenure_nps;
+            const npsColor = worst.tenure_nps > 20 ? '#198754' : worst.tenure_nps >= -20 ? '#997404' : '#dc3545';
+            weakestEl.innerHTML = `${escapeHtml(worst.tenure_group)} <span style="color:${npsColor}">(NPS ${npsDisplay})</span>`;
+        } else {
+            weakestEl.textContent = '--';
+        }
+    }
+
+    const campaignNpsEl = document.getElementById('siCampaignNps');
+    if (campaignNpsEl && dashboardData) {
+        const nps = dashboardData.nps_score;
+        if (nps !== null && nps !== undefined) {
+            const display = (nps > 0 ? '+' : '') + nps;
+            const color = nps > 20 ? '#198754' : nps >= -20 ? '#997404' : '#dc3545';
+            campaignNpsEl.innerHTML = `<span style="color:${color}">${display}</span>`;
+        } else {
+            campaignNpsEl.textContent = '--';
+        }
+    }
+
+    const hasData = _siLastCompanyData.length > 0 || _siLastTenureData.length > 0;
+    panel.style.display = hasData ? '' : 'none';
+}
+
+function siFilterHighRisk() {
+    const searchInput = document.getElementById('companySearch');
+    const npsFilter = document.getElementById('companyNpsFilter');
+    if (npsFilter) npsFilter.value = 'detractors';
+    if (searchInput) searchInput.value = '';
+    searchCompanyNPS();
+
+    const companySection = document.querySelector('#companyNpsTableServerSide');
+    if (companySection) {
+        companySection.closest('.data-table').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+function siCompanyRowClick(companyName) {
+    const row = event.currentTarget;
+    row.classList.add('si-click-flash');
+    setTimeout(() => row.classList.remove('si-click-flash'), 400);
+
+    const searchInput = document.getElementById('responsesSearch');
+    if (searchInput) searchInput.value = companyName;
+
+    const npsFilter = document.getElementById('npsFilter');
+    if (npsFilter) npsFilter.value = '';
+
+    loadSurveyResponses(1, companyName, '');
+
+    setTimeout(() => {
+        const responsesCard = document.getElementById('responsesTable');
+        if (responsesCard) {
+            responsesCard.closest('.chart-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }, 100);
+}
+
+function siTenureRowClick(tenureGroup) {
+    const row = event.currentTarget;
+    row.classList.add('si-click-flash');
+    setTimeout(() => row.classList.remove('si-click-flash'), 400);
+
+    const searchInput = document.getElementById('responsesSearch');
+    if (searchInput) searchInput.value = tenureGroup;
+
+    const npsFilter = document.getElementById('npsFilter');
+    if (npsFilter) npsFilter.value = '';
+
+    loadSurveyResponses(1, tenureGroup, '');
+
+    setTimeout(() => {
+        const responsesCard = document.getElementById('responsesTable');
+        if (responsesCard) {
+            responsesCard.closest('.chart-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }, 100);
+}
+
 // Pagination state for all tables
 let currentResponsesPage = 1;
 let currentCompanyPage = 1;
@@ -3459,8 +3572,14 @@ function populateTenureNpsTable(tenureData) {
     if (!tenureData || tenureData.length === 0) {
         console.log('No tenure data to display');
         tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted">${translations.noTenureDataAvailable}</td></tr>`;
+        _siLastTenureData = [];
+        siUpdatePriorityPanel();
         return;
     }
+    
+    tenureData.sort(siRiskSort);
+    _siLastTenureData = tenureData;
+    siUpdatePriorityPanel();
     
     console.log('Rendering', tenureData.length, 'tenure groups to table');
     
@@ -3494,7 +3613,7 @@ function populateTenureNpsTable(tenureData) {
         const churnClass = (churnRisk === 'High' || churnRisk === 'Critical') ? 'text-danger fw-semibold' : churnRisk === 'Medium' ? 'text-warning fw-semibold' : churnRisk === 'Low' ? 'text-success' : '';
         
         return `
-            <tr class="${riskBorderClass}">
+            <tr class="${riskBorderClass}" data-si-click="tenure" onclick="siTenureRowClick('${escapeHtml(tenure.tenure_group).replace(/'/g, "\\'")}')">
                 <td><strong>${escapeHtml(tenure.tenure_group)}</strong></td>
                 <td><span class="badge ${riskBadgeClass}">${escapeHtml(tenure.risk_level)}</span></td>
                 <td>${escapeHtml(tenure.total_responses)}</td>
@@ -3570,8 +3689,14 @@ function populateCompanyNpsTable(companyData) {
     if (!companyData || companyData.length === 0) {
         console.log('No company data to display');
         tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted">${translations.noCompanyDataAvailable}</td></tr>`;
+        _siLastCompanyData = [];
+        siUpdatePriorityPanel();
         return;
     }
+    
+    companyData.sort(siRiskSort);
+    _siLastCompanyData = companyData;
+    siUpdatePriorityPanel();
     
     console.log('Rendering', companyData.length, 'companies to table');
     
@@ -3604,7 +3729,7 @@ function populateCompanyNpsTable(companyData) {
         const churnClass = (churnRisk === 'High' || churnRisk === 'Critical') ? 'text-danger fw-semibold' : churnRisk === 'Medium' ? 'text-warning fw-semibold' : churnRisk === 'Low' ? 'text-success' : '';
         
         return `
-            <tr class="${riskBorderClass}">
+            <tr class="${riskBorderClass}" data-si-click="company" onclick="siCompanyRowClick('${escapeHtml(company.company_name).replace(/'/g, "\\'")}')">
                 <td><strong>${escapeHtml(company.company_name)}</strong></td>
                 <td><span class="badge ${riskBadgeClass}">${escapeHtml(company.risk_level)}</span></td>
                 <td>${escapeHtml(company.total_responses)}</td>
