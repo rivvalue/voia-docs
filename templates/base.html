@@ -386,7 +386,7 @@
             <h5 class="offcanvas-title" id="notificationPanelLabel">
                 <i class="fas fa-bell me-2"></i>{{ _('Notifications') }}
                 <span class="badge bg-danger ms-2" id="panelUnreadBadge" style="display: none; font-size: 0.7rem;">0</span>
-                <small class="d-block text-muted" style="font-size: 0.7rem; font-weight: 400; margin-top: 2px;">{{ _('Last 7 days') }}</small>
+                <small class="d-block text-muted" style="font-size: 0.7rem; font-weight: 400; margin-top: 2px;">{{ _('Recent') }}</small>
             </h5>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
@@ -663,6 +663,9 @@
                 renderNotifications(data.notifications, countData.unread_count);
             } catch (err) {
                 panelBody.innerHTML = '<div class="notif-empty"><i class="fas fa-exclamation-triangle d-block text-warning"></i><p>{{ _("Could not load notifications") }}</p></div>';
+                panelFooter.style.display = 'block';
+                panelUnreadBadge.style.display = 'none';
+                markAllReadBtn.style.display = 'none';
             }
         }
         
