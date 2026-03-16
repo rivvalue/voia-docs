@@ -3149,7 +3149,7 @@ function loadSurveyResponses(page = 1, searchQuery = '', npsFilter = '') {
                                 ${escapeHtml(response.nps_score)}
                             </span>
                         </td>
-                        <td>${escapeHtml(response.nps_category)}</td>
+                        <td><span class="badge ${response.nps_category === 'Promoter' ? 'bg-success' : response.nps_category === 'Passive' ? 'bg-warning text-dark' : 'bg-danger'}">${escapeHtml(response.nps_category)}</span></td>
                         <td class="${sentimentClass}">${escapeHtml(response.sentiment_label) || 'N/A'}</td>
                         <td>${escapeHtml(response.tenure_with_fc) || 'N/A'}</td>
                         <td>${response.created_at ? new Date(response.created_at).toLocaleDateString() : 'N/A'}</td>
