@@ -4193,6 +4193,9 @@ def company_responses_page(company_name):
         else:
             bi_label = 'Business Intelligence'
         
+        from data_storage import get_company_detail_data
+        account_insights = get_company_detail_data(campaign_id, company_name)
+
         return render_template('company_responses.html',
                              company_name=company_name,
                              campaign=campaign,
@@ -4200,7 +4203,8 @@ def company_responses_page(company_name):
                              branding_context=branding_context,
                              is_business_authenticated=is_business_authenticated,
                              bi_url=last_bi_page,
-                             bi_label=bi_label)
+                             bi_label=bi_label,
+                             account_insights=account_insights)
     
     except Exception as e:
         logger.error(f"Error loading company responses page: {e}")
@@ -4208,6 +4212,53 @@ def company_responses_page(company_name):
         # Redirect based on authentication  
         current_user_check = get_current_business_user()
         return redirect(url_for('executive_summary') if current_user_check else url_for('dashboard'))
+
+@app.route('/api/company_detail')
+@rate_limit(limit=100)
+def api_company_detail():
+    """API endpoint for aggregated per-company qualitative signals (themes, sub-metrics, churn risk, AI summary)"""
+    try:
+        from models import Campaign
+        from business_auth_routes import get_current_business_account
+        from data_storage import get_company_detail_data
+
+        campaign_id = request.args.get('campaign', type=int)
+        company_name = request.args.get('company', '').strip()
+
+        if not campaign_id or not company_name:
+            return jsonify({'error': 'campaign and company parameters are required'}), 400
+
+        current_account = get_current_business_account()
+        if current_account:
+            target_business_account_id = current_account.id
+        else:
+            target_business_account_id = 1
+
+        campaign = Campaign.query.filter_by(
+            id=campaign_id,
+            business_account_id=target_business_account_id
+        ).first()
+        if not campaign:
+            return jsonify({'error': 'Campaign not found or access denied'}), 404
+
+        detail = get_company_detail_data(campaign_id, company_name)
+        if detail is None:
+            return jsonify({
+                'success': True,
+                'data': {
+                    'nps_summary': None,
+                    'top_themes': [],
+                    'sub_metrics': {},
+                    'weakest_metric': None,
+                    'avg_churn_risk_score': None,
+                    'analysis_summary': None
+                }
+            })
+
+        return jsonify({'success': True, 'data': detail})
+    except Exception as e:
+        logger.error(f"Error getting company detail data: {e}")
+        return jsonify({'error': 'Failed to get company detail data'}), 500
 
 @app.route('/admin/regenerate-survey-tokens', methods=['GET'])
 def regenerate_all_survey_tokens():

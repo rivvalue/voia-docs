@@ -2186,3 +2186,110 @@ def generate_campaign_kpi_snapshot(campaign_id):
         print(f"Error generating KPI snapshot for campaign {campaign_id}: {str(e)}")
         db.session.rollback()
         raise e
+
+
+def get_company_detail_data(campaign_id, company_name):
+    """Aggregate per-company qualitative signals for a single company within a campaign.
+    
+    Returns dict with: top_themes, sub_metrics, avg_churn_risk_score, analysis_summary,
+    nps_summary (company_nps, promoters, passives, detractors, total_responses, risk_level).
+    Returns None if no responses found.
+    """
+    from models import SurveyResponse
+    from sqlalchemy import func, case
+    import json as json_module
+
+    responses = SurveyResponse.query.filter(
+        func.upper(SurveyResponse.company_name) == company_name.upper(),
+        SurveyResponse.campaign_id == campaign_id
+    ).all()
+
+    if not responses:
+        return None
+
+    total = len(responses)
+    promoters = sum(1 for r in responses if r.nps_score is not None and r.nps_score >= 9)
+    detractors = sum(1 for r in responses if r.nps_score is not None and r.nps_score <= 6)
+    passives = total - promoters - detractors
+
+    company_nps = round(((promoters - detractors) / total) * 100) if total > 0 else 0
+    if company_nps <= -50:
+        risk_level = "Critical"
+    elif company_nps <= -20:
+        risk_level = "High"
+    elif company_nps <= 20:
+        risk_level = "Medium"
+    else:
+        risk_level = "Low"
+
+    theme_counts = {}
+    for r in responses:
+        if r.key_themes:
+            try:
+                themes = json_module.loads(r.key_themes) if isinstance(r.key_themes, str) else r.key_themes
+                if isinstance(themes, list):
+                    for theme in themes:
+                        if isinstance(theme, dict):
+                            t = (theme.get('theme') or theme.get('name') or '').strip().lower()
+                        elif isinstance(theme, str):
+                            t = theme.strip().lower()
+                        else:
+                            t = str(theme).strip().lower()
+                        if t:
+                            theme_counts[t] = theme_counts.get(t, 0) + 1
+                elif isinstance(themes, dict):
+                    for key in themes:
+                        k = key.strip().lower()
+                        if k:
+                            theme_counts[k] = theme_counts.get(k, 0) + 1
+            except (json_module.JSONDecodeError, TypeError):
+                pass
+
+    top_themes = sorted(theme_counts.items(), key=lambda x: x[1], reverse=True)[:5]
+    top_themes = [{"theme": t, "count": c} for t, c in top_themes]
+
+    metric_fields = {
+        "satisfaction": "satisfaction_rating",
+        "service": "service_rating",
+        "pricing": "pricing_rating",
+        "product_value": "product_value_rating"
+    }
+    sub_metrics = {}
+    for label, field in metric_fields.items():
+        values = [getattr(r, field) for r in responses if getattr(r, field) is not None]
+        if values:
+            sub_metrics[label] = round(sum(values) / len(values), 2)
+
+    weakest_metric = None
+    if sub_metrics:
+        weakest_metric = min(sub_metrics, key=sub_metrics.get)
+
+    churn_scores = [r.churn_risk_score for r in responses if r.churn_risk_score is not None]
+    avg_churn_risk_score = round(sum(churn_scores) / len(churn_scores), 3) if churn_scores else None
+
+    latest_response = max(responses, key=lambda r: r.created_at or datetime.min)
+    analysis_summary = latest_response.analysis_summary if latest_response else None
+
+    avg_nps = round(sum(r.nps_score for r in responses if r.nps_score is not None) / total, 1) if total > 0 else 0
+
+    latest_churn_risk = latest_response.churn_risk_level if latest_response else None
+    latest_response_date = latest_response.created_at.strftime('%Y-%m-%d') if latest_response and latest_response.created_at else None
+
+    return {
+        "nps_summary": {
+            "company_nps": company_nps,
+            "avg_nps": avg_nps,
+            "promoters": promoters,
+            "passives": passives,
+            "detractors": detractors,
+            "total_responses": total,
+            "risk_level": risk_level,
+            "latest_churn_risk": latest_churn_risk,
+            "latest_response": latest_response_date
+        },
+        "top_themes": top_themes,
+        "sub_metrics": sub_metrics,
+        "weakest_metric": weakest_metric,
+        "avg_churn_risk_score": avg_churn_risk_score,
+        "analysis_summary": analysis_summary
+    }

@@ -45,6 +45,108 @@
                 </div>
             </div>
 
+            {% if account_insights %}
+            <div class="card shadow-sm mb-4" id="accountInsightsPanel">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-line me-2 text-primary"></i>{{ _('Account Insights') }}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        {% set nps = account_insights.nps_summary %}
+                        {% if nps %}
+                        <div class="col-md-4">
+                            <div class="p-3 rounded" style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <span class="fw-semibold text-muted" style="font-size: 0.85rem;">{{ _('NPS Score') }}</span>
+                                    {% set nps_val = nps.company_nps %}
+                                    <span class="badge {% if nps_val > 20 %}bg-success{% elif nps_val > -20 %}bg-warning text-dark{% else %}bg-danger{% endif %}" style="font-size: 1rem;">
+                                        {{ '+' if nps_val > 0 }}{{ nps_val }}
+                                    </span>
+                                </div>
+                                <div class="d-flex gap-2 mb-2">
+                                    <span class="badge" style="background-color: #198754; font-size: 0.75rem;">{{ nps.promoters }} P</span>
+                                    <span class="badge" style="background-color: #6c757d; font-size: 0.75rem;">{{ nps.passives }} Pa</span>
+                                    <span class="badge" style="background-color: #dc3545; font-size: 0.75rem;">{{ nps.detractors }} D</span>
+                                </div>
+                                <div class="d-flex justify-content-between" style="font-size: 0.8rem;">
+                                    <span class="text-muted">{{ nps.total_responses }} {{ _('responses') }}</span>
+                                    <span class="badge {% if nps.risk_level == 'Critical' %}bg-danger{% elif nps.risk_level == 'High' %}bg-danger{% elif nps.risk_level == 'Medium' %}bg-warning text-dark{% else %}bg-success{% endif %}" style="font-size: 0.7rem;">
+                                        {{ nps.risk_level }} {{ _('Risk') }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if account_insights.sub_metrics %}
+                        <div class="col-md-4">
+                            <div class="p-3 rounded" style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
+                                <span class="fw-semibold text-muted d-block mb-2" style="font-size: 0.85rem;">{{ _('Sub-Metric Averages') }}</span>
+                                {% set metric_labels = {'satisfaction': _('Satisfaction'), 'service': _('Service'), 'pricing': _('Pricing'), 'product_value': _('Product Value')} %}
+                                {% for key, val in account_insights.sub_metrics.items() %}
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span style="font-size: 0.8rem;" class="{% if key == account_insights.weakest_metric %}text-danger fw-semibold{% else %}text-muted{% endif %}">
+                                        {% if key == account_insights.weakest_metric %}<i class="fas fa-exclamation-circle me-1"></i>{% endif %}
+                                        {{ metric_labels.get(key, key|capitalize) }}
+                                    </span>
+                                    <div class="d-flex align-items-center gap-1">
+                                        <div style="width: 60px; height: 6px; background: #e9ecef; border-radius: 3px; overflow: hidden;">
+                                            <div style="width: {{ (val / 5 * 100)|round }}%; height: 100%; background: {% if key == account_insights.weakest_metric %}#dc3545{% elif val >= 4 %}#198754{% elif val >= 3 %}#ffc107{% else %}#dc3545{% endif %}; border-radius: 3px;"></div>
+                                        </div>
+                                        <span style="font-size: 0.8rem; min-width: 30px; text-align: right;" class="{% if key == account_insights.weakest_metric %}text-danger fw-semibold{% endif %}">{{ val }}/5</span>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="col-md-4">
+                            <div class="p-3 rounded" style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
+                                {% if account_insights.avg_churn_risk_score is not none %}
+                                <div class="mb-2">
+                                    <span class="fw-semibold text-muted d-block" style="font-size: 0.85rem;">{{ _('Avg Churn Risk') }}</span>
+                                    {% set churn_pct = (account_insights.avg_churn_risk_score * 100)|round|int %}
+                                    <div class="d-flex align-items-center gap-2 mt-1">
+                                        <div style="flex: 1; height: 8px; background: #e9ecef; border-radius: 4px; overflow: hidden;">
+                                            <div style="width: {{ churn_pct }}%; height: 100%; background: {% if churn_pct >= 70 %}#dc3545{% elif churn_pct >= 40 %}#ffc107{% else %}#198754{% endif %}; border-radius: 4px;"></div>
+                                        </div>
+                                        <span style="font-size: 0.85rem;" class="fw-semibold {% if churn_pct >= 70 %}text-danger{% elif churn_pct >= 40 %}text-warning{% else %}text-success{% endif %}">{{ churn_pct }}%</span>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% if account_insights.top_themes %}
+                                <div>
+                                    <span class="fw-semibold text-muted d-block mb-1" style="font-size: 0.85rem;">{{ _('Top Themes') }}</span>
+                                    <div class="d-flex flex-wrap gap-1">
+                                        {% for item in account_insights.top_themes %}
+                                        <span class="badge bg-light text-dark border" style="font-size: 0.7rem;">{{ item.theme|capitalize }} <small class="text-muted">({{ item.count }})</small></span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if account_insights.analysis_summary %}
+                    <div class="mt-3">
+                        <a class="text-muted" style="font-size: 0.85rem; cursor: pointer; text-decoration: none;" data-bs-toggle="collapse" href="#aiSummaryCollapse" role="button" aria-expanded="false" aria-controls="aiSummaryCollapse">
+                            <i class="fas fa-robot me-1"></i>{{ _('AI Analysis Summary') }} <i class="fas fa-chevron-down ms-1" style="font-size: 0.7rem;"></i>
+                        </a>
+                        <div class="collapse mt-2" id="aiSummaryCollapse">
+                            <div class="p-3 rounded" style="background-color: #f0f4f8; border-left: 3px solid #0d6efd; font-size: 0.85rem;">
+                                {{ account_insights.analysis_summary }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
             <!-- Responses Table Card -->
             <div class="card shadow-sm">
                 <div class="card-header bg-white">

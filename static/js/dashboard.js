@@ -3247,6 +3247,205 @@ if (document.readyState === 'loading') {
     siAttachRowClickHandlers();
 }
 
+var _siTooltipEl = null;
+var _siTooltipTimer = null;
+var _siTooltipHideTimer = null;
+var _siTooltipCache = {};
+var _siTooltipCurrentRow = null;
+
+function siShowTooltip(row, companyData) {
+    siHideTooltip();
+    _siTooltipCurrentRow = row;
+
+    var el = document.createElement('div');
+    el.className = 'si-tooltip';
+    el.setAttribute('data-si-tooltip', '1');
+
+    var riskBadge = '';
+    var rl = companyData.risk_level || '';
+    if (rl === 'Critical' || rl === 'High') riskBadge = '<span class="badge bg-danger" style="font-size:0.7rem;">' + escapeHtml(rl) + '</span>';
+    else if (rl === 'Medium') riskBadge = '<span class="badge bg-warning text-dark" style="font-size:0.7rem;">' + escapeHtml(rl) + '</span>';
+    else if (rl === 'Low') riskBadge = '<span class="badge bg-success" style="font-size:0.7rem;">' + escapeHtml(rl) + '</span>';
+
+    var npsVal = companyData.company_nps || 0;
+    var npsBadge = 'bg-warning text-dark';
+    if (npsVal > 20) npsBadge = 'bg-success';
+    else if (npsVal < -20) npsBadge = 'bg-danger';
+
+    var staticHtml = '<div class="si-tooltip-header">' +
+        '<span class="si-tt-name">' + escapeHtml(companyData.company_name || '') + '</span>' + riskBadge +
+        '</div><div class="si-tooltip-body">' +
+        '<div class="si-tooltip-section">' +
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">' +
+        '<span class="badge ' + npsBadge + '" style="font-size:0.85rem;">' + (npsVal > 0 ? '+' : '') + npsVal + ' NPS</span>' +
+        '<span style="font-size:0.78rem;color:#6c757d;">' + escapeHtml(companyData.total_responses || 0) + ' responses</span></div>' +
+        '<div style="display:flex;gap:6px;">' +
+        '<span class="badge" style="background:#198754;font-size:0.7rem;">' + (companyData.promoters || 0) + ' P</span>' +
+        '<span class="badge" style="background:#6c757d;font-size:0.7rem;">' + (companyData.passives || 0) + ' Pa</span>' +
+        '<span class="badge" style="background:#dc3545;font-size:0.7rem;">' + (companyData.detractors || 0) + ' D</span>' +
+        '</div></div>' +
+        '<div id="siTooltipEnriched"><div style="text-align:center;padding:6px 0;"><span class="si-tt-spinner"></span></div></div>' +
+        '</div>';
+
+    el.innerHTML = staticHtml;
+    row.style.position = 'relative';
+    row.appendChild(el);
+    _siTooltipEl = el;
+
+    requestAnimationFrame(function() {
+        el.classList.add('si-tooltip-visible');
+    });
+
+    var campaignSelect = document.getElementById('campaignFilter');
+    var campaignId = campaignSelect ? campaignSelect.value : '';
+    var companyName = companyData.company_name;
+    var cacheKey = campaignId + '::' + (companyName || '').toUpperCase();
+
+    if (_siTooltipCache[cacheKey]) {
+        siRenderEnrichedTooltip(_siTooltipCache[cacheKey]);
+        return;
+    }
+
+    if (!campaignId || !companyName) {
+        var enrichDiv = document.getElementById('siTooltipEnriched');
+        if (enrichDiv) enrichDiv.innerHTML = '';
+        return;
+    }
+
+    fetch('/api/company_detail?campaign=' + encodeURIComponent(campaignId) + '&company=' + encodeURIComponent(companyName))
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.success && data.data) {
+                _siTooltipCache[cacheKey] = data.data;
+                siRenderEnrichedTooltip(data.data);
+            } else {
+                var enrichDiv = document.getElementById('siTooltipEnriched');
+                if (enrichDiv) enrichDiv.innerHTML = '';
+            }
+        })
+        .catch(function() {
+            var enrichDiv = document.getElementById('siTooltipEnriched');
+            if (enrichDiv) enrichDiv.innerHTML = '';
+        });
+}
+
+function siRenderEnrichedTooltip(detail) {
+    var enrichDiv = document.getElementById('siTooltipEnriched');
+    if (!enrichDiv) return;
+
+    var html = '';
+
+    if (detail.sub_metrics && Object.keys(detail.sub_metrics).length > 0) {
+        var labelMap = {satisfaction: 'Satisfaction', service: 'Service', pricing: 'Pricing', product_value: 'Product Value'};
+        html += '<div class="si-tooltip-section"><div class="si-tooltip-section-label">Sub-Metrics</div>';
+        Object.keys(detail.sub_metrics).forEach(function(key) {
+            var val = detail.sub_metrics[key];
+            var pct = Math.round((val / 5) * 100);
+            var isWeakest = key === detail.weakest_metric;
+            var barColor = isWeakest ? '#dc3545' : (val >= 4 ? '#198754' : val >= 3 ? '#ffc107' : '#dc3545');
+            html += '<div class="si-tt-metric-row">' +
+                '<span' + (isWeakest ? ' style="color:#dc3545;font-weight:600;"' : '') + '>' + (isWeakest ? '<i class="fas fa-exclamation-circle" style="margin-right:3px;font-size:0.7rem;"></i>' : '') + escapeHtml(labelMap[key] || key) + '</span>' +
+                '<span><span class="si-tt-metric-bar"><span class="si-tt-metric-fill" style="width:' + pct + '%;background:' + barColor + ';"></span></span>' +
+                '<span' + (isWeakest ? ' style="color:#dc3545;font-weight:600;"' : '') + '>' + val + '/5</span></span></div>';
+        });
+        html += '</div>';
+    }
+
+    if (detail.avg_churn_risk_score !== null && detail.avg_churn_risk_score !== undefined) {
+        var churnPct = Math.round(detail.avg_churn_risk_score * 100);
+        var churnColor = churnPct >= 70 ? '#dc3545' : churnPct >= 40 ? '#ffc107' : '#198754';
+        html += '<div class="si-tooltip-section"><div class="si-tooltip-section-label">Avg Churn Risk</div>' +
+            '<div style="display:flex;align-items:center;gap:6px;">' +
+            '<div style="flex:1;height:6px;background:#e9ecef;border-radius:3px;overflow:hidden;">' +
+            '<div style="width:' + churnPct + '%;height:100%;background:' + churnColor + ';border-radius:3px;"></div></div>' +
+            '<span style="font-size:0.8rem;font-weight:600;color:' + churnColor + ';">' + churnPct + '%</span></div></div>';
+    }
+
+    if (detail.top_themes && detail.top_themes.length > 0) {
+        html += '<div class="si-tooltip-section"><div class="si-tooltip-section-label">Top Themes</div><div class="si-tt-themes">';
+        detail.top_themes.forEach(function(t) {
+            html += '<span class="si-tt-theme-pill">' + escapeHtml(t.theme) + ' <small style="color:#999;">(' + t.count + ')</small></span>';
+        });
+        html += '</div></div>';
+    }
+
+    if (detail.analysis_summary) {
+        var summary = detail.analysis_summary;
+        if (summary.length > 150) summary = summary.substring(0, 150) + '…';
+        html += '<div class="si-tooltip-section"><div class="si-tooltip-section-label">AI Summary</div>' +
+            '<div class="si-tt-summary">' + escapeHtml(summary) + '</div></div>';
+    }
+
+    enrichDiv.innerHTML = html;
+}
+
+function siHideTooltip() {
+    if (_siTooltipEl) {
+        _siTooltipEl.classList.remove('si-tooltip-visible');
+        var el = _siTooltipEl;
+        setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 160);
+        _siTooltipEl = null;
+    }
+    _siTooltipCurrentRow = null;
+}
+
+function siAttachTooltipHandlers() {
+    var companyTbody = document.getElementById('companyNpsTableServerSide');
+    if (!companyTbody || companyTbody._siTooltipBound) return;
+    companyTbody._siTooltipBound = true;
+
+    companyTbody.addEventListener('mouseenter', function(e) {
+        var row = e.target.closest('tr[data-si-click="company"]');
+        if (!row) return;
+        if (_siTooltipCurrentRow === row) return;
+
+        clearTimeout(_siTooltipTimer);
+        clearTimeout(_siTooltipHideTimer);
+
+        _siTooltipTimer = setTimeout(function() {
+            var companyName = row.getAttribute('data-company-name');
+            if (!companyName) return;
+
+            var rowCompanyData = null;
+            if (_siLastCompanyData) {
+                for (var i = 0; i < _siLastCompanyData.length; i++) {
+                    if (_siLastCompanyData[i].company_name === companyName) {
+                        rowCompanyData = _siLastCompanyData[i];
+                        break;
+                    }
+                }
+            }
+            if (!rowCompanyData) {
+                rowCompanyData = { company_name: companyName, company_nps: 0, total_responses: 0, promoters: 0, passives: 0, detractors: 0, risk_level: 'Medium' };
+            }
+
+            siShowTooltip(row, rowCompanyData);
+        }, 300);
+    }, true);
+
+    companyTbody.addEventListener('mouseleave', function(e) {
+        var row = e.target.closest('tr[data-si-click="company"]');
+        if (!row) return;
+        var related = e.relatedTarget;
+        if (related && (related.closest('.si-tooltip') || related.closest('tr[data-si-click="company"]') === row)) return;
+
+        clearTimeout(_siTooltipTimer);
+        _siTooltipHideTimer = setTimeout(function() { siHideTooltip(); }, 200);
+    }, true);
+
+    document.addEventListener('click', function(e) {
+        if (_siTooltipEl && !e.target.closest('.si-tooltip')) {
+            siHideTooltip();
+        }
+    });
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', siAttachTooltipHandlers);
+} else {
+    siAttachTooltipHandlers();
+}
+
 // Pagination state for all tables
 let currentResponsesPage = 1;
 let currentCompanyPage = 1;
