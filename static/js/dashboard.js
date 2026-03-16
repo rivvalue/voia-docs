@@ -3121,18 +3121,56 @@ function siUpdatePriorityPanel() {
     panel.style.display = highRiskCount > 0 ? '' : 'none';
 }
 
-let _siFullCompanyData = [];
-
 function siFilterHighRisk() {
     const tbody = document.getElementById('companyNpsTableServerSide');
-    if (!tbody || !_siFullCompanyData.length) return;
+    if (!tbody || !dashboardData || !dashboardData.high_risk_accounts) return;
 
-    const filtered = _siFullCompanyData.filter(c =>
-        c.risk_level === 'Critical' || c.risk_level === 'High'
-    );
-    if (filtered.length > 0) {
-        populateCompanyNpsTable(filtered);
-    }
+    const highRisk = dashboardData.high_risk_accounts;
+    if (highRisk.length === 0) return;
+
+    const mapped = highRisk.map(a => ({
+        company_name: a.company_name,
+        risk_level: a.risk_level,
+        total_responses: a.respondent_count || 0,
+        avg_nps: a.nps_score != null ? String(a.nps_score) : 'N/A',
+        company_nps: 0,
+        promoters: 0,
+        passives: 0,
+        detractors: 0,
+        latest_response: a.latest_response || 'N/A',
+        latest_churn_risk: a.risk_level
+    }));
+    mapped.sort(siRiskSort);
+
+    tbody.innerHTML = mapped.map(company => {
+        let riskBadgeClass = 'bg-warning text-dark';
+        let riskBorderClass = 'si-risk-medium';
+        if (company.risk_level === 'Low') { riskBadgeClass = 'bg-success'; riskBorderClass = 'si-risk-low'; }
+        else if (company.risk_level === 'Medium') { riskBadgeClass = 'bg-warning text-dark'; riskBorderClass = 'si-risk-medium'; }
+        else if (company.risk_level === 'High') { riskBadgeClass = 'bg-danger'; riskBorderClass = 'si-risk-high'; }
+        else if (company.risk_level === 'Critical') { riskBadgeClass = 'bg-dark'; riskBorderClass = 'si-risk-critical'; }
+
+        const avgNps = parseFloat(company.avg_nps) || 0;
+        const avgNpsClass = avgNps >= 8 ? 'si-nps-high' : avgNps >= 6 ? 'si-nps-mid' : 'si-nps-low';
+
+        const churnRisk = company.latest_churn_risk || 'N/A';
+        const churnClass = (churnRisk === 'High' || churnRisk === 'Critical') ? 'text-danger fw-semibold' : churnRisk === 'Medium' ? 'text-warning fw-semibold' : churnRisk === 'Low' ? 'text-success' : '';
+
+        return `
+            <tr class="${riskBorderClass}" data-si-click="company" data-company-name="${escapeHtml(company.company_name)}">
+                <td><strong>${escapeHtml(company.company_name)}</strong></td>
+                <td><span class="badge ${riskBadgeClass}">${escapeHtml(company.risk_level)}</span></td>
+                <td>${escapeHtml(String(company.total_responses))}</td>
+                <td><span class="si-nps-score ${avgNpsClass}">${escapeHtml(company.avg_nps)}</span></td>
+                <td colspan="2"><small class="text-muted">—</small></td>
+                <td>${escapeHtml(company.latest_response) || 'N/A'}</td>
+                <td><span class="${churnClass}">${escapeHtml(churnRisk)}</span></td>
+            </tr>
+        `;
+    }).join('');
+
+    const paginationInfo = document.getElementById('companyPaginationInfo');
+    if (paginationInfo) paginationInfo.textContent = `Showing ${mapped.length} high-risk accounts`;
 
     if (tbody) {
         tbody.closest('.data-table').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -3166,31 +3204,6 @@ function siAttachRowClickHandlers() {
         });
     }
 
-    const tenureTbody = document.getElementById('tenureNpsTable');
-    if (tenureTbody) {
-        tenureTbody.addEventListener('click', function(e) {
-            const row = e.target.closest('tr[data-si-click="tenure"]');
-            if (!row) return;
-            const tenureGroup = row.getAttribute('data-tenure-group');
-            if (!tenureGroup) return;
-
-            row.classList.add('si-click-flash');
-            setTimeout(() => row.classList.remove('si-click-flash'), 400);
-
-            const searchInput = document.getElementById('responsesSearch');
-            if (searchInput) searchInput.value = tenureGroup;
-            const nf = document.getElementById('npsFilter');
-            if (nf) nf.value = '';
-            loadSurveyResponses(1, tenureGroup, '');
-
-            setTimeout(() => {
-                const responsesCard = document.getElementById('responsesTable');
-                if (responsesCard) {
-                    responsesCard.closest('.chart-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            }, 100);
-        });
-    }
 }
 
 if (document.readyState === 'loading') {
@@ -3598,7 +3611,6 @@ function populateTenureNpsTable(tenureData) {
         return;
     }
     
-    tenureData.sort(siRiskSort);
     _siLastTenureData = tenureData;
     siUpdatePriorityPanel();
     
@@ -3634,7 +3646,7 @@ function populateTenureNpsTable(tenureData) {
         const churnClass = (churnRisk === 'High' || churnRisk === 'Critical') ? 'text-danger fw-semibold' : churnRisk === 'Medium' ? 'text-warning fw-semibold' : churnRisk === 'Low' ? 'text-success' : '';
         
         return `
-            <tr class="${riskBorderClass}" data-si-click="tenure" data-tenure-group="${escapeHtml(tenure.tenure_group)}">
+            <tr class="${riskBorderClass}">
                 <td><strong>${escapeHtml(tenure.tenure_group)}</strong></td>
                 <td><span class="badge ${riskBadgeClass}">${escapeHtml(tenure.risk_level)}</span></td>
                 <td>${escapeHtml(tenure.total_responses)}</td>
@@ -3715,9 +3727,7 @@ function populateCompanyNpsTable(companyData) {
         return;
     }
     
-    companyData.sort(siRiskSort);
     _siLastCompanyData = companyData;
-    _siFullCompanyData = companyData;
     siUpdatePriorityPanel();
     
     console.log('Rendering', companyData.length, 'companies to table');
