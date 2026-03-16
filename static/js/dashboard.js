@@ -3156,9 +3156,21 @@ function siFilterHighRisk() {
         const churnRisk = company.latest_churn_risk || 'N/A';
         const churnClass = (churnRisk === 'High' || churnRisk === 'Critical') ? 'text-danger fw-semibold' : churnRisk === 'Medium' ? 'text-warning fw-semibold' : churnRisk === 'Low' ? 'text-success' : '';
 
+        const campaignSelectHR = document.getElementById('campaignFilter');
+        const campaignIdHR = campaignSelectHR ? campaignSelectHR.value : null;
         return `
             <tr class="${riskBorderClass}" data-si-click="company" data-company-name="${escapeHtml(company.company_name)}">
-                <td><strong>${escapeHtml(company.company_name)}</strong></td>
+                <td>
+                    <a href="#"
+                       onclick="event.stopPropagation(); openCompanyResponsesModal('${escapeHtml(company.company_name).replace(/'/g, "\\'")}', ${campaignIdHR}, ''); return false;"
+                       style="color: #2E5090; text-decoration: none; cursor: pointer; font-weight: 600;"
+                       onmouseover="this.style.textDecoration='underline';"
+                       onmouseout="this.style.textDecoration='none';"
+                       title="View all responses from ${escapeHtml(company.company_name)}">
+                        ${escapeHtml(company.company_name)}
+                        <i class="fas fa-external-link-alt ms-2" style="font-size: 0.7em; color: #8A8A8A;"></i>
+                    </a>
+                </td>
                 <td><span class="badge ${riskBadgeClass}">${escapeHtml(company.risk_level)}</span></td>
                 <td>${escapeHtml(String(company.total_responses))}</td>
                 <td><span class="si-nps-score ${avgNpsClass}">${escapeHtml(company.avg_nps)}</span></td>
@@ -4002,9 +4014,21 @@ function populateCompanyNpsTable(companyData) {
         const churnRisk = company.latest_churn_risk || 'N/A';
         const churnClass = (churnRisk === 'High' || churnRisk === 'Critical') ? 'text-danger fw-semibold' : churnRisk === 'Medium' ? 'text-warning fw-semibold' : churnRisk === 'Low' ? 'text-success' : '';
         
+        const campaignSelectCN = document.getElementById('campaignFilter');
+        const campaignIdCN = campaignSelectCN ? campaignSelectCN.value : null;
         return `
             <tr class="${riskBorderClass}" data-si-click="company" data-company-name="${escapeHtml(company.company_name)}">
-                <td><strong>${escapeHtml(company.company_name)}</strong></td>
+                <td>
+                    <a href="#"
+                       onclick="event.stopPropagation(); openCompanyResponsesModal('${escapeHtml(company.company_name).replace(/'/g, "\\'")}', ${campaignIdCN}, ''); return false;"
+                       style="color: #2E5090; text-decoration: none; cursor: pointer; font-weight: 600;"
+                       onmouseover="this.style.textDecoration='underline';"
+                       onmouseout="this.style.textDecoration='none';"
+                       title="View all responses from ${escapeHtml(company.company_name)}">
+                        ${escapeHtml(company.company_name)}
+                        <i class="fas fa-external-link-alt ms-2" style="font-size: 0.7em; color: #8A8A8A;"></i>
+                    </a>
+                </td>
                 <td><span class="badge ${riskBadgeClass}">${escapeHtml(company.risk_level)}</span></td>
                 <td>${escapeHtml(company.total_responses)}</td>
                 <td><span class="si-nps-score ${avgNpsClass}">${escapeHtml(company.avg_nps)}</span></td>
