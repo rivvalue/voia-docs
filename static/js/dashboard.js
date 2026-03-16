@@ -3204,6 +3204,31 @@ function siAttachRowClickHandlers() {
         });
     }
 
+    const tenureTbody = document.getElementById('tenureNpsTable');
+    if (tenureTbody) {
+        tenureTbody.addEventListener('click', function(e) {
+            const row = e.target.closest('tr[data-si-click="tenure"]');
+            if (!row) return;
+            const tenureGroup = row.getAttribute('data-tenure-group');
+            if (!tenureGroup) return;
+
+            row.classList.add('si-click-flash');
+            setTimeout(() => row.classList.remove('si-click-flash'), 400);
+
+            const searchInput = document.getElementById('responsesSearch');
+            if (searchInput) searchInput.value = tenureGroup;
+            const nf = document.getElementById('npsFilter');
+            if (nf) nf.value = '';
+            loadSurveyResponses(1, tenureGroup, '');
+
+            setTimeout(() => {
+                const responsesCard = document.getElementById('responsesTable');
+                if (responsesCard) {
+                    responsesCard.closest('.chart-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 100);
+        });
+    }
 }
 
 if (document.readyState === 'loading') {
@@ -3611,12 +3636,13 @@ function populateTenureNpsTable(tenureData) {
         return;
     }
     
-    _siLastTenureData = tenureData;
+    const sorted = [...tenureData].sort(siRiskSort);
+    _siLastTenureData = sorted;
     siUpdatePriorityPanel();
     
-    console.log('Rendering', tenureData.length, 'tenure groups to table');
+    console.log('Rendering', sorted.length, 'tenure groups to table');
     
-    tbody.innerHTML = tenureData.map(tenure => {
+    tbody.innerHTML = sorted.map(tenure => {
         let riskBadgeClass = 'bg-warning text-dark';
         let riskBorderClass = 'si-risk-medium';
         if (tenure.risk_level === 'Low') { riskBadgeClass = 'bg-success'; riskBorderClass = 'si-risk-low'; }
@@ -3646,7 +3672,7 @@ function populateTenureNpsTable(tenureData) {
         const churnClass = (churnRisk === 'High' || churnRisk === 'Critical') ? 'text-danger fw-semibold' : churnRisk === 'Medium' ? 'text-warning fw-semibold' : churnRisk === 'Low' ? 'text-success' : '';
         
         return `
-            <tr class="${riskBorderClass}">
+            <tr class="${riskBorderClass}" data-si-click="tenure" data-tenure-group="${escapeHtml(tenure.tenure_group)}">
                 <td><strong>${escapeHtml(tenure.tenure_group)}</strong></td>
                 <td><span class="badge ${riskBadgeClass}">${escapeHtml(tenure.risk_level)}</span></td>
                 <td>${escapeHtml(tenure.total_responses)}</td>
@@ -3727,12 +3753,13 @@ function populateCompanyNpsTable(companyData) {
         return;
     }
     
-    _siLastCompanyData = companyData;
+    const sorted = [...companyData].sort(siRiskSort);
+    _siLastCompanyData = sorted;
     siUpdatePriorityPanel();
     
-    console.log('Rendering', companyData.length, 'companies to table');
+    console.log('Rendering', sorted.length, 'companies to table');
     
-    tbody.innerHTML = companyData.map(company => {
+    tbody.innerHTML = sorted.map(company => {
         let riskBadgeClass = 'bg-warning text-dark';
         let riskBorderClass = 'si-risk-medium';
         if (company.risk_level === 'Low') { riskBadgeClass = 'bg-success'; riskBorderClass = 'si-risk-low'; }
