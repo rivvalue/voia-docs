@@ -3252,6 +3252,7 @@ var _siTooltipTimer = null;
 var _siTooltipHideTimer = null;
 var _siTooltipCache = {};
 var _siTooltipCurrentRow = null;
+var _siTooltipRequestId = 0;
 
 function siShowTooltip(row, companyData) {
     siHideTooltip();
@@ -3312,9 +3313,12 @@ function siShowTooltip(row, companyData) {
         return;
     }
 
+    var reqId = ++_siTooltipRequestId;
+
     fetch('/api/company_detail?campaign=' + encodeURIComponent(campaignId) + '&company=' + encodeURIComponent(companyName))
         .then(function(r) { return r.json(); })
         .then(function(data) {
+            if (reqId !== _siTooltipRequestId) return;
             if (data.success && data.data) {
                 _siTooltipCache[cacheKey] = data.data;
                 siRenderEnrichedTooltip(data.data);
@@ -3324,6 +3328,7 @@ function siShowTooltip(row, companyData) {
             }
         })
         .catch(function() {
+            if (reqId !== _siTooltipRequestId) return;
             var enrichDiv = document.getElementById('siTooltipEnriched');
             if (enrichDiv) enrichDiv.innerHTML = '';
         });

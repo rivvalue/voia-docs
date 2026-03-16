@@ -2208,11 +2208,13 @@ def get_company_detail_data(campaign_id, company_name):
         return None
 
     total = len(responses)
-    promoters = sum(1 for r in responses if r.nps_score is not None and r.nps_score >= 9)
-    detractors = sum(1 for r in responses if r.nps_score is not None and r.nps_score <= 6)
-    passives = total - promoters - detractors
+    nps_responses = [r for r in responses if r.nps_score is not None]
+    nps_total = len(nps_responses)
+    promoters = sum(1 for r in nps_responses if r.nps_score >= 9)
+    detractors = sum(1 for r in nps_responses if r.nps_score <= 6)
+    passives = nps_total - promoters - detractors
 
-    company_nps = round(((promoters - detractors) / total) * 100) if total > 0 else 0
+    company_nps = round(((promoters - detractors) / nps_total) * 100) if nps_total > 0 else 0
     if company_nps <= -50:
         risk_level = "Critical"
     elif company_nps <= -20:
@@ -2270,7 +2272,7 @@ def get_company_detail_data(campaign_id, company_name):
     latest_response = max(responses, key=lambda r: r.created_at or datetime.min)
     analysis_summary = latest_response.analysis_summary if latest_response else None
 
-    avg_nps = round(sum(r.nps_score for r in responses if r.nps_score is not None) / total, 1) if total > 0 else 0
+    avg_nps = round(sum(r.nps_score for r in nps_responses) / nps_total, 1) if nps_total > 0 else 0
 
     latest_churn_risk = latest_response.churn_risk_level if latest_response else None
     latest_response_date = latest_response.created_at.strftime('%Y-%m-%d') if latest_response and latest_response.created_at else None
