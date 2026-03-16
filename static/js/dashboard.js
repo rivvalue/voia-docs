@@ -3256,6 +3256,7 @@ var _siTooltipRequestId = 0;
 
 function siShowTooltip(row, companyData) {
     siHideTooltip();
+    ++_siTooltipRequestId;
     _siTooltipCurrentRow = row;
 
     var el = document.createElement('div');
@@ -3313,7 +3314,7 @@ function siShowTooltip(row, companyData) {
         return;
     }
 
-    var reqId = ++_siTooltipRequestId;
+    var reqId = _siTooltipRequestId;
 
     fetch('/api/company_detail?campaign=' + encodeURIComponent(campaignId) + '&company=' + encodeURIComponent(companyName))
         .then(function(r) { return r.json(); })
