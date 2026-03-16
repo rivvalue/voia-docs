@@ -3170,7 +3170,17 @@ function siFilterHighRisk() {
     }).join('');
 
     const paginationInfo = document.getElementById('companyPaginationInfo');
-    if (paginationInfo) paginationInfo.textContent = `Showing ${mapped.length} high-risk accounts`;
+    if (paginationInfo) {
+        paginationInfo.innerHTML = '';
+        const text = document.createTextNode(`Showing ${mapped.length} high-risk accounts `);
+        paginationInfo.appendChild(text);
+        const resetBtn = document.createElement('button');
+        resetBtn.className = 'btn btn-outline-secondary btn-sm py-0 px-2';
+        resetBtn.style.fontSize = '0.75rem';
+        resetBtn.textContent = 'Show all';
+        resetBtn.addEventListener('click', function() { loadCompanyNpsData(1); });
+        paginationInfo.appendChild(resetBtn);
+    }
 
     if (tbody) {
         tbody.closest('.data-table').scrollIntoView({ behavior: 'smooth', block: 'start' });
