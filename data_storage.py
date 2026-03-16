@@ -2284,7 +2284,7 @@ def get_company_detail_data(campaign_id, company_name):
             "promoters": promoters,
             "passives": passives,
             "detractors": detractors,
-            "total_responses": total,
+            "total_responses": nps_total,
             "risk_level": risk_level,
             "latest_churn_risk": latest_churn_risk,
             "latest_response": latest_response_date
