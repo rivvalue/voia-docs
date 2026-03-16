@@ -3575,35 +3575,43 @@ function populateCompanyNpsTable(companyData) {
     console.log('Rendering', companyData.length, 'companies to table');
     
     tbody.innerHTML = companyData.map(company => {
-        // Risk level badge styling
-        let riskBadgeClass = 'bg-secondary';
-        if (company.risk_level === 'Low') riskBadgeClass = 'bg-success';
-        else if (company.risk_level === 'Medium') riskBadgeClass = 'bg-secondary';
-        else if (company.risk_level === 'High') riskBadgeClass = 'bg-danger';
-        else if (company.risk_level === 'Critical') riskBadgeClass = 'bg-dark';
+        let riskBadgeClass = 'bg-warning text-dark';
+        let riskBorderClass = 'si-risk-medium';
+        if (company.risk_level === 'Low') { riskBadgeClass = 'bg-success'; riskBorderClass = 'si-risk-low'; }
+        else if (company.risk_level === 'Medium') { riskBadgeClass = 'bg-warning text-dark'; riskBorderClass = 'si-risk-medium'; }
+        else if (company.risk_level === 'High') { riskBadgeClass = 'bg-danger'; riskBorderClass = 'si-risk-high'; }
+        else if (company.risk_level === 'Critical') { riskBadgeClass = 'bg-dark'; riskBorderClass = 'si-risk-critical'; }
         
-        // Company NPS badge styling
-        let npsBadgeClass = 'bg-secondary';
+        let npsBadgeClass = 'bg-warning text-dark';
         if (company.company_nps > 20) npsBadgeClass = 'bg-success';
-        else if (company.company_nps >= -20) npsBadgeClass = 'bg-secondary'; 
+        else if (company.company_nps >= -20) npsBadgeClass = 'bg-warning text-dark'; 
         else npsBadgeClass = 'bg-danger';
         
-        // Distribution breakdown
-        const distributionText = `${company.promoters}P / ${company.passives}Pa / ${company.detractors}D`;
+        const avgNps = parseFloat(company.avg_nps) || 0;
+        const avgNpsClass = avgNps >= 8 ? 'si-nps-high' : avgNps >= 6 ? 'si-nps-mid' : 'si-nps-low';
         
-        // Churn risk display
-        const churnRiskDisplay = company.latest_churn_risk || 'N/A';
+        const total = (company.promoters || 0) + (company.passives || 0) + (company.detractors || 0);
+        let distHtml = '<small class="text-muted">N/A</small>';
+        if (total > 0) {
+            const pPct = ((company.promoters / total) * 100).toFixed(1);
+            const paPct = ((company.passives / total) * 100).toFixed(1);
+            const dPct = ((company.detractors / total) * 100).toFixed(1);
+            distHtml = `<div class="si-dist-bar" title="${company.promoters}P / ${company.passives}Pa / ${company.detractors}D"><div class="si-dist-p" style="width:${pPct}%"></div><div class="si-dist-pa" style="width:${paPct}%"></div><div class="si-dist-d" style="width:${dPct}%"></div></div><small class="text-muted si-dist-label">${company.promoters}P · ${company.passives}Pa · ${company.detractors}D</small>`;
+        }
+        
+        const churnRisk = company.latest_churn_risk || 'N/A';
+        const churnClass = (churnRisk === 'High' || churnRisk === 'Critical') ? 'text-danger fw-semibold' : churnRisk === 'Medium' ? 'text-warning fw-semibold' : churnRisk === 'Low' ? 'text-success' : '';
         
         return `
-            <tr>
+            <tr class="${riskBorderClass}">
                 <td><strong>${escapeHtml(company.company_name)}</strong></td>
-                <td>${escapeHtml(company.total_responses)}</td>
-                <td>${escapeHtml(company.avg_nps)}</td>
-                <td><span class="badge ${npsBadgeClass}">${company.company_nps > 0 ? '+' : ''}${escapeHtml(company.company_nps)}</span></td>
-                <td><small>${distributionText}</small></td>
                 <td><span class="badge ${riskBadgeClass}">${escapeHtml(company.risk_level)}</span></td>
+                <td>${escapeHtml(company.total_responses)}</td>
+                <td><span class="si-nps-score ${avgNpsClass}">${escapeHtml(company.avg_nps)}</span></td>
+                <td><span class="badge ${npsBadgeClass}">${company.company_nps > 0 ? '+' : ''}${escapeHtml(company.company_nps)}</span></td>
+                <td>${distHtml}</td>
                 <td>${escapeHtml(company.latest_response) || 'N/A'}</td>
-                <td>${escapeHtml(churnRiskDisplay)}</td>
+                <td><span class="${churnClass}">${escapeHtml(churnRisk)}</span></td>
             </tr>
         `;
     }).join('');
