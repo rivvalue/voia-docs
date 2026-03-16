@@ -3084,9 +3084,8 @@ function siUpdatePriorityPanel() {
     const panel = document.getElementById('siPriorityPanel');
     if (!panel) return;
 
-    const highRiskCount = _siLastCompanyData.filter(c =>
-        c.risk_level === 'Critical' || c.risk_level === 'High'
-    ).length;
+    const highRiskAccounts = (dashboardData && dashboardData.high_risk_accounts) ? dashboardData.high_risk_accounts : [];
+    const highRiskCount = highRiskAccounts.length;
 
     const riskCountEl = document.getElementById('siRiskCount');
     if (riskCountEl) riskCountEl.textContent = highRiskCount;
@@ -3119,63 +3118,85 @@ function siUpdatePriorityPanel() {
         }
     }
 
-    const hasData = _siLastCompanyData.length > 0 || _siLastTenureData.length > 0;
-    panel.style.display = hasData ? '' : 'none';
+    panel.style.display = highRiskCount > 0 ? '' : 'none';
 }
 
-function siFilterHighRisk() {
-    const searchInput = document.getElementById('companySearch');
-    const npsFilter = document.getElementById('companyNpsFilter');
-    if (npsFilter) npsFilter.value = 'detractors';
-    if (searchInput) searchInput.value = '';
-    searchCompanyNPS();
+let _siFullCompanyData = [];
 
-    const companySection = document.querySelector('#companyNpsTableServerSide');
-    if (companySection) {
-        companySection.closest('.data-table').scrollIntoView({ behavior: 'smooth', block: 'start' });
+function siFilterHighRisk() {
+    const tbody = document.getElementById('companyNpsTableServerSide');
+    if (!tbody || !_siFullCompanyData.length) return;
+
+    const filtered = _siFullCompanyData.filter(c =>
+        c.risk_level === 'Critical' || c.risk_level === 'High'
+    );
+    if (filtered.length > 0) {
+        populateCompanyNpsTable(filtered);
+    }
+
+    if (tbody) {
+        tbody.closest('.data-table').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 }
 
-function siCompanyRowClick(companyName) {
-    const row = event.currentTarget;
-    row.classList.add('si-click-flash');
-    setTimeout(() => row.classList.remove('si-click-flash'), 400);
+function siAttachRowClickHandlers() {
+    const companyTbody = document.getElementById('companyNpsTableServerSide');
+    if (companyTbody) {
+        companyTbody.addEventListener('click', function(e) {
+            const row = e.target.closest('tr[data-si-click="company"]');
+            if (!row) return;
+            const companyName = row.getAttribute('data-company-name');
+            if (!companyName) return;
 
-    const searchInput = document.getElementById('responsesSearch');
-    if (searchInput) searchInput.value = companyName;
+            row.classList.add('si-click-flash');
+            setTimeout(() => row.classList.remove('si-click-flash'), 400);
 
-    const npsFilter = document.getElementById('npsFilter');
-    if (npsFilter) npsFilter.value = '';
+            const searchInput = document.getElementById('responsesSearch');
+            if (searchInput) searchInput.value = companyName;
+            const nf = document.getElementById('npsFilter');
+            if (nf) nf.value = '';
+            loadSurveyResponses(1, companyName, '');
 
-    loadSurveyResponses(1, companyName, '');
+            setTimeout(() => {
+                const responsesCard = document.getElementById('responsesTable');
+                if (responsesCard) {
+                    responsesCard.closest('.chart-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 100);
+        });
+    }
 
-    setTimeout(() => {
-        const responsesCard = document.getElementById('responsesTable');
-        if (responsesCard) {
-            responsesCard.closest('.chart-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-    }, 100);
+    const tenureTbody = document.getElementById('tenureNpsTable');
+    if (tenureTbody) {
+        tenureTbody.addEventListener('click', function(e) {
+            const row = e.target.closest('tr[data-si-click="tenure"]');
+            if (!row) return;
+            const tenureGroup = row.getAttribute('data-tenure-group');
+            if (!tenureGroup) return;
+
+            row.classList.add('si-click-flash');
+            setTimeout(() => row.classList.remove('si-click-flash'), 400);
+
+            const searchInput = document.getElementById('responsesSearch');
+            if (searchInput) searchInput.value = tenureGroup;
+            const nf = document.getElementById('npsFilter');
+            if (nf) nf.value = '';
+            loadSurveyResponses(1, tenureGroup, '');
+
+            setTimeout(() => {
+                const responsesCard = document.getElementById('responsesTable');
+                if (responsesCard) {
+                    responsesCard.closest('.chart-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 100);
+        });
+    }
 }
 
-function siTenureRowClick(tenureGroup) {
-    const row = event.currentTarget;
-    row.classList.add('si-click-flash');
-    setTimeout(() => row.classList.remove('si-click-flash'), 400);
-
-    const searchInput = document.getElementById('responsesSearch');
-    if (searchInput) searchInput.value = tenureGroup;
-
-    const npsFilter = document.getElementById('npsFilter');
-    if (npsFilter) npsFilter.value = '';
-
-    loadSurveyResponses(1, tenureGroup, '');
-
-    setTimeout(() => {
-        const responsesCard = document.getElementById('responsesTable');
-        if (responsesCard) {
-            responsesCard.closest('.chart-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-    }, 100);
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', siAttachRowClickHandlers);
+} else {
+    siAttachRowClickHandlers();
 }
 
 // Pagination state for all tables
@@ -3613,7 +3634,7 @@ function populateTenureNpsTable(tenureData) {
         const churnClass = (churnRisk === 'High' || churnRisk === 'Critical') ? 'text-danger fw-semibold' : churnRisk === 'Medium' ? 'text-warning fw-semibold' : churnRisk === 'Low' ? 'text-success' : '';
         
         return `
-            <tr class="${riskBorderClass}" data-si-click="tenure" onclick="siTenureRowClick('${escapeHtml(tenure.tenure_group).replace(/'/g, "\\'")}')">
+            <tr class="${riskBorderClass}" data-si-click="tenure" data-tenure-group="${escapeHtml(tenure.tenure_group)}">
                 <td><strong>${escapeHtml(tenure.tenure_group)}</strong></td>
                 <td><span class="badge ${riskBadgeClass}">${escapeHtml(tenure.risk_level)}</span></td>
                 <td>${escapeHtml(tenure.total_responses)}</td>
@@ -3696,6 +3717,7 @@ function populateCompanyNpsTable(companyData) {
     
     companyData.sort(siRiskSort);
     _siLastCompanyData = companyData;
+    _siFullCompanyData = companyData;
     siUpdatePriorityPanel();
     
     console.log('Rendering', companyData.length, 'companies to table');
@@ -3729,7 +3751,7 @@ function populateCompanyNpsTable(companyData) {
         const churnClass = (churnRisk === 'High' || churnRisk === 'Critical') ? 'text-danger fw-semibold' : churnRisk === 'Medium' ? 'text-warning fw-semibold' : churnRisk === 'Low' ? 'text-success' : '';
         
         return `
-            <tr class="${riskBorderClass}" data-si-click="company" onclick="siCompanyRowClick('${escapeHtml(company.company_name).replace(/'/g, "\\'")}')">
+            <tr class="${riskBorderClass}" data-si-click="company" data-company-name="${escapeHtml(company.company_name)}">
                 <td><strong>${escapeHtml(company.company_name)}</strong></td>
                 <td><span class="badge ${riskBadgeClass}">${escapeHtml(company.risk_level)}</span></td>
                 <td>${escapeHtml(company.total_responses)}</td>
