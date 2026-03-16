@@ -620,7 +620,9 @@
         function renderNotifications(notifications, unreadCount) {
             if (!notifications || notifications.length === 0) {
                 panelBody.innerHTML = '<div class="notif-empty"><i class="fas fa-bell-slash d-block"></i><p>{{ _("No notifications yet") }}</p></div>';
-                panelFooter.style.display = 'none';
+                panelFooter.style.display = 'block';
+                panelUnreadBadge.style.display = 'none';
+                markAllReadBtn.style.display = 'none';
                 return;
             }
             
@@ -654,7 +656,7 @@
         
         async function loadPanelNotifications() {
             try {
-                const response = await fetch('/api/notifications?limit=30&since_days=7&_=' + Date.now(), { cache: 'no-store' });
+                const response = await fetch('/api/notifications?limit=30&_=' + Date.now(), { cache: 'no-store' });
                 const data = await response.json();
                 const countResp = await fetch('/api/notifications/count?_=' + Date.now(), { cache: 'no-store' });
                 const countData = await countResp.json();
