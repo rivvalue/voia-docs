@@ -105,7 +105,15 @@ function toCamelCase(str) {
         errorLoadingKpiData: 'Error loading KPI overview data',
         failedToLoadCampaignOptions: 'Failed to load campaign options',
         // No data messages
-        noCampaignDataAvailable: 'No campaign data available'
+        noCampaignDataAvailable: 'No campaign data available',
+        // KPI sparkline row & headline
+        trends: 'Trends',
+        clickToViewFullTrends: 'Click to view full trends',
+        activeCampaign: 'active campaign',
+        activeCampaigns: 'active campaigns',
+        npsRange: 'NPS range',
+        campaignHasCriticalRisk: 'campaign has critical-risk accounts',
+        campaignsHaveCriticalRisk: 'campaigns have critical-risk accounts'
     };
     
     try {
@@ -433,51 +441,168 @@ function populateExecutiveSummary(data) {
         }
     ];
     
+    // Inverse metrics: increase = bad (lower is better)
+    const inverseMetrics = ['Critical Risk Companies', translations.criticalRiskCompanies, translations.riskHeavyAccounts];
+    const isInverse = (name) => inverseMetrics.includes(name);
+    const isNpsMetric = (name) => name === 'NPS Score' || name === translations.npsScore;
+
+    // NPS badge color helper
+    const npsColor = (score) => {
+        if (score >= 30) return 'bg-success';
+        if (score >= 0) return 'bg-warning text-dark';
+        return 'bg-danger';
+    };
+
+    // Consistent change badge: green = improvement, red = deterioration
+    // Arrow always indicates direction; color always indicates outcome
+    const changeBadgeInfo = (change, format, inverse) => {
+        const absVal = Math.abs(change);
+        const formatted = format === 'decimal' ? absVal.toFixed(1) : absVal;
+        if (change === 0) return { text: '0', cls: 'bg-secondary', arrow: '' };
+        const isGood = inverse ? change < 0 : change > 0;
+        const sign = change > 0 ? '+' : '\u2212';
+        return {
+            text: `${sign}${formatted}`,
+            cls: isGood ? 'bg-success' : 'bg-danger',
+            arrow: isGood ? 'fa-arrow-up' : 'fa-arrow-down'
+        };
+    };
+
     // Clear existing content
     tableBody.textContent = '';
-    
+
+    // Build takeaway insights from the metrics
+    const takeaways = [];
+    const npsMetric = metrics.find(m => m.name === 'NPS Score');
+    if (npsMetric && npsMetric.change !== 0) {
+        const dir = npsMetric.change > 0 ? 'improved' : 'declined';
+        takeaways.push({ text: `NPS ${dir} by ${Math.abs(npsMetric.change).toFixed(1)}`, good: npsMetric.change > 0 });
+    }
+    const crMetric = metrics.find(m => m.name === 'Critical Risk Companies');
+    if (crMetric && crMetric.change !== 0) {
+        const dir = crMetric.change > 0 ? 'increased' : 'decreased';
+        takeaways.push({ text: `Critical risk accounts ${dir} by ${Math.abs(crMetric.change)}`, good: crMetric.change < 0 });
+    }
+    const ratingsMetrics = metrics.filter(m => m.format === 'decimal' && m.name !== 'NPS Score');
+    const improvedRatings = ratingsMetrics.filter(m => m.change > 0.1);
+    const declinedRatings = ratingsMetrics.filter(m => m.change < -0.1);
+    if (improvedRatings.length > 0) {
+        takeaways.push({ text: `${improvedRatings.length} rating${improvedRatings.length > 1 ? 's' : ''} improved`, good: true });
+    }
+    if (declinedRatings.length > 0) {
+        takeaways.push({ text: `${declinedRatings.length} rating${declinedRatings.length > 1 ? 's' : ''} declined`, good: false });
+    }
+
+    // Render takeaway
+    const takeawayEl = document.getElementById('metricsComparisonTakeaway');
+    if (takeawayEl && takeaways.length > 0) {
+        takeawayEl.style.display = 'block';
+        takeawayEl.innerHTML = '';
+        const container = document.createElement('div');
+        container.className = 'd-flex flex-wrap gap-2 align-items-center';
+        container.style.fontSize = '0.85rem';
+        const label = document.createElement('span');
+        label.className = 'text-muted fw-semibold me-1';
+        label.innerHTML = '<i class="fas fa-lightbulb me-1" style="color: #E13A44;"></i>Key shifts:';
+        container.appendChild(label);
+        takeaways.forEach(t => {
+            const badge = document.createElement('span');
+            badge.className = `badge ${t.good ? 'bg-success' : 'bg-danger'}`;
+            badge.style.fontSize = '0.8rem';
+            badge.textContent = t.text;
+            container.appendChild(badge);
+        });
+        takeawayEl.appendChild(container);
+    } else if (takeawayEl) {
+        takeawayEl.style.display = 'none';
+    }
+
+    // Track whether we need a separator (inserted before first rating row)
+    let separatorInserted = false;
+    const ratingNames = [translations.satisfactionRating, translations.productValueRating, translations.pricingRating, translations.serviceRating];
+
     metrics.forEach(metric => {
         const c1Display = metric.format === 'decimal' ? parseFloat(metric.c1).toFixed(1) : metric.c1;
         const c2Display = metric.format === 'decimal' ? parseFloat(metric.c2).toFixed(1) : metric.c2;
-        
-        let changeDisplay = '';
-        let changeClass = '';
-        if (metric.change > 0) {
-            changeDisplay = `+${metric.format === 'decimal' ? metric.change.toFixed(1) : metric.change}`;
-            changeClass = metric.name === translations.criticalRiskCompanies || metric.name === translations.riskHeavyAccounts ? 'text-danger' : 'text-success';
-        } else if (metric.change < 0) {
-            changeDisplay = metric.format === 'decimal' ? metric.change.toFixed(1) : metric.change;
-            changeClass = metric.name === translations.criticalRiskCompanies || metric.name === translations.riskHeavyAccounts ? 'text-success' : 'text-danger';
-        } else {
-            changeDisplay = '0';
-            changeClass = 'text-muted';
+
+        const inverse = isInverse(metric.name);
+        const badge = changeBadgeInfo(metric.change, metric.format, inverse);
+
+        // Insert separator row before ratings section
+        if (!separatorInserted && ratingNames.includes(metric.name)) {
+            separatorInserted = true;
+            const sepRow = document.createElement('tr');
+            const sepCell = document.createElement('td');
+            sepCell.setAttribute('colspan', '4');
+            sepCell.style.borderTop = '2px solid #E9E8E4';
+            sepCell.style.padding = '2px 0';
+            sepCell.innerHTML = '<small class="text-muted" style="font-size: 0.75rem;"><em>Ratings (1-5 scale)</em></small>';
+            sepRow.appendChild(sepCell);
+            tableBody.appendChild(sepRow);
+        }
+
+        // Create row
+        const row = document.createElement('tr');
+
+        // Subtle row tint: green for good changes, red for bad changes
+        if (metric.change !== 0) {
+            const isGood = inverse ? metric.change < 0 : metric.change > 0;
+            if (isGood) {
+                row.style.backgroundColor = 'rgba(25, 135, 84, 0.04)';
+            } else {
+                row.style.backgroundColor = 'rgba(220, 53, 69, 0.04)';
+            }
         }
         
-        // Create row using safe DOM methods
-        const row = document.createElement('tr');
-        
-        // Name column
+        // Name column — add "(lower is better)" hint for inverse metrics
         const nameCell = document.createElement('td');
         const nameStrong = document.createElement('strong');
         nameStrong.textContent = metric.name;
         nameCell.appendChild(nameStrong);
+        if (inverse) {
+            const hint = document.createElement('small');
+            hint.className = 'text-muted d-block';
+            hint.style.fontSize = '0.7rem';
+            hint.textContent = '(lower is better)';
+            nameCell.appendChild(hint);
+        }
         
-        // C1 column
+        // C1 column — NPS gets badge treatment
         const c1Cell = document.createElement('td');
         c1Cell.className = 'text-center';
-        c1Cell.textContent = c1Display;
+        if (isNpsMetric(metric.name)) {
+            const npsBadge = document.createElement('span');
+            npsBadge.className = `badge ${npsColor(metric.c1)}`;
+            npsBadge.textContent = c1Display;
+            c1Cell.appendChild(npsBadge);
+        } else {
+            c1Cell.textContent = c1Display;
+        }
         
-        // C2 column
+        // C2 column — NPS gets badge treatment
         const c2Cell = document.createElement('td');
         c2Cell.className = 'text-center';
-        c2Cell.textContent = c2Display;
+        if (isNpsMetric(metric.name)) {
+            const npsBadge = document.createElement('span');
+            npsBadge.className = `badge ${npsColor(metric.c2)}`;
+            npsBadge.textContent = c2Display;
+            c2Cell.appendChild(npsBadge);
+        } else {
+            c2Cell.textContent = c2Display;
+        }
         
-        // Change column
+        // Change column — consistent badge: green arrow up = improvement, red arrow down = deterioration
         const changeCell = document.createElement('td');
-        changeCell.className = `text-center ${changeClass}`;
-        const changeStrong = document.createElement('strong');
-        changeStrong.textContent = changeDisplay;
-        changeCell.appendChild(changeStrong);
+        changeCell.className = 'text-center';
+        const changeBadgeEl = document.createElement('span');
+        changeBadgeEl.className = `badge ${badge.cls}`;
+        changeBadgeEl.style.fontSize = '0.8rem';
+        if (badge.arrow) {
+            changeBadgeEl.innerHTML = `<i class="fas ${badge.arrow} me-1" style="font-size: 0.65rem;"></i>${escapeHtml(badge.text)}`;
+        } else {
+            changeBadgeEl.textContent = badge.text;
+        }
+        changeCell.appendChild(changeBadgeEl);
         
         // Append all cells to row
         row.appendChild(nameCell);
@@ -520,7 +645,89 @@ function populateCompanyComparison(data, page = 1) {
         if (balance === 'N/A') return 'N/A';
         return balance.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
     };
-    
+
+    // Balance badge styling helper
+    const balanceBadge = (balance) => {
+        if (!balance || balance === 'N/A') return { cls: 'bg-secondary', text: 'N/A' };
+        if (balance === 'risk_heavy') return { cls: 'bg-danger', text: 'Risk Heavy' };
+        if (balance === 'opportunity_heavy') return { cls: 'bg-success', text: 'Opp Heavy' };
+        if (balance === 'balanced') return { cls: 'bg-primary', text: 'Balanced' };
+        return { cls: 'bg-secondary', text: formatBalance(balance) };
+    };
+
+    // Status badge styling helper
+    const statusBadge = (status, statusType) => {
+        const map = {
+            'Improved':   'bg-success',
+            'Less Risk':  'bg-success',
+            'More Opps':  'bg-success',
+            'Worsened':   'bg-danger',
+            'Changed':    'bg-warning text-dark',
+            'No Change':  'bg-secondary',
+            'New in C2':  'bg-info text-dark',
+            'Not in C2':  'bg-secondary',
+            'N/A':        'bg-light text-muted'
+        };
+        return map[status] || 'bg-secondary';
+    };
+
+    // Count statuses across ALL companies for summary headline
+    const allCompanies = data.company_details || [];
+    let improvedCount = 0, worsenedCount = 0, noChangeCount = 0, newCount = 0, riskHeavyC2Count = 0;
+    allCompanies.forEach(company => {
+        const c1 = company.campaign1;
+        const c2 = company.campaign2;
+        if (c1.participated && c2.participated) {
+            if (c1.balance !== c2.balance) {
+                if ((c2.balance === 'opportunity_heavy' && c1.balance !== 'opportunity_heavy') ||
+                    (c2.balance === 'balanced' && c1.balance === 'risk_heavy')) {
+                    improvedCount++;
+                } else if (c2.balance === 'risk_heavy' && c1.balance !== 'risk_heavy') {
+                    worsenedCount++;
+                } else {
+                    noChangeCount++;
+                }
+            } else if (c2.risk_count < c1.risk_count || c2.opportunity_count > c1.opportunity_count) {
+                improvedCount++;
+            } else {
+                noChangeCount++;
+            }
+        } else if (!c1.participated && c2.participated) {
+            newCount++;
+        }
+        if (c2.participated && c2.balance === 'risk_heavy') {
+            riskHeavyC2Count++;
+        }
+    });
+
+    // Populate comparison summary headline
+    const headlineEl = document.getElementById('comparisonHeadline');
+    if (headlineEl && allCompanies.length > 0) {
+        headlineEl.style.display = 'block';
+        headlineEl.innerHTML = '';
+        const container = document.createElement('div');
+        container.className = 'd-flex flex-wrap gap-2 align-items-center';
+        container.style.fontSize = '0.85rem';
+        const pills = [];
+        if (improvedCount > 0) pills.push({ text: `${improvedCount} improved`, cls: 'bg-success' });
+        if (worsenedCount > 0) pills.push({ text: `${worsenedCount} worsened`, cls: 'bg-danger' });
+        if (noChangeCount > 0) pills.push({ text: `${noChangeCount} stable`, cls: 'bg-secondary' });
+        if (newCount > 0) pills.push({ text: `${newCount} new`, cls: 'bg-info text-dark' });
+        if (riskHeavyC2Count > 0) pills.push({ text: `${riskHeavyC2Count} currently risk-heavy`, cls: 'bg-danger' });
+        const summaryLabel = document.createElement('span');
+        summaryLabel.className = 'text-muted fw-semibold me-1';
+        summaryLabel.textContent = `${allCompanies.length} accounts:`;
+        container.appendChild(summaryLabel);
+        pills.forEach(p => {
+            const badge = document.createElement('span');
+            badge.className = `badge ${p.cls}`;
+            badge.style.fontSize = '0.8rem';
+            badge.textContent = p.text;
+            container.appendChild(badge);
+        });
+        headlineEl.appendChild(container);
+    }
+
     paginatedCompanies.forEach(company => {
         const c1 = company.campaign1;
         const c2 = company.campaign2;
@@ -532,42 +739,40 @@ function populateCompanyComparison(data, page = 1) {
         
         // Determine status - only compare if both campaigns have data
         let status = 'N/A';
-        let statusClass = 'text-muted';
         
         if (c1.participated && c2.participated) {
-            // Both campaigns have data - can compare
             status = 'No Change';
             
             if (c1.balance !== c2.balance) {
                 if (c2.balance === 'opportunity_heavy' && c1.balance !== 'opportunity_heavy') {
                     status = 'Improved';
-                    statusClass = 'text-success';
                 } else if (c2.balance === 'risk_heavy' && c1.balance !== 'risk_heavy') {
                     status = 'Worsened';
-                    statusClass = 'text-danger';
                 } else if (c2.balance === 'balanced' && c1.balance === 'risk_heavy') {
                     status = 'Improved';
-                    statusClass = 'text-success';
                 } else {
                     status = 'Changed';
                 }
             } else if (c2.risk_count < c1.risk_count) {
                 status = 'Less Risk';
-                statusClass = 'text-success';
             } else if (c2.opportunity_count > c1.opportunity_count) {
                 status = 'More Opps';
-                statusClass = 'text-success';
             }
         } else if (!c1.participated && c2.participated) {
             status = 'New in C2';
-            statusClass = 'text-secondary';
         } else if (c1.participated && !c2.participated) {
             status = 'Not in C2';
-            statusClass = 'text-secondary';
         }
         
         // Create table row using safe DOM methods
         const row = document.createElement('tr');
+
+        // Subtle row tint for worsened accounts
+        if (status === 'Worsened') {
+            row.style.backgroundColor = 'rgba(220, 53, 69, 0.06)';
+        } else if (status === 'Improved' || status === 'Less Risk' || status === 'More Opps') {
+            row.style.backgroundColor = 'rgba(25, 135, 84, 0.04)';
+        }
         
         // Company name column
         const nameCell = document.createElement('td');
@@ -575,42 +780,68 @@ function populateCompanyComparison(data, page = 1) {
         nameStrong.textContent = company.company_name;
         nameCell.appendChild(nameStrong);
         
-        // Campaign 1 - Risk count
-        const c1RiskCell = document.createElement('td');
-        c1RiskCell.className = 'text-center';
-        c1RiskCell.textContent = displayValue(c1.risk_count);
+        // Helper: create a risk/opp count cell with color hint
+        const createCountCell = (value, isRisk) => {
+            const cell = document.createElement('td');
+            cell.className = 'text-center';
+            const val = displayValue(value);
+            if (val === 'N/A' || val === 0) {
+                cell.textContent = val;
+                if (val === 0 && isRisk) cell.classList.add('text-success');
+            } else if (isRisk && val > 0) {
+                const badge = document.createElement('span');
+                badge.className = 'badge bg-danger';
+                badge.textContent = val;
+                cell.appendChild(badge);
+            } else if (!isRisk && val > 0) {
+                const badge = document.createElement('span');
+                badge.className = 'badge bg-success';
+                badge.textContent = val;
+                cell.appendChild(badge);
+            } else {
+                cell.textContent = val;
+            }
+            return cell;
+        };
+
+        // Helper: create a balance cell as badge
+        const createBalanceCell = (balance) => {
+            const cell = document.createElement('td');
+            cell.className = 'text-center';
+            const info = balanceBadge(balance);
+            const badge = document.createElement('span');
+            badge.className = `badge ${info.cls}`;
+            badge.style.fontSize = '0.75rem';
+            badge.textContent = info.text;
+            cell.appendChild(badge);
+            return cell;
+        };
+
+        // Campaign 1 cells (light red tint to match C1 header)
+        const c1RiskCell = createCountCell(c1.risk_count, true);
+        c1RiskCell.style.backgroundColor = 'rgba(225, 58, 68, 0.03)';
+        const c1OppCell = createCountCell(c1.opportunity_count, false);
+        c1OppCell.style.backgroundColor = 'rgba(225, 58, 68, 0.03)';
+        const c1BalanceCell = createBalanceCell(c1.balance);
+        c1BalanceCell.style.backgroundColor = 'rgba(225, 58, 68, 0.03)';
+        c1BalanceCell.style.borderRight = '2px solid #dee2e6';
+
+        // Campaign 2 cells (light blue tint to match C2 header)
+        const c2RiskCell = createCountCell(c2.risk_count, true);
+        c2RiskCell.style.backgroundColor = 'rgba(13, 110, 253, 0.03)';
+        const c2OppCell = createCountCell(c2.opportunity_count, false);
+        c2OppCell.style.backgroundColor = 'rgba(13, 110, 253, 0.03)';
+        const c2BalanceCell = createBalanceCell(c2.balance);
+        c2BalanceCell.style.backgroundColor = 'rgba(13, 110, 253, 0.03)';
         
-        // Campaign 1 - Opportunity count
-        const c1OppCell = document.createElement('td');
-        c1OppCell.className = 'text-center';
-        c1OppCell.textContent = displayValue(c1.opportunity_count);
-        
-        // Campaign 1 - Balance
-        const c1BalanceCell = document.createElement('td');
-        c1BalanceCell.className = 'text-center';
-        c1BalanceCell.textContent = c1.balance ? formatBalance(c1.balance) : 'N/A';
-        
-        // Campaign 2 - Risk count
-        const c2RiskCell = document.createElement('td');
-        c2RiskCell.className = 'text-center';
-        c2RiskCell.textContent = displayValue(c2.risk_count);
-        
-        // Campaign 2 - Opportunity count
-        const c2OppCell = document.createElement('td');
-        c2OppCell.className = 'text-center';
-        c2OppCell.textContent = displayValue(c2.opportunity_count);
-        
-        // Campaign 2 - Balance
-        const c2BalanceCell = document.createElement('td');
-        c2BalanceCell.className = 'text-center';
-        c2BalanceCell.textContent = c2.balance ? formatBalance(c2.balance) : 'N/A';
-        
-        // Status column
+        // Status column as badge
         const statusCell = document.createElement('td');
-        statusCell.className = `text-center ${statusClass}`;
-        const statusStrong = document.createElement('strong');
-        statusStrong.textContent = status;
-        statusCell.appendChild(statusStrong);
+        statusCell.className = 'text-center';
+        const statusBadgeEl = document.createElement('span');
+        statusBadgeEl.className = `badge ${statusBadge(status)}`;
+        statusBadgeEl.style.fontSize = '0.75rem';
+        statusBadgeEl.textContent = status;
+        statusCell.appendChild(statusBadgeEl);
         
         // Append all cells to row
         row.appendChild(nameCell);
@@ -894,12 +1125,19 @@ async function loadKpiOverview() {
         const campaignOrder = campaigns.map(c => c.name);
         kpiRows.sort((a, b) => campaignOrder.indexOf(a.name) - campaignOrder.indexOf(b.name));
         
-        // Generate table HTML
+        // Helper: NPS badge HTML based on value
+        const npsColor = (score) => {
+            if (score >= 30) return 'bg-success';
+            if (score >= 0) return 'bg-warning text-dark';
+            return 'bg-danger';
+        };
+
+        // Generate data rows HTML
         tbody.innerHTML = kpiRows.map(row => `
             <tr>
                 <td><strong>${escapeHtml(row.name)}</strong><br><small class="text-muted">${row.status}</small></td>
                 <td class="text-center">${row.responses}</td>
-                <td class="text-center">${row.nps_score.toFixed(1)}</td>
+                <td class="text-center"><span class="badge ${npsColor(row.nps_score)}">${row.nps_score.toFixed(1)}</span></td>
                 <td class="text-center">${row.companies}</td>
                 <td class="text-center"><span class="badge ${row.critical_risk > 0 ? 'bg-danger' : 'bg-success'}">${row.critical_risk}</span></td>
                 <td class="text-center">${row.satisfaction.toFixed(1)}</td>
@@ -908,7 +1146,78 @@ async function loadKpiOverview() {
                 <td class="text-center">${row.service.toFixed(1)}</td>
             </tr>
         `).join('');
-        
+
+        // Insert sparkline sub-row as first row of tbody (desktop only)
+        const trendsLabel = translations.trends || 'Trends';
+        const trendsTitle = translations.clickToViewFullTrends || 'Click to view full trends';
+        const sparklineRowHtml = `
+            <tr class="sparkline-row d-none d-md-table-row" style="border-bottom: 1px solid #E9E8E4;">
+                <td class="text-muted" style="font-size: 0.75rem; padding-bottom: 4px;"><em>${escapeHtml(trendsLabel)}</em></td>
+                <td class="text-center" style="padding: 0 4px 4px;">
+                    <div class="sparkline-container" style="height: 30px; cursor: pointer;" onclick="openTrendsModal()" title="${escapeHtml(trendsTitle)}">
+                        <canvas id="sparkline-responses"></canvas>
+                    </div>
+                </td>
+                <td class="text-center" style="padding: 0 4px 4px;">
+                    <div class="sparkline-container" style="height: 30px; cursor: pointer;" onclick="openTrendsModal()" title="${escapeHtml(trendsTitle)}">
+                        <canvas id="sparkline-nps"></canvas>
+                    </div>
+                </td>
+                <td class="text-center" style="padding: 0 4px 4px;">
+                    <div class="sparkline-container" style="height: 30px; cursor: pointer;" onclick="openTrendsModal()" title="${escapeHtml(trendsTitle)}">
+                        <canvas id="sparkline-companies"></canvas>
+                    </div>
+                </td>
+                <td class="text-center" style="padding: 0 4px 4px;">
+                    <div class="sparkline-container" style="height: 30px; cursor: pointer;" onclick="openTrendsModal()" title="${escapeHtml(trendsTitle)}">
+                        <canvas id="sparkline-critical"></canvas>
+                    </div>
+                </td>
+                <td class="text-center" style="padding: 0 4px 4px;">
+                    <div class="sparkline-container" style="height: 30px; cursor: pointer;" onclick="openTrendsModal()" title="${escapeHtml(trendsTitle)}">
+                        <canvas id="sparkline-satisfaction"></canvas>
+                    </div>
+                </td>
+                <td class="text-center" style="padding: 0 4px 4px;">
+                    <div class="sparkline-container" style="height: 30px; cursor: pointer;" onclick="openTrendsModal()" title="${escapeHtml(trendsTitle)}">
+                        <canvas id="sparkline-product"></canvas>
+                    </div>
+                </td>
+                <td class="text-center" style="padding: 0 4px 4px;">
+                    <div class="sparkline-container" style="height: 30px; cursor: pointer;" onclick="openTrendsModal()" title="${escapeHtml(trendsTitle)}">
+                        <canvas id="sparkline-pricing"></canvas>
+                    </div>
+                </td>
+                <td class="text-center" style="padding: 0 4px 4px;">
+                    <div class="sparkline-container" style="height: 30px; cursor: pointer;" onclick="openTrendsModal()" title="${escapeHtml(trendsTitle)}">
+                        <canvas id="sparkline-service"></canvas>
+                    </div>
+                </td>
+            </tr>`;
+        tbody.insertAdjacentHTML('afterbegin', sparklineRowHtml);
+
+        // Headline synthesis sentence
+        const headlineEl = document.getElementById('kpiHeadline');
+        if (headlineEl && kpiRows.length > 0) {
+            const npsValues = kpiRows.map(r => r.nps_score);
+            const npsMin = Math.min(...npsValues);
+            const npsMax = Math.max(...npsValues);
+            const criticalCount = kpiRows.filter(r => r.critical_risk > 0).length;
+            const formatNps = (v) => (v >= 0 ? '+' : '') + v.toFixed(0);
+            const campaignLabel = kpiRows.length !== 1
+                ? (translations.activeCampaigns || 'active campaigns')
+                : (translations.activeCampaign || 'active campaign');
+            const npsRangeLabel = translations.npsRange || 'NPS range';
+            let headline = `${kpiRows.length} ${campaignLabel} \u00b7 ${npsRangeLabel}: ${formatNps(npsMin)} to ${formatNps(npsMax)}`;
+            if (criticalCount > 0) {
+                const criticalLabel = criticalCount !== 1
+                    ? (translations.campaignsHaveCriticalRisk || 'campaigns have critical-risk accounts')
+                    : (translations.campaignHasCriticalRisk || 'campaign has critical-risk accounts');
+                headline += ` \u00b7 ${criticalCount} ${criticalLabel}`;
+            }
+            headlineEl.textContent = headline;
+        }
+
         // Create sparklines after table is populated
         createKpiSparklines(kpiRows);
         
