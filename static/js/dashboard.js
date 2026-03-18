@@ -2990,42 +2990,78 @@ function createGrowthFactorChart() {
 
 function populateHighRiskAccounts() {
     const container = document.getElementById('highRiskAccounts');
-    const highRiskAccounts = dashboardData.high_risk_accounts || [];
-    
-    if (highRiskAccounts.length === 0) {
+    const viewAllContainer = document.getElementById('highRiskViewAll');
+    const viewAllLink = document.getElementById('highRiskViewAllLink');
+    const noteContainer = document.getElementById('highRiskNote');
+    const allAccounts = dashboardData.high_risk_accounts || [];
+
+    if (allAccounts.length === 0) {
         container.innerHTML = '<p class="text-muted">No high-risk accounts identified.</p>';
+        if (viewAllContainer) viewAllContainer.style.display = 'none';
+        if (noteContainer) noteContainer.style.display = 'none';
         return;
     }
-    
-    // Get campaign info for drill-down
-    const campaignSelect = document.getElementById('campaignFilter');
-    const campaignId = campaignSelect && campaignSelect.value ? campaignSelect.value : null;
-    const campaignName = campaignSelect && campaignId ? campaignSelect.options[campaignSelect.selectedIndex].text : 'Current Campaign';
-    
-    const html = highRiskAccounts.map(account => `
-        <div class="risk-card p-3 mb-3 rounded">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h6 class="mb-1">
-                        <a href="#" onclick="openCompanyResponsesModal('${escapeHtml(account.company_name).replace(/'/g, "\\'")}', ${campaignId ? campaignId : 'null'}, '${escapeHtml(campaignName).replace(/'/g, "\\'")}'); return false;" 
-                           style="color: #2E5090; text-decoration: none; cursor: pointer;"
-                           onmouseover="this.style.textDecoration='underline';"
-                           onmouseout="this.style.textDecoration='none';"
-                           title="Click to view all responses from ${escapeHtml(account.company_name)}">
-                            ${escapeHtml(account.company_name)}
-                            <i class="fas fa-external-link-alt ms-2" style="font-size: 0.7em; color: #8A8A8A;"></i>
-                        </a>
-                    </h6>
-                    <small class="text-muted">NPS Score: ${escapeHtml(account.nps_score)}</small>
-                </div>
-                <div class="text-end">
-                    <span class="badge bg-danger">${escapeHtml(account.risk_level || 'High')} Risk</span>
-                </div>
-            </div>
+
+    // Sort: Critical first, then by lowest NPS score
+    const RISK_PRIORITY = { 'Critical': 0, 'High': 1, 'Medium': 2, 'Low': 3 };
+    const sorted = [...allAccounts].sort((a, b) => {
+        const pa = RISK_PRIORITY[a.risk_level] !== undefined ? RISK_PRIORITY[a.risk_level] : 4;
+        const pb = RISK_PRIORITY[b.risk_level] !== undefined ? RISK_PRIORITY[b.risk_level] : 4;
+        if (pa !== pb) return pa - pb;
+        const na = a.nps_score != null ? Number(a.nps_score) : Infinity;
+        const nb = b.nps_score != null ? Number(b.nps_score) : Infinity;
+        return na - nb;
+    });
+
+    const top3 = sorted.slice(0, 3);
+
+    function getNpsBadge(score) {
+        const n = Number(score);
+        if (score == null || isNaN(n)) return `<span class="badge" style="background:#e9e8e4;color:#6c757d;border:1px solid #ccc;font-size:0.72em;">N/A</span>`;
+        if (n >= 30) return `<span class="badge" style="background:#19875420;color:#198754;border:1px solid #198754;font-size:0.72em;">NPS ${n}</span>`;
+        if (n >= 0)  return `<span class="badge" style="background:#fd7e1420;color:#fd7e14;border:1px solid #fd7e14;font-size:0.72em;">NPS ${n}</span>`;
+        return `<span class="badge" style="background:#dc354520;color:#dc3545;border:1px solid #dc3545;font-size:0.72em;">NPS ${n}</span>`;
+    }
+
+    function getRiskBadge(level) {
+        const l = level || 'High';
+        const isCritical = l === 'Critical';
+        const color = isCritical ? '#dc3545' : '#fd7e14';
+        const bg = isCritical ? '#dc354520' : '#fd7e1420';
+        return `<span class="badge" style="background:${bg};color:${color};border:1px solid ${color};font-size:0.72em;">${escapeHtml(l)}</span>`;
+    }
+
+    const html = top3.map(account => `
+        <div class="d-flex justify-content-between align-items-center py-2" style="border-bottom:1px solid #eee;">
+            <span class="fw-medium text-truncate me-2" style="max-width:50%;font-size:0.9rem;" title="${escapeHtml(account.company_name)}">${escapeHtml(account.company_name)}</span>
+            <span class="d-flex gap-1 align-items-center flex-shrink-0">
+                ${getNpsBadge(account.nps_score)}
+                ${getRiskBadge(account.risk_level)}
+            </span>
         </div>
     `).join('');
-    
+
     container.innerHTML = html;
+
+    // Show the explanatory note whenever there are accounts
+    if (noteContainer) noteContainer.style.display = 'block';
+
+    // Show/hide "View all" link — only when total exceeds 3
+    if (viewAllContainer && viewAllLink) {
+        if (allAccounts.length > 3) {
+            viewAllLink.textContent = `View all ${allAccounts.length} accounts in Survey Insights \u2192`;
+            viewAllLink.onclick = function(e) {
+                e.preventDefault();
+                const tabEl = document.getElementById('survey-insights-tab');
+                if (tabEl) {
+                    bootstrap.Tab.getOrCreateInstance(tabEl).show();
+                }
+            };
+            viewAllContainer.style.display = 'block';
+        } else {
+            viewAllContainer.style.display = 'none';
+        }
+    }
 }
 
 function populateGrowthOpportunities() {
