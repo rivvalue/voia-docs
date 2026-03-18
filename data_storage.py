@@ -999,7 +999,15 @@ def get_dashboard_data(campaign_id=None, business_account_id=None):
             'growth_opportunities': growth_opportunities,
             'account_risk_factors': account_risk_factors,
             'key_themes': [
-                {'theme': theme.capitalize(), 'count': data['count']}
+                {
+                    'theme': theme.capitalize(),
+                    'count': data['count'],
+                    'sentiment_breakdown': {
+                        'positive': data['sentiments'].count('positive'),
+                        'negative': data['sentiments'].count('negative'),
+                        'neutral': data['sentiments'].count('neutral'),
+                    }
+                }
                 for theme, data in sorted(all_themes.items(), key=lambda x: x[1]['count'], reverse=True)[:10]
             ],
             'average_ratings': {

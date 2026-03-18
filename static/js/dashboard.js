@@ -2144,6 +2144,9 @@ function createThemesChart() {
     
     if (themes.length === 0) {
         console.log('❌ No themes found - creating empty chart to preserve canvas');
+        // Hide/clear callout when there is no data
+        const themesCalloutElEmpty = document.getElementById('themesCallout');
+        if (themesCalloutElEmpty) { themesCalloutElEmpty.style.display = 'none'; themesCalloutElEmpty.innerHTML = ''; }
         // Create an empty chart instead of destroying the canvas element
         charts.themesChart = new Chart(ctx, {
             type: 'bar',
@@ -2183,7 +2186,45 @@ function createThemesChart() {
     
     const labels = sortedThemes.map(item => item.theme.charAt(0).toUpperCase() + item.theme.slice(1));
     const data = sortedThemes.map(item => item.count);
-    
+    const totalResponses = dashboardData.total_responses || 1;
+
+    // Derive per-bar color from dominant sentiment
+    function themeBarColor(item) {
+        const sb = item.sentiment_breakdown;
+        if (!sb) return '#BDBDBD';
+        const pos = sb.positive || 0;
+        const neg = sb.negative || 0;
+        const total = pos + neg + (sb.neutral || 0);
+        if (total === 0) return '#BDBDBD';
+        if (pos / total > 0.6) return '#22C55E';   // green — predominantly positive
+        if (neg / total > 0.6) return '#EF4444';   // red — predominantly negative
+        return '#F59E0B';                           // amber — mixed / neutral
+    }
+    const backgroundColors = sortedThemes.map(themeBarColor);
+
+    // Value label plugin: "12 · 38%" at end of each bar
+    const themesValueLabelPlugin = {
+        id: 'themesValueLabels',
+        afterDatasetsDraw(chart) {
+            const { ctx: c, data: d, chartArea } = chart;
+            const dataset = d.datasets[0];
+            const meta = chart.getDatasetMeta(0);
+            meta.data.forEach((bar, i) => {
+                const count = dataset.data[i];
+                const pct = Math.round((count / totalResponses) * 100);
+                const label = `${count} · ${pct}%`;
+                const { x, y } = bar.getProps(['x', 'y'], true);
+                c.save();
+                c.textAlign = 'left';
+                c.textBaseline = 'middle';
+                c.fillStyle = '#374151';
+                c.font = `bold 11px sans-serif`;
+                c.fillText(label, x + 6, y);
+                c.restore();
+            });
+        }
+    };
+
     // Get mobile-responsive configuration
     const config = getMobileChartConfig();
     
@@ -2194,18 +2235,48 @@ function createThemesChart() {
             datasets: [{
                 label: 'Mentions',
                 data: data,
-                backgroundColor: '#BDBDBD',
+                backgroundColor: backgroundColors,
                 borderWidth: 1,
                 borderColor: '#E9E8E4'
             }]
         },
+        plugins: [themesValueLabelPlugin],
         options: {
             responsive: true,
             maintainAspectRatio: config.maintainAspectRatio,
             indexAxis: 'y',
+            layout: {
+                padding: { right: 80 }
+            },
             plugins: {
                 legend: {
                     display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        title: function(items) {
+                            return items[0].label;
+                        },
+                        label: function(context) {
+                            const i = context.dataIndex;
+                            const item = sortedThemes[i];
+                            const count = item.count;
+                            const pct = Math.round((count / totalResponses) * 100);
+                            const lines = [
+                                `Mentions: ${count} (${pct}% of responses)`
+                            ];
+                            const sb = item.sentiment_breakdown;
+                            if (sb) {
+                                const tot = (sb.positive || 0) + (sb.negative || 0) + (sb.neutral || 0);
+                                if (tot > 0) {
+                                    lines.push(`Positive: ${sb.positive || 0} (${Math.round(((sb.positive || 0) / tot) * 100)}%)`);
+                                    lines.push(`Neutral: ${sb.neutral || 0} (${Math.round(((sb.neutral || 0) / tot) * 100)}%)`);
+                                    lines.push(`Negative: ${sb.negative || 0} (${Math.round(((sb.negative || 0) / tot) * 100)}%)`);
+                                }
+                            }
+                            return lines;
+                        }
+                    }
                 }
             },
             scales: {
@@ -2239,6 +2310,68 @@ function createThemesChart() {
             }
         }
     });
+
+    // Populate interpretive callout
+    const themesCalloutEl = document.getElementById('themesCallout');
+    if (themesCalloutEl && sortedThemes.length > 0) {
+        const topTheme = sortedThemes[0];
+        const topPct = Math.round((topTheme.count / totalResponses) * 100);
+
+        function dominantSentimentLabel(item) {
+            const sb = item.sentiment_breakdown;
+            if (!sb) return 'mixed';
+            const pos = sb.positive || 0;
+            const neg = sb.negative || 0;
+            const tot = pos + neg + (sb.neutral || 0);
+            if (tot === 0) return 'mixed';
+            if (pos / tot > 0.6) return 'positive';
+            if (neg / tot > 0.6) return 'negative';
+            return 'mixed';
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        const topTone = dominantSentimentLabel(topTheme);
+        const topName = escapeHtml(topTheme.theme.charAt(0).toUpperCase() + topTheme.theme.slice(1));
+
+        let calloutHtml = `<div class="alert alert-light border-start border-3 py-2 px-3 mb-2" style="border-color:#6366f1!important;font-size:0.85rem;">
+            <i class="fas fa-lightbulb me-2" style="color:#6366f1;"></i>
+            Customers most frequently mentioned <strong>${topName}</strong> — cited in <strong>${topPct}%</strong> of responses, with a predominantly <strong>${escapeHtml(topTone)}</strong> tone.
+        </div>`;
+
+        // Watch signal: highest-negative theme (if different from top theme)
+        if (sortedThemes.length > 1) {
+            let mostNegTheme = null;
+            let mostNegRatio = 0;
+            sortedThemes.forEach(item => {
+                const sb = item.sentiment_breakdown;
+                if (!sb) return;
+                const neg = sb.negative || 0;
+                const tot = (sb.positive || 0) + neg + (sb.neutral || 0);
+                if (tot > 0 && neg / tot > mostNegRatio) {
+                    mostNegRatio = neg / tot;
+                    mostNegTheme = item;
+                }
+            });
+            if (mostNegTheme && mostNegTheme.theme.toLowerCase() !== topTheme.theme.toLowerCase()) {
+                const watchName = escapeHtml(mostNegTheme.theme.charAt(0).toUpperCase() + mostNegTheme.theme.slice(1));
+                calloutHtml += `<div class="alert alert-warning border-start border-3 py-2 px-3" style="border-color:#EF4444!important;font-size:0.85rem;">
+                    <i class="fas fa-exclamation-triangle me-2" style="color:#EF4444;"></i>
+                    Watch: <strong>${watchName}</strong> carries the strongest negative signal.
+                </div>`;
+            }
+        }
+
+        themesCalloutEl.innerHTML = calloutHtml;
+        themesCalloutEl.style.display = 'block';
+    } else if (themesCalloutEl) {
+        themesCalloutEl.style.display = 'none';
+        themesCalloutEl.innerHTML = '';
+    }
 }
 
 function createTenureChart() {
