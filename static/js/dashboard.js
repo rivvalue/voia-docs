@@ -3153,9 +3153,9 @@ function siFilterHighRisk() {
         detractors: 0,
         latest_response: a.latest_response || 'N/A',
         latest_churn_risk: a.risk_level,
-        confidence_level: a.confidence_level || 'insufficient',
-        response_rate: a.response_rate || null,
-        invited_count: a.invited_count || 0,
+        confidence_level: a.confidence_level ?? 'insufficient',
+        response_rate: a.response_rate ?? null,
+        invited_count: a.invited_count ?? 0,
     }));
     mapped.sort(siRiskSort);
 
@@ -3175,7 +3175,7 @@ function siFilterHighRisk() {
 
         const campaignSelectHR = document.getElementById('campaignFilter');
         const campaignIdHR = campaignSelectHR ? campaignSelectHR.value : null;
-        const confidenceBadgeHR = getConfidenceBadge(company.confidence_level || 'insufficient');
+        const confidenceBadgeHR = getConfidenceBadge(company.confidence_level ?? 'insufficient');
         const rateHintHR = company.response_rate != null ? ` (${company.response_rate}% of ${company.invited_count} invited)` : '';
         return `
             <tr class="${riskBorderClass}" data-si-click="company" data-company-name="${escapeHtml(company.company_name)}">
