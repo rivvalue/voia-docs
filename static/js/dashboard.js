@@ -1447,7 +1447,7 @@ function loadDashboardData() {
     }
     
     // Clear chart canvases
-    const chartIds = ['npsChart', 'sentimentChart', 'ratingsChart', 'tenureChart', 'growthFactorChart', 'themesChart'];
+    const chartIds = ['npsChartGrowth', 'npsChart', 'sentimentChartGrowth', 'sentimentChart', 'ratingsChart', 'tenureChart', 'growthFactorChart', 'themesChart'];
     for (const chartId of chartIds) {
         const chartElement = document.getElementById(chartId);
         if (chartElement) {
@@ -1650,17 +1650,19 @@ function getActiveCampaignId() {
 // Note: setupTabEventListeners function is defined later in the file with full campaign management support
 
 function createNpsChart() {
-    const chartElement = document.getElementById('npsChart');
+    // Support both campaign_insights.html (npsChartGrowth) and dashboard.html (npsChart)
+    const chartElement = document.getElementById('npsChartGrowth') || document.getElementById('npsChart');
     if (!chartElement) {
         console.warn('NPS chart element not found');
         return;
     }
+    const chartKey = chartElement.id === 'npsChartGrowth' ? 'npsChartGrowth' : 'npsChart';
     
     const ctx = chartElement.getContext('2d');
     
     // Destroy existing chart if it exists
-    if (charts.npsChart) {
-        charts.npsChart.destroy();
+    if (charts[chartKey]) {
+        charts[chartKey].destroy();
     }
     
     const npsData = dashboardData.nps_distribution || [];
@@ -1729,7 +1731,7 @@ function createNpsChart() {
     // Get mobile-responsive configuration
     const config = getMobileChartConfig();
     
-    charts.npsChart = new Chart(ctx, {
+    charts[chartKey] = new Chart(ctx, {
         type: 'doughnut',
         data: {
             labels: labels,
@@ -1797,17 +1799,19 @@ function createNpsChart() {
 }
 
 function createSentimentChart() {
-    const chartElement = document.getElementById('sentimentChart');
+    // Support both campaign_insights.html (sentimentChartGrowth) and dashboard.html (sentimentChart)
+    const chartElement = document.getElementById('sentimentChartGrowth') || document.getElementById('sentimentChart');
     if (!chartElement) {
         console.warn('Sentiment chart element not found');
         return;
     }
+    const chartKey = chartElement.id === 'sentimentChartGrowth' ? 'sentimentChartGrowth' : 'sentimentChart';
     
     const ctx = chartElement.getContext('2d');
     
     // Destroy existing chart if it exists
-    if (charts.sentimentChart) {
-        charts.sentimentChart.destroy();
+    if (charts[chartKey]) {
+        charts[chartKey].destroy();
     }
     
     const sentimentData = dashboardData.sentiment_distribution || [];
@@ -1820,7 +1824,7 @@ function createSentimentChart() {
         const calloutClr = document.getElementById('sentimentCallout');
         if (calloutClr) { calloutClr.style.display = 'none'; calloutClr.innerHTML = ''; }
         // Create empty chart with message
-        charts.sentimentChart = new Chart(ctx, {
+        charts[chartKey] = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: ['No Data'],
@@ -1905,7 +1909,7 @@ function createSentimentChart() {
     // Get mobile-responsive configuration
     const config = getMobileChartConfig();
     
-    charts.sentimentChart = new Chart(ctx, {
+    charts[chartKey] = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: labels,

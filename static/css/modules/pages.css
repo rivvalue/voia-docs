@@ -387,10 +387,8 @@ small, .small {
 }
 
 /* Force KPI warning cards to stay white (override warning color rules) */
-.kpi-card.kpi-warning,
-.container .kpi-card.kpi-warning,
-body .kpi-card.kpi-warning,
-html .kpi-card.kpi-warning {
+body.page-dashboard .kpi-card.kpi-warning,
+body.page-dashboard .container .kpi-card.kpi-warning {
     background: var(--primary-white) !important;
     background-color: var(--primary-white) !important;
     color: inherit !important;
@@ -405,13 +403,14 @@ html .kpi-card.kpi-warning {
     color: var(--primary-black);
 }
 
-.kpi-value.text-primary,
-.kpi-value.text-success,
-.kpi-value.text-info,
-.kpi-value.text-warning,
-.kpi-value.text-danger { 
-    color: var(--primary-black) !important; 
-}
+/* KPI value semantic colors — override Bootstrap utilities with semantic intent */
+.kpi-value.text-success { color: #198754 !important; }
+.kpi-value.text-primary { color: #2E5090 !important; }
+.kpi-value.text-info    { color: #0d6efd !important; }
+.kpi-value.text-danger  { color: #dc3545 !important; }
+.kpi-value.text-muted   { color: #8A8A8A !important; }
+.kpi-value.text-accent  { color: #E13A44 !important; }
+
 
 .kpi-label {
     color: var(--gray-dark);
@@ -761,7 +760,8 @@ canvas {
     box-shadow: var(--shadow-sm);
 }
 
-.badge.bg-warning {
+/* Badge warning — scoped to dashboard page to preserve semantic yellow elsewhere */
+body.page-dashboard .badge.bg-warning {
     background-color: var(--medium-gray) !important;
     color: var(--primary-black) !important;
     box-shadow: var(--shadow-sm);
@@ -968,7 +968,15 @@ a:hover {
 }
 
 .nav-tabs .nav-link i {
-    color: inherit;
+    color: #BDBDBD;
+}
+
+.nav-tabs .nav-link.active i {
+    color: #2E5090;
+}
+
+.nav-tabs .nav-link:hover i {
+    color: var(--primary-red);
 }
 
 .tab-content {

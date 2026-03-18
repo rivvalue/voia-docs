@@ -956,51 +956,64 @@ p, .text-body {
     color: var(--primary-white) !important;
 }
 
-.badge.bg-warning {
+/* Badge warning — scoped to dashboard page to preserve semantic yellow elsewhere */
+body.page-dashboard .badge.bg-warning {
     background-color: var(--medium-gray) !important;
     color: var(--primary-black) !important;
 }
 
-/* AGGRESSIVE override of ALL Bootstrap warning colors */
-.text-warning,
-.text-warning:hover,
-.text-warning:focus,
-.text-warning:active {
+/* Warning color overrides — scoped to dashboard pages where yellow must be suppressed */
+body.page-dashboard .text-warning,
+body.page-dashboard .text-warning:hover,
+body.page-dashboard .text-warning:focus,
+body.page-dashboard .text-warning:active {
     color: var(--primary-red) !important;
 }
 
-.border-warning {
+body.page-dashboard .border-warning {
     border-color: var(--medium-gray) !important;
 }
 
-.alert-warning {
+body.page-dashboard .alert-warning {
     background-color: var(--light-gray) !important;
     border-color: var(--medium-gray) !important;
     color: var(--primary-black) !important;
 }
 
-/* Override ALL possible Bootstrap warning variants */
-.btn-warning,
-.btn-outline-warning,
-.bg-warning,
-.badge-warning {
+body.page-dashboard .btn-warning,
+body.page-dashboard .btn-outline-warning,
+body.page-dashboard .bg-warning,
+body.page-dashboard .badge-warning {
     background-color: var(--medium-gray) !important;
     border-color: var(--medium-gray) !important;
     color: var(--primary-black) !important;
 }
 
-/* Force override any CDN Bootstrap warning styles */
-*[class*="warning"] {
+/* Force override any CDN Bootstrap warning styles — scoped to dashboard pages only */
+body.page-dashboard *[class*="warning"] {
     color: var(--primary-red) !important;
     background-color: var(--medium-gray) !important;
     border-color: var(--medium-gray) !important;
 }
 
 /* EXCEPTION: KPI cards with warning class should stay white */
-*[class*="warning"].kpi-card {
+body.page-dashboard *[class*="warning"].kpi-card {
     background-color: var(--primary-white) !important;
     background: var(--primary-white) !important;
     color: inherit !important;
+}
+
+/* EXCEPTION: Allow yellow warning badges inside data tables and tab panes (NPS, risk badges) */
+body.page-dashboard .tab-pane .badge.bg-warning,
+body.page-dashboard .tab-pane *[class*="warning"].badge,
+body.page-dashboard table .badge.bg-warning,
+body.page-dashboard .si-table .badge.bg-warning {
+    background-color: #ffc107 !important;
+    color: #000000 !important;
+    border-color: #ffc107 !important;
+}
+body.page-dashboard .tab-pane .text-warning {
+    color: #997404 !important;
 }
 
 /* Specifically target Font Awesome warning icons */
@@ -1009,54 +1022,31 @@ p, .text-body {
     color: var(--primary-red) !important;
 }
 
-/* NUCLEAR option - override ANY yellow color */
-* {
-    --bs-warning: var(--medium-gray) !important;
-    --bs-warning-rgb: 189, 189, 189 !important;
-}
-
-/* Override Bootstrap CSS variables if they exist */
-:root {
+/* Dashboard-scoped: suppress yellow Bootstrap warning CSS variables */
+body.page-dashboard {
     --bs-warning: #BDBDBD !important;
     --bs-warning-rgb: 189, 189, 189 !important;
     --warning: #BDBDBD !important;
     --warning-rgb: 189, 189, 189 !important;
 }
 
-/* Target ALL possible Bootstrap classes with highest specificity */
-.container .nav-tabs .badge.bg-warning,
-.container .card .badge.bg-warning,
-.container .badge.bg-warning,
-.bg-warning,
-body .bg-warning,
-html .bg-warning {
+/* Dashboard-scoped: suppress all remaining Bootstrap warning badge/bg classes */
+body.page-dashboard .container .nav-tabs .badge.bg-warning,
+body.page-dashboard .container .card .badge.bg-warning,
+body.page-dashboard .container .badge.bg-warning,
+body.page-dashboard .bg-warning {
     background-color: #BDBDBD !important;
     color: #000000 !important;
 }
 
-.container .text-warning,
-.text-warning,
-body .text-warning,
-html .text-warning {
+body.page-dashboard .container .text-warning,
+body.page-dashboard .text-warning {
     color: #E13A44 !important;
 }
 
-.container .border-warning,
-.border-warning,
-body .border-warning,
-html .border-warning {
+body.page-dashboard .container .border-warning,
+body.page-dashboard .border-warning {
     border-color: #BDBDBD !important;
-}
-
-/* Absolute override for any yellow/orange colors that might sneak in */
-*[style*="color: #ffc107"],
-*[style*="color: #FFC107"],
-*[style*="color: rgb(255, 193, 7)"],
-*[style*="background-color: #ffc107"],
-*[style*="background-color: #FFC107"],
-*[style*="background-color: rgb(255, 193, 7)"] {
-    color: var(--primary-red) !important;
-    background-color: var(--medium-gray) !important;
 }
 
 /* Risk and theme indicators */
@@ -1583,13 +1573,14 @@ html .kpi-card.kpi-warning {
     color: var(--primary-black);
 }
 
-.kpi-value.text-primary,
-.kpi-value.text-success,
-.kpi-value.text-info,
-.kpi-value.text-warning,
-.kpi-value.text-danger { 
-    color: var(--primary-black) !important; 
-}
+/* KPI value semantic colors — override Bootstrap utilities with semantic intent */
+.kpi-value.text-success { color: #198754 !important; }
+.kpi-value.text-primary { color: #2E5090 !important; }
+.kpi-value.text-info    { color: #0d6efd !important; }
+.kpi-value.text-danger  { color: #dc3545 !important; }
+.kpi-value.text-muted   { color: var(--gray-dark) !important; }
+.kpi-value.text-accent  { color: #E13A44 !important; }
+
 
 .kpi-label {
     color: var(--gray-dark);
@@ -2146,7 +2137,15 @@ a:hover {
 }
 
 .nav-tabs .nav-link i {
-    color: inherit;
+    color: #BDBDBD;
+}
+
+.nav-tabs .nav-link.active i {
+    color: #2E5090;
+}
+
+.nav-tabs .nav-link:hover i {
+    color: var(--primary-red);
 }
 
 .tab-content {

@@ -138,27 +138,27 @@
     <ul class="nav nav-tabs mb-4" id="dashboardNav" role="tablist" style="border-bottom: 1px solid #e5e5e5;">
         <li class="nav-item" role="presentation">
             <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab" aria-controls="overview" aria-selected="true">
-                <i class="fas fa-tachometer-alt me-2" style="color: #E13A44;"></i>{{ _('Overview') }}
+                <i class="fas fa-tachometer-alt me-2"></i>{{ _('Overview') }}
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics" type="button" role="tab" aria-controls="analytics" aria-selected="false">
-                <i class="fas fa-chart-line me-2" style="color: #E13A44;"></i>{{ _('Growth Analytics') }}
+                <i class="fas fa-chart-line me-2"></i>{{ _('Growth Analytics') }}
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="intelligence-tab" data-bs-toggle="tab" data-bs-target="#intelligence" type="button" role="tab" aria-controls="intelligence" aria-selected="false">
-                <i class="fas fa-brain me-2" style="color: #E13A44;"></i>{{ _('Account Intelligence') }}
+                <i class="fas fa-brain me-2"></i>{{ _('Account Intelligence') }}
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="survey-insights-tab" data-bs-toggle="tab" data-bs-target="#survey-insights" type="button" role="tab" aria-controls="survey-insights" aria-selected="false">
-                <i class="fas fa-comments me-2" style="color: #E13A44;"></i>{{ _('Survey Insights') }}
+                <i class="fas fa-comments me-2"></i>{{ _('Survey Insights') }}
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="segmentation-tab" data-bs-toggle="tab" data-bs-target="#segmentation" type="button" role="tab" aria-controls="segmentation" aria-selected="false">
-                <i class="fas fa-users me-2" style="color: #E13A44;"></i>{{ _('Segmentation Insights') }}
+                <i class="fas fa-users me-2"></i>{{ _('Segmentation Insights') }}
             </button>
         </li>
     </ul>
@@ -196,14 +196,14 @@
             <div class="row mb-4 g-3">
                 <div class="col">
                     <div class="kpi-card kpi-success">
-                        <div class="kpi-value text-primary" id="npsScore">0</div>
+                        <div class="kpi-value text-success" id="npsScore">0</div>
                         <div class="kpi-label">{{ _('NPS Score') }}</div>
                         <div class="kpi-trend" id="npsScoreTrend">{{ _('Overall satisfaction metric') }}</div>
                     </div>
                 </div>
                 <div class="col">
                     <div class="kpi-card kpi-primary">
-                        <div class="kpi-value text-success" id="totalResponses">0</div>
+                        <div class="kpi-value text-primary" id="totalResponses">0</div>
                         <div class="kpi-label">{{ _('Total Responses') }}</div>
                         <div class="kpi-trend" id="totalResponsesTrend">{{ _('All time feedback collected') }}</div>
                     </div>
@@ -220,8 +220,8 @@
                     </div>
                 </div>
                 <div class="col">
-                    <div class="kpi-card kpi-info">
-                        <div class="kpi-value text-info" id="recentResponses">0</div>
+                    <div class="kpi-card kpi-muted">
+                        <div class="kpi-value text-muted" id="recentResponses">0</div>
                         <div class="kpi-label">{{ _('Recent (30 days)') }}</div>
                         <div class="kpi-trend" id="recentResponsesTrend">{{ _('Latest customer feedback') }}</div>
                     </div>
@@ -238,8 +238,8 @@
                     </div>
                 </div>
                 <div class="col">
-                    <div class="kpi-card kpi-success">
-                        <div class="kpi-value text-success" id="growthPotential">0%</div>
+                    <div class="kpi-card kpi-accent">
+                        <div class="kpi-value text-accent" id="growthPotential">0%</div>
                         <div class="kpi-label">{{ _('Opportunity signals') }}</div>
                         <div class="kpi-trend" id="growthPotentialTrend">{{ _('Client Development Insights') }}</div>
                     </div>
@@ -390,7 +390,7 @@
                             </div>
                             <div class="card-body">
                                 <div class="chart-container">
-                                    <canvas id="npsChart"></canvas>
+                                    <canvas id="npsChartGrowth"></canvas>
                                 </div>
                             </div>
                         </div>
@@ -402,7 +402,7 @@
                             </div>
                             <div class="card-body">
                                 <div class="chart-container">
-                                    <canvas id="sentimentChart"></canvas>
+                                    <canvas id="sentimentChartGrowth"></canvas>
                                 </div>
                                 <div id="sentimentCallout" style="display:none;"></div>
                             </div>

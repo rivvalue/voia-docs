@@ -11,26 +11,6 @@
     {'label': company_name, 'current': true}
 ] %}
 {% include 'components/breadcrumb.html' %}
-<style>
-/* EMERGENCY override - inject directly into page head */
-.text-warning, .text-warning:hover, .text-warning:focus, .text-warning:active,
-.bg-warning, .badge.bg-warning, .btn-warning, .btn-outline-warning,
-.border-warning, .alert-warning {
-    color: #E13A44 !important;
-    background-color: #BDBDBD !important;
-    border-color: #BDBDBD !important;
-}
-.fa-exclamation-triangle, .fas.fa-exclamation-triangle {
-    color: #E13A44 !important;
-}
-/* Override Bootstrap CSS variables with highest priority */
-:root {
-    --bs-warning: #BDBDBD !important;
-    --bs-warning-rgb: 189, 189, 189 !important;
-    --warning: #BDBDBD !important;
-}
-</style>
-
 <div class="container-fluid py-4">
     <div class="row">
         <div class="col-lg-10 mx-auto">
@@ -40,7 +20,7 @@
                 <div>
                     <h2 class="mb-1">{{ company_name }}</h2>
                     <p class="text-muted mb-0">
-                        <i class="fas fa-campaign me-2"></i>{{ campaign.name }}
+                        <i class="fas fa-bullhorn me-2"></i>{{ campaign.name }}
                     </p>
                 </div>
             </div>
