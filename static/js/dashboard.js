@@ -1447,7 +1447,7 @@ function loadDashboardData() {
     }
     
     // Clear chart canvases
-    const chartIds = ['npsChartGrowth', 'npsChart', 'sentimentChartGrowth', 'sentimentChart', 'ratingsChart', 'tenureChart', 'growthFactorChart', 'themesChart'];
+    const chartIds = ['npsChart', 'sentimentChartGrowth', 'sentimentChart', 'ratingsChart', 'tenureChart', 'growthFactorChart', 'themesChart'];
     for (const chartId of chartIds) {
         const chartElement = document.getElementById(chartId);
         if (chartElement) {
@@ -1696,13 +1696,13 @@ function getBrandPalette() {
 // ────────────────────────────────────────────────────────────────────────────
 
 function createNpsChart() {
-    // Support both campaign_insights.html (npsChartGrowth) and dashboard.html (npsChart)
-    const chartElement = document.getElementById('npsChartGrowth') || document.getElementById('npsChart');
+    // Support campaign_insights.html (npsChart on Overview) and dashboard.html (npsChart)
+    const chartElement = document.getElementById('npsChart') || document.getElementById('npsChartGrowth');
     if (!chartElement) {
         console.warn('NPS chart element not found');
         return;
     }
-    const chartKey = chartElement.id === 'npsChartGrowth' ? 'npsChartGrowth' : 'npsChart';
+    const chartKey = chartElement.id;
     
     const ctx = chartElement.getContext('2d');
     
@@ -5459,15 +5459,15 @@ function setupTabEventListeners() {
             
             // Re-initialize charts when Analytics tab is shown - immediate rendering
             if (targetTab === '#analytics') {
-                createNpsChart();
                 createSentimentChart();
                 createRatingsChart();
                 createTenureChart();
                 createGrowthFactorChart();
             }
             
-            // Re-initialize themes chart when Overview tab is shown - immediate rendering
+            // Re-initialize NPS donut and themes chart when Overview tab is shown - immediate rendering
             if (targetTab === '#overview') {
+                createNpsChart();
                 createThemesChart();
             }
             

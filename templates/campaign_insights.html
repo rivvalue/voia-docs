@@ -250,6 +250,22 @@
                 </div>
             </div>
 
+            <!-- NPS Distribution -->
+            <div class="row mb-4 g-3">
+                <div class="col-md-6 offset-md-3">
+                    <div class="chart-card">
+                        <div class="card-header">
+                            <h5>{{ _('NPS Distribution') }}</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="npsChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- {{ _('Accounts Needing Attention') }} & {{ _('Key Themes') }} Summary -->
             <div class="row mb-4">
                 <div class="col-md-6">
@@ -386,35 +402,6 @@
             
             <!-- Conversational Analytics Container (hidden for classic campaigns) -->
             <div id="conversationalAnalyticsSection">
-                <!-- Charts Row -->
-                <div class="row mb-4 g-3">
-                    <div class="col-md-6">
-                        <div class="chart-card">
-                            <div class="card-header">
-                                <h5>{{ _('NPS Distribution') }}</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="chart-container">
-                                    <canvas id="npsChartGrowth"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="chart-card">
-                            <div class="card-header">
-                                <h5>{{ _('Sentiment Analysis') }}</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="chart-container">
-                                    <canvas id="sentimentChartGrowth"></canvas>
-                                </div>
-                                <div id="sentimentCallout" style="display:none;"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Tenure Distribution + NPS Opportunity -->
                 <div class="row mb-4 g-3">
                     <div class="col-md-6">
@@ -450,9 +437,22 @@
                     </div>
                 </div>
 
-                <!-- {{ _('Average Ratings') }} -->
-                <div class="row mb-4">
-                    <div class="col-12">
+                <!-- Sentiment Analysis + Average Ratings -->
+                <div class="row mb-4 g-3">
+                    <div class="col-md-6">
+                        <div class="chart-card">
+                            <div class="card-header">
+                                <h5>{{ _('Sentiment Analysis') }}</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="sentimentChartGrowth"></canvas>
+                                </div>
+                                <div id="sentimentCallout" style="display:none;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
                         <div class="chart-card">
                             <div class="card-header">
                                 <h5>{{ _('Average Ratings') }}</h5>
