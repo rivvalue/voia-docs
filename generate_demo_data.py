@@ -22,6 +22,7 @@ from models import (
     SurveyResponse, ClassicSurveyConfig, SurveyTemplate,
     ExecutiveReport, EmailDelivery, ActiveConversation, ExportJob
 )
+from tenure_utils import map_tenure_years_to_category as _tenure_category
 
 
 CAMPAIGN_CONFIGS = {
@@ -710,7 +711,7 @@ def generate_campaign(campaign_key, dry_run=False, config=None, business_account
                     company_name=company,
                     respondent_name=participant.name,
                     respondent_email=participant.email,
-                    tenure_with_fc=f"{participant.tenure_years:.0f} years" if participant.tenure_years else "< 1 year",
+                    tenure_with_fc=_tenure_category(participant.tenure_years),
                     nps_score=nps_score,
                     nps_category=nps_category,
                     satisfaction_rating=scores["satisfaction_rating"],

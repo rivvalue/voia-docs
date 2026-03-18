@@ -2134,7 +2134,46 @@ function createTenureChart() {
     }).filter(c => c.count > 0);
 
     if (cohorts.length === 0) {
-        ctx.canvas.parentNode.innerHTML = '<div class="alert alert-info">No tenure data available yet.</div>';
+        // Fallback: if distMap has entries but none matched standard cohort keys,
+        // render a simple chart using the raw tenure strings as labels
+        const rawKeys = Object.keys(distMap);
+        if (rawKeys.length === 0) {
+            ctx.canvas.parentNode.innerHTML = '<div class="alert alert-info">No tenure data available yet.</div>';
+            if (calloutEl) calloutEl.style.display = 'none';
+            return;
+        }
+        const rawTotal = rawKeys.reduce((s, k) => s + distMap[k], 0);
+        const fallbackConfig = getMobileChartConfig();
+        charts.tenure = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: rawKeys,
+                datasets: [{
+                    label: 'Respondents',
+                    data: rawKeys.map(k => distMap[k]),
+                    backgroundColor: '#6366f1',
+                    borderColor: '#ffffff',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: fallbackConfig.maintainAspectRatio,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => ` ${ctx.raw} respondents (${Math.round(ctx.raw / rawTotal * 100)}%)`
+                        }
+                    }
+                },
+                scales: {
+                    x: { beginAtZero: true, ticks: { color: '#000000' }, grid: { color: '#f1f5f9' } },
+                    y: { ticks: { color: '#000000' }, grid: { color: '#f1f5f9' } }
+                }
+            }
+        });
         if (calloutEl) calloutEl.style.display = 'none';
         return;
     }
@@ -2357,6 +2396,8 @@ function createGrowthFactorChart() {
 
     // Compute per-bar data
     const pctData    = distribution.map(d => total > 0 ? Math.round((d.count / total) * 100) : 0);
+    const maxPct = Math.max(...pctData, 1);
+    const yAxisMax = Math.ceil((maxPct * 1.3) / 5) * 5;
     const barColors  = distribution.map(d => (NPS_RANGE_META[d.nps_range] || {}).color || '#BDBDBD');
     const barLabels  = distribution.map(d => {
         const meta = NPS_RANGE_META[d.nps_range];
@@ -2425,7 +2466,7 @@ function createGrowthFactorChart() {
             scales: {
                 y: {
                     beginAtZero: true,
-                    max: 100,
+                    suggestedMax: yAxisMax,
                     ticks: {
                         color: '#000000',
                         font: { size: config.fontSize },
