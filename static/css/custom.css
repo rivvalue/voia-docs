@@ -1573,13 +1573,9 @@ html .kpi-card.kpi-warning {
     color: var(--primary-black);
 }
 
-/* KPI value semantic colors — override Bootstrap utilities with semantic intent */
-.kpi-value.text-success { color: #198754 !important; }
-.kpi-value.text-primary { color: #2E5090 !important; }
-.kpi-value.text-info    { color: #0d6efd !important; }
-.kpi-value.text-danger  { color: #dc3545 !important; }
-.kpi-value.text-muted   { color: var(--gray-dark) !important; }
+/* KPI value color — unified VOÏA brand accent */
 .kpi-value.text-accent  { color: #E13A44 !important; }
+.kpi-value.text-muted   { color: var(--gray-dark) !important; }
 
 
 .kpi-label {
@@ -2141,7 +2137,7 @@ a:hover {
 }
 
 .nav-tabs .nav-link.active i {
-    color: #2E5090;
+    color: #E13A44;
 }
 
 .nav-tabs .nav-link:hover i {

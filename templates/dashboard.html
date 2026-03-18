@@ -335,22 +335,22 @@
     <ul class="nav nav-tabs mb-4" id="dashboardNav" role="tablist" style="border-bottom: 1px solid #e5e5e5;">
         <li class="nav-item" role="presentation">
             <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab" aria-controls="overview" aria-selected="true">
-                <i class="fas fa-tachometer-alt me-2" style="color: #E13A44;"></i>{{ _('Overview') }}
+                <i class="fas fa-tachometer-alt me-2"></i>{{ _('Overview') }}
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="intelligence-tab" data-bs-toggle="tab" data-bs-target="#intelligence" type="button" role="tab" aria-controls="intelligence" aria-selected="false">
-                <i class="fas fa-brain me-2" style="color: #E13A44;"></i>{{ _('Account Intelligence') }}
+                <i class="fas fa-brain me-2"></i>{{ _('Account Intelligence') }}
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics" type="button" role="tab" aria-controls="analytics" aria-selected="false">
-                <i class="fas fa-chart-line me-2" style="color: #E13A44;"></i>{{ _('Analytics') }}
+                <i class="fas fa-chart-line me-2"></i>{{ _('Analytics') }}
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="survey-insights-tab" data-bs-toggle="tab" data-bs-target="#survey-insights" type="button" role="tab" aria-controls="survey-insights" aria-selected="false">
-                <i class="fas fa-comments me-2" style="color: #E13A44;"></i>{{ _('Survey Insights') }}
+                <i class="fas fa-comments me-2"></i>{{ _('Survey Insights') }}
             </button>
         </li>
     </ul>
@@ -387,29 +387,29 @@
             <!-- Key Metrics -->
             <div class="row mb-4 g-3">
                 <div class="col">
-                    <div class="kpi-card kpi-success">
-                        <div class="kpi-value text-primary" id="npsScore">0</div>
+                    <div class="kpi-card">
+                        <div class="kpi-value" id="npsScore">0</div>
                         <div class="kpi-label">{{ _('NPS Score') }}</div>
                         <div class="kpi-trend" id="npsScoreTrend">{{ _('Overall satisfaction metric') }}</div>
                     </div>
                 </div>
                 <div class="col">
-                    <div class="kpi-card kpi-primary">
-                        <div class="kpi-value text-success" id="totalResponses">0</div>
+                    <div class="kpi-card">
+                        <div class="kpi-value" id="totalResponses">0</div>
                         <div class="kpi-label">Total {{ _('Responses') }}</div>
                         <div class="kpi-trend" id="totalResponsesTrend">{{ _('All time feedback collected') }}</div>
                     </div>
                 </div>
                 <div class="col">
-                    <div class="kpi-card kpi-info">
-                        <div class="kpi-value text-info" id="recentResponses">0</div>
+                    <div class="kpi-card">
+                        <div class="kpi-value" id="recentResponses">0</div>
                         <div class="kpi-label">{{ _('Recent (30 days)') }}</div>
                         <div class="kpi-trend" id="recentResponsesTrend">{{ _('Latest customer feedback') }}</div>
                     </div>
                 </div>
                 <div class="col">
-                    <div class="kpi-card kpi-danger">
-                        <div class="kpi-value text-danger" id="highRiskCount">0</div>
+                    <div class="kpi-card">
+                        <div class="kpi-value text-accent" id="highRiskCount">0</div>
                         <div class="kpi-label">
                             {{ _('Accounts Needing Attention') }}
                             <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" data-bs-placement="top" 
@@ -419,9 +419,13 @@
                     </div>
                 </div>
                 <div class="col">
-                    <div class="kpi-card kpi-success">
-                        <div class="kpi-value text-success" id="growthPotential">0%</div>
-                        <div class="kpi-label">{{ _('Client Development Insights') }}</div>
+                    <div class="kpi-card">
+                        <div class="kpi-value" id="growthPotential">0%</div>
+                        <div class="kpi-label">
+                            {{ _('Opportunity Signal') }}
+                            <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" data-bs-placement="top" 
+                               data-bs-title="{{ _('Aggregated growth potential based on NPS distribution across accounts. Derived from the same NPS-Based Opportunity Analysis in the Growth Analytics tab. Higher values indicate a stronger base of promoters and greater organic growth potential.') }}" style="font-size: 0.8em; opacity: 0.7;"></i>
+                        </div>
                         <div class="kpi-trend" id="growthPotentialTrend">{{ _('Business development signal') }}</div>
                     </div>
                 </div>
@@ -1077,6 +1081,15 @@
 <!-- Pass business authentication status to JavaScript -->
 <script>
     window.isBusinessAuthenticated = {{ 'true' if is_business_authenticated else 'false' }};
+</script>
+
+<!-- Brand palette: emitted by template, consumed by decorative charts in dashboard.js -->
+<script>
+    window.brandColors = {
+        primary: '{{ branding_context.branding_config.get_color_palette().primary if branding_context and branding_context.branding_config else "" }}',
+        secondary: '{{ branding_context.branding_config.get_color_palette().secondary if branding_context and branding_context.branding_config else "" }}',
+        accent: '{{ branding_context.branding_config.get_color_palette().accent if branding_context and branding_context.branding_config else "" }}'
+    };
 </script>
 
 <!-- Translation Loader - Async JSON files for better performance -->

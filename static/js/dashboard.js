@@ -11,10 +11,10 @@ function escapeHtml(text) {
 // Get confidence level badge for response rate metrics
 function getConfidenceBadge(level) {
     const badges = {
-        'high': { color: '#198754', bg: '#19875420', label: 'High', labelFr: 'Élevé' },
-        'medium': { color: '#fd7e14', bg: '#fd7e1420', label: 'Medium', labelFr: 'Moyen' },
-        'low': { color: '#dc3545', bg: '#dc354520', label: 'Low', labelFr: 'Faible' },
-        'insufficient': { color: '#6c757d', bg: '#6c757d20', label: 'Insufficient', labelFr: 'Insuffisant' }
+        'high': { color: '#000000', bg: '#00000010', label: 'High', labelFr: 'Élevé' },
+        'medium': { color: '#BDBDBD', bg: '#BDBDBD20', label: 'Medium', labelFr: 'Moyen' },
+        'low': { color: '#E13A44', bg: '#E13A4420', label: 'Low', labelFr: 'Faible' },
+        'insufficient': { color: '#BDBDBD', bg: '#BDBDBD20', label: 'Insufficient', labelFr: 'Insuffisant' }
     };
     
     const badge = badges[level] || badges['insufficient'];
@@ -651,10 +651,10 @@ function updateSelectedCampaignInfo() {
         if (statusBadge && statusText) {
             statusText.textContent = displayStatus;  // Use display status for UI
             if (rawStatus === 'active') {  // Use raw status for logic
-                statusBadge.style.backgroundColor = '#28a745';
+                statusBadge.style.backgroundColor = '#000000';
                 statusBadge.style.color = 'white';
             } else {
-                statusBadge.style.backgroundColor = '#6c757d';
+                statusBadge.style.backgroundColor = '#BDBDBD';
                 statusBadge.style.color = 'white';
             }
         }
@@ -1649,6 +1649,52 @@ function getActiveCampaignId() {
 
 // Note: setupTabEventListeners function is defined later in the file with full campaign management support
 
+// ─── Brand Palette Helper ───────────────────────────────────────────────────
+// Reads window.brandColors (emitted by the template) and returns a palette
+// object. `configured` is true only when the brand palette was actually set
+// by the template. Chart functions use this flag to decide whether to apply
+// brand colors or fall back to their original hardcoded defaults, ensuring
+// zero visual regression for accounts without configured branding.
+function getBrandPalette() {
+    const bc = window.brandColors || {};
+    const primary   = (bc.primary   && bc.primary   !== '') ? bc.primary   : null;
+    const secondary = (bc.secondary && bc.secondary !== '') ? bc.secondary : null;
+    const accent    = (bc.accent    && bc.accent    !== '') ? bc.accent    : null;
+    const configured = !!(primary || secondary || accent);
+
+    // Parse a hex color to [r, g, b]
+    function hexToRgb(hex) {
+        const h = hex.replace('#', '');
+        return [
+            parseInt(h.substring(0, 2), 16),
+            parseInt(h.substring(2, 4), 16),
+            parseInt(h.substring(4, 6), 16)
+        ];
+    }
+
+    // Blend a color toward white by `amount` (0–1)
+    function tintHex(hex, amount) {
+        const [r, g, b] = hexToRgb(hex);
+        const tr = Math.round(r + (255 - r) * amount);
+        const tg = Math.round(g + (255 - g) * amount);
+        const tb = Math.round(b + (255 - b) * amount);
+        return '#' + [tr, tg, tb].map(v => v.toString(16).padStart(2, '0')).join('');
+    }
+
+    // Generate n evenly-spaced tinted variants from baseHex
+    // Steps go from the base color (darkest) to a light tint.
+    function tintSequence(baseHex, n) {
+        const result = [];
+        for (let i = 0; i < n; i++) {
+            result.push(tintHex(baseHex, i * (0.55 / Math.max(n - 1, 1))));
+        }
+        return result;
+    }
+
+    return { primary, secondary, accent, configured, tintSequence };
+}
+// ────────────────────────────────────────────────────────────────────────────
+
 function createNpsChart() {
     // Support both campaign_insights.html (npsChartGrowth) and dashboard.html (npsChart)
     const chartElement = document.getElementById('npsChartGrowth') || document.getElementById('npsChart');
@@ -1700,7 +1746,7 @@ function createNpsChart() {
             c.fillStyle = '#000000';
             c.fillText(npsScore > 0 ? '+' + npsScore : npsScore, cx, cy - 8);
             c.font = '12px Karla, sans-serif';
-            c.fillStyle = '#6B7280';
+            c.fillStyle = '#BDBDBD';
             c.fillText('NPS', cx, cy + 12);
             c.restore();
         }
@@ -1856,10 +1902,10 @@ function createSentimentChart() {
     const data = validSentimentData.map(item => item.count || 0);
     const sentTotal = data.reduce((a, b) => a + b, 0);
 
-    // Semantic colours by label name
+    // Semantic colours by label name (V2: brand gray for neutral)
     const SENTIMENT_COLOUR_MAP = {
         positive: '#22C55E',
-        neutral:  '#94A3B8',
+        neutral:  '#BDBDBD',
         negative: '#EF4444'
     };
     const colors = labels.map(lbl => {
@@ -1899,7 +1945,7 @@ function createSentimentChart() {
                 c.textAlign = 'center';
                 c.textBaseline = 'bottom';
                 c.font = 'bold 11px Karla, sans-serif';
-                c.fillStyle = '#374151';
+                c.fillStyle = '#000000';
                 c.fillText(pct + '%', x, y - 2);
                 c.restore();
             });
@@ -2000,7 +2046,9 @@ function createRatingsChart() {
         ratings.pricing || 0
     ];
     
-    // Semantic colours by score threshold
+    // Semantic threshold colours: green=good, amber=moderate, red=poor.
+    // Charts always use the red/green/yellow pattern for data meaning.
+    const nonZeroData = data.filter(v => v > 0);
     const barColors = data.map(v => {
         if (v >= 4) return '#22C55E';
         if (v >= 3) return '#F59E0B';
@@ -2009,7 +2057,6 @@ function createRatingsChart() {
 
     // Weakest metric callout
     const ratingsCalloutEl = document.getElementById('ratingsCallout');
-    const nonZeroData = data.filter(v => v > 0);
     if (ratingsCalloutEl) {
         if (nonZeroData.length > 0) {
             const minVal = Math.min(...data.filter((_, i) => data[i] > 0));
@@ -2040,7 +2087,7 @@ function createRatingsChart() {
                 c.textAlign = 'left';
                 c.textBaseline = 'middle';
                 c.font = 'bold 11px Karla, sans-serif';
-                c.fillStyle = '#374151';
+                c.fillStyle = '#000000';
                 c.fillText(val.toFixed(1) + ' / 5', x + 6, y);
                 c.restore();
             });
@@ -2217,7 +2264,7 @@ function createThemesChart() {
                 c.save();
                 c.textAlign = 'left';
                 c.textBaseline = 'middle';
-                c.fillStyle = '#374151';
+                c.fillStyle = '#000000';
                 c.font = `bold 11px sans-serif`;
                 c.fillText(label, x + 6, y);
                 c.restore();
@@ -2338,8 +2385,8 @@ function createThemesChart() {
         const topTone = dominantSentimentLabel(topTheme);
         const topName = escapeHtml(topTheme.theme.charAt(0).toUpperCase() + topTheme.theme.slice(1));
 
-        let calloutHtml = `<div class="alert alert-light border-start border-3 py-2 px-3 mb-2" style="border-color:#6366f1!important;font-size:0.85rem;">
-            <i class="fas fa-lightbulb me-2" style="color:#6366f1;"></i>
+        let calloutHtml = `<div class="alert alert-light border-start border-3 py-2 px-3 mb-2" style="border-color:#E13A44!important;font-size:0.85rem;">
+            <i class="fas fa-lightbulb me-2" style="color:#E13A44;"></i>
             Customers most frequently mentioned <strong>${topName}</strong> — cited in <strong>${topPct}%</strong> of responses, with a predominantly <strong>${escapeHtml(topTone)}</strong> tone.
         </div>`;
 
@@ -2377,12 +2424,19 @@ function createThemesChart() {
 function createTenureChart() {
     // Strategic cohort definitions — maps the 7 controlled tenure strings from
     // map_tenure_years_to_category() into 5 meaningful business cohorts
+    // When brand primary is configured, derive a 5-step tint sequence from it.
+    // When no brand is configured, fall back to the original hardcoded palette.
+    const _tenureBp = getBrandPalette();
+    const _TENURE_DEFAULTS = ['#E13A44', '#000000', '#8A8A8A', '#BDBDBD', '#E9E8E4'];
+    const _tenureColors = (_tenureBp.configured && _tenureBp.primary)
+        ? _tenureBp.tintSequence(_tenureBp.primary, 5)
+        : _TENURE_DEFAULTS;
     const TENURE_COHORTS = [
-        { label: 'New (<1 yr)',          keys: ['Less than 6 months', '6 months - 1 year'],  color: '#6366f1' },
-        { label: 'Growing (1–3 yr)',     keys: ['1-2 years', '2-3 years'],                   color: '#3b82f6' },
-        { label: 'Established (3–5 yr)', keys: ['3-5 years'],                                color: '#0ea5e9' },
-        { label: 'Mature (5–10 yr)',     keys: ['5-10 years'],                               color: '#14b8a6' },
-        { label: 'Strategic (10+ yr)',   keys: ['More than 10 years'],                       color: '#10b981' }
+        { label: 'New (<1 yr)',          keys: ['Less than 6 months', '6 months - 1 year'],  color: _tenureColors[0] },
+        { label: 'Growing (1–3 yr)',     keys: ['1-2 years', '2-3 years'],                   color: _tenureColors[1] },
+        { label: 'Established (3–5 yr)', keys: ['3-5 years'],                                color: _tenureColors[2] },
+        { label: 'Mature (5–10 yr)',     keys: ['5-10 years'],                               color: _tenureColors[3] },
+        { label: 'Strategic (10+ yr)',   keys: ['More than 10 years'],                       color: _tenureColors[4] }
     ];
 
     let chartElement = document.getElementById('tenureChart');
@@ -2477,6 +2531,8 @@ function createTenureChart() {
             return;
         }
         const rawTotal = rawKeys.reduce((s, k) => s + distMap[k], 0);
+        const _fbBp = getBrandPalette();
+        const _fbColor = (_fbBp.configured && _fbBp.primary) ? _fbBp.primary : '#E13A44';
         const fallbackConfig = getMobileChartConfig();
         charts.tenure = new Chart(ctx, {
             type: 'bar',
@@ -2485,7 +2541,7 @@ function createTenureChart() {
                 datasets: [{
                     label: 'Respondents',
                     data: rawKeys.map(k => distMap[k]),
-                    backgroundColor: '#6366f1',
+                    backgroundColor: _fbColor,
                     borderColor: '#ffffff',
                     borderWidth: 1
                 }]
@@ -2533,7 +2589,7 @@ function createTenureChart() {
                 const val = pctData[i];
                 if (val > 0) {
                     ctx.save();
-                    ctx.fillStyle = '#374151';
+                    ctx.fillStyle = '#000000';
                     ctx.font = 'bold 11px Arial, sans-serif';
                     ctx.textAlign = 'left';
                     ctx.textBaseline = 'middle';
@@ -2679,8 +2735,8 @@ function createTenureChart() {
                       'Add tenure data to participants to see the NPS overlay and identify loyalty trends by relationship age.';
         }
         if (insight) {
-            calloutEl.innerHTML = `<div class="alert alert-light border-start border-3 py-2 px-3" style="border-color:#6366f1!important;font-size:0.85rem;">
-                <i class="fas fa-lightbulb me-2" style="color:#6366f1;"></i>${insight}</div>`;
+            calloutEl.innerHTML = `<div class="alert alert-light border-start border-3 py-2 px-3" style="border-color:#E13A44!important;font-size:0.85rem;">
+                <i class="fas fa-lightbulb me-2" style="color:#E13A44;"></i>${insight}</div>`;
             calloutEl.style.display = 'block';
         }
     }
@@ -2688,12 +2744,22 @@ function createTenureChart() {
 
 function createGrowthFactorChart() {
     // NPS range → semantic classification (from calculate_growth_factor in ai_analysis.py)
+    // Semantic red/yellow tones (danger/risk/passive) are always preserved.
+    // Growth/champion segments use brand accent when configured; otherwise fall
+    // back to semantic green defaults (#22C55E and #15803d).
+    const _growthBp = getBrandPalette();
+    const _growthColor  = (_growthBp.configured && _growthBp.accent)
+        ? _growthBp.tintSequence(_growthBp.accent, 2)[0]
+        : '#22C55E';
+    const _championColor = (_growthBp.configured && _growthBp.accent)
+        ? _growthBp.tintSequence(_growthBp.accent, 2)[1]
+        : '#15803d';
     const NPS_RANGE_META = {
-        '<0':     { label: 'Negative NPS',      color: '#991b1b', bainGrowth: '~0%',   type: 'danger'   },
-        '0-29':   { label: 'Low NPS (0–29)',     color: '#E13A44', bainGrowth: '~5%',   type: 'risk'     },
-        '30-49':  { label: 'Moderate (30–49)',   color: '#f59e0b', bainGrowth: '~15%',  type: 'passive'  },
-        '50-69':  { label: 'Good (50–69)',        color: '#3b82f6', bainGrowth: '~25%',  type: 'growth'   },
-        '70-100': { label: 'Excellent (70–100)', color: '#10b981', bainGrowth: '~40%',  type: 'champion' }
+        '<0':     { label: 'Negative NPS',      color: '#991b1b',      bainGrowth: '~0%',   type: 'danger'   },
+        '0-29':   { label: 'Low NPS (0–29)',     color: '#E13A44',      bainGrowth: '~5%',   type: 'risk'     },
+        '30-49':  { label: 'Moderate (30–49)',   color: '#f59e0b',      bainGrowth: '~15%',  type: 'passive'  },
+        '50-69':  { label: 'Good (50–69)',        color: _growthColor,  bainGrowth: '~25%',  type: 'growth'   },
+        '70-100': { label: 'Excellent (70–100)', color: _championColor, bainGrowth: '~40%',  type: 'champion' }
     };
 
     let chartElement = document.getElementById('growthFactorChart');
@@ -2768,7 +2834,7 @@ function createGrowthFactorChart() {
                 const val = pctData[i];
                 if (val > 0) {
                     ctx.save();
-                    ctx.fillStyle = '#374151';
+                    ctx.fillStyle = '#000000';
                     ctx.font = 'bold 11px Arial, sans-serif';
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'bottom';
@@ -2886,7 +2952,7 @@ function createGrowthFactorChart() {
             const topRange = championTop.nps_range === '70-100' ? '70–100' : '50–69';
             rows.push({
                 icon: 'fas fa-star',
-                iconColor: '#10b981',
+                iconColor: '#E13A44',
                 priority: rows.length + 1,
                 title: 'Activate Promoter Growth',
                 body: `<strong>${championTop.count} account${championTop.count !== 1 ? 's' : ''} (${pct}%)</strong> in the ${topRange} NPS band. ` +
@@ -2911,8 +2977,8 @@ function createGrowthFactorChart() {
                     </div>
                 </div>`).join('');
 
-            focusEl.innerHTML = `<div class="border rounded p-3" style="background:#fafafa;">
-                <div class="fw-semibold mb-2" style="font-size:0.82rem;color:#374151;letter-spacing:0.03em;">
+            focusEl.innerHTML = `<div class="border rounded p-3" style="background:#E9E8E4;">
+                <div class="fw-semibold mb-2" style="font-size:0.82rem;color:#000000;letter-spacing:0.03em;">
                     <i class="fas fa-crosshairs me-1" style="color:#E13A44;"></i>PRIORITY FOCUS
                 </div>
                 ${rowsHtml}
@@ -3143,7 +3209,7 @@ function populateAccountIntelligence() {
     
     // Create legend
     const legendHtml = `
-        <div class="account-health-legend mb-4 p-3 rounded" style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
+        <div class="account-health-legend mb-4 p-3 rounded" style="background-color: #E9E8E4; border: 1px solid #BDBDBD;">
             <div class="row">
                 <div class="col-md-6">
                     <h6 class="text-success mb-2">Growth Opportunities</h6>
@@ -3272,7 +3338,7 @@ function populateAccountIntelligence() {
                     </div>
                     
                     <!-- Account Details -->
-                    <div class="account-details mb-3 p-2 rounded" style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
+                    <div class="account-details mb-3 p-2 rounded" style="background-color: #E9E8E4; border: 1px solid #BDBDBD;">
                         <div class="row">
                             <div class="col-4">
                                 <small class="text-muted">NPS:</small>
@@ -3387,7 +3453,7 @@ function renderAccountIntelligence(accountData, pagination) {
     
     // Create legend (same as before)
     const legendHtml = `
-        <div class="account-health-legend mb-4 p-3 rounded" style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
+        <div class="account-health-legend mb-4 p-3 rounded" style="background-color: #E9E8E4; border: 1px solid #BDBDBD;">
             <div class="row">
                 <div class="col-md-6">
                     <h6 class="text-success mb-2">Growth Opportunities</h6>
@@ -3510,7 +3576,7 @@ function renderAccountIntelligence(accountData, pagination) {
                         </div>
                     </div>
                     
-                    <div class="account-details mb-3 p-2 rounded" style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
+                    <div class="account-details mb-3 p-2 rounded" style="background-color: #E9E8E4; border: 1px solid #BDBDBD;">
                         <div class="row">
                             <div class="col-3">
                                 <small class="text-muted">NPS:</small>
@@ -3795,7 +3861,7 @@ function siUpdatePriorityPanel() {
         if (validTenure.length > 0) {
             const worst = validTenure.reduce((a, b) => (a.tenure_nps < b.tenure_nps ? a : b));
             const npsDisplay = (worst.tenure_nps > 0 ? '+' : '') + worst.tenure_nps;
-            const npsColor = worst.tenure_nps > 20 ? '#198754' : worst.tenure_nps >= -20 ? '#997404' : '#dc3545';
+            const npsColor = worst.tenure_nps > 20 ? '#000000' : worst.tenure_nps >= -20 ? '#BDBDBD' : '#E13A44';
             weakestEl.innerHTML = `${escapeHtml(worst.tenure_group)} <span style="color:${npsColor}">(NPS ${npsDisplay})</span>`;
         } else {
             weakestEl.textContent = '--';
@@ -3807,7 +3873,7 @@ function siUpdatePriorityPanel() {
         const nps = dashboardData.nps_score;
         if (nps !== null && nps !== undefined) {
             const display = (nps > 0 ? '+' : '') + nps;
-            const color = nps > 20 ? '#198754' : nps >= -20 ? '#997404' : '#dc3545';
+            const color = nps > 20 ? '#000000' : nps >= -20 ? '#BDBDBD' : '#E13A44';
             campaignNpsEl.innerHTML = `<span style="color:${color}">${display}</span>`;
         } else {
             campaignNpsEl.textContent = '--';
@@ -3994,11 +4060,11 @@ function siShowTooltip(row, companyData) {
         '<div class="si-tooltip-section">' +
         '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">' +
         '<span class="badge ' + npsBadge + '" style="font-size:0.85rem;">' + (npsVal > 0 ? '+' : '') + npsVal + ' NPS</span>' +
-        '<span style="font-size:0.78rem;color:#6c757d;">' + escapeHtml(companyData.total_responses || 0) + ' responses</span></div>' +
+        '<span style="font-size:0.78rem;color:#BDBDBD;">' + escapeHtml(companyData.total_responses || 0) + ' responses</span></div>' +
         '<div style="display:flex;gap:6px;">' +
-        '<span class="badge" style="background:#198754;font-size:0.7rem;">' + (companyData.promoters || 0) + ' P</span>' +
-        '<span class="badge" style="background:#6c757d;font-size:0.7rem;">' + (companyData.passives || 0) + ' Pa</span>' +
-        '<span class="badge" style="background:#dc3545;font-size:0.7rem;">' + (companyData.detractors || 0) + ' D</span>' +
+        '<span class="badge" style="background:#000000;font-size:0.7rem;">' + (companyData.promoters || 0) + ' P</span>' +
+        '<span class="badge" style="background:#BDBDBD;font-size:0.7rem;">' + (companyData.passives || 0) + ' Pa</span>' +
+        '<span class="badge" style="background:#E13A44;font-size:0.7rem;">' + (companyData.detractors || 0) + ' D</span>' +
         '</div></div>' +
         '<div id="siTooltipEnriched"><div style="text-align:center;padding:6px 0;"><span class="si-tt-spinner"></span></div></div>' +
         '</div>';
@@ -4062,21 +4128,21 @@ function siRenderEnrichedTooltip(detail) {
             var val = detail.sub_metrics[key];
             var pct = Math.round((val / 5) * 100);
             var isWeakest = key === detail.weakest_metric;
-            var barColor = isWeakest ? '#dc3545' : (val >= 4 ? '#198754' : val >= 3 ? '#ffc107' : '#dc3545');
+            var barColor = isWeakest ? '#E13A44' : (val >= 4 ? '#000000' : val >= 3 ? '#BDBDBD' : '#E13A44');
             html += '<div class="si-tt-metric-row">' +
-                '<span' + (isWeakest ? ' style="color:#dc3545;font-weight:600;"' : '') + '>' + (isWeakest ? '<i class="fas fa-exclamation-circle" style="margin-right:3px;font-size:0.7rem;"></i>' : '') + escapeHtml(labelMap[key] || key) + '</span>' +
+                '<span' + (isWeakest ? ' style="color:#E13A44;font-weight:600;"' : '') + '>' + (isWeakest ? '<i class="fas fa-exclamation-circle" style="margin-right:3px;font-size:0.7rem;"></i>' : '') + escapeHtml(labelMap[key] || key) + '</span>' +
                 '<span><span class="si-tt-metric-bar"><span class="si-tt-metric-fill" style="width:' + pct + '%;background:' + barColor + ';"></span></span>' +
-                '<span' + (isWeakest ? ' style="color:#dc3545;font-weight:600;"' : '') + '>' + val + '/5</span></span></div>';
+                '<span' + (isWeakest ? ' style="color:#E13A44;font-weight:600;"' : '') + '>' + val + '/5</span></span></div>';
         });
         html += '</div>';
     }
 
     if (detail.avg_churn_risk_score !== null && detail.avg_churn_risk_score !== undefined) {
         var churnPct = Math.round(detail.avg_churn_risk_score * 100);
-        var churnColor = churnPct >= 70 ? '#dc3545' : churnPct >= 40 ? '#ffc107' : '#198754';
+        var churnColor = churnPct >= 70 ? '#E13A44' : churnPct >= 40 ? '#BDBDBD' : '#000000';
         html += '<div class="si-tooltip-section"><div class="si-tooltip-section-label">Avg Churn Risk</div>' +
             '<div style="display:flex;align-items:center;gap:6px;">' +
-            '<div style="flex:1;height:6px;background:#e9ecef;border-radius:3px;overflow:hidden;">' +
+            '<div style="flex:1;height:6px;background:#E9E8E4;border-radius:3px;overflow:hidden;">' +
             '<div style="width:' + churnPct + '%;height:100%;background:' + churnColor + ';border-radius:3px;"></div></div>' +
             '<span style="font-size:0.8rem;font-weight:600;color:' + churnColor + ';">' + churnPct + '%</span></div></div>';
     }
@@ -4894,8 +4960,11 @@ function createKpiSparklines(kpiData) {
     });
     sparklineCharts = {};
     
-    // Approved color palette
-    const PRIMARY_RED = '#E13A44';
+    // Brand primary for sparklines when configured; fall back to original #E13A44 otherwise.
+    const _sparklinesBp = getBrandPalette();
+    const _sparklinesColor = (_sparklinesBp.configured && _sparklinesBp.primary)
+        ? _sparklinesBp.primary
+        : '#E13A44';
     const MEDIUM_GRAY = '#BDBDBD';
     
     // Extract data for each metric
@@ -4917,7 +4986,7 @@ function createKpiSparklines(kpiData) {
     const getLineColor = (data) => {
         if (data.length < 2) return MEDIUM_GRAY;
         const trend = data[data.length - 1] - data[0];
-        return trend >= 0 ? PRIMARY_RED : MEDIUM_GRAY;
+        return trend >= 0 ? _sparklinesColor : MEDIUM_GRAY;
     };
     
     // Common sparkline configuration
@@ -4933,8 +5002,8 @@ function createKpiSparklines(kpiData) {
                 borderWidth: 2,
                 pointRadius: 0,
                 pointHoverRadius: 4,
-                pointBackgroundColor: PRIMARY_RED,
-                pointBorderColor: PRIMARY_RED,
+                pointBackgroundColor: _sparklinesColor,
+                pointBorderColor: _sparklinesColor,
                 tension: 0.3
             }]
         },

@@ -208,10 +208,10 @@
             if (statusBadge && statusText) {
                 statusText.textContent = displayStatus;
                 if (rawStatus === 'active') {
-                    statusBadge.style.backgroundColor = '#28a745';
+                    statusBadge.style.backgroundColor = '#000000';
                     statusBadge.style.color = 'white';
                 } else {
-                    statusBadge.style.backgroundColor = '#6c757d';
+                    statusBadge.style.backgroundColor = '#BDBDBD';
                     statusBadge.style.color = 'white';
                 }
             }

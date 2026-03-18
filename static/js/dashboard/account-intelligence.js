@@ -255,7 +255,7 @@
         
         // Create legend
         const legendHtml = `
-            <div class="account-health-legend mb-4 p-3 rounded" style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
+            <div class="account-health-legend mb-4 p-3 rounded" style="background-color: #E9E8E4; border: 1px solid #BDBDBD;">
                 <div class="row">
                     <div class="col-md-6">
                         <h6 class="text-success mb-2">Growth Opportunities</h6>
@@ -381,7 +381,7 @@
                             </div>
                         </div>
                         
-                        <div class="account-details mb-3 p-2 rounded" style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
+                        <div class="account-details mb-3 p-2 rounded" style="background-color: #E9E8E4; border: 1px solid #BDBDBD;">
                             <div class="row">
                                 <div class="col-4">
                                     <small class="text-muted">NPS:</small>
@@ -500,7 +500,7 @@
         
         // Create legend (same as snapshot version)
         const legendHtml = `
-            <div class="account-health-legend mb-4 p-3 rounded" style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
+            <div class="account-health-legend mb-4 p-3 rounded" style="background-color: #E9E8E4; border: 1px solid #BDBDBD;">
                 <div class="row">
                     <div class="col-md-6">
                         <h6 class="text-success mb-2">Growth Opportunities</h6>
@@ -623,7 +623,7 @@
                             </div>
                         </div>
                         
-                        <div class="account-details mb-3 p-2 rounded" style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
+                        <div class="account-details mb-3 p-2 rounded" style="background-color: #E9E8E4; border: 1px solid #BDBDBD;">
                             <div class="row">
                                 <div class="col-4">
                                     <small class="text-muted">NPS:</small>

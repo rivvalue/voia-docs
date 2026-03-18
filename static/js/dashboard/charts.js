@@ -12,7 +12,49 @@
     
     // Import utilities from bootstrap module
     const { escapeHtml, getMobileChartConfig } = window.dashboardModules.bootstrap.utils;
-    
+
+    // ─── Brand Palette Helper ─────────────────────────────────────────────────
+    // Reads window.brandColors (emitted by the template) and returns a palette
+    // object. `configured` is true only when the brand palette was actually set
+    // by the template. Chart functions use this flag to decide whether to apply
+    // brand colors or fall back to their original hardcoded defaults, ensuring
+    // zero visual regression for accounts without configured branding.
+    function getBrandPalette() {
+        const bc = window.brandColors || {};
+        const primary   = (bc.primary   && bc.primary   !== '') ? bc.primary   : null;
+        const secondary = (bc.secondary && bc.secondary !== '') ? bc.secondary : null;
+        const accent    = (bc.accent    && bc.accent    !== '') ? bc.accent    : null;
+        const configured = !!(primary || secondary || accent);
+
+        function hexToRgb(hex) {
+            const h = hex.replace('#', '');
+            return [
+                parseInt(h.substring(0, 2), 16),
+                parseInt(h.substring(2, 4), 16),
+                parseInt(h.substring(4, 6), 16)
+            ];
+        }
+
+        function tintHex(hex, amount) {
+            const [r, g, b] = hexToRgb(hex);
+            const tr = Math.round(r + (255 - r) * amount);
+            const tg = Math.round(g + (255 - g) * amount);
+            const tb = Math.round(b + (255 - b) * amount);
+            return '#' + [tr, tg, tb].map(v => v.toString(16).padStart(2, '0')).join('');
+        }
+
+        function tintSequence(baseHex, n) {
+            const result = [];
+            for (let i = 0; i < n; i++) {
+                result.push(tintHex(baseHex, i * (0.55 / Math.max(n - 1, 1))));
+            }
+            return result;
+        }
+
+        return { primary, secondary, accent, configured, tintSequence };
+    }
+    // ─────────────────────────────────────────────────────────────────────────
+
     /**
      * Create NPS Distribution Chart (Doughnut)
      */
@@ -484,13 +526,11 @@
                 datasets: [{
                     label: 'Customers',
                     data: data,
-                    backgroundColor: [
-                        '#E13A44',
-                        '#BDBDBD', 
-                        '#E9E8E4',
-                        '#000000',
-                        'rgba(225, 58, 68, 0.6)'
-                    ],
+                    backgroundColor: (function(){
+                        const bp = getBrandPalette();
+                        if (bp.configured && bp.primary) return bp.tintSequence(bp.primary, 5);
+                        return ['#E13A44', '#000000', '#8A8A8A', '#BDBDBD', '#E9E8E4'];
+                    })(),
                     borderColor: '#FFFFFF',
                     borderWidth: 2
                 }]
@@ -557,7 +597,23 @@
         const distribution = dashboardData.growth_factor_analysis.distribution;
         const labels = distribution.map(item => `${item.nps_range} (${item.growth_rate})`);
         const data = distribution.map(item => item.count);
-        const colors = ['#E13A44', '#BDBDBD', '#E9E8E4', '#000000', '#FFFFFF'];
+        // When brand accent is configured: apply semantic NPS_COLOR_MAP with accent
+        // for growth/champion ranges, preserving red/yellow for negative/passive ranges.
+        // When no brand is configured: fall back to the original positional color array
+        // (no visual regression for unbranded accounts).
+        const _gfBp = getBrandPalette();
+        const _gfGrowthColor   = (_gfBp.configured && _gfBp.accent)
+            ? _gfBp.tintSequence(_gfBp.accent, 2)[0] : '#22C55E';
+        const _gfChampionColor = (_gfBp.configured && _gfBp.accent)
+            ? _gfBp.tintSequence(_gfBp.accent, 2)[1] : '#15803d';
+        const NPS_COLOR_MAP = {
+            '<0':     '#991b1b',
+            '0-29':   '#E13A44',
+            '30-49':  '#f59e0b',
+            '50-69':  _gfGrowthColor,
+            '70-100': _gfChampionColor
+        };
+        const colors = distribution.map(item => NPS_COLOR_MAP[item.nps_range] || '#BDBDBD');
         
         const config = getMobileChartConfig();
         
@@ -568,7 +624,7 @@
                 datasets: [{
                     label: 'Customers',
                     data: data,
-                    backgroundColor: colors.slice(0, data.length),
+                    backgroundColor: colors,
                     borderColor: '#FFFFFF',
                     borderWidth: 1
                 }]
