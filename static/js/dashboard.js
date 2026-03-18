@@ -2352,13 +2352,16 @@ function createGrowthFactorChart() {
         confEl.style.display = 'block';
     }
 
+    // Normalize nps_range field — very old snapshots used 'range' instead of 'nps_range'
+    distribution.forEach(d => { if (!d.nps_range && d.range) d.nps_range = d.range; });
+
     // Compute per-bar data
     const pctData    = distribution.map(d => total > 0 ? Math.round((d.count / total) * 100) : 0);
     const barColors  = distribution.map(d => (NPS_RANGE_META[d.nps_range] || {}).color || '#BDBDBD');
     const barLabels  = distribution.map(d => {
         const meta = NPS_RANGE_META[d.nps_range];
         const gr   = d.growth_rate || null;
-        return gr ? `${d.nps_range}\n(${gr} growth)` : d.nps_range;
+        return gr ? `${d.nps_range}\n(${gr} growth)` : (d.nps_range || '?');
     });
 
     const config = getMobileChartConfig();
