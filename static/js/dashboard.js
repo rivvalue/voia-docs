@@ -2062,150 +2062,358 @@ function createThemesChart() {
 }
 
 function createTenureChart() {
+    // Strategic cohort definitions — maps the 7 controlled tenure strings from
+    // map_tenure_years_to_category() into 5 meaningful business cohorts
+    const TENURE_COHORTS = [
+        { label: 'New (<1 yr)',          keys: ['Less than 6 months', '6 months - 1 year'],  color: '#6366f1' },
+        { label: 'Growing (1–3 yr)',     keys: ['1-2 years', '2-3 years'],                   color: '#3b82f6' },
+        { label: 'Established (3–5 yr)', keys: ['3-5 years'],                                color: '#0ea5e9' },
+        { label: 'Mature (5–10 yr)',     keys: ['5-10 years'],                               color: '#14b8a6' },
+        { label: 'Strategic (10+ yr)',   keys: ['More than 10 years'],                       color: '#10b981' }
+    ];
+
     let chartElement = document.getElementById('tenureChart');
-    
-    // If canvas was destroyed by previous "no data" message, recreate it
     if (!chartElement) {
-        // Find all chart containers and look for one that doesn't have a canvas
-        const chartContainers = document.querySelectorAll('.chart-container');
-        for (const container of chartContainers) {
-            // Check if this container has the alert message instead of canvas
-            if (container.querySelector('.alert-info') && container.textContent.includes('tenure data')) {
-                container.innerHTML = '<canvas id="tenureChart"></canvas>';
+        const containers = document.querySelectorAll('.chart-container');
+        for (const c of containers) {
+            if (c.querySelector('.alert-info') && c.textContent.includes('tenure data')) {
+                c.innerHTML = '<canvas id="tenureChart"></canvas>';
                 chartElement = document.getElementById('tenureChart');
                 break;
             }
         }
     }
-    
-    if (!chartElement) {
-        console.warn('Tenure chart element not found');
-        return;
-    }
-    
+    if (!chartElement) { console.warn('Tenure chart element not found'); return; }
+
     const ctx = chartElement.getContext('2d');
-    
-    // Destroy existing chart if it exists
-    if (charts.tenure) {
-        charts.tenure.destroy();
-    }
-    
+    if (charts.tenure) { charts.tenure.destroy(); }
+
+    const calloutEl = document.getElementById('tenureCallout');
+
     if (!dashboardData.tenure_distribution || dashboardData.tenure_distribution.length === 0) {
         ctx.canvas.parentNode.innerHTML = '<div class="alert alert-info">No tenure data available yet. This will populate as surveys are completed.</div>';
+        if (calloutEl) calloutEl.style.display = 'none';
         return;
     }
-    
-    const labels = dashboardData.tenure_distribution.map(item => item.tenure);
-    const data = dashboardData.tenure_distribution.map(item => item.count);
-    
-    // Get mobile-responsive configuration  
+
+    // Aggregate raw counts by cohort
+    const distMap = {};
+    (dashboardData.tenure_distribution || []).forEach(item => {
+        distMap[item.tenure] = (distMap[item.tenure] || 0) + item.count;
+    });
+
+    // Aggregate NPS per cohort using tenure_nps_data (weighted average)
+    const npsWeightedSum = {};
+    const npsWeightTotal = {};
+    (dashboardData.tenure_nps_data || []).forEach(item => {
+        const key = item.tenure_group;
+        const n = item.total_responses || 0;
+        const nps = item.tenure_nps ?? item.avg_nps ?? null;
+        if (nps !== null && n > 0) {
+            npsWeightedSum[key] = (npsWeightedSum[key] || 0) + nps * n;
+            npsWeightTotal[key] = (npsWeightTotal[key] || 0) + n;
+        }
+    });
+
+    // Build cohort-level data arrays
+    const cohorts = TENURE_COHORTS.map(cohort => {
+        let count = 0;
+        let npsSum = 0;
+        let npsN = 0;
+        cohort.keys.forEach(key => {
+            count += distMap[key] || 0;
+            npsSum += npsWeightedSum[key] || 0;
+            npsN += npsWeightTotal[key] || 0;
+        });
+        return {
+            label: cohort.label,
+            color: cohort.color,
+            count,
+            avgNps: npsN > 0 ? Math.round(npsSum / npsN) : null
+        };
+    }).filter(c => c.count > 0);
+
+    if (cohorts.length === 0) {
+        ctx.canvas.parentNode.innerHTML = '<div class="alert alert-info">No tenure data available yet.</div>';
+        if (calloutEl) calloutEl.style.display = 'none';
+        return;
+    }
+
+    const total = cohorts.reduce((s, c) => s + c.count, 0);
+    const labels     = cohorts.map(c => c.label);
+    const pctData    = cohorts.map(c => Math.round((c.count / total) * 100));
+    const npsData    = cohorts.map(c => c.avgNps);
+    const barColors  = cohorts.map(c => c.color);
+    const rawCounts  = cohorts.map(c => c.count);
+
     const config = getMobileChartConfig();
-    
+
+    // Inline plugin: draw % value above each bar
+    const pctLabelPlugin = {
+        id: 'tenurePctLabels',
+        afterDraw(chart) {
+            const ctx = chart.ctx;
+            const meta = chart.getDatasetMeta(0);
+            meta.data.forEach((bar, i) => {
+                const val = pctData[i];
+                if (val > 0) {
+                    ctx.save();
+                    ctx.fillStyle = '#374151';
+                    ctx.font = 'bold 11px Arial, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'bottom';
+                    ctx.fillText(val + '%', bar.x, bar.y - 3);
+                    ctx.restore();
+                }
+            });
+        }
+    };
+
     charts.tenure = new Chart(ctx, {
-        type: 'doughnut',
+        type: 'bar',
         data: {
             labels: labels,
-            datasets: [{
-                label: 'Customers',
-                data: data,
-                backgroundColor: [
-                    '#E13A44',
-                    '#BDBDBD', 
-                    '#E9E8E4',
-                    '#000000',
-                    'rgba(225, 58, 68, 0.6)'
-                ],
-                borderColor: '#FFFFFF',
-                borderWidth: 2
-            }]
+            datasets: [
+                {
+                    type: 'bar',
+                    label: 'Share of Accounts (%)',
+                    data: pctData,
+                    backgroundColor: barColors,
+                    borderColor: barColors,
+                    borderWidth: 1,
+                    yAxisID: 'yPct',
+                    order: 2
+                },
+                {
+                    type: 'line',
+                    label: 'NPS Score',
+                    data: npsData,
+                    borderColor: '#1e293b',
+                    backgroundColor: 'rgba(30,41,59,0.15)',
+                    pointBackgroundColor: '#1e293b',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    borderWidth: 2,
+                    tension: 0.3,
+                    spanGaps: true,
+                    yAxisID: 'yNps',
+                    order: 1
+                }
+            ]
         },
+        plugins: [pctLabelPlugin],
         options: {
             responsive: true,
-            maintainAspectRatio: config.maintainAspectRatio,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
             plugins: {
                 legend: {
-                    position: config.legendPosition,
+                    position: 'bottom',
                     labels: {
                         color: '#000000',
                         padding: config.legendPadding,
-                        font: {
-                            size: config.legendFontSize
+                        font: { size: config.legendFontSize },
+                        usePointStyle: true
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            if (context.dataset.label === 'Share of Accounts (%)') {
+                                const i = context.dataIndex;
+                                return ` ${context.dataset.label}: ${pctData[i]}% (${rawCounts[i]} accounts)`;
+                            }
+                            const val = context.parsed.y;
+                            return val !== null ? ` NPS Score: ${val}` : ' NPS Score: n/a';
                         }
                     }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: { color: '#000000', font: { size: config.fontSize } },
+                    grid: { color: '#f1f5f9' }
+                },
+                yPct: {
+                    type: 'linear',
+                    position: 'left',
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        color: '#6b7280',
+                        font: { size: config.fontSize },
+                        callback: v => v + '%'
+                    },
+                    grid: { color: '#f1f5f9' },
+                    title: { display: true, text: '% of Accounts', color: '#6b7280', font: { size: 11 } }
+                },
+                yNps: {
+                    type: 'linear',
+                    position: 'right',
+                    min: -100,
+                    max: 100,
+                    ticks: {
+                        color: '#1e293b',
+                        font: { size: config.fontSize }
+                    },
+                    grid: { drawOnChartArea: false },
+                    title: { display: true, text: 'NPS Score', color: '#1e293b', font: { size: 11 } }
                 }
             }
         }
     });
+
+    // Interpretive callout
+    if (calloutEl) {
+        const campaignNps = dashboardData.nps_score ?? null;
+        const withNps = cohorts.filter(c => c.avgNps !== null);
+        const largest = cohorts.reduce((a, b) => b.count > a.count ? b : a, cohorts[0]);
+        const strategic = cohorts.find(c => c.label.startsWith('Strategic'));
+        let insight = '';
+        if (strategic && strategic.avgNps !== null && campaignNps !== null) {
+            const diff = strategic.avgNps - campaignNps;
+            const dir = diff >= 0 ? 'above' : 'below';
+            const absDiff = Math.abs(diff);
+            insight = `Your longest-tenured accounts (Strategic cohort) score <strong>NPS ${strategic.avgNps}</strong>, ` +
+                      `<strong>${absDiff} point${absDiff !== 1 ? 's' : ''} ${dir}</strong> your campaign average of ${campaignNps}. `;
+            insight += diff >= 5
+                ? 'Long-term relationships are driving loyalty — prioritise retention programmes to protect this group.'
+                : diff <= -5
+                ? 'Long-term accounts show lower satisfaction — consider proactive executive outreach to address unmet expectations.'
+                : 'Long-term accounts align closely with your overall NPS, suggesting consistent experience across the lifecycle.';
+        } else if (largest) {
+            insight = `Your largest cohort is <strong>${largest.label}</strong> (${Math.round((largest.count / total) * 100)}% of accounts). ` +
+                      'Add tenure data to participants to see the NPS overlay and identify loyalty trends by relationship age.';
+        }
+        if (insight) {
+            calloutEl.innerHTML = `<div class="alert alert-light border-start border-3 py-2 px-3" style="border-color:#6366f1!important;font-size:0.85rem;">
+                <i class="fas fa-lightbulb me-2" style="color:#6366f1;"></i>${insight}</div>`;
+            calloutEl.style.display = 'block';
+        }
+    }
 }
 
 function createGrowthFactorChart() {
+    // NPS range → semantic classification (from calculate_growth_factor in ai_analysis.py)
+    const NPS_RANGE_META = {
+        '<0':     { label: 'Negative NPS',      color: '#991b1b', bainGrowth: '~0%',   type: 'danger'   },
+        '0-29':   { label: 'Low NPS (0–29)',     color: '#E13A44', bainGrowth: '~5%',   type: 'risk'     },
+        '30-49':  { label: 'Moderate (30–49)',   color: '#f59e0b', bainGrowth: '~15%',  type: 'passive'  },
+        '50-69':  { label: 'Good (50–69)',        color: '#3b82f6', bainGrowth: '~25%',  type: 'growth'   },
+        '70-100': { label: 'Excellent (70–100)', color: '#10b981', bainGrowth: '~40%',  type: 'champion' }
+    };
+
     let chartElement = document.getElementById('growthFactorChart');
-    
-    // If canvas was destroyed by previous "no data" message, recreate it
     if (!chartElement) {
-        // Find all chart containers and look for one that doesn't have a canvas
-        const chartContainers = document.querySelectorAll('.chart-container');
-        for (const container of chartContainers) {
-            // Check if this container has the alert message instead of canvas
-            if (container.querySelector('.alert-info') && container.textContent.includes('growth factor data')) {
-                container.innerHTML = '<canvas id="growthFactorChart"></canvas>';
+        const containers = document.querySelectorAll('.chart-container');
+        for (const c of containers) {
+            if (c.querySelector('.alert-info') && c.textContent.includes('growth factor data')) {
+                c.innerHTML = '<canvas id="growthFactorChart"></canvas>';
                 chartElement = document.getElementById('growthFactorChart');
                 break;
             }
         }
     }
-    
-    if (!chartElement) {
-        console.warn('Growth factor chart element not found');
-        return;
-    }
-    
+    if (!chartElement) { console.warn('Growth factor chart element not found'); return; }
+
     const ctx = chartElement.getContext('2d');
-    
-    // Destroy existing chart if it exists
-    if (charts.growthFactor) {
-        charts.growthFactor.destroy();
-    }
-    
-    if (!dashboardData.growth_factor_analysis || 
-        !dashboardData.growth_factor_analysis.distribution || 
+    if (charts.growthFactor) { charts.growthFactor.destroy(); }
+
+    const confEl    = document.getElementById('growthConfidenceBar');
+    const focusEl   = document.getElementById('growthPriorityFocus');
+
+    if (!dashboardData.growth_factor_analysis ||
+        !dashboardData.growth_factor_analysis.distribution ||
         dashboardData.growth_factor_analysis.distribution.length === 0) {
         ctx.canvas.parentNode.innerHTML = '<div class="alert alert-info">No growth factor data available yet. This will populate as surveys are completed.</div>';
+        if (confEl)  confEl.style.display  = 'none';
+        if (focusEl) focusEl.style.display = 'none';
         return;
     }
-    
+
     const distribution = dashboardData.growth_factor_analysis.distribution;
-    const labels = distribution.map(item => `${item.nps_range} (${item.growth_rate})`);
-    const data = distribution.map(item => item.count);
-    const colors = ['#E13A44', '#BDBDBD', '#E9E8E4', '#000000', '#FFFFFF'];
-    
-    // Get mobile-responsive configuration  
+    const total = distribution.reduce((s, d) => s + (d.count || 0), 0);
+
+    // --- Confidence indicator ---
+    if (confEl && total > 0) {
+        const confLevel = total >= 30 ? 'High' : total >= 10 ? 'Medium' : 'Low';
+        const confBadge = confLevel === 'High' ? 'success' : confLevel === 'Medium' ? 'warning' : 'danger';
+        confEl.innerHTML = `<div class="d-flex align-items-center gap-2 flex-wrap" style="font-size:0.82rem;">
+            <span class="text-muted">Confidence:</span>
+            <span class="badge bg-${confBadge} text-${confLevel === 'Medium' ? 'dark' : 'white'}">${confLevel}</span>
+            <span class="text-muted">Based on ${total} response${total !== 1 ? 's' : ''} &mdash; ` +
+            (confLevel === 'High' ? 'statistically robust signals.' :
+             confLevel === 'Medium' ? 'directionally reliable; grow sample for precision.' :
+             'preliminary signal only; interpret with caution.') +
+            `</span></div>`;
+        confEl.style.display = 'block';
+    }
+
+    // Compute per-bar data
+    const pctData    = distribution.map(d => total > 0 ? Math.round((d.count / total) * 100) : 0);
+    const barColors  = distribution.map(d => (NPS_RANGE_META[d.nps_range] || {}).color || '#BDBDBD');
+    const barLabels  = distribution.map(d => {
+        const meta = NPS_RANGE_META[d.nps_range];
+        const gr   = d.growth_rate || null;
+        return gr ? `${d.nps_range}\n(${gr} growth)` : d.nps_range;
+    });
+
     const config = getMobileChartConfig();
-    
+
+    // Inline plugin: draw % above each bar
+    const pctLabelPlugin = {
+        id: 'growthPctLabels',
+        afterDraw(chart) {
+            const ctx = chart.ctx;
+            const meta = chart.getDatasetMeta(0);
+            meta.data.forEach((bar, i) => {
+                const val = pctData[i];
+                if (val > 0) {
+                    ctx.save();
+                    ctx.fillStyle = '#374151';
+                    ctx.font = 'bold 11px Arial, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'bottom';
+                    ctx.fillText(val + '%', bar.x, bar.y - 3);
+                    ctx.restore();
+                }
+            });
+        }
+    };
+
     charts.growthFactor = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: labels,
+            labels: barLabels,
             datasets: [{
-                label: 'Customers',
-                data: data,
-                backgroundColor: colors.slice(0, data.length),
-                borderColor: '#FFFFFF',
+                label: 'Accounts (%)',
+                data: pctData,
+                backgroundColor: barColors,
+                borderColor: '#ffffff',
                 borderWidth: 1
             }]
         },
+        plugins: [pctLabelPlugin],
         options: {
             responsive: true,
             maintainAspectRatio: config.maintainAspectRatio,
             plugins: {
-                legend: {
-                    display: false
-                },
+                legend: { display: false },
                 tooltip: {
                     callbacks: {
-                        afterLabel: function(context) {
-                            const item = distribution[context.dataIndex];
-                            return [`Growth Factor: ${item.avg_factor}`, `Expected Growth: ${item.growth_rate}`];
+                        title: function(items) {
+                            const d = distribution[items[0].dataIndex];
+                            const meta = NPS_RANGE_META[d.nps_range];
+                            return meta ? meta.label : d.nps_range;
+                        },
+                        label: function(context) {
+                            const d = distribution[context.dataIndex];
+                            const lines = [`  ${d.count} account${d.count !== 1 ? 's' : ''} (${pctData[context.dataIndex]}% of total)`];
+                            if (d.growth_rate) lines.push(`  Bain expected growth: ${d.growth_rate}`);
+                            if (d.avg_factor != null) lines.push(`  Avg growth factor score: ${d.avg_factor}`);
+                            return lines;
                         }
                     }
                 }
@@ -2213,31 +2421,106 @@ function createGrowthFactorChart() {
             scales: {
                 y: {
                     beginAtZero: true,
+                    max: 100,
                     ticks: {
                         color: '#000000',
-                        stepSize: 1,
-                        font: {
-                            size: config.fontSize
-                        }
+                        font: { size: config.fontSize },
+                        callback: v => v + '%'
                     },
-                    grid: {
-                        color: '#E9E8E4'
-                    }
+                    grid: { color: '#f1f5f9' },
+                    title: { display: true, text: '% of Accounts', color: '#6b7280', font: { size: 11 } }
                 },
                 x: {
                     ticks: {
                         color: '#000000',
-                        font: {
-                            size: config.fontSize
-                        }
+                        font: { size: config.fontSize },
+                        maxRotation: 0
                     },
-                    grid: {
-                        color: '#E9E8E4'
-                    }
+                    grid: { color: '#f1f5f9' }
                 }
             }
         }
     });
+
+    // --- Priority Focus panel ---
+    if (focusEl && total > 0) {
+        // Classify each distribution item
+        const risks     = distribution.filter(d => ['<0', '0-29'].includes(d.nps_range));
+        const passives  = distribution.filter(d => ['30-49'].includes(d.nps_range));
+        const champions = distribution.filter(d => ['50-69', '70-100'].includes(d.nps_range));
+
+        const biggest = arr => arr.reduce((a, b) => (b.count > a.count ? b : a), arr[0] || null);
+        const riskTop     = biggest(risks);
+        const passiveTop  = biggest(passives);
+        const championTop = biggest(champions);
+
+        const rows = [];
+
+        if (riskTop && riskTop.count > 0) {
+            const pct = Math.round((riskTop.count / total) * 100);
+            rows.push({
+                icon: 'fas fa-exclamation-triangle',
+                iconColor: '#E13A44',
+                priority: '1',
+                title: 'Address Churn Risk',
+                body: `<strong>${riskTop.count} account${riskTop.count !== 1 ? 's' : ''} (${pct}%)</strong> in the ${riskTop.nps_range} NPS band. ` +
+                      `Bain research links this zone to ` + (riskTop.growth_rate ? `${riskTop.growth_rate} organic growth` : 'minimal organic growth') + `. ` +
+                      `Run targeted executive outreach and resolve top pain points to prevent churn.`
+            });
+        }
+
+        if (passiveTop && passiveTop.count > 0) {
+            const pct = Math.round((passiveTop.count / total) * 100);
+            rows.push({
+                icon: 'fas fa-exchange-alt',
+                iconColor: '#f59e0b',
+                priority: riskTop && riskTop.count > 0 ? '2' : '1',
+                title: 'Convert Passive Accounts',
+                body: `<strong>${passiveTop.count} account${passiveTop.count !== 1 ? 's' : ''} (${pct}%)</strong> in the 30–49 NPS band — your conversion opportunity. ` +
+                      `A shift to the 50–69 band would lift expected growth from ~15% to ~25%. ` +
+                      `Focus on closing known service gaps and demonstrating new value.`
+            });
+        }
+
+        if (championTop && championTop.count > 0) {
+            const pct = Math.round((championTop.count / total) * 100);
+            const topRange = championTop.nps_range === '70-100' ? '70–100' : '50–69';
+            rows.push({
+                icon: 'fas fa-star',
+                iconColor: '#10b981',
+                priority: rows.length + 1,
+                title: 'Activate Promoter Growth',
+                body: `<strong>${championTop.count} account${championTop.count !== 1 ? 's' : ''} (${pct}%)</strong> in the ${topRange} NPS band. ` +
+                      `These are your growth engine — expected organic growth of ` +
+                      (championTop.growth_rate ? `${championTop.growth_rate}` : 'up to 40%') + `. ` +
+                      `Engage them for referrals, case studies, and co-marketing to compound growth.`
+            });
+        }
+
+        if (rows.length > 0) {
+            const rowsHtml = rows.map(r => `
+                <div class="d-flex gap-2 mb-2 pb-2 ${rows.indexOf(r) < rows.length - 1 ? 'border-bottom' : ''}">
+                    <div class="flex-shrink-0 mt-1">
+                        <i class="${r.icon}" style="color:${r.iconColor};font-size:1rem;"></i>
+                    </div>
+                    <div>
+                        <div class="fw-semibold" style="font-size:0.82rem;color:#1e293b;">
+                            <span class="badge me-1" style="background:${r.iconColor};font-size:0.7rem;">P${r.priority}</span>
+                            ${r.title}
+                        </div>
+                        <div class="text-muted" style="font-size:0.78rem;line-height:1.45;">${r.body}</div>
+                    </div>
+                </div>`).join('');
+
+            focusEl.innerHTML = `<div class="border rounded p-3" style="background:#fafafa;">
+                <div class="fw-semibold mb-2" style="font-size:0.82rem;color:#374151;letter-spacing:0.03em;">
+                    <i class="fas fa-crosshairs me-1" style="color:#E13A44;"></i>PRIORITY FOCUS
+                </div>
+                ${rowsHtml}
+            </div>`;
+            focusEl.style.display = 'block';
+        }
+    }
 }
 
 function populateHighRiskAccounts() {

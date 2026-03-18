@@ -142,13 +142,13 @@
             </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="intelligence-tab" data-bs-toggle="tab" data-bs-target="#intelligence" type="button" role="tab" aria-controls="intelligence" aria-selected="false">
-                <i class="fas fa-brain me-2" style="color: #E13A44;"></i>{{ _('Account Intelligence') }}
+            <button class="nav-link" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics" type="button" role="tab" aria-controls="analytics" aria-selected="false">
+                <i class="fas fa-chart-line me-2" style="color: #E13A44;"></i>{{ _('Growth Analytics') }}
             </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics" type="button" role="tab" aria-controls="analytics" aria-selected="false">
-                <i class="fas fa-chart-line me-2" style="color: #E13A44;"></i>{{ _('Analytics') }}
+            <button class="nav-link" id="intelligence-tab" data-bs-toggle="tab" data-bs-target="#intelligence" type="button" role="tab" aria-controls="intelligence" aria-selected="false">
+                <i class="fas fa-brain me-2" style="color: #E13A44;"></i>{{ _('Account Intelligence') }}
             </button>
         </li>
         <li class="nav-item" role="presentation">
@@ -409,17 +409,19 @@
                     </div>
                 </div>
 
-                <!-- Tenure Distribution -->
+                <!-- Tenure Distribution + NPS Opportunity -->
                 <div class="row mb-4 g-3">
                     <div class="col-md-6">
                         <div class="chart-card">
                             <div class="card-header">
                                 <h5>{{ _('Customer Tenure Distribution') }}</h5>
+                                <p class="text-muted mb-0 small">{{ _('Relationship duration vs. loyalty — % of accounts per cohort with NPS overlay') }}</p>
                             </div>
                             <div class="card-body">
-                                <div class="chart-container">
+                                <div class="chart-container" style="position:relative; height:260px;">
                                     <canvas id="tenureChart"></canvas>
                                 </div>
+                                <div id="tenureCallout" class="mt-3" style="display:none;"></div>
                             </div>
                         </div>
                     </div>
@@ -427,11 +429,16 @@
                         <div class="chart-card">
                             <div class="card-header">
                                 <h5>{{ _('NPS-Based Opportunity Analysis') }}</h5>
+                                <p class="text-muted mb-0 small">
+                                    <i class="fas fa-info-circle me-1" style="color:#E13A44;"></i>{{ _('Based on Bain & Company research: NPS ranges correlate to expected organic revenue growth rates') }}
+                                </p>
                             </div>
                             <div class="card-body">
+                                <div id="growthConfidenceBar" class="mb-2" style="display:none;"></div>
                                 <div class="chart-container">
                                     <canvas id="growthFactorChart"></canvas>
                                 </div>
+                                <div id="growthPriorityFocus" class="mt-3" style="display:none;"></div>
                             </div>
                         </div>
                     </div>
