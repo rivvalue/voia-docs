@@ -2148,7 +2148,7 @@ function createTenureChart() {
 
     const config = getMobileChartConfig();
 
-    // Inline plugin: draw % value above each bar
+    // Inline plugin: draw % label at right end of each horizontal bar
     const pctLabelPlugin = {
         id: 'tenurePctLabels',
         afterDraw(chart) {
@@ -2160,9 +2160,9 @@ function createTenureChart() {
                     ctx.save();
                     ctx.fillStyle = '#374151';
                     ctx.font = 'bold 11px Arial, sans-serif';
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'bottom';
-                    ctx.fillText(val + '%', bar.x, bar.y - 3);
+                    ctx.textAlign = 'left';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(val + '%', bar.x + 4, bar.y);
                     ctx.restore();
                 }
             });
@@ -2181,7 +2181,7 @@ function createTenureChart() {
                     backgroundColor: barColors,
                     borderColor: barColors,
                     borderWidth: 1,
-                    yAxisID: 'yPct',
+                    xAxisID: 'xPct',
                     order: 2
                 },
                 {
@@ -2198,13 +2198,14 @@ function createTenureChart() {
                     borderWidth: 2,
                     tension: 0.3,
                     spanGaps: true,
-                    yAxisID: 'yNps',
+                    xAxisID: 'xNps',
                     order: 1
                 }
             ]
         },
         plugins: [pctLabelPlugin],
         options: {
+            indexAxis: 'y',
             responsive: true,
             maintainAspectRatio: false,
             interaction: { mode: 'index', intersect: false },
@@ -2225,20 +2226,20 @@ function createTenureChart() {
                                 const i = context.dataIndex;
                                 return ` ${context.dataset.label}: ${pctData[i]}% (${rawCounts[i]} accounts)`;
                             }
-                            const val = context.parsed.y;
+                            const val = context.parsed.x;
                             return val !== null ? ` NPS Score: ${val}` : ' NPS Score: n/a';
                         }
                     }
                 }
             },
             scales: {
-                x: {
+                y: {
                     ticks: { color: '#000000', font: { size: config.fontSize } },
                     grid: { color: '#f1f5f9' }
                 },
-                yPct: {
+                xPct: {
                     type: 'linear',
-                    position: 'left',
+                    position: 'bottom',
                     beginAtZero: true,
                     max: 100,
                     ticks: {
@@ -2249,9 +2250,9 @@ function createTenureChart() {
                     grid: { color: '#f1f5f9' },
                     title: { display: true, text: '% of Accounts', color: '#6b7280', font: { size: 11 } }
                 },
-                yNps: {
+                xNps: {
                     type: 'linear',
-                    position: 'right',
+                    position: 'top',
                     min: -100,
                     max: 100,
                     ticks: {
@@ -2447,12 +2448,15 @@ function createGrowthFactorChart() {
         // Classify each distribution item
         const risks     = distribution.filter(d => ['<0', '0-29'].includes(d.nps_range));
         const passives  = distribution.filter(d => ['30-49'].includes(d.nps_range));
-        const champions = distribution.filter(d => ['50-69', '70-100'].includes(d.nps_range));
-
         const biggest = arr => arr.reduce((a, b) => (b.count > a.count ? b : a), arr[0] || null);
-        const riskTop     = biggest(risks);
-        const passiveTop  = biggest(passives);
-        const championTop = biggest(champions);
+        const riskTop    = biggest(risks);
+        const passiveTop = biggest(passives);
+
+        // Prefer the highest NPS band (70-100 > 50-69) for referral potential
+        const topBand = distribution.find(d => d.nps_range === '70-100' && d.count > 0)
+                     || distribution.find(d => d.nps_range === '50-69'  && d.count > 0)
+                     || null;
+        const championTop = topBand;
 
         const rows = [];
 
