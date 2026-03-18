@@ -89,6 +89,13 @@
                         <i class="fas fa-chart-line me-2"></i>{{ _('View Trends') }}
                     </button>
                 </div>
+
+                <!-- View Campaign Trends Button (visible on all screen sizes) -->
+                <div class="text-center mt-3">
+                    <button class="btn btn-outline-secondary btn-sm" onclick="openTrendsModal()" style="border-color: #BDBDBD; color: #000000;">
+                        <i class="fas fa-chart-line me-2"></i>{{ _('View Campaign Trends') }} &rarr;
+                    </button>
+                </div>
             </div>
 
             <!-- {{ _('Campaign') }} Comparison Section -->
@@ -248,6 +255,8 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
             </div>
             <div class="modal-body">
+                <!-- Performance Group -->
+                <h6 class="text-uppercase text-muted fw-semibold mb-3" style="letter-spacing: 0.05em;">{{ _('Performance') }}</h6>
                 <div class="row">
                     <div class="col-lg-6 mb-4">
                         <div class="card border">
@@ -279,16 +288,13 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-6 mb-4">
-                        <div class="card border">
-                            <div class="card-header bg-white border-bottom">
-                                <h6 class="mb-0">{{ _('Critical Risk') }} Count</h6>
-                            </div>
-                            <div class="card-body">
-                                <canvas id="modal-chart-critical" height="250"></canvas>
-                            </div>
-                        </div>
-                    </div>
+                </div>
+
+                <hr class="my-2">
+
+                <!-- Health Signals Group -->
+                <h6 class="text-uppercase text-muted fw-semibold mb-3 mt-3" style="letter-spacing: 0.05em;">{{ _('Health Signals') }}</h6>
+                <div class="row">
                     <div class="col-lg-6 mb-4">
                         <div class="card border">
                             <div class="card-header bg-white border-bottom">
@@ -326,6 +332,16 @@
                             </div>
                             <div class="card-body">
                                 <canvas id="modal-chart-service" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-4">
+                        <div class="card border">
+                            <div class="card-header bg-white border-bottom">
+                                <h6 class="mb-0">{{ _('Critical Risk') }} Count</h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="modal-chart-critical" height="250"></canvas>
                             </div>
                         </div>
                     </div>
