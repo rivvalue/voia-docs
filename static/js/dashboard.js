@@ -1666,9 +1666,65 @@ function createNpsChart() {
     const npsData = dashboardData.nps_distribution || [];
     const labels = npsData.map(item => item.category);
     const data = npsData.map(item => item.count);
-    
-    // Professional color palette matching the design
-    const chartColors = ['#E13A44', '#BDBDBD', '#8A8A8A']; // Red (Detractor), Medium Gray (Passive), Dark Gray (Promoter)
+    const total = data.reduce((a, b) => a + b, 0);
+
+    // Semantic colours mapped by label name (case-insensitive)
+    const NPS_COLOUR_MAP = {
+        promoter:  '#22C55E', // green
+        passive:   '#F59E0B', // amber
+        detractor: '#EF4444'  // red
+    };
+    const chartColors = labels.map(lbl => {
+        const key = lbl.toLowerCase();
+        for (const k of Object.keys(NPS_COLOUR_MAP)) {
+            if (key.includes(k)) return NPS_COLOUR_MAP[k];
+        }
+        return '#BDBDBD';
+    });
+
+    // Centre-text plugin: shows NPS score
+    const npsScore = dashboardData.nps_score ?? null;
+    const npsCentrePlugin = {
+        id: 'npsCentre',
+        afterDraw(chart) {
+            if (npsScore === null) return;
+            const { ctx: c, chartArea: { left, top, right, bottom } } = chart;
+            const cx = (left + right) / 2;
+            const cy = (top + bottom) / 2;
+            c.save();
+            c.textAlign = 'center';
+            c.textBaseline = 'middle';
+            c.font = 'bold 22px Montserrat, sans-serif';
+            c.fillStyle = '#000000';
+            c.fillText(npsScore > 0 ? '+' + npsScore : npsScore, cx, cy - 8);
+            c.font = '12px Karla, sans-serif';
+            c.fillStyle = '#6B7280';
+            c.fillText('NPS', cx, cy + 12);
+            c.restore();
+        }
+    };
+
+    // Arc % labels plugin
+    const npsArcLabelPlugin = {
+        id: 'npsArcLabels',
+        afterDatasetDraw(chart) {
+            if (total === 0) return;
+            const { ctx: c, data: d } = chart;
+            const dataset = chart.getDatasetMeta(0);
+            dataset.data.forEach((arc, i) => {
+                const pct = Math.round((d.datasets[0].data[i] / total) * 100);
+                if (pct === 0) return;
+                const { x, y } = arc.tooltipPosition();
+                c.save();
+                c.textAlign = 'center';
+                c.textBaseline = 'middle';
+                c.font = 'bold 11px Karla, sans-serif';
+                c.fillStyle = '#FFFFFF';
+                c.fillText(pct + '%', x, y);
+                c.restore();
+            });
+        }
+    };
     
     // Get mobile-responsive configuration
     const config = getMobileChartConfig();
@@ -1683,7 +1739,7 @@ function createNpsChart() {
                 borderWidth: 3,
                 borderColor: '#FFFFFF',
                 hoverBorderWidth: 4,
-                hoverBorderColor: '#E13A44'
+                hoverBorderColor: '#333333'
             }]
         },
         options: {
@@ -1708,7 +1764,7 @@ function createNpsChart() {
                     backgroundColor: '#000000',
                     titleColor: '#FFFFFF',
                     bodyColor: '#FFFFFF',
-                    borderColor: '#E13A44',
+                    borderColor: '#333333',
                     borderWidth: 1,
                     cornerRadius: 8,
                     titleFont: {
@@ -1720,6 +1776,13 @@ function createNpsChart() {
                         family: 'Karla',
                         size: config.fontSize - 1,
                         weight: '500'
+                    },
+                    callbacks: {
+                        label(context) {
+                            const count = context.parsed;
+                            const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+                            return ` ${count} responses (${pct}%)`;
+                        }
                     }
                 }
             },
@@ -1728,7 +1791,8 @@ function createNpsChart() {
                     borderRadius: 4
                 }
             }
-        }
+        },
+        plugins: [npsCentrePlugin, npsArcLabelPlugin]
     });
 }
 
@@ -1753,6 +1817,8 @@ function createSentimentChart() {
     
     if (validSentimentData.length === 0) {
         console.warn('No valid sentiment data available for chart');
+        const calloutClr = document.getElementById('sentimentCallout');
+        if (calloutClr) { calloutClr.style.display = 'none'; calloutClr.innerHTML = ''; }
         // Create empty chart with message
         charts.sentimentChart = new Chart(ctx, {
             type: 'bar',
@@ -1784,7 +1850,57 @@ function createSentimentChart() {
     
     const labels = validSentimentData.map(item => item.sentiment.charAt(0).toUpperCase() + item.sentiment.slice(1));
     const data = validSentimentData.map(item => item.count || 0);
-    const colors = ['#8A8A8A', '#BDBDBD', '#E13A44']; // Dark Gray (Positive), Medium Gray (Neutral), Red (Negative)
+    const sentTotal = data.reduce((a, b) => a + b, 0);
+
+    // Semantic colours by label name
+    const SENTIMENT_COLOUR_MAP = {
+        positive: '#22C55E',
+        neutral:  '#94A3B8',
+        negative: '#EF4444'
+    };
+    const colors = labels.map(lbl => {
+        const key = lbl.toLowerCase();
+        return SENTIMENT_COLOUR_MAP[key] || '#BDBDBD';
+    });
+
+    // Dominant sentiment callout
+    const sentimentCalloutEl = document.getElementById('sentimentCallout');
+    if (sentimentCalloutEl) {
+        if (sentTotal > 0) {
+            const maxIdx = data.indexOf(Math.max(...data));
+            const domLabel = labels[maxIdx];
+            const domPct = Math.round((data[maxIdx] / sentTotal) * 100);
+            const domColour = colors[maxIdx];
+            sentimentCalloutEl.innerHTML = `<div class="d-flex align-items-center gap-2 mt-2 p-2 rounded" style="background:#F8F9FA; border-left: 3px solid ${domColour};">
+            <i class="fas fa-circle" style="color:${domColour}; font-size:0.65rem;"></i>
+            <small class="text-muted">Dominant sentiment: <strong style="color:${domColour};">${domLabel}</strong> at <strong>${domPct}%</strong> of responses</small>
+        </div>`;
+            sentimentCalloutEl.style.display = 'block';
+        } else {
+            sentimentCalloutEl.style.display = 'none';
+            sentimentCalloutEl.innerHTML = '';
+        }
+    }
+
+    // % label above bar plugin
+    const sentimentBarLabelPlugin = {
+        id: 'sentimentBarLabels',
+        afterDatasetDraw(chart) {
+            if (sentTotal === 0) return;
+            const { ctx: c, data: d } = chart;
+            chart.getDatasetMeta(0).data.forEach((bar, i) => {
+                const pct = Math.round((d.datasets[0].data[i] / sentTotal) * 100);
+                const { x, y } = bar.getProps(['x', 'y'], true);
+                c.save();
+                c.textAlign = 'center';
+                c.textBaseline = 'bottom';
+                c.font = 'bold 11px Karla, sans-serif';
+                c.fillStyle = '#374151';
+                c.fillText(pct + '%', x, y - 2);
+                c.restore();
+            });
+        }
+    };
     
     // Get mobile-responsive configuration
     const config = getMobileChartConfig();
@@ -1807,6 +1923,23 @@ function createSentimentChart() {
             plugins: {
                 legend: {
                     display: false
+                },
+                tooltip: {
+                    backgroundColor: '#000000',
+                    titleColor: '#FFFFFF',
+                    bodyColor: '#FFFFFF',
+                    borderColor: '#333333',
+                    borderWidth: 1,
+                    cornerRadius: 8,
+                    titleFont: { family: 'Montserrat', size: config.fontSize, weight: '600' },
+                    bodyFont: { family: 'Karla', size: config.fontSize - 1, weight: '500' },
+                    callbacks: {
+                        label(context) {
+                            const count = context.parsed.y;
+                            const pct = sentTotal > 0 ? Math.round((count / sentTotal) * 100) : 0;
+                            return ` ${count} responses (${pct}%)`;
+                        }
+                    }
                 }
             },
             scales: {
@@ -1834,7 +1967,8 @@ function createSentimentChart() {
                     }
                 }
             }
-        }
+        },
+        plugins: [sentimentBarLabelPlugin]
     });
 }
 
@@ -1853,14 +1987,6 @@ function createRatingsChart() {
     }
     
     const ratings = dashboardData.average_ratings || {};
-    console.log('Chart Data Debug - Full dashboardData:', dashboardData);
-    console.log('Chart Data Debug - ratings object:', ratings);
-    console.log('Chart Data Debug - individual values:', {
-        satisfaction: ratings.satisfaction,
-        product_value: ratings.product_value,
-        service: ratings.service,
-        pricing: ratings.pricing
-    });
     
     const labels = [translations.satisfaction, translations.productValue, translations.service, translations.pricing];
     const data = [
@@ -1870,65 +1996,115 @@ function createRatingsChart() {
         ratings.pricing || 0
     ];
     
-    console.log('Chart Data Debug - final data array:', data);
-    console.log('Chart Data Debug - data types:', data.map(v => typeof v));
+    // Semantic colours by score threshold
+    const barColors = data.map(v => {
+        if (v >= 4) return '#22C55E';
+        if (v >= 3) return '#F59E0B';
+        return '#EF4444';
+    });
+
+    // Weakest metric callout
+    const ratingsCalloutEl = document.getElementById('ratingsCallout');
+    const nonZeroData = data.filter(v => v > 0);
+    if (ratingsCalloutEl) {
+        if (nonZeroData.length > 0) {
+            const minVal = Math.min(...data.filter((_, i) => data[i] > 0));
+            const minIdx = data.indexOf(minVal);
+            const minLabel = labels[minIdx];
+            const minColour = barColors[minIdx];
+            ratingsCalloutEl.innerHTML = `<div class="d-flex align-items-center gap-2 mt-2 p-2 rounded" style="background:#F8F9FA; border-left: 3px solid ${minColour};">
+            <i class="fas fa-exclamation-circle" style="color:${minColour}; font-size:0.8rem;"></i>
+            <small class="text-muted">Weakest metric: <strong style="color:${minColour};">${minLabel}</strong> scored <strong>${minVal.toFixed(1)} / 5</strong></small>
+        </div>`;
+            ratingsCalloutEl.style.display = 'block';
+        } else {
+            ratingsCalloutEl.style.display = 'none';
+            ratingsCalloutEl.innerHTML = '';
+        }
+    }
+
+    // Value label at end of each bar plugin
+    const ratingsBarLabelPlugin = {
+        id: 'ratingsBarLabels',
+        afterDatasetDraw(chart) {
+            const { ctx: c, data: d } = chart;
+            chart.getDatasetMeta(0).data.forEach((bar, i) => {
+                const val = d.datasets[0].data[i];
+                if (!val) return;
+                const { x, y } = bar.getProps(['x', 'y'], true);
+                c.save();
+                c.textAlign = 'left';
+                c.textBaseline = 'middle';
+                c.font = 'bold 11px Karla, sans-serif';
+                c.fillStyle = '#374151';
+                c.fillText(val.toFixed(1) + ' / 5', x + 6, y);
+                c.restore();
+            });
+        }
+    };
     
     // Get mobile-responsive configuration
     const config = getMobileChartConfig();
     
     charts.ratingsChart = new Chart(ctx, {
-        type: 'radar',
+        type: 'bar',
         data: {
             labels: labels,
             datasets: [{
                 label: translations.averageRating,
                 data: data,
-                borderColor: '#E13A44',
-                backgroundColor: 'rgba(225, 58, 68, 0.1)',
-                borderWidth: 2,
-                pointBackgroundColor: '#E13A44',
-                pointBorderColor: '#FFFFFF',
-                pointBorderWidth: 2
+                backgroundColor: barColors,
+                borderWidth: 0,
+                borderRadius: 4,
+                barThickness: 28
             }]
         },
         options: {
+            indexAxis: 'y',
             responsive: true,
             maintainAspectRatio: config.maintainAspectRatio,
             plugins: {
                 legend: {
-                    position: config.legendPosition,
-                    labels: {
-                        color: '#000000',
-                        padding: config.legendPadding,
-                        font: {
-                            size: config.legendFontSize
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: '#000000',
+                    titleColor: '#FFFFFF',
+                    bodyColor: '#FFFFFF',
+                    borderColor: '#333333',
+                    borderWidth: 1,
+                    cornerRadius: 8,
+                    titleFont: { family: 'Montserrat', size: config.fontSize, weight: '600' },
+                    bodyFont: { family: 'Karla', size: config.fontSize - 1, weight: '500' },
+                    callbacks: {
+                        label(context) {
+                            const v = context.parsed.x;
+                            return ` ${v.toFixed(1)} / 5`;
                         }
                     }
                 }
             },
             scales: {
-                r: {
+                x: {
                     beginAtZero: true,
                     max: 5,
                     ticks: {
                         color: '#000000',
                         stepSize: 1,
-                        font: {
-                            size: config.fontSize
-                        }
+                        font: { size: config.fontSize }
                     },
-                    grid: {
-                        color: '#BDBDBD'
-                    },
-                    pointLabels: {
+                    grid: { color: '#E9E8E4' }
+                },
+                y: {
+                    ticks: {
                         color: '#000000',
-                        font: {
-                            size: config.fontSize
-                        }
-                    }
+                        font: { size: config.fontSize }
+                    },
+                    grid: { display: false }
                 }
             }
-        }
+        },
+        plugins: [ratingsBarLabelPlugin]
     });
 }
 
