@@ -443,14 +443,39 @@ def get_dashboard_data(campaign_id=None, business_account_id=None):
             promoters = sum(1 for r in company_all_responses if r.nps_score >= 9)
             detractors = sum(1 for r in company_all_responses if r.nps_score <= 6)
             company_nps = round(((promoters - detractors) / total_company_responses) * 100) if total_company_responses > 0 else 0
-            
+
+            # Confidence level based on invited count vs responses (same logic as account_intelligence)
+            company_invited_count = 0
+            company_response_rate = None
+            company_confidence_level = 'insufficient'
+            if campaign_id and business_account_id:
+                company_invited_count = db.session.query(func.count(CampaignParticipant.id)).join(
+                    Participant, CampaignParticipant.participant_id == Participant.id
+                ).filter(
+                    CampaignParticipant.campaign_id == campaign_id,
+                    func.upper(Participant.company_name) == company_key
+                ).scalar() or 0
+                if company_invited_count > 0:
+                    company_response_rate = round((total_company_responses / company_invited_count) * 100, 1)
+                    if company_invited_count < 5:
+                        company_confidence_level = 'insufficient'
+                    elif company_response_rate >= 60 and total_company_responses >= 10:
+                        company_confidence_level = 'high'
+                    elif (30 <= company_response_rate < 60) or (5 <= total_company_responses < 10):
+                        company_confidence_level = 'medium'
+                    else:
+                        company_confidence_level = 'low'
+
             high_risk_accounts.append({
                 'company_name': company_data['company_name'],
                 'risk_level': max_risk_level,
                 'risk_score': round(avg_risk_score, 2),
                 'nps_score': company_nps,
                 'respondent_count': company_data['respondent_count'],
-                'latest_response': company_data['latest_response']
+                'latest_response': company_data['latest_response'],
+                'invited_count': company_invited_count,
+                'response_rate': company_response_rate,
+                'confidence_level': company_confidence_level,
             })
         
         # Sort by highest risk first, then by lowest NPS

@@ -289,7 +289,11 @@
                            title="Weighted Scoring: Opportunities (upsell/expansion=3, cross-sell=2, referral/advocacy=1.5, renewal=1) and risks (Critical=3, High=2, Medium=1, Low=0.5) are scored by impact. Health Ratio = Opp Score / (Opp + Risk). High Potential: ratio &gt; 65%% | Balanced: 35-65%% | Risk-Heavy: ratio &lt; 35%%." 
                            style="font-size: 0.8em; opacity: 0.7;"></i>
                     </h5>
-                    <small class="text-muted">Risk vs Opportunity {{ _('Balance') }} by {{ _('Company') }}</small>
+                    <small class="text-muted">Risk vs Opportunity {{ _('Balance') }} by {{ _('Company') }}
+                        <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" data-bs-placement="top"
+                           title="{{ _('Based on qualitative risk factors and growth opportunities identified from open-text AI analysis across all responses. Different from churn risk signals shown in Survey Insights.') }}"
+                           style="font-size: 0.85em; opacity: 0.6;"></i>
+                    </small>
                     <div class="mt-1">
                         <small class="text-muted">
                             <i class="fas fa-chart-bar me-1"></i>{{ _('Response Rate') }} {{ _('Confidence Level') }}:
@@ -633,12 +637,20 @@
                                         <i class="fas fa-exclamation-triangle"></i>
                                     </div>
                                     <div>
-                                        <div class="si-stat-label">{{ _('Accounts Needing Attention') }}</div>
+                                        <div class="si-stat-label">
+                                            {{ _('Accounts Needing Attention') }}
+                                            <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" data-bs-placement="top"
+                                               title="{{ _('Based on AI churn risk signals (High or Critical) detected in individual survey responses. Confidence reflects response rate vs invited contacts.') }}"
+                                               style="font-size: 0.8em; opacity: 0.6;"></i>
+                                        </div>
                                         <div class="si-stat-value">
                                             <span id="siRiskCount">0</span> {{ _('at risk') }}
                                             <button class="btn btn-outline-danger btn-sm ms-2 py-0 px-2" id="siShowRiskBtn" onclick="siFilterHighRisk()" style="font-size: 0.75rem;">
                                                 {{ _('Show') }}
                                             </button>
+                                        </div>
+                                        <div style="font-size: 0.75rem; color: #6c757d; margin-top: 2px;">
+                                            <span id="siRiskCountSub" style="display: none;"></span>
                                         </div>
                                     </div>
                                 </div>

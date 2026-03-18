@@ -3090,6 +3090,20 @@ function siUpdatePriorityPanel() {
     const riskCountEl = document.getElementById('siRiskCount');
     if (riskCountEl) riskCountEl.textContent = highRiskCount;
 
+    const lowConfCount = highRiskAccounts.filter(function(a) {
+        var cl = a.confidence_level || 'insufficient';
+        return cl === 'low' || cl === 'insufficient';
+    }).length;
+    var riskSubEl = document.getElementById('siRiskCountSub');
+    if (riskSubEl) {
+        if (lowConfCount > 0 && highRiskCount > 0) {
+            riskSubEl.textContent = lowConfCount + ' with limited data';
+            riskSubEl.style.display = 'inline';
+        } else {
+            riskSubEl.style.display = 'none';
+        }
+    }
+
     const showBtn = document.getElementById('siShowRiskBtn');
     if (showBtn) showBtn.style.display = highRiskCount > 0 ? '' : 'none';
 
@@ -3138,7 +3152,10 @@ function siFilterHighRisk() {
         passives: 0,
         detractors: 0,
         latest_response: a.latest_response || 'N/A',
-        latest_churn_risk: a.risk_level
+        latest_churn_risk: a.risk_level,
+        confidence_level: a.confidence_level || 'insufficient',
+        response_rate: a.response_rate || null,
+        invited_count: a.invited_count || 0,
     }));
     mapped.sort(siRiskSort);
 
@@ -3158,6 +3175,8 @@ function siFilterHighRisk() {
 
         const campaignSelectHR = document.getElementById('campaignFilter');
         const campaignIdHR = campaignSelectHR ? campaignSelectHR.value : null;
+        const confidenceBadgeHR = getConfidenceBadge(company.confidence_level || 'insufficient');
+        const rateHintHR = company.response_rate != null ? ` (${company.response_rate}% of ${company.invited_count} invited)` : '';
         return `
             <tr class="${riskBorderClass}" data-si-click="company" data-company-name="${escapeHtml(company.company_name)}">
                 <td>
@@ -3170,6 +3189,7 @@ function siFilterHighRisk() {
                         ${escapeHtml(company.company_name)}
                         <i class="fas fa-external-link-alt ms-2" style="font-size: 0.7em; color: #8A8A8A;"></i>
                     </a>
+                    <br><small title="Data confidence${escapeHtml(rateHintHR)}">${confidenceBadgeHR}</small>
                 </td>
                 <td><span class="badge ${riskBadgeClass}">${escapeHtml(company.risk_level)}</span></td>
                 <td>${escapeHtml(String(company.total_responses))}</td>
