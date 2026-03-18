@@ -3097,7 +3097,7 @@ function siUpdatePriorityPanel() {
     var riskSubEl = document.getElementById('siRiskCountSub');
     if (riskSubEl) {
         if (lowConfCount > 0 && highRiskCount > 0) {
-            riskSubEl.textContent = lowConfCount + ' with limited data';
+            riskSubEl.textContent = lowConfCount + ' with low/insufficient data';
             riskSubEl.style.display = 'inline';
         } else {
             riskSubEl.style.display = 'none';
