@@ -134,7 +134,9 @@
                     <!-- {{ _('Metrics Comparison') }} -->
                     <div class="border rounded p-3 mb-3" style="background-color: #ffffff;">
                         <h6 class="mb-3">{{ _('Metrics Comparison') }}</h6>
-                        <!-- Key takeaway (populated by JS) -->
+                        <!-- Comparison headline: "Campaign 2 improved on X of Y metrics" (populated by JS) -->
+                        <div id="comparisonHeadline" class="comparison-headline mb-2" style="display: none;"></div>
+                        <!-- Key shifts takeaway badges (populated by JS) -->
                         <div id="metricsComparisonTakeaway" class="mb-3" style="display: none;"></div>
                         <div class="table-responsive">
                             <table class="table table-borderless table-sm">
@@ -178,10 +180,16 @@
                         <div class="row align-items-end mb-3">
                             <div class="col-md-5">
                                 <label for="comparison{{ _('Search') }}" class="form-label">{{ _('Search') }}</label>
-                                <input type="text" class="form-control" id="comparison{{ _('Search') }}" 
-                                       placeholder="{{ _('Search') }} by company name...">
+                                <div class="position-relative">
+                                    <input type="text" class="form-control pe-4" id="comparison{{ _('Search') }}" 
+                                           placeholder="{{ _('Search') }} by company name..."
+                                           oninput="searchComparisonTable(); toggleComparisonClearBtn();">
+                                    <button type="button" id="comparisonClearBtn" class="btn-clear-input" 
+                                            onclick="clearComparisonSearch()" style="display: none;"
+                                            title="{{ _('Clear') }}">&#x2715;</button>
+                                </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <label for="comparisonBalanceFilter" class="form-label">{{ _('Balance Status') }}</label>
                                 <select class="form-select" id="comparisonBalanceFilter" onchange="searchComparisonTable()">
                                     <option value="">All {{ _('Companies') }}</option>
@@ -190,33 +198,28 @@
                                     <option value="risk_heavy">{{ _('Risk Heavy') }}</option>
                                 </select>
                             </div>
-                            <div class="col-md-4">
-                                <div class="btn-group w-100">
-                                    <button type="button" class="btn btn-primary" onclick="searchComparisonTable()">
-                                        <i class="fas fa-search me-1"></i>{{ _('Search') }}
-                                    </button>
-                                    <button type="button" class="btn btn-outline-secondary" onclick="clearComparison{{ _('Search') }}()">
-                                        <i class="fas fa-times me-1"></i>{{ _('Clear') }}
-                                    </button>
-                                </div>
-                            </div>
                         </div>
                         <div class="table-responsive">
                             <table class="table table-hover table-sm" style="border-collapse: collapse;">
                                 <thead>
                                     <tr>
-                                        <th rowspan="2" style="width: 13%; vertical-align: middle; background-color: #f8f9fa;">{{ _('Company') }}</th>
+                                        <th rowspan="2" style="width: 20%; vertical-align: middle; background-color: #f8f9fa;">{{ _('Company') }}</th>
                                         <th colspan="3" class="text-center" style="background-color: rgba(225, 58, 68, 0.08); border-bottom: 2px solid #E13A44; border-right: 2px solid #dee2e6;">{{ _('Campaign 1') }} <span class="text-muted fw-normal">(C1)</span></th>
                                         <th colspan="3" class="text-center" style="background-color: rgba(13, 110, 253, 0.08); border-bottom: 2px solid #0d6efd;">{{ _('Campaign 2') }} <span class="text-muted fw-normal">(C2)</span></th>
-                                        <th rowspan="2" class="text-center" style="width: 12%; vertical-align: middle; background-color: #f8f9fa;">{{ _('Status') }}</th>
+                                        <th rowspan="2" class="text-center" style="width: 10%; vertical-align: middle; background-color: #f8f9fa;"
+                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                            title="{{ _('Improved / Stable / Worsened / New / Lost — based on balance shift between campaigns') }}">
+                                            {{ _('Status') }} <i class="fas fa-info-circle fa-xs text-muted"></i>
+                                        </th>
+                                        <th rowspan="2" class="text-center" style="width: 8%; vertical-align: middle; background-color: #f8f9fa;">{{ _('NPS') }} &Delta;</th>
                                     </tr>
                                     <tr>
-                                        <th class="text-center" style="width: 12%; background-color: rgba(225, 58, 68, 0.04); font-weight: 500; font-size: 0.8rem;">{{ _('Risks') }}</th>
-                                        <th class="text-center" style="width: 12%; background-color: rgba(225, 58, 68, 0.04); font-weight: 500; font-size: 0.8rem;">{{ _('Opps') }}</th>
-                                        <th class="text-center" style="width: 13%; background-color: rgba(225, 58, 68, 0.04); font-weight: 500; font-size: 0.8rem; border-right: 2px solid #dee2e6;">{{ _('Balance') }}</th>
-                                        <th class="text-center" style="width: 12%; background-color: rgba(13, 110, 253, 0.04); font-weight: 500; font-size: 0.8rem;">{{ _('Risks') }}</th>
-                                        <th class="text-center" style="width: 12%; background-color: rgba(13, 110, 253, 0.04); font-weight: 500; font-size: 0.8rem;">{{ _('Opps') }}</th>
-                                        <th class="text-center" style="width: 13%; background-color: rgba(13, 110, 253, 0.04); font-weight: 500; font-size: 0.8rem;">{{ _('Balance') }}</th>
+                                        <th class="text-center" style="width: 10%; background-color: rgba(225, 58, 68, 0.04); font-weight: 500; font-size: 0.8rem;">{{ _('Risks') }}</th>
+                                        <th class="text-center" style="width: 10%; background-color: rgba(225, 58, 68, 0.04); font-weight: 500; font-size: 0.8rem;">{{ _('Opps') }}</th>
+                                        <th class="text-center" style="width: 11%; background-color: rgba(225, 58, 68, 0.04); font-weight: 500; font-size: 0.8rem; border-right: 2px solid #dee2e6;">{{ _('Balance') }}</th>
+                                        <th class="text-center" style="width: 10%; background-color: rgba(13, 110, 253, 0.04); font-weight: 500; font-size: 0.8rem;">{{ _('Risks') }}</th>
+                                        <th class="text-center" style="width: 10%; background-color: rgba(13, 110, 253, 0.04); font-weight: 500; font-size: 0.8rem;">{{ _('Opps') }}</th>
+                                        <th class="text-center" style="width: 11%; background-color: rgba(13, 110, 253, 0.04); font-weight: 500; font-size: 0.8rem;">{{ _('Balance') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody id="companyTable">
@@ -362,4 +365,12 @@
 
 <!-- JavaScript for {{ _('Executive Summary') }} -->
 <script src="{{ url_for('static', filename='js/executive_summary.js') }}?v={{ range(1000, 9999) | random }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var tooltipEls = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+        tooltipEls.forEach(function (el) {
+            new bootstrap.Tooltip(el);
+        });
+    });
+</script>
 {% endblock %}

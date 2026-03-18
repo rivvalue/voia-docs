@@ -471,7 +471,7 @@ function populateExecutiveSummary(data) {
     // Clear existing content
     tableBody.textContent = '';
 
-    // Build takeaway insights from the metrics
+    // Build takeaway insights from the metrics (Key shifts badges)
     const takeaways = [];
     const npsMetric = metrics.find(m => m.name === 'NPS Score');
     if (npsMetric && npsMetric.change !== 0) {
@@ -493,7 +493,7 @@ function populateExecutiveSummary(data) {
         takeaways.push({ text: `${declinedRatings.length} rating${declinedRatings.length > 1 ? 's' : ''} declined`, good: false });
     }
 
-    // Render takeaway
+    // Render key shifts takeaway
     const takeawayEl = document.getElementById('metricsComparisonTakeaway');
     if (takeawayEl && takeaways.length > 0) {
         takeawayEl.style.display = 'block';
@@ -517,6 +517,24 @@ function populateExecutiveSummary(data) {
         takeawayEl.style.display = 'none';
     }
 
+    // Compute max absolute change for mini-bar scaling
+    const maxAbsChange = Math.max(...metrics.map(m => Math.abs(m.change || 0)), 1);
+
+    // Compute headline: count metrics where the change is semantically an improvement
+    let metricsImprovedCount = 0;
+    metrics.forEach(metric => {
+        const inv = isInverse(metric.name);
+        if (metric.change > 0 && !inv) metricsImprovedCount++;
+        if (metric.change < 0 && inv) metricsImprovedCount++;
+    });
+    const headlineEl = document.getElementById('comparisonHeadline');
+    if (headlineEl) {
+        const c2Name = document.getElementById('campaign2Header')?.textContent?.trim() || 'Campaign 2';
+        const c1Name = document.getElementById('campaign1Header')?.textContent?.trim() || 'Campaign 1';
+        headlineEl.textContent = `${c2Name} improved on ${metricsImprovedCount} of ${metrics.length} metrics vs ${c1Name}`;
+        headlineEl.style.display = '';
+    }
+
     // Track whether we need a separator (inserted before first rating row)
     let separatorInserted = false;
     const ratingNames = [translations.satisfactionRating, translations.productValueRating, translations.pricingRating, translations.serviceRating];
@@ -527,6 +545,7 @@ function populateExecutiveSummary(data) {
 
         const inverse = isInverse(metric.name);
         const badge = changeBadgeInfo(metric.change, metric.format, inverse);
+        const barWidth = Math.round((Math.abs(metric.change) / maxAbsChange) * 40);
 
         // Insert separator row before ratings section
         if (!separatorInserted && ratingNames.includes(metric.name)) {
@@ -553,7 +572,7 @@ function populateExecutiveSummary(data) {
                 row.style.backgroundColor = 'rgba(220, 53, 69, 0.04)';
             }
         }
-        
+
         // Name column — add "(lower is better)" hint for inverse metrics
         const nameCell = document.createElement('td');
         const nameStrong = document.createElement('strong');
@@ -591,7 +610,7 @@ function populateExecutiveSummary(data) {
             c2Cell.textContent = c2Display;
         }
         
-        // Change column — consistent badge: green arrow up = improvement, red arrow down = deterioration
+        // Change column — badge with arrow + mini-bar for magnitude
         const changeCell = document.createElement('td');
         changeCell.className = 'text-center';
         const changeBadgeEl = document.createElement('span');
@@ -603,6 +622,17 @@ function populateExecutiveSummary(data) {
             changeBadgeEl.textContent = badge.text;
         }
         changeCell.appendChild(changeBadgeEl);
+        
+        if (barWidth > 0) {
+            const barWrap = document.createElement('div');
+            barWrap.className = 'change-minibar-wrap';
+            const bar = document.createElement('div');
+            bar.className = 'change-minibar';
+            bar.style.width = barWidth + 'px';
+            bar.style.backgroundColor = 'currentColor';
+            barWrap.appendChild(bar);
+            changeCell.appendChild(barWrap);
+        }
         
         // Append all cells to row
         row.appendChild(nameCell);
@@ -843,6 +873,30 @@ function populateCompanyComparison(data, page = 1) {
         statusBadgeEl.textContent = status;
         statusCell.appendChild(statusBadgeEl);
         
+        // NPS Delta column
+        const npsDeltaCell = document.createElement('td');
+        npsDeltaCell.className = 'text-center';
+        const c1Nps = c1.nps_score !== null && c1.nps_score !== undefined ? parseFloat(c1.nps_score) : null;
+        const c2Nps = c2.nps_score !== null && c2.nps_score !== undefined ? parseFloat(c2.nps_score) : null;
+        if (c1Nps !== null && c2Nps !== null && !isNaN(c1Nps) && !isNaN(c2Nps)) {
+            const delta = c2Nps - c1Nps;
+            const npsDeltaStrong = document.createElement('strong');
+            if (delta > 0) {
+                npsDeltaStrong.className = 'text-success';
+                npsDeltaStrong.textContent = `↑ +${delta.toFixed(1)}`;
+            } else if (delta < 0) {
+                npsDeltaStrong.className = 'text-danger';
+                npsDeltaStrong.textContent = `↓ ${delta.toFixed(1)}`;
+            } else {
+                npsDeltaStrong.className = 'text-muted';
+                npsDeltaStrong.textContent = '0';
+            }
+            npsDeltaCell.appendChild(npsDeltaStrong);
+        } else {
+            npsDeltaCell.className = 'text-center text-muted';
+            npsDeltaCell.textContent = 'N/A';
+        }
+        
         // Append all cells to row
         row.appendChild(nameCell);
         row.appendChild(c1RiskCell);
@@ -852,6 +906,7 @@ function populateCompanyComparison(data, page = 1) {
         row.appendChild(c2OppCell);
         row.appendChild(c2BalanceCell);
         row.appendChild(statusCell);
+        row.appendChild(npsDeltaCell);
         
         // Append row to table body
         tableBody.appendChild(row);
@@ -906,12 +961,22 @@ function searchComparisonTable() {
     }
 }
 
+// Toggle visibility of the clear (×) button based on search input content
+function toggleComparisonClearBtn() {
+    const searchInput = document.getElementById('comparisonSearch');
+    const clearBtn = document.getElementById('comparisonClearBtn');
+    if (clearBtn) {
+        clearBtn.style.display = (searchInput && searchInput.value.length > 0) ? '' : 'none';
+    }
+}
+
 // Clear comparison search and filters
 function clearComparisonSearch() {
     const searchInput = document.getElementById('comparisonSearch');
     if (searchInput) {
         searchInput.value = '';
     }
+    toggleComparisonClearBtn();
     
     const balanceFilter = document.getElementById('comparisonBalanceFilter');
     if (balanceFilter) {
