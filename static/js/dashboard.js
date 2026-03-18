@@ -2096,17 +2096,38 @@ function createTenureChart() {
         return;
     }
 
+    // Normalize old-format tenure strings to standardized cohort keys
+    function normalizeTenureString(s) {
+        if (!s) return s;
+        const t = s.trim();
+        // Old format: "< 1 year" or "<1 year"
+        if (/^<\s*1\s*year$/i.test(t)) return 'Less than 6 months';
+        // Old format: "N years" (single integer year values)
+        const singleYearMatch = t.match(/^(\d+)\s*years?$/i);
+        if (singleYearMatch) {
+            const n = parseInt(singleYearMatch[1], 10);
+            if (n < 1) return 'Less than 6 months';
+            if (n === 1) return '1-2 years';
+            if (n === 2) return '2-3 years';
+            if (n <= 4) return '3-5 years';
+            if (n <= 9) return '5-10 years';
+            return 'More than 10 years';
+        }
+        return t;
+    }
+
     // Aggregate raw counts by cohort
     const distMap = {};
     (dashboardData.tenure_distribution || []).forEach(item => {
-        distMap[item.tenure] = (distMap[item.tenure] || 0) + item.count;
+        const key = normalizeTenureString(item.tenure);
+        distMap[key] = (distMap[key] || 0) + item.count;
     });
 
     // Aggregate NPS per cohort using tenure_nps_data (weighted average)
     const npsWeightedSum = {};
     const npsWeightTotal = {};
     (dashboardData.tenure_nps_data || []).forEach(item => {
-        const key = item.tenure_group;
+        const key = normalizeTenureString(item.tenure_group);
         const n = item.total_responses || 0;
         const nps = item.tenure_nps ?? item.avg_nps ?? null;
         if (nps !== null && n > 0) {
@@ -2187,13 +2208,15 @@ function createTenureChart() {
 
     const config = getMobileChartConfig();
 
-    // Inline plugin: draw % label at right end of each horizontal bar
+    // Inline plugin: draw % label at right end of each horizontal bar,
+    // and NPS value above each line point
     const pctLabelPlugin = {
         id: 'tenurePctLabels',
         afterDraw(chart) {
             const ctx = chart.ctx;
-            const meta = chart.getDatasetMeta(0);
-            meta.data.forEach((bar, i) => {
+            // Draw % labels on bars (dataset 0)
+            const barMeta = chart.getDatasetMeta(0);
+            barMeta.data.forEach((bar, i) => {
                 const val = pctData[i];
                 if (val > 0) {
                     ctx.save();
@@ -2202,6 +2225,21 @@ function createTenureChart() {
                     ctx.textAlign = 'left';
                     ctx.textBaseline = 'middle';
                     ctx.fillText(val + '%', bar.x + 4, bar.y);
+                    ctx.restore();
+                }
+            });
+            // Draw NPS value labels above each line point (dataset 1)
+            const lineMeta = chart.getDatasetMeta(1);
+            lineMeta.data.forEach((point, i) => {
+                const val = npsData[i];
+                if (val !== null && val !== undefined) {
+                    const label = (val >= 0 ? '+' : '') + val;
+                    ctx.save();
+                    ctx.fillStyle = '#1e293b';
+                    ctx.font = 'bold 11px Arial, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'bottom';
+                    ctx.fillText(label, point.x, point.y - 6);
                     ctx.restore();
                 }
             });
