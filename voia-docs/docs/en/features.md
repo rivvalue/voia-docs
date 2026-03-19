@@ -48,14 +48,18 @@ Highlights areas where customers want improvements
 
 ### Executive Reports
 
-Get professional PDF reports with:
-- Overall NPS score and trend
-- Sentiment breakdown
-- Top customer themes
-- Risk and opportunity highlights
-- Response statistics
+Executive Reports bring together the most important findings from a campaign into a single, presentation-ready document you can share with leadership or stakeholders. Each report is organized into three named sections.
 
-**Perfect for:** Sharing with leadership or stakeholders
+**KPI Overview**
+A summary table that shows your key performance indicators side by side. Each metric row includes a sparkline — a miniature trend chart — so readers can see at a glance whether a number has been improving or declining over the campaign period. The NPS figure is color-coded (green for a healthy score, amber for a score that needs attention, red for a score requiring immediate action) so the most critical information is immediately visible. An AI-generated headline sentence at the top of the table translates the numbers into plain language for readers who prefer a quick summary.
+
+**Campaign Comparison**
+A structured table that lets you measure the current campaign against one or more previous campaigns. Each metric is shown with a directional indicator — an upward arrow for improvement, a downward arrow for decline — so trends are visible without having to calculate differences yourself. A real-time search bar lets you filter the comparison table by metric name or campaign name, which is especially useful when you are working with many campaigns and need to find a specific data point quickly. See the Campaign Comparison section below for more detail on how to use this feature.
+
+**Trends Modal**
+An interactive overlay that opens when you click **View Trends** inside the report. It displays eight charts organized into two groups. The first group focuses on experience metrics: NPS trajectory, sentiment distribution over time, response volume, and completion rate. The second group focuses on relationship health: churn risk trend, growth opportunity trend, account balance score, and theme frequency changes. Use the Trends Modal when you want to understand the story behind the headline numbers and identify which direction things are heading.
+
+**Perfect for:** Sharing with leadership or stakeholders who need the full picture without logging into the platform
 
 ---
 
@@ -201,31 +205,116 @@ Every response is analyzed for emotion:
 
 ### Key Themes
 
-VOÏA automatically extracts the main topics from feedback:
-- Product quality
-- Customer support
-- Pricing
-- Features
-- Onboarding experience
+VOÏA automatically extracts the main topics customers mention and presents them as a ranked bar chart. Each bar represents one theme (for example, "pricing," "support quality," or "onboarding") and is color-coded by the dominant sentiment behind it — green for predominantly positive feedback, red for predominantly negative, and grey for neutral or mixed. Bars are ordered from most-mentioned to least-mentioned so you can see at a glance what is top of mind. Each bar displays both the raw response count and the percentage of respondents who raised that topic. Beneath the chart, an interpretive callout sentence summarizes the single most important takeaway — for example, "Pricing was the most discussed topic and was viewed negatively by 63% of respondents."
 
-**See what matters most** to your customers without reading every response manually.
+**Use Key Themes to:**
+- Spot recurring concerns before they become serious problems
+- Prioritize which areas of your product or service to improve first
+- Track whether a theme grows or shrinks after you make changes
+
+---
+
+### Campaign Insights: Five-Tab Analytics
+
+When you open a campaign and click **Insights**, you see a five-tab analytics workspace. Each tab focuses on a different dimension of your results. You can move freely between tabs without losing your place.
+
+**Overview**
+A high-level summary of the campaign so far:
+- NPS score with a trend line showing how it has moved over the campaign period
+- Response rate and total responses received
+- Sentiment distribution (positive, neutral, negative) as a donut chart
+- A short AI-written headline that describes the most important finding in plain language
+
+**Growth Analytics**
+Focuses on expansion and retention signals:
+- Promoter, Passive, and Detractor counts with week-over-week changes
+- Response volume over time as an area chart
+- Completion funnel showing how many participants opened the survey versus responded
+- Highlight cards for the segments with the highest and lowest NPS
+
+**Account Intelligence**
+Gives you a company-level view of risk and opportunity across all accounts in the campaign:
+- Balance score for each company — a single indicator combining NPS, sentiment, churn risk, and growth opportunity
+- Confidence level (High, Medium, Low, or Insufficient) alongside each score so you know how much weight to give it
+- A sortable account list so you can quickly surface the accounts most at risk or most likely to expand
+- Hover over any account row to load detailed themes, sub-metrics, and verbatim highlights on demand
+- See the [Account Intelligence](#account-intelligence) section below for a full explanation of each element
+
+**Survey Insights**
+Dives into the content of what customers said:
+- Key Themes bar chart (described above)
+- A question-by-question breakdown showing the distribution of answers
+- Verbatim response samples tagged with sentiment and the themes they relate to
+
+**Segmentation Insights**
+Breaks results down by the groups you care about:
+- NPS and sentiment split by company, role, or tenure
+- Side-by-side segment comparison so you can see which groups are happiest and which need attention
+- Filter controls let you isolate a single segment to explore its themes and responses in isolation
 
 ---
 
 ### Account Intelligence
 
-For each customer, VOÏA assesses:
+Account Intelligence gives you a company-by-company view of how your customer relationships are performing.
 
-**Churn Risk**  
-Customers who might leave based on negative sentiment or low NPS
+**Balance Score**
+Each account receives a balance score — a single number that combines NPS, sentiment, churn risk, and growth opportunity signals into one easy-to-read indicator. A positive balance score suggests a healthy relationship; a negative score is a warning sign that the account may need attention.
 
-**Growth Opportunity**  
-Customers who are engaged and might expand their usage
+**Confidence Levels**
+Because some accounts have responded more than others, every score is accompanied by a confidence level that tells you how much weight to give it:
 
-**Use this data to:**
-- Prioritize at-risk accounts
-- Identify upsell opportunities
-- Allocate customer success resources
+- **High confidence** — Enough responses and data points to be statistically reliable. You can act on this score with confidence.
+- **Medium confidence** — A reasonable signal, but consider reaching out directly to confirm the picture.
+- **Low confidence** — Only a small amount of data is available. Treat this as an early indicator rather than a firm conclusion.
+- **Insufficient data** — Too few responses to generate a meaningful score. The account row is still shown so you can decide whether to follow up proactively.
+
+**Hover-Loaded Enrichment**
+Hovering over any account row opens a tooltip that loads additional detail on demand: the top themes that respondents from that company mentioned, sub-metric scores (such as churn risk and growth opportunity individually), and any verbatim highlights. This keeps the main table clean and scannable while still giving you depth when you need it.
+
+**Use Account Intelligence to:**
+- Prioritize at-risk accounts for your customer success team
+- Identify expansion opportunities with healthy, engaged accounts
+- Allocate outreach effort where it will have the most impact
+
+---
+
+### Campaign Comparison
+
+Campaign Comparison lets you place two or more campaigns side by side to understand how your results have changed over time. It is most useful when you have run a campaign more than once — for example, an annual or quarterly customer feedback cycle — and want to know whether things are getting better, staying the same, or getting worse.
+
+**How to use it:**
+- Open the **Executive Reports** section of a campaign and scroll to the Campaign Comparison table, or access it directly from the **Insights** workspace
+- Select which previous campaigns to include in the comparison using the campaign selector
+- Use the real-time search bar to filter rows by metric name if you are looking for a specific indicator
+
+**What you see:**
+- A metrics table that shows each KPI (NPS, sentiment, response rate, churn risk, and others) for each campaign in the comparison set
+- A directional indicator next to each value — an upward arrow means the metric improved relative to the previous campaign, a downward arrow means it declined, and a dash means it held steady
+- An account-level comparison table that shows, for each company in your participant list, the NPS delta between the current and previous campaign — so you can spot which accounts are trending up or down at the relationship level
+
+**When to use Campaign Comparison:**
+- At the end of each survey cycle to brief your leadership on progress
+- When you suspect a product change or service improvement has had an effect on customer sentiment and want data to confirm it
+- To identify accounts whose scores have dropped significantly since the last campaign, so your customer success team can intervene early
+
+---
+
+### Account Insights
+
+Account Insights is a per-company panel that appears on the **Company Responses** page when you click on a company name. It gives you a concentrated view of everything VOÏA knows about that account from the current campaign, without needing to open the full Account Intelligence tab.
+
+**The panel includes:**
+- **NPS breakdown** — the count of Promoters, Passives, and Detractors from that company, along with their calculated NPS
+- **Sub-metric progress bars** — visual indicators for churn risk and growth opportunity, scaled from 0–100 so you can assess account health at a glance
+- **Churn risk gauge** — a prominent gauge that highlights accounts most at risk of not renewing or disengaging, helping you prioritize outreach
+- **Topic pills** — small labeled tags showing the themes that respondents from this company mentioned most frequently; clicking a pill filters the response list to show only responses that mention that topic
+- **Collapsible AI summary** — an AI-generated paragraph that synthesizes all responses from this company into a plain-language narrative; it explains the dominant sentiment, key concerns, and any notable positive signals; expand it when you need a quick briefing before a customer call
+
+**Use Account Insights when:**
+- You are preparing for a customer review or renewal conversation and need a quick summary of how that account feels
+- Your customer success team wants to understand a specific company's feedback without reading through every individual response
+- You need to decide whether to escalate an account to senior leadership based on their current sentiment and churn risk
 
 ---
 

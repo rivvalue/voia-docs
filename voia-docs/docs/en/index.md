@@ -71,11 +71,11 @@ Once your campaign is ready, send invitations to your participants:
 
 Watch responses come in and analyze the results:
 
-1. Go to your **Dashboard**
-2. View real-time metrics (NPS score, sentiment, key themes)
-3. Download executive reports
+1. Go to your **Dashboard** for a real-time summary of NPS, sentiment, and response rate
+2. Open your campaign and click **Insights** to explore the full tab-based analytics workspace — five tabs cover everything from high-level trends to individual account health
+3. Download executive reports to share findings with leadership
 
-**Updates:** Your dashboard updates in real-time as responses arrive.
+**Updates:** Your dashboard and campaign analytics update in real-time as responses arrive. See the [Analytics & Business Intelligence section](features.md#analytics--business-intelligence) of the Feature Guide for a full explanation of each tab and report.
 
 ---
 
