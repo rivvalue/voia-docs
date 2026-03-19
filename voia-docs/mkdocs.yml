@@ -1,7 +1,8 @@
 site_name: VOÏA Documentation
-site_description: Voice of Client - AI-Powered Customer Feedback Platform
+site_description: Voice of Client - AI-Powered Voice Of Client Platform for B2B.
 site_author: VOÏA Platform
-copyright: Copyright &copy; 2025 VOÏA Platform
+site_url: https://docs-voia.rivvalue.com
+copyright: Copyright &copy; 2026 VOÏA - By Rivvalue inc.
 
 theme:
   name: material
@@ -23,8 +24,8 @@ theme:
     - search.suggest
     - search.highlight
     - content.code.copy
-  logo: assets/logo.svg
-  favicon: assets/logo.svg
+  logo: assets/logo.png
+  favicon: assets/logo.png
 
 plugins:
   - search:

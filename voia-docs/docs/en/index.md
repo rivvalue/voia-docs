@@ -1,8 +1,8 @@
 # Welcome to VOÏA Documentation
 
 <div class="text-center">
-  <h2>Transform Customer Feedback into Business Intelligence</h2>
-  <p class="text-muted">AI-Powered Voice of Customer Platform</p>
+  <h2>From Client Voices to Business Clarity</h2>
+  <p class="text-muted">AI-Powered Voice of Client Platform</p>
 </div>
 
 ---
@@ -160,5 +160,5 @@ Step-by-step video walkthroughs of key features will be available soon.
 ---
 
 <div class="text-center text-muted" style="margin-top: 3rem;">
-  <p>Welcome to VOÏA - Let's turn customer feedback into business growth.</p>
+  <p>Welcome to VOÏA - From Client Voices to Business Clarity.</p>
 </div>

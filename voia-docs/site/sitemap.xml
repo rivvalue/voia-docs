@@ -1,45 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
     <url>
-        <loc>None./</loc>
+        <loc>https://docs-voia.rivvalue.com/</loc>
         <lastmod>2026-03-19</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="None"/>
-        <xhtml:link rel="alternate" hreflang="fr" href="Nonefr/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://docs-voia.rivvalue.com/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://docs-voia.rivvalue.com/fr/"/>
     </url>
     <url>
-        <loc>Nonefeatures/</loc>
+        <loc>https://docs-voia.rivvalue.com/features/</loc>
         <lastmod>2026-03-19</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="Nonefeatures/"/>
-        <xhtml:link rel="alternate" hreflang="fr" href="Nonefr/features/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://docs-voia.rivvalue.com/features/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://docs-voia.rivvalue.com/fr/features/"/>
     </url>
     <url>
-        <loc>Nonelicenses/</loc>
+        <loc>https://docs-voia.rivvalue.com/licenses/</loc>
         <lastmod>2026-03-19</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="Nonelicenses/"/>
-        <xhtml:link rel="alternate" hreflang="fr" href="Nonefr/licenses/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://docs-voia.rivvalue.com/licenses/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://docs-voia.rivvalue.com/fr/licenses/"/>
     </url>
     <url>
-        <loc>Nonefr/</loc>
+        <loc>https://docs-voia.rivvalue.com/fr/</loc>
         <lastmod>2026-03-19</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="fr" href="Nonefr/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="None"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://docs-voia.rivvalue.com/fr/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://docs-voia.rivvalue.com/"/>
     </url>
     <url>
-        <loc>Nonefr/features/</loc>
+        <loc>https://docs-voia.rivvalue.com/fr/features/</loc>
         <lastmod>2026-03-19</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="fr" href="Nonefr/features/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="Nonefeatures/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://docs-voia.rivvalue.com/fr/features/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://docs-voia.rivvalue.com/features/"/>
     </url>
     <url>
-        <loc>Nonefr/licenses/</loc>
+        <loc>https://docs-voia.rivvalue.com/fr/licenses/</loc>
         <lastmod>2026-03-19</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="fr" href="Nonefr/licenses/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="Nonelicenses/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://docs-voia.rivvalue.com/fr/licenses/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://docs-voia.rivvalue.com/licenses/"/>
     </url>
 </urlset>

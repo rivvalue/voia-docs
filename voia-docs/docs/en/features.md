@@ -1,4 +1,4 @@
-# VOÏA Platform Features
+# VOÏA Voice Of Client Platform Features
 
 This guide covers all features available in the VOÏA platform.
 
@@ -21,8 +21,6 @@ Instead of traditional forms, VOÏA can conduct natural conversations with your 
 - Richer feedback (more detailed responses)
 - Less survey fatigue
 - Automatic language detection
-
-**Powered by:** OpenAI GPT-4o (state-of-the-art AI)
 
 ---
 
@@ -601,8 +599,7 @@ Step-by-step video walkthroughs
 ### Contact Support
 
 Reach out to your account administrator or contact:
-- **Email:** support@voia.com
-- **In-App Chat** (if enabled)
+- **Email:** voia@rivvalue.com
 
 ---
 
