@@ -1341,8 +1341,19 @@ function loadCompanyNpsDataDirect() {
         console.log('companyNpsTable element not found - probably in different tab, skipping...');
         return;
     }
-    
-    fetch('/api/company_nps')
+
+    // If the table already has server-rendered rows, skip the fallback fetch
+    // (fetching without a campaign_id returns empty for demo accounts with no active campaign)
+    if (tbody.querySelectorAll('tr').length > 0) {
+        console.log('companyNpsTable already has data, skipping direct fetch.');
+        return;
+    }
+
+    // Build URL with campaign_id if available
+    const campaignSelect = document.getElementById('campaignFilter');
+    const campaignParam = (campaignSelect && campaignSelect.value) ? `?campaign=${campaignSelect.value}` : '';
+
+    fetch('/api/company_nps' + campaignParam)
         .then(response => response.json())
         .then(data => {
             console.log('Direct API response:', data);
