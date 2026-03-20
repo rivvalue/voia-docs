@@ -121,7 +121,7 @@
             <!-- Left: Logo (when present) -->
             <div class="navbar-left">
                 {% if not is_business_authenticated and branding_context and branding_context.logo_url and request.endpoint != 'demo_intro' %}
-                <div class="navbar-brand d-flex align-items-center">
+                <div class="navbar-brand d-flex align-items-center" style="background: rgba(255,255,255,0.92); padding: 4px 10px; border-radius: 6px;">
                     <img src="{{ branding_context.logo_url }}" alt="{{ branding_context.company_name }}" height="64" class="navbar-logo"
                          onerror="this.parentElement.style.display='none';"
                          loading="eager">

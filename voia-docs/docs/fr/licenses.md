@@ -12,7 +12,7 @@ The French version of the license guide is currently being translated.
 
 Please use the **English version** for now:
 
-**[View License Guide in English →](../en/licenses.md)**
+**[View License Guide in English →](/licenses/)**
 
 ---
 

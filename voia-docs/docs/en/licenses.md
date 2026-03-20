@@ -336,11 +336,11 @@ Your company's VOÏA admin can check your license status
 
 **VOÏA Sales**  
 For upgrades, renewals, or custom licensing  
-Email: sales@voia.com
+Email: [voia@rivvalue.com](mailto:voia@rivvalue.com)
 
 **VOÏA Support**  
 For technical questions about licenses  
-Email: support@voia.com
+Email: [support@rivvalue.com](mailto:support@rivvalue.com)
 
 ---
 

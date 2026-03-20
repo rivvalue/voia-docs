@@ -12,7 +12,7 @@ The French version of the features guide is currently being translated.
 
 Please use the **English version** for now:
 
-**[View Features in English →](../en/features.md)**
+**[View Features in English →](/features/)**
 
 ---
 

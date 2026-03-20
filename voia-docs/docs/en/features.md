@@ -1,5 +1,7 @@
 # VOÏA Voice Of Client Platform Features
 
+VOÏA captures customer feedback through conversational interactions, processes each response into structured data (NPS, sentiment, drivers, risk signals), and aggregates results into actionable insights at both campaign and account levels.
+
 This guide covers all features available in the VOÏA platform.
 
 ---
@@ -168,6 +170,14 @@ Your main dashboard shows:
 - **Recent Responses:** Latest feedback received
 
 **Real-time updates:** Dashboard refreshes automatically
+
+**Example output:**
+
+- Company: Mid-market SaaS
+- NPS: 6 (Detractor)
+- Sentiment: Negative
+- Key driver: Support responsiveness
+- Risk signal: High churn probability
 
 ---
 
@@ -599,7 +609,7 @@ Step-by-step video walkthroughs
 ### Contact Support
 
 Reach out to your account administrator or contact:
-- **Email:** voia@rivvalue.com
+- **Email:** [support@rivvalue.com](mailto:support@rivvalue.com)
 
 ---
 

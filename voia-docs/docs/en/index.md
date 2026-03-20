@@ -9,7 +9,9 @@
 
 ## What is VOÏA?
 
-VOÏA (Voice of Client) is a customer feedback platform that helps you understand what your customers really think. Using AI technology, VOÏA transforms survey responses into clear, actionable insights that help you improve your business.
+VOÏA (Voice of Client) is a conversational Voice of Client (VoC) platform that collects unstructured customer feedback and converts it into structured, analysis-ready data.
+
+It replaces traditional surveys with AI-driven conversations and provides clear insights into customer sentiment, loyalty, and risk.
 
 ### Key Benefits
 

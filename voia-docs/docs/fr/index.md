@@ -12,7 +12,7 @@ The French version of the VOÏA documentation is currently being translated.
 
 In the meantime, please use the **English documentation**:
 
-**[Switch to English Documentation →](../en/index.md)**
+**[Switch to English Documentation →](/overview/)**
 
 ---
 
