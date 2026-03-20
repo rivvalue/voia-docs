@@ -22,12 +22,13 @@
             </div>
             <div class="col-12 col-md-4 text-center text-md-end">
                 <div class="d-flex align-items-center justify-content-center justify-content-md-end gap-3">
-                    <!-- Export Response Data - Only for trial/public users -->
+                    {# Export Response Data - hidden for now (irrelevant for demos)
                     {% if not is_business_authenticated %}
                     <button class="btn btn-outline-secondary btn-sm" onclick="exportUserData()">
                         <i class="fas fa-user-circle me-2"></i>Export Response Data
                     </button>
                     {% endif %}
+                    #}
                     
                     <!-- Refresh Icon -->
                     <button class="btn btn-sm btn-link text-muted p-1" 
