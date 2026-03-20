@@ -200,9 +200,9 @@
                     </div>
                     {% endif %}
                     
-                    <!-- Language toggle: navbar widget intentionally hidden for authenticated users (they use the profile dropdown instead) -->
-                    <!-- Uncomment below when French content is ready — shows only to non-authenticated users -->
-                    {# {% if not is_business_authenticated %}{% include 'components/language_selector.html' %}{% endif %} #}
+                    {% if not is_business_authenticated %}
+                    <a href="https://www.rivvalue.com/voia#pricing" target="_blank" rel="noopener" style="color: #E13A44; text-decoration: none; font-size: 0.85rem; font-weight: 500; letter-spacing: 0.01em; white-space: nowrap;">Contact Rivvalue ↗</a>
+                    {% endif %}
                     
                     {% if is_business_authenticated %}
                     <div class="collapse navbar-collapse" id="navbarNav">
