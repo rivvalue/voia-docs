@@ -46,6 +46,10 @@ class FeatureFlags:
         'auth_strict_validation': {
             'enabled': True,  # Phase C: Align decorator with is_business_authenticated()
             'description': 'Strict session validation in decorators - Phase C auth fix'
+        },
+        'demo_blur': {
+            'enabled': True,  # Controls blur effect on demo dashboard data
+            'description': 'Blur sensitive data in demo dashboard for demand generation'
         }
     }
     
@@ -65,6 +69,8 @@ class FeatureFlags:
         self.auth_soft_fallback_enabled = os.environ.get('AUTH_SOFT_FALLBACK', 'true').lower() == 'true'
         self.auth_strict_validation_enabled = os.environ.get('AUTH_STRICT_VALIDATION', 'true').lower() == 'true'
         
+        self.demo_blur_enabled = os.environ.get('DEMO_BLUR_ENABLED', 'true').lower() == 'true'
+        
         # Update FLAGS dict with runtime values from environment
         self.FLAGS['sidebar_navigation']['enabled'] = self.sidebar_enabled
         self.FLAGS['sidebar_navigation']['rollout_percentage'] = self.rollout_percentage
@@ -76,6 +82,7 @@ class FeatureFlags:
         self.FLAGS['auth_observability']['enabled'] = self.auth_observability_enabled
         self.FLAGS['auth_soft_fallback']['enabled'] = self.auth_soft_fallback_enabled
         self.FLAGS['auth_strict_validation']['enabled'] = self.auth_strict_validation_enabled
+        self.FLAGS['demo_blur']['enabled'] = self.demo_blur_enabled
         
         logger.info(f"Feature Flags initialized - Sidebar: {self.sidebar_enabled}, "
                    f"Rollout: {self.rollout_percentage}%, Settings Hub v2: {self.settings_hub_enabled}, "

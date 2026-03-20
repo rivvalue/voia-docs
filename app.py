@@ -437,7 +437,8 @@ def inject_frontend_refactoring_flag():
     """Inject frontend refactoring toggle for incremental rollout with instant rollback"""
     import os
     return {
-        'use_refactored_frontend': os.getenv('USE_REFACTORED_FRONTEND', 'false').lower() == 'true'
+        'use_refactored_frontend': os.getenv('USE_REFACTORED_FRONTEND', 'false').lower() == 'true',
+        'demo_blur_enabled': os.getenv('DEMO_BLUR_ENABLED', 'true').lower() == 'true'
     }
 
 # Sentry Test Endpoint (Admin Only)

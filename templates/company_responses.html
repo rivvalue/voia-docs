@@ -11,9 +11,9 @@
     {'label': company_name, 'current': true}
 ] %}
 {% include 'components/breadcrumb.html' %}
-<div class="container-fluid py-4">
+<div class="container-fluid py-4 {{ 'demo-blur-active' if demo_blur_enabled and not is_business_authenticated else '' }}">
     <div class="row">
-        <div class="col-lg-10 mx-auto">
+        <div class="col-lg-10 mx-auto company-responses-blur-target">
             
             <!-- Page Header -->
             <div class="mb-4">

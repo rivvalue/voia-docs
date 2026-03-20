@@ -11,7 +11,7 @@
     {'label': 'Business Intelligence', 'current': true}
 ] %}
 {% include 'components/breadcrumb.html' %}
-<div class="container">
+<div class="container {{ 'demo-blur-active' if demo_blur_enabled else '' }}">
     <div data-page="dashboard"></div>
     <!-- Dashboard Header -->
     <div class="bg-white border-bottom" style="padding: 2.5rem 0; margin-bottom: 2rem;">
@@ -345,12 +345,17 @@
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics" type="button" role="tab" aria-controls="analytics" aria-selected="false">
-                <i class="fas fa-chart-line me-2"></i>{{ _('Analytics') }}
+                <i class="fas fa-chart-line me-2"></i>{{ _('Growth Analytics') }}
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="survey-insights-tab" data-bs-toggle="tab" data-bs-target="#survey-insights" type="button" role="tab" aria-controls="survey-insights" aria-selected="false">
                 <i class="fas fa-comments me-2"></i>{{ _('Survey Insights') }}
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="demo-segmentation-tab" data-bs-toggle="tab" data-bs-target="#demo-segmentation" type="button" role="tab" aria-controls="demo-segmentation" aria-selected="false">
+                <i class="fas fa-users me-2"></i>{{ _('Segmentation Insights') }}
             </button>
         </li>
     </ul>
@@ -868,6 +873,145 @@
                         </div>
                     </div>
         </div>
+
+        <!-- Segmentation Insights Tab (Demo) -->
+        <div class="tab-pane fade" id="demo-segmentation" role="tabpanel" aria-labelledby="demo-segmentation-tab">
+            <!-- Row 1: NPS by Role + NPS by Region -->
+            <div class="row mb-4 g-3">
+                <div class="col-lg-6">
+                    <div class="chart-card demo-seg-card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-user-tie me-2" style="color: #E13A44;"></i>NPS by Role</h5>
+                            <small class="text-muted">Net Promoter Score distribution across different participant roles</small>
+                        </div>
+                        <div class="card-body demo-seg-chart-body" style="height: 240px; position: relative;">
+                            <canvas id="demoNpsByRoleChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="chart-card demo-seg-card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-globe me-2" style="color: #E13A44;"></i>NPS by Region</h5>
+                            <small class="text-muted">Geographic distribution of customer satisfaction</small>
+                        </div>
+                        <div class="card-body demo-seg-chart-body" style="height: 240px; position: relative;">
+                            <canvas id="demoNpsByRegionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 2: NPS by Tier + NPS by Industry -->
+            <div class="row mb-4 g-3">
+                <div class="col-lg-6">
+                    <div class="chart-card demo-seg-card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-layer-group me-2" style="color: #E13A44;"></i>NPS by Customer Tier</h5>
+                            <small class="text-muted">Customer satisfaction across different tier levels</small>
+                        </div>
+                        <div class="card-body demo-seg-chart-body" style="height: 240px; position: relative;">
+                            <canvas id="demoNpsByTierChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="chart-card demo-seg-card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-industry me-2" style="color: #E13A44;"></i>NPS by Client Industry</h5>
+                            <small class="text-muted">Customer satisfaction across different industry sectors</small>
+                        </div>
+                        <div class="card-body demo-seg-chart-body" style="height: 240px; position: relative;">
+                            <canvas id="demoNpsByIndustryChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 3: Promoter / Passive / Detractor Composition (full-width) -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="chart-card demo-seg-card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-chart-bar me-2" style="color: #E13A44;"></i>Promoter / Passive / Detractor Composition</h5>
+                            <small class="text-muted">Percentage breakdown across segments sorted by NPS score</small>
+                        </div>
+                        <div class="card-body demo-seg-chart-body" style="height: 340px; position: relative;">
+                            <canvas id="demoCompositionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 4: Churn Risk by Segment + Tenure Cohort Analysis -->
+            <div class="row mb-4 g-3">
+                <div class="col-lg-6">
+                    <div class="chart-card demo-seg-card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-shield-alt me-2" style="color: #E13A44;"></i>Churn Risk by Segment</h5>
+                            <small class="text-muted">Distribution of churn risk levels across customer tiers, roles, and regions</small>
+                        </div>
+                        <div style="padding: 0 1rem;">
+                            <ul class="nav nav-pills nav-fill mb-2" style="font-size: 0.8rem; pointer-events: none; opacity: 0.85;">
+                                <li class="nav-item">
+                                    <button class="nav-link active py-1 px-2" type="button">Tier</button>
+                                </li>
+                                <li class="nav-item">
+                                    <button class="nav-link py-1 px-2" type="button">Role</button>
+                                </li>
+                                <li class="nav-item">
+                                    <button class="nav-link py-1 px-2" type="button">Region</button>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="card-body demo-seg-chart-body" style="height: 280px; position: relative;">
+                            <canvas id="demoChurnRiskChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="chart-card demo-seg-card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-clock me-2" style="color: #1A3C6E;"></i>Tenure Cohort Analysis</h5>
+                            <small class="text-muted">How NPS and satisfaction evolve with client maturity</small>
+                        </div>
+                        <div class="card-body demo-seg-chart-body" style="height: 310px; position: relative;">
+                            <canvas id="demoTenureCohortChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 5: Sub-Metric Breakdown by Segment (full-width) -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="chart-card demo-seg-card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-chart-bar me-2" style="color: #E13A44;"></i>Sub-Metric Breakdown by Segment</h5>
+                            <small class="text-muted">Product, Service, Pricing, and Support ratings compared across segments — reveals why segments differ</small>
+                        </div>
+                        <div style="padding: 0 1rem;">
+                            <ul class="nav nav-pills nav-fill mb-2" style="font-size: 0.8rem; pointer-events: none; opacity: 0.85;">
+                                <li class="nav-item">
+                                    <button class="nav-link active py-1 px-2" type="button">Role</button>
+                                </li>
+                                <li class="nav-item">
+                                    <button class="nav-link py-1 px-2" type="button">Region</button>
+                                </li>
+                                <li class="nav-item">
+                                    <button class="nav-link py-1 px-2" type="button">Tier</button>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="card-body demo-seg-chart-body" style="height: 320px; position: relative;">
+                            <canvas id="demoSubMetricChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End Segmentation Insights Tab -->
+
     </div>
         <!-- End Tab Content -->
 
@@ -1128,4 +1272,265 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- Legacy: Monolithic Dashboard JavaScript -->
 <script src="{{ url_for('static', filename='js/dashboard.js') }}?v={{ range(1000, 9999) | random }}"></script>
 {% endif %}
+
+<!-- Demo Segmentation Insights Charts -->
+<script>
+(function() {
+    function initDemoSegmentationCharts() {
+        var red = '#E13A44';
+        var navy = '#1A3C6E';
+        var amber = '#F59E0B';
+        var green = '#22C55E';
+        var gray = '#6B7280';
+        var lightRed = 'rgba(225,58,68,0.15)';
+
+        var defaultFont = { family: 'Karla, sans-serif', size: 12 };
+
+        var hBarDefaults = {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: function(ctx) { return ' NPS: ' + ctx.parsed.x; } } }
+            },
+            scales: {
+                x: { min: -100, max: 100, grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { font: defaultFont } },
+                y: { grid: { display: false }, ticks: { font: defaultFont } }
+            }
+        };
+
+        function npsColor(val) {
+            if (val >= 30) return green;
+            if (val >= 0) return amber;
+            return red;
+        }
+
+        // --- 1. NPS by Role ---
+        var roleLabels = ['C-Suite / VP', 'Director', 'Manager', 'Individual Contributor', 'Procurement'];
+        var roleData = [58, 44, 32, 19, 11];
+        new Chart(document.getElementById('demoNpsByRoleChart'), {
+            type: 'bar',
+            data: {
+                labels: roleLabels,
+                datasets: [{
+                    data: roleData,
+                    backgroundColor: roleData.map(npsColor),
+                    borderRadius: 4
+                }]
+            },
+            options: hBarDefaults
+        });
+
+        // --- 2. NPS by Region ---
+        var regionLabels = ['North America', 'Western Europe', 'Asia-Pacific', 'Latin America', 'Middle East & Africa'];
+        var regionData = [52, 46, 28, 14, -8];
+        new Chart(document.getElementById('demoNpsByRegionChart'), {
+            type: 'bar',
+            data: {
+                labels: regionLabels,
+                datasets: [{
+                    data: regionData,
+                    backgroundColor: regionData.map(npsColor),
+                    borderRadius: 4
+                }]
+            },
+            options: hBarDefaults
+        });
+
+        // --- 3. NPS by Tier ---
+        var tierLabels = ['Enterprise', 'Strategic', 'Mid-Market', 'Growth', 'Starter'];
+        var tierData = [62, 48, 34, 12, -6];
+        new Chart(document.getElementById('demoNpsByTierChart'), {
+            type: 'bar',
+            data: {
+                labels: tierLabels,
+                datasets: [{
+                    data: tierData,
+                    backgroundColor: tierData.map(npsColor),
+                    borderRadius: 4
+                }]
+            },
+            options: hBarDefaults
+        });
+
+        // --- 4. NPS by Industry ---
+        var industryLabels = ['Financial Services', 'Healthcare', 'Technology', 'Manufacturing', 'Retail', 'Government'];
+        var industryData = [55, 41, 38, 22, 9, -4];
+        new Chart(document.getElementById('demoNpsByIndustryChart'), {
+            type: 'bar',
+            data: {
+                labels: industryLabels,
+                datasets: [{
+                    data: industryData,
+                    backgroundColor: industryData.map(npsColor),
+                    borderRadius: 4
+                }]
+            },
+            options: Object.assign({}, hBarDefaults, {
+                scales: Object.assign({}, hBarDefaults.scales, {
+                    x: Object.assign({}, hBarDefaults.scales.x, { min: -100, max: 100 })
+                })
+            })
+        });
+
+        // --- 5. Promoter / Passive / Detractor Composition (stacked bar) ---
+        var compLabels = ['Enterprise', 'Strategic', 'Mid-Market', 'Growth', 'Starter', 'N. America', 'W. Europe', 'APAC', 'C-Suite', 'Director'];
+        new Chart(document.getElementById('demoCompositionChart'), {
+            type: 'bar',
+            data: {
+                labels: compLabels,
+                datasets: [
+                    {
+                        label: 'Promoters',
+                        data: [71, 62, 54, 43, 35, 66, 58, 48, 74, 60],
+                        backgroundColor: green
+                    },
+                    {
+                        label: 'Passives',
+                        data: [20, 24, 26, 28, 30, 21, 25, 28, 17, 24],
+                        backgroundColor: amber
+                    },
+                    {
+                        label: 'Detractors',
+                        data: [9, 14, 20, 29, 35, 13, 17, 24, 9, 16],
+                        backgroundColor: red
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top', labels: { font: defaultFont } },
+                    tooltip: { callbacks: { label: function(ctx) { return ctx.dataset.label + ': ' + ctx.parsed.y + '%'; } } }
+                },
+                scales: {
+                    x: { stacked: true, grid: { display: false }, ticks: { font: defaultFont } },
+                    y: { stacked: true, min: 0, max: 100, ticks: { font: defaultFont, callback: function(v) { return v + '%'; } }, grid: { color: 'rgba(0,0,0,0.05)' } }
+                }
+            }
+        });
+
+        // --- 6. Churn Risk by Segment (stacked bar, by Tier) ---
+        var churnLabels = ['Enterprise', 'Strategic', 'Mid-Market', 'Growth', 'Starter'];
+        new Chart(document.getElementById('demoChurnRiskChart'), {
+            type: 'bar',
+            data: {
+                labels: churnLabels,
+                datasets: [
+                    { label: 'Low', data: [58, 47, 36, 24, 14], backgroundColor: green },
+                    { label: 'Medium', data: [28, 32, 34, 38, 36], backgroundColor: amber },
+                    { label: 'High', data: [10, 16, 22, 28, 34], backgroundColor: '#F97316' },
+                    { label: 'Critical', data: [4, 5, 8, 10, 16], backgroundColor: red }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top', labels: { font: defaultFont } },
+                    tooltip: { callbacks: { label: function(ctx) { return ctx.dataset.label + ': ' + ctx.parsed.y + '%'; } } }
+                },
+                scales: {
+                    x: { stacked: true, grid: { display: false }, ticks: { font: defaultFont } },
+                    y: { stacked: true, min: 0, max: 100, ticks: { font: defaultFont, callback: function(v) { return v + '%'; } }, grid: { color: 'rgba(0,0,0,0.05)' } }
+                }
+            }
+        });
+
+        // --- 7a. Tenure Cohort Analysis (grouped bar: NPS + Avg Rating) ---
+        var tenureLabels = ['< 1 yr', '1–2 yrs', '2–3 yrs', '3–5 yrs', '5–7 yrs', '7+ yrs'];
+        new Chart(document.getElementById('demoTenureCohortChart'), {
+            type: 'bar',
+            data: {
+                labels: tenureLabels,
+                datasets: [
+                    {
+                        label: 'NPS Score',
+                        data: [8, 22, 36, 48, 55, 62],
+                        backgroundColor: red,
+                        yAxisID: 'yNps',
+                        borderRadius: 3
+                    },
+                    {
+                        label: 'Avg Satisfaction (1-10)',
+                        data: [6.2, 6.9, 7.4, 7.8, 8.1, 8.5],
+                        backgroundColor: navy,
+                        yAxisID: 'ySat',
+                        borderRadius: 3
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'top', labels: { font: defaultFont } } },
+                scales: {
+                    x: { grid: { display: false }, ticks: { font: defaultFont } },
+                    yNps: {
+                        type: 'linear', position: 'left', min: -20, max: 80,
+                        title: { display: true, text: 'NPS', font: defaultFont },
+                        ticks: { font: defaultFont }, grid: { color: 'rgba(0,0,0,0.05)' }
+                    },
+                    ySat: {
+                        type: 'linear', position: 'right', min: 0, max: 10,
+                        title: { display: true, text: 'Satisfaction', font: defaultFont },
+                        ticks: { font: defaultFont }, grid: { display: false }
+                    }
+                }
+            }
+        });
+
+        // --- 7b. Sub-Metric Breakdown by Segment (grouped bar, by Role) ---
+        var subMetricLabels = ['C-Suite / VP', 'Director', 'Manager', 'Individual Contributor', 'Procurement'];
+        new Chart(document.getElementById('demoSubMetricChart'), {
+            type: 'bar',
+            data: {
+                labels: subMetricLabels,
+                datasets: [
+                    { label: 'Product', data: [8.1, 7.6, 7.2, 6.8, 7.0], backgroundColor: red, borderRadius: 3 },
+                    { label: 'Service', data: [8.4, 7.9, 7.5, 7.1, 6.8], backgroundColor: navy, borderRadius: 3 },
+                    { label: 'Pricing', data: [7.2, 6.8, 6.5, 6.2, 5.9], backgroundColor: amber, borderRadius: 3 },
+                    { label: 'Support', data: [8.6, 8.1, 7.8, 7.4, 7.0], backgroundColor: green, borderRadius: 3 }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'top', labels: { font: defaultFont } } },
+                scales: {
+                    x: { grid: { display: false }, ticks: { font: defaultFont } },
+                    y: { min: 0, max: 10, ticks: { font: defaultFont }, grid: { color: 'rgba(0,0,0,0.05)' } }
+                }
+            }
+        });
+    }
+
+    var initialized = false;
+
+    function maybeInit() {
+        if (!initialized) {
+            initialized = true;
+            initDemoSegmentationCharts();
+        }
+    }
+
+    // Initialize on page load if the tab is already active
+    document.addEventListener('DOMContentLoaded', function() {
+        var segPane = document.getElementById('demo-segmentation');
+        if (segPane && segPane.classList.contains('active')) {
+            maybeInit();
+        }
+    });
+
+    // Also initialize on first tab show (handles lazy activation)
+    var segTab = document.getElementById('demo-segmentation-tab');
+    if (segTab) {
+        segTab.addEventListener('shown.bs.tab', function() {
+            maybeInit();
+        });
+    }
+})();
+</script>
 {% endblock %}

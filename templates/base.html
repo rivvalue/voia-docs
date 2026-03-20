@@ -200,8 +200,8 @@
                     </div>
                     {% endif %}
                     
-                    <!-- Language toggle - visible for anonymous users only (authenticated users access via account menu) -->
-                    {% if not is_business_authenticated %}
+                    <!-- Language toggle - hidden for public/demo users until French content is complete -->
+                    {% if is_business_authenticated %}
                     {% include 'components/language_selector.html' %}
                     {% endif %}
                     

@@ -12413,3 +12413,74 @@ thead th.th-c2 {
 .btn-clear-input:hover {
     color: var(--primary-red);
 }
+
+/* Demo Dashboard Blur Effect - toggled via DEMO_BLUR_ENABLED parameter */
+
+/* Segmentation Insights tab - chart canvases */
+.demo-blur-active .demo-seg-chart-body canvas {
+    filter: blur(2.5px);
+    transition: filter 0.2s ease;
+}
+
+.demo-blur-active .demo-seg-card:hover .demo-seg-chart-body canvas {
+    filter: blur(1.5px);
+}
+
+/* Growth Analytics tab - Tenure Distribution & Opportunity Analysis charts */
+.demo-blur-active #tenureChart,
+.demo-blur-active #growthFactorChart {
+    filter: blur(2.5px);
+    transition: filter 0.2s ease;
+}
+
+.demo-blur-active #tenureChart:hover,
+.demo-blur-active #growthFactorChart:hover {
+    filter: blur(1.5px);
+}
+
+/* Account Intelligence tab - account cards */
+.demo-blur-active #accountIntelligence .card,
+.demo-blur-active #accountIntelligence .border {
+    filter: blur(2.5px);
+    transition: filter 0.2s ease;
+    pointer-events: none;
+}
+
+.demo-blur-active #accountIntelligence .card:hover,
+.demo-blur-active #accountIntelligence .border:hover {
+    filter: blur(1.5px);
+}
+
+/* Company Responses page - blur all content when demo blur active */
+.demo-blur-active .company-responses-blur-target {
+    filter: blur(2.5px);
+    pointer-events: none;
+}
+
+/* Survey Insights tab - table body rows */
+.demo-blur-active #companyNpsTable tr,
+.demo-blur-active #tenureNpsTable tr,
+.demo-blur-active #responsesTable tr {
+    filter: blur(2.5px);
+    transition: filter 0.2s ease;
+    pointer-events: none;
+}
+
+.demo-blur-active #companyNpsTable tr:hover,
+.demo-blur-active #tenureNpsTable tr:hover,
+.demo-blur-active #responsesTable tr:hover {
+    filter: blur(1.5px);
+}
+
+/* Campaign Comparison - results tables */
+.demo-blur-active #comparisonResults #summaryTable tr,
+.demo-blur-active #comparisonResults #companyTable tr {
+    filter: blur(2.5px);
+    transition: filter 0.2s ease;
+    pointer-events: none;
+}
+
+.demo-blur-active #comparisonResults #summaryTable tr:hover,
+.demo-blur-active #comparisonResults #companyTable tr:hover {
+    filter: blur(1.5px);
+}
