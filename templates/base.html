@@ -200,10 +200,9 @@
                     </div>
                     {% endif %}
                     
-                    <!-- Language toggle - hidden for public/demo users until French content is complete -->
-                    {% if is_business_authenticated %}
-                    {% include 'components/language_selector.html' %}
-                    {% endif %}
+                    <!-- Language toggle: navbar widget intentionally hidden for authenticated users (they use the profile dropdown instead) -->
+                    <!-- Uncomment below when French content is ready — shows only to non-authenticated users -->
+                    {# {% if not is_business_authenticated %}{% include 'components/language_selector.html' %}{% endif %} #}
                     
                     {% if is_business_authenticated %}
                     <div class="collapse navbar-collapse" id="navbarNav">
