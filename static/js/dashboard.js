@@ -4763,7 +4763,8 @@ function loadCompanyNpsData(page = 1, searchQuery = '', npsFilter = '') {
                 }
             } else {
                 console.error('Error loading company NPS data:', data.error);
-                document.getElementById('companyNpsTableServerSide').innerHTML = 
+                const errTbody = document.getElementById('companyNpsTableServerSide') || document.getElementById('companyNpsTable');
+                if (errTbody) errTbody.innerHTML =
                     '<tr><td colspan="8" class="text-center text-danger">Error: ' + (data.error || 'Unknown error') + '</td></tr>';
                 updateCompanyPaginationInfo(0, 0, 0);
                 updateCompanyPaginationControls(null);
@@ -4771,7 +4772,8 @@ function loadCompanyNpsData(page = 1, searchQuery = '', npsFilter = '') {
         })
         .catch(error => {
             console.error('Error fetching company NPS data:', error);
-            document.getElementById('companyNpsTableServerSide').innerHTML = 
+            const catchTbody = document.getElementById('companyNpsTableServerSide') || document.getElementById('companyNpsTable');
+            if (catchTbody) catchTbody.innerHTML =
                 `<tr><td colspan="8" class="text-center text-danger">${translations.networkErrorLoadingCompanyData}</td></tr>`;
             updateCompanyPaginationInfo(0, 0, 0);
             updateCompanyPaginationControls(null);
@@ -4780,7 +4782,7 @@ function loadCompanyNpsData(page = 1, searchQuery = '', npsFilter = '') {
 
 function populateCompanyNpsTable(companyData) {
     console.log('populateCompanyNpsTable called with:', companyData);
-    const tbody = document.getElementById('companyNpsTableServerSide');
+    const tbody = document.getElementById('companyNpsTableServerSide') || document.getElementById('companyNpsTable');
     
     if (!tbody) {
         console.error('companyNpsTable element not found!');
