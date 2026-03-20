@@ -573,56 +573,53 @@
 
         <!-- Analytics Tab -->
         <div class="tab-pane fade" id="analytics" role="tabpanel" aria-labelledby="analytics-tab">
-            <!-- Charts Row -->
-    <div class="row mb-4 g-3">
-        <div class="col-md-6 offset-md-3">
-            <div class="chart-card">
-                <div class="card-header">
-                    <h5>{{ _('Sentiment Analysis') }}</h5>
-                </div>
-                <div class="card-body">
-                    <div class="chart-container">
-                        <canvas id="sentimentChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Tenure Distribution -->
-    <div class="row mb-4 g-3">
-        <div class="col-md-6">
-            <div class="chart-card">
-                <div class="card-header">
-                    <h5>{{ _('Customer Tenure Distribution') }}</h5>
-                </div>
-                <div class="card-body">
-                    <div class="chart-container">
-                        <canvas id="tenureChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="chart-card">
-                <div class="card-header">
-                    <h5>{{ _('NPS-Based Opportunity Analysis') }}</h5>
-                </div>
-                <div class="card-body">
-                    <div class="chart-container">
-                        <canvas id="growthFactorChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-            <!-- Average {{ _('Ratings') }} -->
-            <div class="row mb-4">
-                <div class="col-12">
+            <!-- Row 1: Tenure Distribution + NPS Opportunity -->
+            <div class="row mb-4 g-3">
+                <div class="col-md-6">
                     <div class="chart-card">
                         <div class="card-header">
-                            <h5>Average {{ _('Ratings') }}</h5>
+                            <h5>{{ _('Customer Tenure Distribution') }}</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="tenureChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="chart-card">
+                        <div class="card-header">
+                            <h5>{{ _('NPS-Based Opportunity Analysis') }}</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="growthFactorChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 2: Sentiment Analysis + Average Ratings -->
+            <div class="row mb-4 g-3">
+                <div class="col-md-6">
+                    <div class="chart-card">
+                        <div class="card-header">
+                            <h5>{{ _('Sentiment Analysis') }}</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="sentimentChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="chart-card">
+                        <div class="card-header">
+                            <h5>{{ _('Average Ratings') }}</h5>
                         </div>
                         <div class="card-body">
                             <div class="chart-container">
