@@ -390,6 +390,34 @@
                 </div>
             </div>
 
+            <!-- Demo Environment Banner -->
+            {% if not is_business_authenticated %}
+            <div class="row mb-4" id="demoBanner">
+                <div class="col-12">
+                    <div class="d-flex align-items-center justify-content-between rounded"
+                         style="background: rgba(46,80,144,0.04); border: 1px solid rgba(46,80,144,0.18); border-left: 4px solid #2E5090; padding: 0.85rem 1.1rem;">
+                        <div class="d-flex align-items-center gap-3">
+                            <i class="fas fa-info-circle" style="color: #2E5090; font-size: 1.05rem;"></i>
+                            <div>
+                                <span class="badge me-2" style="background: rgba(46,80,144,0.12); color: #2E5090; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.04em;">DEMO</span>
+                                <span class="text-muted" style="font-size: 0.875rem;">{{ _('Demo environment — Data shown here is sourced from public participants exploring VOÏA and reflects a limited subset of the platform\'s analytical capabilities.') }}</span>
+                            </div>
+                        </div>
+                        <button type="button" onclick="document.getElementById('demoBanner').style.display='none'; sessionStorage.setItem('demoBannerDismissed','1');"
+                                style="background: none; border: none; color: #999; font-size: 1rem; cursor: pointer; padding: 0 0.25rem; line-height: 1;"
+                                aria-label="{{ _('Dismiss') }}">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <script>
+                if (sessionStorage.getItem('demoBannerDismissed') === '1') {
+                    document.getElementById('demoBanner').style.display = 'none';
+                }
+            </script>
+            {% endif %}
+
             <!-- Key Metrics -->
             <div class="row mb-4 g-3">
                 <div class="col">
