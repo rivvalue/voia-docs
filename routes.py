@@ -247,7 +247,11 @@ def verify_survey_access(token):
                 'participant_name': verification.get('participant_name'),
                 'participant_company': verification.get('company_name'),
                 'campaign_name': verification.get('campaign_name'),
-                'token': token
+                'token': token,
+                'campaign_id': verification.get('campaign_id'),
+                'participant_id': verification.get('participant_id'),
+                'business_account_id': verification.get('business_account_id'),
+                'association_id': verification.get('association_id')
             }
     
     # Fallback to simple token system for backward compatibility
