@@ -1389,11 +1389,21 @@ def submit_survey():
                 campaign_id=campaign_id
             ).first()
         
+        # Resolve tenure: use form-submitted value; fall back to participant profile
+        tenure_with_fc_route2 = data.get('tenure_with_fc')
+        if not tenure_with_fc_route2:
+            participant_id_route2 = session.get('participant_id')
+            if participant_id_route2:
+                from models import Participant
+                participant_route2 = Participant.query.get(participant_id_route2)
+                if participant_route2 and hasattr(participant_route2, 'tenure_years') and participant_route2.tenure_years is not None:
+                    tenure_with_fc_route2 = map_tenure_years_to_category(participant_route2.tenure_years)
+
         if existing_response:
             # Update existing response (maintains one-row-per-campaign for analytics)
             existing_response.company_name = response_data['company_name']
             existing_response.respondent_name = response_data['respondent_name']
-            existing_response.tenure_with_fc = data.get('tenure_with_fc')
+            existing_response.tenure_with_fc = tenure_with_fc_route2
             existing_response.nps_score = nps_score
             existing_response.nps_category = nps_category
             existing_response.satisfaction_rating = int(data['satisfaction_rating']) if data.get('satisfaction_rating') else None
@@ -1413,7 +1423,7 @@ def submit_survey():
                 company_name=response_data['company_name'],
                 respondent_name=response_data['respondent_name'],
                 respondent_email=response_data['respondent_email'],
-                tenure_with_fc=data.get('tenure_with_fc'),
+                tenure_with_fc=tenure_with_fc_route2,
                 nps_score=nps_score,
                 nps_category=nps_category,
                 satisfaction_rating=int(data['satisfaction_rating']) if data.get('satisfaction_rating') else None,
@@ -1559,11 +1569,21 @@ def submit_survey_overwrite():
         # Apply anonymization if campaign requires it
         response_data = anonymize_response_data(active_campaign, response_data)
         
+        # Resolve tenure: use form-submitted value; fall back to participant profile
+        tenure_with_fc_route3 = data.get('tenure_with_fc')
+        if not tenure_with_fc_route3:
+            participant_id_route3 = session.get('participant_id')
+            if participant_id_route3:
+                from models import Participant
+                participant_route3 = Participant.query.get(participant_id_route3)
+                if participant_route3 and hasattr(participant_route3, 'tenure_years') and participant_route3.tenure_years is not None:
+                    tenure_with_fc_route3 = map_tenure_years_to_category(participant_route3.tenure_years)
+
         if existing_response:
             # Update existing response with potentially anonymized data
             existing_response.company_name = response_data['company_name']
             existing_response.respondent_name = response_data['respondent_name']
-            existing_response.tenure_with_fc = data.get('tenure_with_fc')
+            existing_response.tenure_with_fc = tenure_with_fc_route3
             existing_response.nps_score = nps_score
             existing_response.nps_category = nps_category
             existing_response.satisfaction_rating = int(data['satisfaction_rating']) if data.get('satisfaction_rating') else None
@@ -1587,7 +1607,7 @@ def submit_survey_overwrite():
                 company_name=response_data['company_name'],
                 respondent_name=response_data['respondent_name'],
                 respondent_email=response_data['respondent_email'],
-                tenure_with_fc=data.get('tenure_with_fc'),
+                tenure_with_fc=tenure_with_fc_route3,
                 nps_score=nps_score,
                 nps_category=nps_category,
                 satisfaction_rating=int(data['satisfaction_rating']) if data.get('satisfaction_rating') else None,
@@ -3379,11 +3399,21 @@ def finalize_conversation():
                 campaign_id=campaign_id
             ).first()
         
+        # Resolve tenure: AI extraction takes precedence; fall back to participant profile
+        tenure_with_fc_voia = structured_data.get('tenure_with_fc')
+        if not tenure_with_fc_voia:
+            participant_id_voia = session.get('participant_id')
+            if participant_id_voia:
+                from models import Participant
+                participant_voia = Participant.query.get(participant_id_voia)
+                if participant_voia and hasattr(participant_voia, 'tenure_years') and participant_voia.tenure_years is not None:
+                    tenure_with_fc_voia = map_tenure_years_to_category(participant_voia.tenure_years)
+
         if existing_response:
             # Update existing response (maintains one-row-per-campaign for analytics)
             existing_response.company_name = response_data['company_name']
             existing_response.respondent_name = response_data['respondent_name']
-            existing_response.tenure_with_fc = structured_data.get('tenure_with_fc')
+            existing_response.tenure_with_fc = tenure_with_fc_voia
             existing_response.nps_score = structured_data.get('nps_score')
             existing_response.satisfaction_rating = structured_data.get('satisfaction_rating')
             existing_response.product_value_rating = structured_data.get('product_value_rating')
@@ -3420,7 +3450,7 @@ def finalize_conversation():
                 company_name=response_data['company_name'],
                 respondent_name=response_data['respondent_name'],
                 respondent_email=response_data['respondent_email'],
-                tenure_with_fc=structured_data.get('tenure_with_fc'),
+                tenure_with_fc=tenure_with_fc_voia,
                 nps_score=structured_data.get('nps_score'),
                 satisfaction_rating=structured_data.get('satisfaction_rating'),
                 product_value_rating=structured_data.get('product_value_rating'),

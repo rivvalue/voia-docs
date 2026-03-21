@@ -193,7 +193,10 @@ EXTRACTION_TO_DB_FIELD_MAP = {
     'feature_requests': 'feature_requests',
     
     # Support rating (already matches, kept for completeness)
-    'support_rating': 'support_rating'
+    'support_rating': 'support_rating',
+    
+    # Company tenure (how long the respondent's company has been a client)
+    'client_tenure': 'tenure_with_fc'
 }
 
 
@@ -1149,6 +1152,7 @@ You may fill any of the following fields if the information is clearly present i
 - service_rating (0–5 integer; ALL service/support/account management/professional services)
 - product_appreciation_rating (0–5 integer; how much they like the product itself)
 - feature_requests (array of strings; concrete requested features or capabilities)
+- client_tenure (string; how long the respondent's *company* has been a client of {vendor_name}; valid values: "< 1 year", "1-2 years", "3-5 years", "5-10 years", "10+ years"; only fill if explicitly stated by the respondent)
 
 **RATING RULES:**
 - Only fill a numeric rating field when the user gives an explicit number for that aspect
@@ -1267,6 +1271,7 @@ Extract structured data from the user's response below.
    - detailed_feedback (string)
    - pricing_satisfaction (string)
    - feature_requests (array of strings)
+   - client_tenure (string; how long the respondent's company has been a client; valid values: "< 1 year", "1-2 years", "3-5 years", "5-10 years", "10+ years")
    
 4. SCALE RULES: NPS uses 0-10, all other ratings use 0-5. Convert if needed.
 5. If user provides data for topics we haven't asked about yet, capture it anyway
