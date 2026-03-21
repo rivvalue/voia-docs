@@ -1538,10 +1538,11 @@ def manage_campaign_participants(campaign_id: int):
                 import uuid
                 from sqlalchemy import text
                 
-                # Atomic lock acquisition using SELECT FOR UPDATE
+                # Atomic lock acquisition using SELECT FOR UPDATE OF campaigns
+                # (of=Campaign avoids "FOR UPDATE on nullable outer join" error from classic_survey_configs join)
                 campaign_locked = db.session.query(Campaign).filter(
                     Campaign.id == campaign_id
-                ).with_for_update().first()
+                ).with_for_update(of=Campaign).first()
                 
                 # Check for active bulk job (now atomic - row is locked)
                 if campaign_locked.has_active_bulk_job:
@@ -1763,10 +1764,11 @@ def bulk_remove_campaign_participants(campaign_id):
             from models import BulkOperationJob
             from task_queue import task_queue
             
-            # Atomic lock acquisition using SELECT FOR UPDATE
+            # Atomic lock acquisition using SELECT FOR UPDATE OF campaigns
+            # (of=Campaign avoids "FOR UPDATE on nullable outer join" error from classic_survey_configs join)
             campaign_locked = db.session.query(Campaign).filter(
                 Campaign.id == campaign_id
-            ).with_for_update().first()
+            ).with_for_update(of=Campaign).first()
             
             # Check for active bulk job (now atomic - row is locked)
             if campaign_locked.has_active_bulk_job:

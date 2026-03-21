@@ -1,0 +1,248 @@
+Timestamp: 2026-03-21T01:13:38.674Z
+Type: query
+Category: query
+Level: info
+Message: SELECT user_sessions.id AS user_sessions_id, user_sessions.user_id AS user_sessions_user_id,
+       user_sessions.session_id AS user_sessions_session_id, user_sessions.session_data AS user_sessions_session_data,
+       user_sessions.ip_address AS user_sessions_ip_address, user_sessions.user_agent AS user_sessions_user_agent,
+       user_sessions.is_active AS user_sessions_is_active, user_sessions.created_at AS user_sessions_created_at,
+       user_sessions.last_activity_at AS user_sessions_last_activity_at, user_sessions.expires_at AS user_sessions_expires_at
+FROM user_sessions
+WHERE user_sessions.session_id = %(session_id_1)s
+  AND user_sessions.is_active = true
+  AND user_sessions.expires_at > now()
+LIMIT %(param_1)s
+
+Timestamp: 2026-03-21T01:13:38.770Z
+Type: query
+Category: query
+Level: info
+Message: SELECT business_accounts.id AS business_accounts_id, business_accounts.uuid AS business_accounts_uuid, business_accounts.name AS business_accounts_name, business_accounts.account_type AS business_accounts_account_type, business_accounts.contact_email AS business_accounts_contact_email, business_accounts.contact_name AS business_accounts_contact_name, business_accounts.status AS business_accounts_status, business_accounts.license_activated_at AS business_accounts_license_activated_at, business_accounts.license_expires_at AS business_accounts_license_expires_at, business_accounts.license_status AS business_accounts_license_status, business_accounts.allow_parallel_campaigns AS business_accounts_allow_parallel_campaigns, business_accounts.industry AS business_accounts_industry, business_accounts.company_description AS business_accounts_company_description, business_accounts.product_description AS business_accounts_product_description, business_accounts.target_clients_description AS business_accounts_target_clients_description, business_accounts.conversation_tone AS business_accounts_conversation_tone, business_accounts.survey_goals AS business_accounts_survey_goals, business_accounts.industry_topic_hints AS business_accounts_industry_topic_hints, business_accounts.role_prompt_overrides AS business_accounts_role_prompt_overrides, business_accounts.max_questions AS business_accounts_max_questions, business_accounts.max_duration_seconds AS business_accounts_max_duration_seconds, business_accounts.max_follow_ups_per_topic AS business_accounts_max_follow_ups_per_topic, business_accounts.prioritized_topics AS business_accounts_prioritized_topics, business_accounts.optional_topics AS business_accounts_optional_topics, business_accounts.custom_end_message AS business_accounts_custom_end_message, business_accounts.custom_system_prompt AS business_accounts_custom_system_prompt, business_accounts.prompt_template_version AS business_accounts_prompt_template_version, business_accounts.created_at AS business_accounts_created_at, business_accounts.updated_at AS business_accounts_updated_at 
+FROM business_accounts 
+WHERE business_accounts.id = %(pk_1)s
+
+Timestamp: 2026-03-21T01:13:38.817Z
+Type: query
+Category: query
+Level: info
+Message: [Filtered]
+
+Timestamp: 2026-03-21T01:13:38.864Z
+Type: query
+Category: query
+Level: info
+Message: SELECT license_history.id AS license_history_id,
+       license_history.business_account_id AS license_history_business_account_id, license_history.license_type AS license_history_license_type,
+       license_history.status AS license_history_status, license_history.activated_at AS license_history_activated_at,
+       license_history.expires_at AS license_history_expires_at,
+       license_history.max_campaigns_per_year AS license_history_max_campaigns_per_year, license_history.max_users AS license_history_max_users,
+       license_history.max_participants_per_campaign AS license_history_max_participants_per_campaign,
+       license_history.max_invitations_per_campaign AS license_history_max_invitations_per_campaign, license_history.annual_price AS license_history_annual_price,
+       license_history.migrated_from_business_account AS license_history_migrated_from_business_account, license_history.migration_notes AS license_history_migration_notes,
+       license_history.created_at AS license_history_created_at, license_history.created_by AS license_history_created_by,
+       license_history.notes AS license_history_notes
+FROM license_history
+WHERE license_history.business_account_id = %(business_account_id_1)s
+  AND license_history.status = %(status_1)s
+  AND license_history.activated_at <= %(activated_at_1)s
+  AND license_history.expires_at >= %(expires_at_1)s
+LIMIT %(param_1)s
+
+Timestamp: 2026-03-21T01:13:38.913Z
+Type: query
+Category: query
+Level: info
+Message: [Filtered]
+
+Timestamp: 2026-03-21T01:13:38.959Z
+Type: query
+Category: query
+Level: info
+Message: [Filtered]
+
+Timestamp: 2026-03-21T01:13:39.008Z
+Type: query
+Category: query
+Level: info
+Message: SELECT license_history.id AS license_history_id,
+       license_history.business_account_id AS license_history_business_account_id, license_history.license_type AS license_history_license_type,
+       license_history.status AS license_history_status, license_history.activated_at AS license_history_activated_at,
+       license_history.expires_at AS license_history_expires_at,
+       license_history.max_campaigns_per_year AS license_history_max_campaigns_per_year, license_history.max_users AS license_history_max_users,
+       license_history.max_participants_per_campaign AS license_history_max_participants_per_campaign,
+       license_history.max_invitations_per_campaign AS license_history_max_invitations_per_campaign, license_history.annual_price AS license_history_annual_price,
+       license_history.migrated_from_business_account AS license_history_migrated_from_business_account, license_history.migration_notes AS license_history_migration_notes,
+       license_history.created_at AS license_history_created_at, license_history.created_by AS license_history_created_by,
+       license_history.notes AS license_history_notes
+FROM license_history
+WHERE license_history.business_account_id = %(business_account_id_1)s
+  AND license_history.status = %(status_1)s
+  AND license_history.activated_at <= %(activated_at_1)s
+  AND license_history.expires_at >= %(expires_at_1)s
+LIMIT %(param_1)s
+
+Timestamp: 2026-03-21T01:13:39.055Z
+Type: query
+Category: query
+Level: info
+Message: SELECT count(*) AS count_1 
+FROM (SELECT campaigns.id AS campaigns_id, campaigns.uuid AS campaigns_uuid, campaigns.name AS campaigns_name, campaigns.description AS campaigns_description, campaigns.start_date AS campaigns_start_date, campaigns.end_date AS campaigns_end_date, campaigns.status AS campaigns_status, campaigns.survey_type AS campaigns_survey_type, campaigns.language_code AS campaigns_language_code, campaigns.client_identifier AS campaigns_client_identifier, campaigns.business_account_id AS campaigns_business_account_id, campaigns.product_description AS campaigns_product_description, campaigns.target_clients_description AS campaigns_target_clients_description, campaigns.survey_goals AS campaigns_survey_goals, campaigns.max_questions AS campaigns_max_questions, campaigns.max_duration_seconds AS campaigns_max_duration_seconds, campaigns.max_follow_ups_per_topic AS campaigns_max_follow_ups_per_topic, campaigns.prioritized_topics AS campaigns_prioritized_topics, campaigns.optional_topics AS campaigns_optional_topics, campaigns.custom_end_message AS campaigns_custom_end_message, campaigns.custom_system_prompt AS campaigns_custom_system_prompt, campaigns.industry AS campaigns_industry, campaigns.use_business_topics AS campaigns_use_business_topics, campaigns.use_business_controls AS campaigns_use_business_controls, campaigns.use_business_product_focus AS campaigns_use_business_product_focus, campaigns.role_prompt_overrides AS campaigns_role_prompt_overrides, campaigns.use_business_role_prompts AS campaigns_use_business_role_prompts, campaigns.use_custom_email_content AS campaigns_use_custom_email_content, campaigns.custom_subject_template AS campaigns_custom_subject_template, campaigns.custom_intro_message AS campaigns_custom_intro_message, campaigns.custom_cta_text AS campaigns_custom_cta_text, campaigns.custom_closing_message AS campaigns_custom_closing_message, campaigns.custom_footer_note AS campaigns_custom_footer_note, campaigns.anonymize_responses AS campaigns_anonymize_responses, campaigns.reminder_enabled AS campaigns_reminder_enabled, campaigns.reminder_delay_days AS campaigns_reminder_delay_days, campaigns.has_active_bulk_job AS campaigns_has_active_bulk_job, campaigns.active_bulk_job_id AS campaigns_active_bulk_job_id, campaigns.active_bulk_operation AS campaigns_active_bulk_operation, campaigns.created_at AS campaigns_created_at, campaigns.completed_at AS campaigns_completed_at 
+FROM campaigns 
+WHERE campaigns.business_account_id = %(business_account_id_1)s AND campaigns.start_date >= %(start_date_1)s AND campaigns.start_date <= %(start_date_2)s AND campaigns.status IN (%(status_1_1)s, %(status_1_2)s)) AS anon_1
+
+Timestamp: 2026-03-21T01:13:39.105Z
+Type: query
+Category: query
+Level: info
+Message: SELECT license_history.id AS license_history_id,
+       license_history.business_account_id AS license_history_business_account_id, license_history.license_type AS license_history_license_type,
+       license_history.status AS license_history_status, license_history.activated_at AS license_history_activated_at,
+       license_history.expires_at AS license_history_expires_at,
+       license_history.max_campaigns_per_year AS license_history_max_campaigns_per_year, license_history.max_users AS license_history_max_users,
+       license_history.max_participants_per_campaign AS license_history_max_participants_per_campaign,
+       license_history.max_invitations_per_campaign AS license_history_max_invitations_per_campaign, license_history.annual_price AS license_history_annual_price,
+       license_history.migrated_from_business_account AS license_history_migrated_from_business_account, license_history.migration_notes AS license_history_migration_notes,
+       license_history.created_at AS license_history_created_at, license_history.created_by AS license_history_created_by,
+       license_history.notes AS license_history_notes
+FROM license_history
+WHERE license_history.business_account_id = %(business_account_id_1)s
+  AND license_history.status = %(status_1)s
+  AND license_history.activated_at <= %(activated_at_1)s
+  AND license_history.expires_at >= %(expires_at_1)s
+LIMIT %(param_1)s
+
+Timestamp: 2026-03-21T01:13:39.152Z
+Type: query
+Category: query
+Level: info
+Message: SELECT license_history.id AS license_history_id,
+       license_history.business_account_id AS license_history_business_account_id, license_history.license_type AS license_history_license_type,
+       license_history.status AS license_history_status, license_history.activated_at AS license_history_activated_at,
+       license_history.expires_at AS license_history_expires_at,
+       license_history.max_campaigns_per_year AS license_history_max_campaigns_per_year, license_history.max_users AS license_history_max_users,
+       license_history.max_participants_per_campaign AS license_history_max_participants_per_campaign,
+       license_history.max_invitations_per_campaign AS license_history_max_invitations_per_campaign, license_history.annual_price AS license_history_annual_price,
+       license_history.migrated_from_business_account AS license_history_migrated_from_business_account, license_history.migration_notes AS license_history_migration_notes,
+       license_history.created_at AS license_history_created_at, license_history.created_by AS license_history_created_by,
+       license_history.notes AS license_history_notes
+FROM license_history
+WHERE license_history.business_account_id = %(business_account_id_1)s
+  AND license_history.status = %(status_1)s
+  AND license_history.activated_at <= %(activated_at_1)s
+  AND license_history.expires_at >= %(expires_at_1)s
+LIMIT %(param_1)s
+
+Timestamp: 2026-03-21T01:13:39.198Z
+Type: query
+Category: query
+Level: info
+Message: SELECT count(*) AS count_1 
+FROM (SELECT campaigns.id AS campaigns_id, campaigns.uuid AS campaigns_uuid, campaigns.name AS campaigns_name, campaigns.description AS campaigns_description, campaigns.start_date AS campaigns_start_date, campaigns.end_date AS campaigns_end_date, campaigns.status AS campaigns_status, campaigns.survey_type AS campaigns_survey_type, campaigns.language_code AS campaigns_language_code, campaigns.client_identifier AS campaigns_client_identifier, campaigns.business_account_id AS campaigns_business_account_id, campaigns.product_description AS campaigns_product_description, campaigns.target_clients_description AS campaigns_target_clients_description, campaigns.survey_goals AS campaigns_survey_goals, campaigns.max_questions AS campaigns_max_questions, campaigns.max_duration_seconds AS campaigns_max_duration_seconds, campaigns.max_follow_ups_per_topic AS campaigns_max_follow_ups_per_topic, campaigns.prioritized_topics AS campaigns_prioritized_topics, campaigns.optional_topics AS campaigns_optional_topics, campaigns.custom_end_message AS campaigns_custom_end_message, campaigns.custom_system_prompt AS campaigns_custom_system_prompt, campaigns.industry AS campaigns_industry, campaigns.use_business_topics AS campaigns_use_business_topics, campaigns.use_business_controls AS campaigns_use_business_controls, campaigns.use_business_product_focus AS campaigns_use_business_product_focus, campaigns.role_prompt_overrides AS campaigns_role_prompt_overrides, campaigns.use_business_role_prompts AS campaigns_use_business_role_prompts, campaigns.use_custom_email_content AS campaigns_use_custom_email_content, campaigns.custom_subject_template AS campaigns_custom_subject_template, campaigns.custom_intro_message AS campaigns_custom_intro_message, campaigns.custom_cta_text AS campaigns_custom_cta_text, campaigns.custom_closing_message AS campaigns_custom_closing_message, campaigns.custom_footer_note AS campaigns_custom_footer_note, campaigns.anonymize_responses AS campaigns_anonymize_responses, campaigns.reminder_enabled AS campaigns_reminder_enabled, campaigns.reminder_delay_days AS campaigns_reminder_delay_days, campaigns.has_active_bulk_job AS campaigns_has_active_bulk_job, campaigns.active_bulk_job_id AS campaigns_active_bulk_job_id, campaigns.active_bulk_operation AS campaigns_active_bulk_operation, campaigns.created_at AS campaigns_created_at, campaigns.completed_at AS campaigns_completed_at 
+FROM campaigns 
+WHERE campaigns.business_account_id = %(business_account_id_1)s AND campaigns.start_date >= %(start_date_1)s AND campaigns.start_date <= %(start_date_2)s AND campaigns.status IN (%(status_1_1)s, %(status_1_2)s)) AS anon_1
+
+Timestamp: 2026-03-21T01:13:39.246Z
+Type: query
+Category: query
+Level: info
+Message: SELECT license_history.id AS license_history_id,
+       license_history.business_account_id AS license_history_business_account_id, license_history.license_type AS license_history_license_type,
+       license_history.status AS license_history_status, license_history.activated_at AS license_history_activated_at,
+       license_history.expires_at AS license_history_expires_at,
+       license_history.max_campaigns_per_year AS license_history_max_campaigns_per_year, license_history.max_users AS license_history_max_users,
+       license_history.max_participants_per_campaign AS license_history_max_participants_per_campaign,
+       license_history.max_invitations_per_campaign AS license_history_max_invitations_per_campaign, license_history.annual_price AS license_history_annual_price,
+       license_history.migrated_from_business_account AS license_history_migrated_from_business_account, license_history.migration_notes AS license_history_migration_notes,
+       license_history.created_at AS license_history_created_at, license_history.created_by AS license_history_created_by,
+       license_history.notes AS license_history_notes
+FROM license_history
+WHERE license_history.business_account_id = %(business_account_id_1)s
+  AND license_history.status = %(status_1)s
+  AND license_history.activated_at <= %(activated_at_1)s
+  AND license_history.expires_at >= %(expires_at_1)s
+LIMIT %(param_1)s
+
+Timestamp: 2026-03-21T01:13:39.293Z
+Type: query
+Category: query
+Level: info
+Message: [Filtered]
+
+Timestamp: 2026-03-21T01:13:39.339Z
+Type: query
+Category: query
+Level: info
+Message: SELECT license_history.id AS license_history_id,
+       license_history.business_account_id AS license_history_business_account_id, license_history.license_type AS license_history_license_type,
+       license_history.status AS license_history_status, license_history.activated_at AS license_history_activated_at,
+       license_history.expires_at AS license_history_expires_at,
+       license_history.max_campaigns_per_year AS license_history_max_campaigns_per_year, license_history.max_users AS license_history_max_users,
+       license_history.max_participants_per_campaign AS license_history_max_participants_per_campaign,
+       license_history.max_invitations_per_campaign AS license_history_max_invitations_per_campaign, license_history.annual_price AS license_history_annual_price,
+       license_history.migrated_from_business_account AS license_history_migrated_from_business_account, license_history.migration_notes AS license_history_migration_notes,
+       license_history.created_at AS license_history_created_at, license_history.created_by AS license_history_created_by,
+       license_history.notes AS license_history_notes
+FROM license_history
+WHERE license_history.business_account_id = %(business_account_id_1)s
+  AND license_history.status = %(status_1)s
+  AND license_history.activated_at <= %(activated_at_1)s
+  AND license_history.expires_at >= %(expires_at_1)s
+LIMIT %(param_1)s
+
+Timestamp: 2026-03-21T01:13:39.386Z
+Type: query
+Category: query
+Level: info
+Message: SELECT campaigns.id AS campaigns_id, campaigns.uuid AS campaigns_uuid, campaigns.name AS campaigns_name, campaigns.description AS campaigns_description, campaigns.start_date AS campaigns_start_date, campaigns.end_date AS campaigns_end_date, campaigns.status AS campaigns_status, campaigns.survey_type AS campaigns_survey_type, campaigns.language_code AS campaigns_language_code, campaigns.client_identifier AS campaigns_client_identifier, campaigns.business_account_id AS campaigns_business_account_id, campaigns.product_description AS campaigns_product_description, campaigns.target_clients_description AS campaigns_target_clients_description, campaigns.survey_goals AS campaigns_survey_goals, campaigns.max_questions AS campaigns_max_questions, campaigns.max_duration_seconds AS campaigns_max_duration_seconds, campaigns.max_follow_ups_per_topic AS campaigns_max_follow_ups_per_topic, campaigns.prioritized_topics AS campaigns_prioritized_topics, campaigns.optional_topics AS campaigns_optional_topics, campaigns.custom_end_message AS campaigns_custom_end_message, campaigns.custom_system_prompt AS campaigns_custom_system_prompt, campaigns.industry AS campaigns_industry, campaigns.use_business_topics AS campaigns_use_business_topics, campaigns.use_business_controls AS campaigns_use_business_controls, campaigns.use_business_product_focus AS campaigns_use_business_product_focus, campaigns.role_prompt_overrides AS campaigns_role_prompt_overrides, campaigns.use_business_role_prompts AS campaigns_use_business_role_prompts, campaigns.use_custom_email_content AS campaigns_use_custom_email_content, campaigns.custom_subject_template AS campaigns_custom_subject_template, campaigns.custom_intro_message AS campaigns_custom_intro_message, campaigns.custom_cta_text AS campaigns_custom_cta_text, campaigns.custom_closing_message AS campaigns_custom_closing_message, campaigns.custom_footer_note AS campaigns_custom_footer_note, campaigns.anonymize_responses AS campaigns_anonymize_responses, campaigns.reminder_enabled AS campaigns_reminder_enabled, campaigns.reminder_delay_days AS campaigns_reminder_delay_days, campaigns.has_active_bulk_job AS campaigns_has_active_bulk_job, campaigns.active_bulk_job_id AS campaigns_active_bulk_job_id, campaigns.active_bulk_operation AS campaigns_active_bulk_operation, campaigns.created_at AS campaigns_created_at, campaigns.completed_at AS campaigns_completed_at, classic_survey_configs_1.id AS classic_survey_configs_1_id, classic_survey_configs_1.campaign_id AS classic_survey_configs_1_campaign_id, classic_survey_configs_1.template_id AS classic_survey_configs_1_template_id, classic_survey_configs_1.sections_enabled AS classic_survey_configs_1_sections_enabled, classic_survey_configs_1.feature_count AS classic_survey_configs_1_feature_count, classic_survey_configs_1.features AS classic_survey_configs_1_features, classic_survey_configs_1.driver_labels AS classic_survey_configs_1_driver_labels, classic_survey_configs_1.custom_prompts AS classic_survey_configs_1_custom_prompts, classic_survey_configs_1.frozen_at AS classic_survey_configs_1_frozen_at, classic_survey_configs_1.created_at AS classic_survey_configs_1_created_at, classic_survey_configs_1.updated_at AS classic_survey_configs_1_updated_at 
+FROM campaigns LEFT OUTER JOIN classic_survey_configs AS classic_survey_configs_1 ON campaigns.id = classic_survey_configs_1.campaign_id 
+WHERE campaigns.id = %(id_1)s AND campaigns.business_account_id = %(business_account_id_1)s 
+ LIMIT %(param_1)s
+
+Timestamp: 2026-03-21T01:13:39.434Z
+Type: query
+Category: query
+Level: info
+Message: SELECT license_history.id AS license_history_id,
+       license_history.business_account_id AS license_history_business_account_id, license_history.license_type AS license_history_license_type,
+       license_history.status AS license_history_status, license_history.activated_at AS license_history_activated_at,
+       license_history.expires_at AS license_history_expires_at,
+       license_history.max_campaigns_per_year AS license_history_max_campaigns_per_year, license_history.max_users AS license_history_max_users,
+       license_history.max_participants_per_campaign AS license_history_max_participants_per_campaign,
+       license_history.max_invitations_per_campaign AS license_history_max_invitations_per_campaign, license_history.annual_price AS license_history_annual_price,
+       license_history.migrated_from_business_account AS license_history_migrated_from_business_account, license_history.migration_notes AS license_history_migration_notes,
+       license_history.created_at AS license_history_created_at, license_history.created_by AS license_history_created_by,
+       license_history.notes AS license_history_notes
+FROM license_history
+WHERE license_history.business_account_id = %(business_account_id_1)s
+  AND license_history.status = %(status_1)s
+  AND license_history.activated_at <= %(activated_at_1)s
+  AND license_history.expires_at >= %(expires_at_1)s
+LIMIT %(param_1)s
+
+Timestamp: 2026-03-21T01:13:39.481Z
+Type: query
+Category: query
+Level: info
+Message: [Filtered]
+
+Timestamp: 2026-03-21T01:13:39.532Z
+Type: query
+Category: query
+Level: info
+Message: SELECT campaigns.id AS campaigns_id, campaigns.uuid AS campaigns_uuid, campaigns.name AS campaigns_name, campaigns.description AS campaigns_description, campaigns.start_date AS campaigns_start_date, campaigns.end_date AS campaigns_end_date, campaigns.status AS campaigns_status, campaigns.survey_type AS campaigns_survey_type, campaigns.language_code AS campaigns_language_code, campaigns.client_identifier AS campaigns_client_identifier, campaigns.business_account_id AS campaigns_business_account_id, campaigns.product_description AS campaigns_product_description, campaigns.target_clients_description AS campaigns_target_clients_description, campaigns.survey_goals AS campaigns_survey_goals, campaigns.max_questions AS campaigns_max_questions, campaigns.max_duration_seconds AS campaigns_max_duration_seconds, campaigns.max_follow_ups_per_topic AS campaigns_max_follow_ups_per_topic, campaigns.prioritized_topics AS campaigns_prioritized_topics, campaigns.optional_topics AS campaigns_optional_topics, campaigns.custom_end_message AS campaigns_custom_end_message, campaigns.custom_system_prompt AS campaigns_custom_system_prompt, campaigns.industry AS campaigns_industry, campaigns.use_business_topics AS campaigns_use_business_topics, campaigns.use_business_controls AS campaigns_use_business_controls, campaigns.use_business_product_focus AS campaigns_use_business_product_focus, campaigns.role_prompt_overrides AS campaigns_role_prompt_overrides, campaigns.use_business_role_prompts AS campaigns_use_business_role_prompts, campaigns.use_custom_email_content AS campaigns_use_custom_email_content, campaigns.custom_subject_template AS campaigns_custom_subject_template, campaigns.custom_intro_message AS campaigns_custom_intro_message, campaigns.custom_cta_text AS campaigns_custom_cta_text, campaigns.custom_closing_message AS campaigns_custom_closing_message, campaigns.custom_footer_note AS campaigns_custom_footer_note, campaigns.anonymize_responses AS campaigns_anonymize_responses, campaigns.reminder_enabled AS campaigns_reminder_enabled, campaigns.reminder_delay_days AS campaigns_reminder_delay_days, campaigns.has_active_bulk_job AS campaigns_has_active_bulk_job, campaigns.active_bulk_job_id AS campaigns_active_bulk_job_id, campaigns.active_bulk_operation AS campaigns_active_bulk_operation, campaigns.created_at AS campaigns_created_at, campaigns.completed_at AS campaigns_completed_at, classic_survey_configs_1.id AS classic_survey_configs_1_id, classic_survey_configs_1.campaign_id AS classic_survey_configs_1_campaign_id, classic_survey_configs_1.template_id AS classic_survey_configs_1_template_id, classic_survey_configs_1.sections_enabled AS classic_survey_configs_1_sections_enabled, classic_survey_configs_1.feature_count AS classic_survey_configs_1_feature_count, classic_survey_configs_1.features AS classic_survey_configs_1_features, classic_survey_configs_1.driver_labels AS classic_survey_configs_1_driver_labels, classic_survey_configs_1.custom_prompts AS classic_survey_configs_1_custom_prompts, classic_survey_configs_1.frozen_at AS classic_survey_configs_1_frozen_at, classic_survey_configs_1.created_at AS classic_survey_configs_1_created_at, classic_survey_configs_1.updated_at AS classic_survey_configs_1_updated_at 
+FROM campaigns LEFT OUTER JOIN classic_survey_configs AS classic_survey_configs_1 ON campaigns.id = classic_survey_configs_1.campaign_id 
+WHERE campaigns.id = %(id_1)s 
+ LIMIT %(param_1)s FOR UPDATE
+
+Timestamp: 2026-03-21T01:13:39.623Z
+Type: info
+Category: message
+Level: error
+Message: Error managing campaign participants for campaign 11: (psycopg2.errors.FeatureNotSupported) FOR UPDATE cannot be applied to the nullable side of an outer join
+
+[SQL: SELECT campaigns.id AS campaigns_id, campaigns.uuid AS campaigns_uuid, campaigns.name AS campaigns_name, campaigns.description AS campaigns_description, campaigns.start_date AS campaigns_start_date, campaigns.end_date AS campaigns_end_date, campaigns.status AS campaigns_status, campaigns.survey_type AS campaigns_survey_type, campaigns.language_code AS campaigns_language_code, campaigns.client_identifier AS campaigns_client_identifier, campaigns.business_account_id AS campaigns_business_account_id, campaigns.product_description AS campaigns_product_description, campaigns.target_clients_description AS campaigns_target_clients_description, campaigns.survey_goals AS campaigns_survey_goals, campaigns.max_questions AS campaigns_max_questions, campaigns.max_duration_seconds AS campaigns_max_duration_seconds, campaigns.max_follow_ups_per_topic AS campaigns_max_follow_ups_per_topic, campaigns.prioritized_topics AS campaigns_prioritized_topics, campaigns.optional_topics AS campaigns_optional_topics, campaigns.custom_end_message AS campaigns_custom_end_message, campaigns.custom_system_prompt AS campaigns_custom_system_prompt, campaigns.industry AS campaigns_industry, campaigns.use_business_topics AS campaigns_use_business_topics, campaigns.use_business_controls AS campaigns_use_business_controls, campaigns.use_business_product_focus AS campaigns_use_business_product_focus, campaigns.role_prompt_overrides AS campaigns_role_prompt_overrides, campaigns.use_business_role_prompts AS campaigns_use_business_role_prompts, campaigns.use_custom_email_content AS campaigns_use_custom_email_content, campaigns.custom_subject_template AS campaigns_custom_subject_template, campaigns.custom_intro_message AS campaigns_custom_intro_message, campaigns.custom_cta_text AS campaigns_custom_cta_text, campaigns.custom_closing_message AS campaigns_custom_closing_message, campaigns.custom_footer_note AS campaigns_custom_footer_note, campaigns.anonymize_responses AS campaigns_anonymize_responses, campaigns.reminder_enabled AS campaigns_reminder_enabled, campaigns.reminder_delay_days AS campaigns_reminder_delay_days, campaigns.has_active_bulk_job AS campaigns_has_active_bulk_job, campaigns.active_bulk_job_id AS campaigns_active_bulk_job_id, campaigns.active_bulk_operation AS campaigns_active_bulk_operation, campaigns.created_at AS campaigns_created_at, campaigns.completed_at AS campaigns_completed_at, classic_survey_configs_1.id AS classic_survey_configs_1_id, classic_survey_configs_1.campaign_id AS classic_survey_configs_1_campaign_id, classic_survey_configs_1.template_id AS classic_survey_configs_1_template_id, classic_survey_configs_1.sections_enabled AS classic_survey_configs_1_sections_enabled, classic_survey_configs_1.feature_count AS classic_survey_configs_1_feature_count, classic_survey_configs_1.features AS classic_survey_configs_1_features, classic_survey_configs_1.driver_labels AS classic_survey_configs_1_driver_labels, classic_survey_configs_1.custom_prompts AS classic_survey_configs_1_custom_prompts, classic_survey_configs_1.frozen_at AS classic_survey_configs_1_frozen_at, classic_survey_configs_1.created_at AS classic_survey_configs_1_created_at, classic_survey_configs_1.updated_at AS classic_survey_configs_1_updated_at 
+FROM campaigns LEFT OUTER JOIN classic_survey_configs AS classic_survey_configs_1 ON campaigns.id = classic_survey_configs_1.campaign_id 
+WHERE campaigns.id = %(id_1)s 
+ LIMIT %(param_1)s FOR UPDATE]
+[parameters: {'id_1': 11, 'param_1': 1}]
+(Background on this error at: https://sqlalche.me/e/20/tw8g)

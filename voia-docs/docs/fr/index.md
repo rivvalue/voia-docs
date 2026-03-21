@@ -1,43 +1,119 @@
-# Bienvenue dans la Documentation VOÏA
+# Bienvenue dans la documentation VOÏA
 
 <div class="text-center">
-  <p class="badge badge-coming-soon" style="font-size: 1.2em; padding: 0.5em 1em;">Traduction française à venir</p>
+  <h2>De la voix des clients à la clarté business</h2>
+  <p class="text-muted">Plateforme Voix du Client pilotée par l’IA</p>
 </div>
 
 ---
 
-## 🌐 French Translation Coming Soon
+## Qu’est-ce que VOÏA ?
 
-The French version of the VOÏA documentation is currently being translated.
+VOÏA (Voice of Client) est une plateforme conversationnelle qui collecte des retours clients non structurés et les transforme en données structurées, prêtes à être analysées.
 
-In the meantime, please use the **English documentation**:
-
-**[Switch to English Documentation →](/overview/)**
+Elle remplace les sondages traditionnels par des conversations pilotées par l’IA et fournit une lecture claire du sentiment client, de la fidélité et des risques.
 
 ---
 
-## Contenu Disponible Prochainement
+## Bénéfices clés
 
-Les sections suivantes seront bientôt disponibles en français:
+<span class="badge badge-new">IA</span> **Analyse intelligente**  
+Analyse automatique des retours pour identifier tendances, sentiment et opportunités
 
-- **Guide de Démarrage Rapide**
-- **Fonctionnalités de la Plateforme**
-- **Guide des Licences**
-- **Tutoriels Vidéo**
+<span class="badge badge-new">Simple</span> **Création rapide de campagnes**  
+Créer et envoyer des sondages en quelques minutes
 
----
+<span class="badge badge-new">Conversationnel</span> **Sondages en langage naturel**  
+Les clients répondent librement via des conversations
 
-## Besoin d'Aide?
-
-Pour l'instant, vous pouvez:
-
-1. **Consulter la documentation en anglais** - [Version anglaise complète](../en/index.md)
-2. **Contacter le support** - support@voia.com
-3. **Parler à votre administrateur** - Ils peuvent vous guider en français
+<span class="badge badge-new">Actionnable</span> **Rapports exécutifs**  
+Des synthèses claires et directement exploitables
 
 ---
 
-<div class="text-center text-muted" style="margin-top: 3rem;">
-  <p>Merci de votre patience pendant que nous préparons la documentation française.</p>
-  <p><strong>Date de publication prévue:</strong> À déterminer</p>
-</div>
+## Démarrage rapide
+
+### 1. Créer une campagne
+
+1. Cliquez sur **Campaigns**
+2. Cliquez sur **Create Campaign**
+3. Donnez un nom
+4. Définissez les dates
+5. Personnalisez le sondage
+
+**Temps estimé :** 5–10 minutes
+
+---
+
+### 2. Ajouter des participants
+
+1. Aller dans **Participants**
+2. Ajouter manuellement ou via CSV
+3. Renseigner nom, email, etc.
+
+---
+
+### 3. Envoyer les invitations
+
+1. Ouvrir la campagne
+2. Cliquer sur **Activate Campaign**
+
+Les invitations sont envoyées automatiquement.
+
+---
+
+### 4. Analyser les résultats
+
+- Dashboard en temps réel (NPS, sentiment, taux de réponse)
+- Onglet **Insights** pour analyse complète
+- Export des rapports exécutifs
+
+Voir la section [Analytics](features.md#analytics--business-intelligence)
+
+---
+
+## Fonctionnalités populaires
+
+### 📊 Analytics
+Vue globale des retours clients
+
+### 🤖 Sondages conversationnels
+Interactions naturelles pilotées par IA
+
+### 👥 Gestion des participants
+Segmentation et ciblage
+
+### 📧 Emails
+Invitations et relances automatiques
+
+---
+
+## Comprendre votre compte
+
+### Rôles utilisateurs
+
+**Admin / Manager / Viewer** (inchangé)
+
+---
+
+### Licences
+
+- Nombre de campagnes
+- Participants
+- Utilisateurs
+
+[Voir les licences →](/fr/licenses)
+
+---
+
+## Support
+
+- Aide intégrée
+- Documentation
+- Email support
+
+---
+
+## Prochaines étapes
+
+(blocs conservés)
