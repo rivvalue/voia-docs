@@ -53,7 +53,7 @@
                 <i class="fas fa-download"></i>
             </button>
             {% endif %}
-            {% if campaign.status == 'completed' %}
+            {% if campaign.status == 'completed' and campaign.uuid %}
             <button type="button" id="execReportBtn_{{ campaign.uuid }}" 
                     class="btn btn-outline-primary btn-sm" 
                     onclick="downloadExecutiveReport('{{ campaign.uuid }}', '{{ campaign.name|e }}')"
@@ -62,7 +62,7 @@
             </button>
             {% endif %}
         </div>
-        {% if campaign.status == 'completed' %}
+        {% if campaign.status == 'completed' and campaign.uuid %}
         <div id="regenerateLink_{{ campaign.uuid }}" class="d-none mt-1">
             <a href="#" onclick="regenerateExecutiveReport('{{ campaign.uuid }}', '{{ campaign.name|e }}'); return false;" 
                class="text-muted text-decoration-none small">
@@ -992,6 +992,11 @@ document.addEventListener('DOMContentLoaded', function() {
         // OPTIMIZATION: Defer each status check to prevent blocking
         reportButtons.forEach((button, index) => {
             const campaignId = button.id.replace('execReportBtn_', '');
+            
+            // Skip buttons with missing or invalid campaign IDs
+            if (!campaignId || campaignId === 'None' || campaignId === '') {
+                return;
+            }
             
             // Stagger checks to avoid overwhelming server (50ms intervals)
             setTimeout(() => {

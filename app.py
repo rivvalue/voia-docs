@@ -569,6 +569,22 @@ with app.app_context():
         app.logger.error(f"Database validation failed: {str(e)}")
         # Continue startup but log the issue
     
+    # Backfill any campaigns with NULL or empty UUID
+    try:
+        import uuid as uuid_lib
+        from models import Campaign
+        campaigns_needing_uuid = Campaign.query.filter(
+            (Campaign.uuid == None) | (Campaign.uuid == '')
+        ).all()
+        if campaigns_needing_uuid:
+            for c in campaigns_needing_uuid:
+                c.uuid = str(uuid_lib.uuid4())
+            db.session.commit()
+            app.logger.info(f"Backfilled UUIDs for {len(campaigns_needing_uuid)} campaigns")
+    except Exception as e:
+        app.logger.warning(f"UUID backfill failed: {e}")
+        db.session.rollback()
+
     # Start the background task queue for AI processing
     start_task_queue()
     
