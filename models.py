@@ -300,6 +300,7 @@ class Campaign(db.Model):
         """
         result = {
             'id': self.id,
+            'uuid': self.uuid,
             'name': self.name,
             'description': self.description,
             'start_date': self.start_date.isoformat() if self.start_date else None,
