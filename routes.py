@@ -3124,7 +3124,19 @@ def start_conversation():
         business_account_id = session.get('business_account_id')
         campaign_id = session.get('campaign_id')
         participant_id = session.get('participant_id')
-        
+
+        # Fallback for demo/simple-token users who have no campaign context in session
+        # (simple_token_system only sets auth_token/auth_email — never campaign_id or business_account_id)
+        if not business_account_id or not campaign_id:
+            demo_account = BusinessAccount.query.filter_by(name='Archelo Group inc').first()
+            if demo_account:
+                if not business_account_id:
+                    business_account_id = demo_account.id
+                if not campaign_id:
+                    active = Campaign.get_active_campaigns(demo_account.id)
+                    campaign_id = active[0].id if active else None
+            logger.info(f"Demo fallback applied — business_account_id: {business_account_id}, campaign_id: {campaign_id}")
+
         # Look up participant data if participant_id is available
         participant_data = None
         tenure_with_fc = None
