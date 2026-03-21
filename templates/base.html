@@ -673,8 +673,11 @@
             return meta ? meta.getAttribute('content') : '';
         }
         
+        let suppressPollBadge = 0;
+
         window.markNotifRead = async function(notificationId, btnEl) {
             try {
+                suppressPollBadge++;
                 btnEl.disabled = true;
                 btnEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
                 const resp = await fetch('/api/notifications/' + notificationId + '/read', {
@@ -691,11 +694,14 @@
             } catch (err) {
                 btnEl.disabled = false;
                 btnEl.innerHTML = '<i class="fas fa-check"></i>';
+            } finally {
+                suppressPollBadge--;
             }
         };
         
         markAllReadBtn.addEventListener('click', async function() {
             try {
+                suppressPollBadge++;
                 markAllReadBtn.disabled = true;
                 markAllReadBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>{{ _("Marking...") }}';
                 const resp = await fetch('/api/notifications/mark-all-read', {
@@ -717,6 +723,8 @@
             } catch (err) {
                 markAllReadBtn.disabled = false;
                 markAllReadBtn.innerHTML = '<i class="fas fa-check-double me-1"></i>{{ _("Mark all as read") }}';
+            } finally {
+                suppressPollBadge--;
             }
         });
         
@@ -763,12 +771,14 @@
             try {
                 const response = await fetch('/api/notifications/count?_=' + Date.now(), { cache: 'no-store' });
                 const data = await response.json();
-                
-                if (data.unread_count > 0) {
-                    notificationBadge.textContent = data.unread_count;
-                    notificationBadge.style.display = 'inline-block';
-                } else {
-                    notificationBadge.style.display = 'none';
+
+                if (suppressPollBadge <= 0) {
+                    if (data.unread_count > 0) {
+                        notificationBadge.textContent = data.unread_count;
+                        notificationBadge.style.display = 'inline-block';
+                    } else {
+                        notificationBadge.style.display = 'none';
+                    }
                 }
                 
                 if (previousCount >= 0 && data.unread_count > previousCount) {
