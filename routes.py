@@ -858,7 +858,12 @@ def submit_survey_form():
         # Fallback to active campaign for backward compatibility (old system)
         campaign = None
         if not campaign_id:
-            active_campaign = Campaign.get_active_campaign('archelo_group')
+            demo_account = BusinessAccount.query.filter_by(name='Archelo Group inc').first()
+            if demo_account:
+                active_campaigns = Campaign.get_active_campaigns(demo_account.id)
+                active_campaign = active_campaigns[0] if active_campaigns else None
+            else:
+                active_campaign = None
             campaign_id = active_campaign.id if active_campaign else None
             campaign = active_campaign
         else:
@@ -1344,7 +1349,12 @@ def submit_survey():
         # Fallback to active campaign for backward compatibility (old system)
         campaign = None
         if not campaign_id:
-            active_campaign = Campaign.get_active_campaign('archelo_group')
+            demo_account = BusinessAccount.query.filter_by(name='Archelo Group inc').first()
+            if demo_account:
+                active_campaigns = Campaign.get_active_campaigns(demo_account.id)
+                active_campaign = active_campaigns[0] if active_campaigns else None
+            else:
+                active_campaign = None
             campaign_id = active_campaign.id if active_campaign else None
             campaign = active_campaign
         else:
@@ -1527,7 +1537,12 @@ def submit_survey_overwrite():
             nps_category = 'Detractor'
         
         # Get active campaign for automatic assignment
-        active_campaign = Campaign.get_active_campaign('archelo_group')
+        demo_account = BusinessAccount.query.filter_by(name='Archelo Group inc').first()
+        if demo_account:
+            active_campaigns = Campaign.get_active_campaigns(demo_account.id)
+            active_campaign = active_campaigns[0] if active_campaigns else None
+        else:
+            active_campaign = None
         campaign_id = active_campaign.id if active_campaign else None
         
         # Prepare response data for potential anonymization
@@ -3305,7 +3320,12 @@ def finalize_conversation():
         # Fallback to active campaign for backward compatibility (old system)
         campaign = None
         if not campaign_id:
-            active_campaign = Campaign.get_active_campaign('archelo_group')
+            demo_account = BusinessAccount.query.filter_by(name='Archelo Group inc').first()
+            if demo_account:
+                active_campaigns = Campaign.get_active_campaigns(demo_account.id)
+                active_campaign = active_campaigns[0] if active_campaigns else None
+            else:
+                active_campaign = None
             campaign_id = active_campaign.id if active_campaign else None
             campaign = active_campaign
         else:
