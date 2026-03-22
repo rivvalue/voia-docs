@@ -459,7 +459,9 @@
                 <div class="conv-hero-primary" aria-label="{{ _('Survey information') }}">
                     <div class="conv-brand-block">
                         {% if branding and branding.logo_url %}
-                            <img src="{{ branding.logo_url }}" alt="{{ branding.company_name }}" class="conv-business-logo">
+                            <div style="background: #ffffff; padding: 0; border-radius: 6px; line-height: 0; overflow: hidden; height: 64px; width: fit-content; display: inline-block;">
+                                <img src="{{ branding.logo_url }}" alt="{{ branding.company_name }}" height="64" class="conv-business-logo" style="display: block; width: auto; max-width: 220px; object-fit: contain;">
+                            </div>
                         {% endif %}
                         <div class="conv-brand-text">
                             {% if branding and branding.company_name %}
@@ -543,7 +545,9 @@
     
     {% if branding and branding.logo_url %}
     <div class="text-center mb-3">
-        <img src="{{ branding.logo_url }}" alt="{{ branding.company_name }}" class="img-fluid" style="max-height: 60px;">
+        <div style="background: #ffffff; padding: 0; border-radius: 6px; line-height: 0; overflow: hidden; height: 64px; width: fit-content; display: inline-block;">
+            <img src="{{ branding.logo_url }}" alt="{{ branding.company_name }}" height="64" class="img-fluid" style="display: block; width: auto; max-width: 220px; object-fit: contain;">
+        </div>
     </div>
     {% endif %}
 
