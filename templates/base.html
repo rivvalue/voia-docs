@@ -57,11 +57,13 @@
             <!-- Multi-tenant Business Logo -->
             {% if branding_context and branding_context.logo_url %}
             <div class="text-center mb-3">
-                <img src="{{ branding_context.logo_url }}" 
-                     alt="{{ branding_context.company_name }}" 
-                     style="max-height: 80px; max-width: 220px; height: auto; object-fit: contain;"
-                     onerror="this.parentElement.style.display='none';"
-                     loading="eager">
+                <div style="display: inline-block; background: #ffffff; border-radius: 6px; max-height: 80px; max-width: 220px; line-height: 0; overflow: hidden;">
+                    <img src="{{ branding_context.logo_url }}" 
+                         alt="{{ branding_context.company_name }}" 
+                         style="max-height: 80px; max-width: 220px; height: auto; object-fit: contain; display: block;"
+                         onerror="this.parentElement.parentElement.style.display='none';"
+                         loading="eager">
+                </div>
             </div>
             {% endif %}
             
@@ -121,8 +123,9 @@
             <!-- Left: Logo (when present) -->
             <div class="navbar-left">
                 {% if not is_business_authenticated and branding_context and branding_context.logo_url and request.endpoint != 'demo_intro' %}
-                <div class="navbar-brand d-flex align-items-center" style="background: rgba(255,255,255,0.92); padding: 0; border-radius: 6px; line-height: 0; overflow: hidden;">
+                <div class="navbar-brand" style="background: #ffffff; padding: 0; border-radius: 6px; line-height: 0; overflow: hidden; height: 64px; width: fit-content; display: inline-block;">
                     <img src="{{ branding_context.logo_url }}" alt="{{ branding_context.company_name }}" height="64" class="navbar-logo"
+                         style="display: block; width: auto; max-width: 220px; object-fit: contain;"
                          onerror="this.parentElement.style.display='none';"
                          loading="eager">
                 </div>
