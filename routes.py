@@ -929,6 +929,16 @@ def submit_survey_form():
         db.session.add(response)
         db.session.commit()
         
+        # Bust dashboard cache so the next Executive Summary load reflects fresh data
+        if campaign_id:
+            try:
+                from data_storage import bust_dashboard_cache
+                campaign_ba_id = campaign.business_account_id if campaign else None
+                if campaign_ba_id:
+                    bust_dashboard_cache(campaign_id, campaign_ba_id, company_name=response.company_name)
+            except Exception as cache_bust_err:
+                logger.warning(f"Cache bust failed after form survey submit: {cache_bust_err}")
+        
         # Mark association as completed if using new token system
         # Fallback: Look up association_id from database if missing from session
         if not association_id and campaign_id and authenticated_email:
@@ -1240,6 +1250,16 @@ def submit_classic_survey():
         
         db.session.commit()
         
+        # Bust dashboard cache so the next Executive Summary load reflects fresh data
+        if campaign_id:
+            try:
+                from data_storage import bust_dashboard_cache
+                classic_ba_id = campaign.business_account_id if campaign else None
+                if classic_ba_id:
+                    bust_dashboard_cache(campaign_id, classic_ba_id, company_name=response.company_name)
+            except Exception as cache_bust_err:
+                logger.warning(f"Cache bust failed after classic survey submit: {cache_bust_err}")
+        
         # Mark association as completed
         if association_id:
             try:
@@ -1487,6 +1507,16 @@ def submit_survey():
         # Single atomic commit for both response and status update
         db.session.commit()
         
+        # Bust dashboard cache so the next Executive Summary load reflects fresh data
+        if campaign_id:
+            try:
+                from data_storage import bust_dashboard_cache
+                campaign_ba_id = campaign.business_account_id if campaign else None
+                if campaign_ba_id:
+                    bust_dashboard_cache(campaign_id, campaign_ba_id, company_name=response.company_name)
+            except Exception as cache_bust_err:
+                logger.warning(f"Cache bust failed after survey submit: {cache_bust_err}")
+        
         # Queue AI analysis for background processing
         try:
             add_analysis_task(response.id)
@@ -1623,6 +1653,17 @@ def submit_survey_overwrite():
             action = "created"
         
         db.session.commit()
+        
+        # Bust dashboard cache so the next Executive Summary load reflects fresh data
+        if campaign_id:
+            try:
+                from data_storage import bust_dashboard_cache
+                ow_campaign = active_campaign if active_campaign else Campaign.query.get(campaign_id)
+                ow_ba_id = ow_campaign.business_account_id if ow_campaign else None
+                if ow_ba_id:
+                    bust_dashboard_cache(campaign_id, ow_ba_id, company_name=response.company_name)
+            except Exception as cache_bust_err:
+                logger.warning(f"Cache bust failed after overwrite survey submit: {cache_bust_err}")
         
         # Queue AI analysis for background processing
         try:
@@ -3508,6 +3549,17 @@ def finalize_conversation():
                 response.nps_category = "Detractor"
         db.session.commit()
         
+        # Bust dashboard cache so the next Executive Summary load reflects fresh data
+        if campaign_id:
+            try:
+                from data_storage import bust_dashboard_cache
+                conv_campaign = Campaign.query.get(campaign_id)
+                conv_ba_id = conv_campaign.business_account_id if conv_campaign else None
+                if conv_ba_id:
+                    bust_dashboard_cache(campaign_id, conv_ba_id, company_name=response.company_name)
+            except Exception as cache_bust_err:
+                logger.warning(f"Cache bust failed after conversational survey submit: {cache_bust_err}")
+        
         # Mark association as completed if using new token system
         # Fallback: Look up association_id from database if missing from session
         if not association_id and campaign_id and authenticated_email:
@@ -4234,7 +4286,8 @@ def company_responses_page(company_name):
             bi_label = 'Business Intelligence'
         
         from data_storage import get_company_detail_data
-        account_insights = get_company_detail_data(campaign_id, company_name)
+        detail_ba_id = current_business_user.business_account_id if current_business_user else 1
+        account_insights = get_company_detail_data(campaign_id, company_name, business_account_id=detail_ba_id)
 
         return render_template('company_responses.html',
                              company_name=company_name,
@@ -4281,7 +4334,7 @@ def api_company_detail():
         if not campaign:
             return jsonify({'error': 'Campaign not found or access denied'}), 404
 
-        detail = get_company_detail_data(campaign_id, company_name)
+        detail = get_company_detail_data(campaign_id, company_name, business_account_id=target_business_account_id)
         if detail is None:
             return jsonify({
                 'success': True,

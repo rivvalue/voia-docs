@@ -241,45 +241,107 @@ def calculate_weighted_account_balance(opportunities, risk_factors):
     return balance, opp_score, risk_score, health_ratio
 
 
-@cache.memoize(timeout=cache_config.get_timeout())
 def get_dashboard_data_cached(campaign_id=None, business_account_id=None):
     """
     Cached wrapper for dashboard data retrieval with performance optimization.
     Uses optimized queries to reduce database round-trips from 20+ to 2-3.
     Cache can be disabled/configured by admins via environment variables.
-    
+
     Phase 2: 2-hour cache TTL for 10x performance improvement on repeat visits.
     SECURITY: Cache key MUST include business_account_id to prevent cross-tenant data leakage.
+
+    Cache guard: only cache when business_account_id is confirmed non-null to prevent
+    stale/demo data being stored under the wrong key (original Nov 2025 bug).
+    Active campaigns use a 30-minute TTL; completed campaigns use the full 2-hour TTL.
     """
     import time
     start_time = time.time()
-    
+
     # Generate TENANT-SCOPED cache key for multi-tenant security
     cache_key = f"dashboard_data_campaign{campaign_id}_tenant{business_account_id}"
-    logger.info(f"🔍 DEBUG: Dashboard cache request | Campaign: {campaign_id} | Business Account: {business_account_id} | Cache Key: {cache_key}")
-    
-    # Check if we should use optimized queries
+
+    # --- CACHE GUARD ---
+    # Only use the cache when business_account_id is resolved and non-null.
+    # A null/unresolved ID was the root cause of the original stale-data flash bug
+    # (demo data was cached under the wrong key before auth was fully resolved).
+    use_cache = cache_config.is_enabled() and business_account_id is not None
+
+    if use_cache:
+        cached = cache.get(cache_key)
+        if cached is not None:
+            cache_config.record_hit()
+            elapsed = (time.time() - start_time) * 1000
+            logger.info(f"✅ CACHE HIT | Campaign: {campaign_id} | Tenant: {business_account_id} | Time: {elapsed:.0f}ms")
+            return cached
+        cache_config.record_miss()
+        logger.info(f"🔍 CACHE MISS | Campaign: {campaign_id} | Tenant: {business_account_id} | Key: {cache_key}")
+    else:
+        logger.info(f"⏭️ CACHE SKIPPED | Campaign: {campaign_id} | Tenant: {business_account_id} | Cache enabled: {cache_config.is_enabled()}")
+
+    # --- DATA FETCH ---
     use_optimized = os.environ.get('USE_OPTIMIZED_DASHBOARD', 'true').lower() == 'true'
-    
+
+    result = None
     if use_optimized:
         try:
             from dashboard_query_optimizer import get_optimized_dashboard_data
-            logger.info(f"✅ Using OPTIMIZED dashboard queries | Cache: {cache_config.is_enabled()}")
-            return get_optimized_dashboard_data(campaign_id, business_account_id)
+            logger.info(f"✅ Using OPTIMIZED dashboard queries")
+            result = get_optimized_dashboard_data(campaign_id, business_account_id)
         except Exception as e:
             logger.warning(f"⚠️ Optimized queries FAILED, falling back to original: {e}")
-            # Fall through to original implementation
-    
-    # Fallback to original implementation
-    logger.info(f"⏪ Using ORIGINAL dashboard queries | Cache: {cache_config.is_enabled()}")
-    # SECURITY: Pass business_account_id to prevent segmentation analytics data leakage
-    result = get_dashboard_data(campaign_id, business_account_id)
-    
-    # Log execution time for performance monitoring
-    execution_time = (time.time() - start_time) * 1000  # Convert to ms
+
+    if result is None:
+        logger.info(f"⏪ Using ORIGINAL dashboard queries")
+        result = get_dashboard_data(campaign_id, business_account_id)
+
+    # --- CACHE STORE ---
+    # Determine TTL based on campaign status:
+    #   - Completed campaigns: 2-hour TTL (data is immutable)
+    #   - Active campaigns: 30-minute TTL (data changes as responses arrive)
+    if use_cache and result is not None:
+        try:
+            campaign_status = None
+            if campaign_id:
+                campaign_obj = Campaign.query.get(campaign_id)
+                if campaign_obj:
+                    campaign_status = campaign_obj.status
+
+            if campaign_status == 'completed':
+                ttl = cache_config.get_timeout()  # 2-hour TTL from cache_config
+            else:
+                ttl = 1800  # 30-minute TTL for active campaigns
+
+            cache.set(cache_key, result, timeout=ttl)
+            logger.info(f"💾 CACHE SET | Campaign: {campaign_id} | Status: {campaign_status} | TTL: {ttl}s | Tenant: {business_account_id}")
+        except Exception as cache_err:
+            logger.warning(f"⚠️ Failed to write to cache: {cache_err}")
+
+    execution_time = (time.time() - start_time) * 1000
     logger.info(f"⏱️ Dashboard data generated | Time: {execution_time:.0f}ms | Key: {cache_key}")
-    
+
     return result
+
+
+def bust_dashboard_cache(campaign_id, business_account_id, company_name=None):
+    """
+    Invalidate the dashboard cache for a specific campaign and tenant.
+    Call this whenever new survey responses are submitted for an active campaign
+    so the next load reflects fresh data.
+    
+    If company_name is provided, also busts the company detail cache for that company.
+    """
+    cache_key = f"dashboard_data_campaign{campaign_id}_tenant{business_account_id}"
+    try:
+        cache.delete(cache_key)
+        logger.info(f"🗑️ CACHE BUSTED | Campaign: {campaign_id} | Tenant: {business_account_id} | Key: {cache_key}")
+    except Exception as e:
+        logger.warning(f"⚠️ Failed to bust dashboard cache: {e}")
+
+    if company_name:
+        try:
+            bust_company_detail_cache(campaign_id, company_name, business_account_id)
+        except Exception as e:
+            logger.warning(f"⚠️ Failed to bust company detail cache: {e}")
 
 def get_dashboard_data(campaign_id=None, business_account_id=None):
     """Compile dashboard data for visualization with optional campaign filtering"""
@@ -2221,13 +2283,32 @@ def generate_campaign_kpi_snapshot(campaign_id):
         raise e
 
 
-def get_company_detail_data(campaign_id, company_name):
+def get_company_detail_data(campaign_id, company_name, business_account_id=None):
     """Aggregate per-company qualitative signals for a single company within a campaign.
     
     Returns dict with: top_themes, sub_metrics, avg_churn_risk_score, analysis_summary,
     nps_summary (company_nps, promoters, passives, detractors, total_responses, risk_level).
     Returns None if no responses found.
+
+    Caching: Uses tenant-scoped cache keys when business_account_id is provided.
+    Completed campaigns use 2-hour TTL; active campaigns use 30-minute TTL.
     """
+    import time
+    start_time = time.time()
+
+    cache_key = f"company_detail_campaign{campaign_id}_company{company_name.upper()}_tenant{business_account_id}"
+    use_cache = cache_config.is_enabled() and business_account_id is not None
+
+    if use_cache:
+        cached = cache.get(cache_key)
+        if cached is not None:
+            cache_config.record_hit()
+            elapsed = (time.time() - start_time) * 1000
+            logger.info(f"✅ COMPANY DETAIL CACHE HIT | Campaign: {campaign_id} | Company: {company_name} | Tenant: {business_account_id} | Time: {elapsed:.0f}ms")
+            return cached
+        cache_config.record_miss()
+        logger.info(f"🔍 COMPANY DETAIL CACHE MISS | Campaign: {campaign_id} | Company: {company_name} | Tenant: {business_account_id}")
+
     from models import SurveyResponse
     from sqlalchemy import func, case
     import json as json_module
@@ -2310,7 +2391,7 @@ def get_company_detail_data(campaign_id, company_name):
     latest_churn_risk = latest_response.churn_risk_level if latest_response else None
     latest_response_date = latest_response.created_at.strftime('%Y-%m-%d') if latest_response and latest_response.created_at else None
 
-    return {
+    result = {
         "nps_summary": {
             "company_nps": company_nps,
             "avg_nps": avg_nps,
@@ -2328,3 +2409,26 @@ def get_company_detail_data(campaign_id, company_name):
         "avg_churn_risk_score": avg_churn_risk_score,
         "analysis_summary": analysis_summary
     }
+
+    if use_cache and result is not None:
+        try:
+            campaign_obj = Campaign.query.get(campaign_id)
+            campaign_status = campaign_obj.status if campaign_obj else None
+            ttl = cache_config.get_timeout() if campaign_status == 'completed' else 1800
+            cache.set(cache_key, result, timeout=ttl)
+            elapsed = (time.time() - start_time) * 1000
+            logger.info(f"💾 COMPANY DETAIL CACHE SET | Campaign: {campaign_id} | Company: {company_name} | Status: {campaign_status} | TTL: {ttl}s | Time: {elapsed:.0f}ms")
+        except Exception as cache_err:
+            logger.warning(f"⚠️ Failed to cache company detail: {cache_err}")
+
+    return result
+
+
+def bust_company_detail_cache(campaign_id, company_name, business_account_id):
+    """Invalidate the company detail cache for a specific company/campaign/tenant."""
+    cache_key = f"company_detail_campaign{campaign_id}_company{company_name.upper()}_tenant{business_account_id}"
+    try:
+        cache.delete(cache_key)
+        logger.info(f"🗑️ COMPANY DETAIL CACHE BUSTED | Campaign: {campaign_id} | Company: {company_name} | Tenant: {business_account_id}")
+    except Exception as e:
+        logger.warning(f"⚠️ Failed to bust company detail cache: {e}")

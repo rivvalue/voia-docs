@@ -967,9 +967,11 @@ class LicenseService:
             # CRITICAL: Invalidate business-specific cached data so UI reflects new limits immediately
             if CACHE_AVAILABLE and cache:
                 try:
-                    # Invalidate dashboard data cache for this business account
-                    from data_storage import get_dashboard_data_cached
-                    cache.delete_memoized(get_dashboard_data_cached, business_account_id=business_account_id)
+                    # Invalidate all dashboard campaign caches for this business account
+                    from data_storage import bust_dashboard_cache
+                    campaigns = Campaign.query.filter_by(business_account_id=business_account_id).all()
+                    for c in campaigns:
+                        bust_dashboard_cache(c.id, business_account_id)
                     logger.info(f"Invalidated dashboard cache for business_account_id {business_account_id} after license update")
                 except Exception as cache_error:
                     logger.warning(f"Failed to invalidate cache after license update: {cache_error}")
