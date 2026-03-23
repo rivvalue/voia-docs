@@ -665,6 +665,58 @@ def get_dashboard_data(campaign_id=None, business_account_id=None):
                 except json.JSONDecodeError:
                     continue
         
+        # Pre-fetch bulk data to eliminate N+1 queries inside the loop
+        # ---------------------------------------------------------------
+        # 1. All campaign responses grouped by upper(company_name)
+        bulk_responses_query = SurveyResponse.query
+        if campaign_id:
+            bulk_responses_query = bulk_responses_query.filter(SurveyResponse.campaign_id == campaign_id)
+        all_campaign_responses = bulk_responses_query.all()
+        responses_by_company = {}
+        for _resp in all_campaign_responses:
+            _key = _resp.company_name.upper() if _resp.company_name else ''
+            if _key not in responses_by_company:
+                responses_by_company[_key] = []
+            responses_by_company[_key].append(_resp)
+
+        # 2. All participant commercial values grouped by upper(company_name)
+        #    (company_commercial_value is company-level; one query for the whole campaign tenant)
+        target_business_account_id_bulk = None
+        if campaign_id and campaign:
+            target_business_account_id_bulk = campaign.business_account_id
+        if not target_business_account_id_bulk and business_account_id:
+            target_business_account_id_bulk = business_account_id
+        commercial_value_map = {}
+        if target_business_account_id_bulk:
+            participant_values = Participant.query.filter(
+                Participant.business_account_id == target_business_account_id_bulk,
+                Participant.company_commercial_value.isnot(None)
+            ).with_entities(
+                Participant.company_name,
+                Participant.company_commercial_value
+            ).all()
+            for _pv in participant_values:
+                if _pv.company_name:
+                    _key = _pv.company_name.upper()
+                    if _key not in commercial_value_map:
+                        commercial_value_map[_key] = _pv.company_commercial_value
+
+        # 3. Invited-participant counts per company for this campaign
+        invited_count_map = {}
+        if campaign_id and target_business_account_id_bulk:
+            invited_rows = db.session.query(
+                func.upper(Participant.company_name).label('upper_company'),
+                func.count(CampaignParticipant.id).label('cnt')
+            ).join(
+                Participant, CampaignParticipant.participant_id == Participant.id
+            ).filter(
+                CampaignParticipant.campaign_id == campaign_id
+            ).group_by(func.upper(Participant.company_name)).all()
+            for _row in invited_rows:
+                if _row.upper_company:
+                    invited_count_map[_row.upper_company] = _row.cnt
+        # ---------------------------------------------------------------
+
         # Create unified account intelligence structure
         account_intelligence = []
         for company_key in all_companies:
@@ -710,13 +762,8 @@ def get_dashboard_data(campaign_id=None, business_account_id=None):
                     severity_order = {'Critical': 0, 'High': 1, 'Medium': 2, 'Low': 3}
                     risk_factors.sort(key=lambda x: (severity_order.get(x['severity'], 2), -x['count']))
             
-            # Get tenure, commercial value, and NPS data for this company (filtered by campaign)
-            company_responses_query = SurveyResponse.query.filter(
-                func.upper(SurveyResponse.company_name) == company_key
-            )
-            if campaign_id:
-                company_responses_query = company_responses_query.filter(SurveyResponse.campaign_id == campaign_id)
-            company_responses = company_responses_query.all()
+            # Use pre-fetched bulk data instead of per-company queries (eliminates N+1)
+            company_responses = responses_by_company.get(company_key, [])
             
             # Calculate max tenure and get commercial value (from participants)
             tenure_values = []
@@ -748,15 +795,12 @@ def get_dashboard_data(campaign_id=None, business_account_id=None):
             
             max_tenure = max(tenure_values) if tenure_values else None
             
-            # Get commercial_value from participant (company-level, manual input only)
-            # All participants from same company should have the same value
-            commercial_value = None
+            # Get commercial_value from pre-fetched participant map (no additional query)
+            commercial_value = commercial_value_map.get(company_key)
             
-            # Get business_account_id from campaign or from a response
-            target_business_account_id = None
-            if campaign_id and campaign:
-                target_business_account_id = campaign.business_account_id
-            elif company_responses:
+            # Resolve business_account_id for this company
+            target_business_account_id = target_business_account_id_bulk
+            if not target_business_account_id and company_responses:
                 # For non-campaign views, get business_account_id from any response's campaign
                 for resp in company_responses:
                     if resp.campaign_id:
@@ -765,33 +809,20 @@ def get_dashboard_data(campaign_id=None, business_account_id=None):
                             target_business_account_id = resp_campaign.business_account_id
                             break
             
-            if target_business_account_id:
-                participant_sample = Participant.query.filter(
-                    func.upper(Participant.company_name) == company_key,
-                    Participant.business_account_id == target_business_account_id
-                ).first()
-                if participant_sample and participant_sample.company_commercial_value is not None:
-                    commercial_value = participant_sample.company_commercial_value
-            
             # Calculate company NPS from all responses (campaign-filtered)
             total_company_responses = len(company_responses)
             promoters = sum(1 for r in company_responses if r.nps_score >= 9)
             detractors = sum(1 for r in company_responses if r.nps_score <= 6)
             company_nps = round(((promoters - detractors) / total_company_responses) * 100) if total_company_responses > 0 else 0
             
-            # Calculate per-company participation rate (invited vs responded)
+            # Calculate per-company participation rate using pre-fetched invited counts
             company_invited_count = 0
             company_response_rate = None
             company_confidence_level = 'insufficient'
             
             if campaign_id and target_business_account_id:
-                # Count participants invited from this company for this campaign
-                company_invited_count = db.session.query(func.count(CampaignParticipant.id)).join(
-                    Participant, CampaignParticipant.participant_id == Participant.id
-                ).filter(
-                    CampaignParticipant.campaign_id == campaign_id,
-                    func.upper(Participant.company_name) == company_key
-                ).scalar() or 0
+                # Look up invited count from pre-fetched map (no additional query)
+                company_invited_count = invited_count_map.get(company_key, 0)
                 
                 if company_invited_count > 0:
                     company_response_rate = round((total_company_responses / company_invited_count) * 100, 1)

@@ -2813,7 +2813,7 @@ def api_account_intelligence():
     """API endpoint for Account Intelligence with pagination, search, and filtering"""
     try:
         from models import Campaign
-        from data_storage import get_dashboard_data
+        from data_storage import get_dashboard_data_cached
         from business_auth_routes import get_current_business_account
         
         # Get pagination and filter parameters
@@ -2873,7 +2873,7 @@ def api_account_intelligence():
         
         # Get dashboard data which includes account_intelligence (campaign_id now guaranteed and validated)
         # SECURITY: Pass business_account_id to enable segmentation analytics filtering
-        dashboard_data = get_dashboard_data(campaign_id=campaign_id, business_account_id=target_business_account_id)
+        dashboard_data = get_dashboard_data_cached(campaign_id=campaign_id, business_account_id=target_business_account_id)
         all_accounts = dashboard_data.get('account_intelligence', [])
         
         # Apply filters
