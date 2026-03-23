@@ -64,6 +64,9 @@ LLM_GATEWAY_ENABLED = "true"
 DEFAULT_LLM_PROVIDER = "anthropic"
 DEMO_BLUR_ENABLED = "true"
 
+[userenv.production]
+BASE_URL = "https://voia.rivvalue.com"
+
 [postMerge]
 path = "scripts/post-merge.sh"
 timeoutMs = 60000
