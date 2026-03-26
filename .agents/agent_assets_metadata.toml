@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "pYYHlFOqFRS8s2P-vZTHs"
+uri = "file://docs/voia_bi_analytics_reference.md"
+type = "text"
+title = "VOÏA BI Analytics Reference (EN + FR)"
