@@ -626,6 +626,13 @@ function finalizeSurvey() {
         // Clear persisted conversation state from sessionStorage
         clearConversationState();
         
+        // Simulation mode: show extraction summary instead of standard thank-you
+        if (data.is_simulation && typeof window.showSimulationSummary === 'function') {
+            window.showSimulationSummary(data.extraction || {});
+            console.log('Simulation finalized — extraction summary displayed, no data written.');
+            return;
+        }
+        
         // Show completion state
         showSurveyComplete();
         

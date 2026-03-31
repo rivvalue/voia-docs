@@ -540,6 +540,10 @@
                         </span>
                         {% endif %}
                     </a>
+                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#simulationModal"
+                            title="{{ _('Test the VOÏA conversation against this campaign\'s settings without writing any data') }}">
+                        <i class="fas fa-flask me-2"></i>{{ _('Test Conversation') }}
+                    </button>
                     {% else %}
                     {% if campaign.status in ['draft', 'ready'] %}
                     <a href="{{ url_for('campaigns.classic_survey_config', campaign_id=campaign.id) }}" 
@@ -577,6 +581,10 @@
                     </span>
                     {% endif %}
                 </a>
+                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#simulationModal"
+                        title="{{ _('Test the VOÏA conversation against this campaign\'s settings without writing any data') }}">
+                    <i class="fas fa-flask me-2"></i>{{ _('Test Conversation') }}
+                </button>
                 {% else %}
                 <a href="{{ url_for('campaigns.classic_survey_config', campaign_id=campaign.id) }}" 
                    class="btn btn-secondary">
@@ -1249,5 +1257,74 @@ function deleteDraft() {
         </div>
     </div>
 </div>
+
+<!-- Simulation Role Selector Modal -->
+{% if campaign.survey_type != 'classic' %}
+<div class="modal fade" id="simulationModal" tabindex="-1" aria-labelledby="simulationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="simulationModalLabel">
+                    <i class="fas fa-flask me-2" style="color: #E13A44;"></i>{{ _('Test Conversation') }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted mb-3">
+                    {{ _('Run a full VOÏA conversation against this campaign\'s real settings. No data will be saved — this is for validation only.') }}
+                </p>
+
+                <div class="mb-3">
+                    <label for="simRoleSelect" class="form-label fw-semibold">{{ _('Respondent Role') }}</label>
+                    <select id="simRoleSelect" class="form-select">
+                        <option value="c_level">{{ _('C-Level Executive') }} (CEO, CTO, CFO…)</option>
+                        <option value="vp_director">{{ _('VP / Director') }}</option>
+                        <option value="manager" selected>{{ _('Manager') }}</option>
+                        <option value="team_lead">{{ _('Team Lead / Supervisor') }}</option>
+                        <option value="end_user">{{ _('End User') }}</option>
+                        <option value="default">{{ _('General Participant') }}</option>
+                    </select>
+                    <div class="form-text">{{ _('VOÏA will adapt its questioning style to this role.') }}</div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">{{ _('Campaign Language') }}</label>
+                    <div>
+                        {% if campaign.language_code == 'fr' %}
+                            <span class="badge bg-info fs-6">🇫🇷 {{ _('French') }}</span>
+                        {% else %}
+                            <span class="badge bg-info fs-6">🇬🇧 {{ _('English') }}</span>
+                        {% endif %}
+                        <small class="text-muted ms-2">{{ _('The conversation will be conducted in this language.') }}</small>
+                    </div>
+                </div>
+
+                <div class="alert alert-warning py-2 mb-0">
+                    <i class="fas fa-shield-alt me-2"></i>
+                    <small><strong>{{ _('Simulation mode:') }}</strong> {{ _('Zero analytics footprint. No survey responses will be saved.') }}</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>{{ _('Cancel') }}
+                </button>
+                <button type="button" class="btn btn-primary" onclick="startSimulation();">
+                    <i class="fas fa-play me-2"></i>{{ _('Start Simulation') }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function startSimulation() {
+    var role = document.getElementById('simRoleSelect').value;
+    var url = '{{ url_for("campaigns.simulate_campaign", campaign_id=campaign.id) }}?role=' + encodeURIComponent(role);
+    window.open(url, '_blank');
+    var modal = bootstrap.Modal.getInstance(document.getElementById('simulationModal'));
+    if (modal) { modal.hide(); }
+}
+</script>
+{% endif %}
 
 {% endblock %}

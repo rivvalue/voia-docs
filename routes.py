@@ -3201,8 +3201,12 @@ def start_conversation():
         # Look up participant data if participant_id is available
         participant_data = None
         tenure_with_fc = None
-        
-        if participant_id:
+
+        # Simulation mode: use session-stored participant_data instead of DB lookup
+        if session.get('is_simulation') and session.get('participant_data'):
+            participant_data = session.get('participant_data')
+            logger.info(f"Simulation: loaded participant_data from session, role={participant_data.get('role')}")
+        elif participant_id:
             participant = Participant.query.get(participant_id)
             if participant:
                 # Build participant_data dictionary with segmentation attributes
@@ -3338,6 +3342,80 @@ def finalize_conversation():
         
         if not conversation_id:
             return jsonify({'error': 'Conversation ID is required'}), 400
+
+        # SIMULATION MODE GUARD — no data written to survey_responses
+        if session.get('is_simulation') is True:
+            logger.info(f"Simulation finalization: running extraction only (no DB write) for {conversation_id}")
+
+            survey_data['respondent_email'] = authenticated_email
+            survey_data['conversation_id'] = conversation_id
+            survey_data['conversation_history'] = json.dumps(messages)
+
+            # Determine controller version from ActiveConversation
+            from models import ActiveConversation
+            sim_active_conv = ActiveConversation.query.filter_by(conversation_id=conversation_id).first()
+            sim_controller_version = 'v1'
+            if sim_active_conv and sim_active_conv.survey_data:
+                try:
+                    sim_persisted = json.loads(sim_active_conv.survey_data)
+                    sim_controller_version = sim_persisted.get('controller_version', 'v1')
+                except json.JSONDecodeError:
+                    pass
+
+            try:
+                if sim_controller_version == 'v2_deterministic':
+                    sim_structured = finalize_ai_conversational_survey_v2(survey_data)
+                else:
+                    sim_structured = finalize_ai_conversational_survey(survey_data)
+            except Exception as sim_err:
+                logger.error(f"Simulation extraction error: {sim_err}")
+                sim_structured = {}
+
+            # Delete the ActiveConversation record (no analytics footprint)
+            if sim_active_conv:
+                try:
+                    db.session.delete(sim_active_conv)
+                    db.session.commit()
+                except Exception as del_err:
+                    logger.warning(f"Simulation: could not delete ActiveConversation: {del_err}")
+                    db.session.rollback()
+
+            # Clear simulation session flag
+            session.pop('is_simulation', None)
+            session.pop('auth_token', None)
+            session.pop('auth_email', None)
+
+            nps_score = sim_structured.get('nps_score')
+            nps_category = None
+            if nps_score is not None:
+                if nps_score >= 9:
+                    nps_category = 'Promoter'
+                elif nps_score >= 7:
+                    nps_category = 'Passive'
+                else:
+                    nps_category = 'Detractor'
+
+            return jsonify({
+                'is_simulation': True,
+                'simulation_complete': True,
+                'extraction': {
+                    'nps_score': nps_score,
+                    'nps_category': nps_category,
+                    'satisfaction_rating': sim_structured.get('satisfaction_rating'),
+                    'service_rating': sim_structured.get('service_rating'),
+                    'product_value_rating': sim_structured.get('product_value_rating'),
+                    'pricing_rating': sim_structured.get('pricing_rating'),
+                    'tenure_with_fc': sim_structured.get('tenure_with_fc'),
+                    'product_quality_feedback': sim_structured.get('product_quality_feedback'),
+                    'support_experience_feedback': sim_structured.get('support_experience_feedback'),
+                    'service_rating_feedback': sim_structured.get('service_rating_feedback'),
+                    'user_experience_feedback': sim_structured.get('user_experience_feedback'),
+                    'improvement_feedback': sim_structured.get('improvement_feedback'),
+                    'additional_comments': sim_structured.get('additional_comments'),
+                    'recommendation_reason': sim_structured.get('recommendation_reason'),
+                    'is_complete': sim_structured.get('is_complete', False)
+                }
+            })
         
         # Add authenticated email and conversation ID to survey data
         survey_data['respondent_email'] = authenticated_email

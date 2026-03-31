@@ -2297,6 +2297,104 @@ def export_campaign_responses_legacy(campaign_id):
         return jsonify({'error': 'Failed to export campaign data'}), 500
 
 
+@campaign_bp.route('/<int:campaign_id>/simulate')
+@require_business_auth
+def simulate_campaign(campaign_id):
+    """
+    Simulation entry route: run a full VOÏA conversation against real campaign settings
+    without writing any data to survey_responses. Bypasses campaign status check so
+    draft campaigns can be tested.
+    """
+    import uuid as _uuid
+    from flask import render_template as _render_template
+    from business_auth_routes import get_branding_context
+    from prompt_template_service import ROLE_METADATA
+
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            flash('Business account context not found.', 'error')
+            return redirect(url_for('business_auth.login'))
+
+        campaign = Campaign.query.filter_by(
+            id=campaign_id,
+            business_account_id=current_account.id
+        ).first()
+
+        if not campaign:
+            flash('Campaign not found.', 'error')
+            return redirect(url_for('campaigns.list_campaigns'))
+
+        role = request.args.get('role', 'default')
+
+        language_code = campaign.language_code or 'en'
+        role_label = ROLE_METADATA.get(role, ROLE_METADATA['default']).get('label', 'Participant')
+
+        synthetic_email = f'simulation+{_uuid.uuid4().hex[:8]}@simulation.local'
+        synthetic_token = f'sim_{_uuid.uuid4().hex}'
+
+        session['is_simulation'] = True
+        session['auth_token'] = synthetic_token
+        session['auth_email'] = synthetic_email
+        session['campaign_id'] = campaign_id
+        session['business_account_id'] = current_account.id
+        session['language'] = language_code
+        session['participant_name'] = f'Simulation ({role_label})'
+        session['campaign_name'] = campaign.name
+        session['participant_company'] = current_account.name
+        session['participant_id'] = None
+        session['association_id'] = None
+        session['simulation_campaign_id'] = campaign_id
+        session['participant_data'] = {
+            'participant_name': f'Simulation ({role_label})',
+            'participant_company': current_account.name,
+            'name': f'Simulation ({role_label})',
+            'email': synthetic_email,
+            'company_name': current_account.name,
+            'role': role,
+            'language': language_code
+        }
+
+        branding_context = get_branding_context(current_account.id)
+
+        custom_end_message = campaign.custom_end_message
+        campaign_start_date = campaign.start_date
+        campaign_end_date = campaign.end_date
+        campaign_description = campaign.description
+
+        logger.info(
+            f"Simulation started: campaign={campaign_id}, role={role}, "
+            f"lang={language_code}, account={current_account.id}"
+        )
+
+        return _render_template(
+            'conversational_survey_business.html',
+            authenticated=True,
+            email=synthetic_email,
+            user_email=synthetic_email,
+            participant_name=f'Simulation ({role_label})',
+            participant_company=current_account.name,
+            campaign_name=campaign.name,
+            campaign_description=campaign_description,
+            campaign_start_date=campaign_start_date,
+            campaign_end_date=campaign_end_date,
+            custom_end_message=custom_end_message,
+            branding=branding_context,
+            branding_context=branding_context,
+            is_business_authenticated=True,
+            is_simulation=True,
+            simulation_campaign_id=campaign_id,
+            simulation_role=role,
+            simulation_role_label=role_label,
+            simulation_language=language_code
+        )
+
+    except Exception as e:
+        logger.error(f"Simulation route error: {e}")
+        flash('Failed to start simulation.', 'error')
+        return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+
+
 @campaign_bp.route('/api/timeline-data')
 @require_business_auth
 @require_permission('manage_participants')

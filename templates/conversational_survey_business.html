@@ -179,6 +179,108 @@
                     <small class="text-muted">{{ _('You can now close this window.') }}</small>
                 </div>
             </div>
+
+            <!-- Simulation Extraction Summary (shown only in simulation mode) -->
+            {% if is_simulation is defined and is_simulation %}
+            <div id="simulationSummary" class="conv-card" style="display: none;">
+                <div class="conv-card-header d-flex align-items-center gap-2">
+                    <i class="fas fa-flask" style="color: #E13A44;"></i>
+                    <h5 class="mb-0">{{ _('Simulation — Extraction Summary') }}</h5>
+                    <span class="badge bg-warning text-dark ms-auto">{{ _('Simulation Mode') }}</span>
+                </div>
+                <div class="conv-card-body">
+                    <p class="text-muted mb-3">
+                        {{ _('VOÏA extracted the following data from this simulated conversation. No data has been saved.') }}
+                    </p>
+
+                    <div class="alert alert-info py-2 mb-3">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <small>
+                            <strong>{{ _('Role:') }}</strong> {{ simulation_role_label }}
+                            &nbsp;|&nbsp;
+                            <strong>{{ _('Language:') }}</strong>
+                            {% if simulation_language == 'fr' %}🇫🇷 {{ _('French') }}{% else %}🇬🇧 {{ _('English') }}{% endif %}
+                        </small>
+                    </div>
+
+                    <!-- NPS Score -->
+                    <div class="card mb-3 shadow-sm">
+                        <div class="card-header" style="background: #f8f9fa;">
+                            <strong><i class="fas fa-star me-2" style="color: #E13A44;"></i>{{ _('NPS Score') }}</strong>
+                        </div>
+                        <div class="card-body py-2">
+                            <div id="sim-nps-display" class="d-flex align-items-center gap-3">
+                                <span id="sim-nps-score" class="display-6 fw-bold">—</span>
+                                <span id="sim-nps-badge" class="badge fs-6">—</span>
+                            </div>
+                            <small id="sim-nps-note" class="text-muted"></small>
+                        </div>
+                    </div>
+
+                    <!-- Sub-metric Ratings -->
+                    <div class="card mb-3 shadow-sm">
+                        <div class="card-header" style="background: #f8f9fa;">
+                            <strong><i class="fas fa-chart-bar me-2" style="color: #E13A44;"></i>{{ _('Sub-Metric Ratings') }}</strong>
+                            <small class="text-muted ms-2">({{ _('out of 5') }})</small>
+                        </div>
+                        <div class="card-body py-2">
+                            <table class="table table-sm table-borderless mb-0">
+                                <tbody>
+                                    <tr>
+                                        <td class="text-muted" style="width:50%">{{ _('Overall Satisfaction') }}</td>
+                                        <td><strong id="sim-satisfaction">—</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">{{ _('Service / Support') }}</td>
+                                        <td><strong id="sim-service">—</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">{{ _('Product Value') }}</td>
+                                        <td><strong id="sim-product-value">—</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">{{ _('Pricing') }}</td>
+                                        <td><strong id="sim-pricing">—</strong></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Tenure & Key Themes -->
+                    <div class="card mb-3 shadow-sm">
+                        <div class="card-header" style="background: #f8f9fa;">
+                            <strong><i class="fas fa-comments me-2" style="color: #E13A44;"></i>{{ _('Extracted Context') }}</strong>
+                        </div>
+                        <div class="card-body py-2">
+                            <table class="table table-sm table-borderless mb-0">
+                                <tbody>
+                                    <tr>
+                                        <td class="text-muted" style="width:40%">{{ _('Tenure') }}</td>
+                                        <td><span id="sim-tenure">—</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">{{ _('Key Themes') }}</td>
+                                        <td><span id="sim-themes">—</span></td>
+                                    </tr>
+                                    <tr id="sim-feedback-row" style="display:none;">
+                                        <td class="text-muted">{{ _('Improvement Areas') }}</td>
+                                        <td><span id="sim-feedback" class="text-wrap"></span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button type="button" class="btn btn-secondary" onclick="window.close();">
+                            <i class="fas fa-times me-2"></i>{{ _('Close & Adjust Settings') }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
         </div>
     </div>
 </div>
@@ -191,6 +293,70 @@
 window.isAuthenticated = {{ 'true' if authenticated else 'false' }};
 window.userEmail = '{{ email or '' }}';
 window.typingIndicatorText = "{{ _('VOÏA is typing...') }}";
+window.isSimulation = {{ 'true' if is_simulation is defined and is_simulation else 'false' }};
+
+{% if is_simulation is defined and is_simulation %}
+window.showSimulationSummary = function(extraction) {
+    var loadingState = document.getElementById('loadingState');
+    var convInterface = document.getElementById('conversationInterface');
+    var summaryEl = document.getElementById('simulationSummary');
+
+    if (loadingState) loadingState.style.display = 'none';
+    if (convInterface) convInterface.style.display = 'none';
+    if (!summaryEl) return;
+    summaryEl.style.display = 'block';
+
+    var npsScore = extraction.nps_score;
+    var npsCategory = extraction.nps_category;
+
+    var npsScoreEl = document.getElementById('sim-nps-score');
+    var npsBadgeEl = document.getElementById('sim-nps-badge');
+    var npsNoteEl = document.getElementById('sim-nps-note');
+
+    if (npsScore !== null && npsScore !== undefined) {
+        npsScoreEl.textContent = npsScore + '/10';
+        if (npsCategory) {
+            npsBadgeEl.textContent = npsCategory;
+            if (npsCategory === 'Promoter') {
+                npsBadgeEl.className = 'badge fs-6 bg-success';
+            } else if (npsCategory === 'Passive') {
+                npsBadgeEl.className = 'badge fs-6 bg-warning text-dark';
+            } else {
+                npsBadgeEl.className = 'badge fs-6 bg-danger';
+            }
+        }
+        npsNoteEl.textContent = '';
+    } else {
+        npsScoreEl.textContent = '—';
+        npsBadgeEl.textContent = '';
+        npsNoteEl.textContent = '{{ _("NPS not extracted — conversation may have been incomplete.") }}';
+    }
+
+    function fmt(val) { return (val !== null && val !== undefined) ? val + '/5' : '—'; }
+
+    document.getElementById('sim-satisfaction').textContent = fmt(extraction.satisfaction_rating);
+    document.getElementById('sim-service').textContent = fmt(extraction.service_rating);
+    document.getElementById('sim-product-value').textContent = fmt(extraction.product_value_rating);
+    document.getElementById('sim-pricing').textContent = fmt(extraction.pricing_rating);
+    document.getElementById('sim-tenure').textContent = extraction.tenure_with_fc || '—';
+
+    var themes = [];
+    if (extraction.product_quality_feedback) themes.push(extraction.product_quality_feedback);
+    if (extraction.support_experience_feedback) themes.push(extraction.support_experience_feedback);
+    if (extraction.service_rating_feedback) themes.push(extraction.service_rating_feedback);
+    if (extraction.user_experience_feedback) themes.push(extraction.user_experience_feedback);
+    document.getElementById('sim-themes').textContent = themes.length > 0 ? themes.join(' | ') : '—';
+
+    if (extraction.improvement_feedback) {
+        var fbRow = document.getElementById('sim-feedback-row');
+        var fbEl = document.getElementById('sim-feedback');
+        if (fbRow) fbRow.style.display = '';
+        if (fbEl) fbEl.textContent = extraction.improvement_feedback;
+    }
+
+    window.scrollTo(0, 0);
+};
+{% endif %}
 </script>
 <script src="{{ url_for('static', filename='js/conversational_survey.js') }}"></script>
 {% endblock %}
