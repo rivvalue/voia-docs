@@ -405,6 +405,133 @@ def preview_classic_survey(campaign_id):
         return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
 
 
+@campaign_bp.route('/<uuid:campaign_uuid>/acknowledge_preview', methods=['POST'])
+@require_business_auth
+@require_permission('manage_participants')
+def acknowledge_preview(campaign_uuid):
+    """Acknowledge classic survey preview and mark simulation_completed_at"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            flash('Business account context not found.', 'error')
+            return redirect(url_for('business_auth.login'))
+
+        campaign = Campaign.query.filter_by(
+            uuid=str(campaign_uuid),
+            business_account_id=current_account.id
+        ).first()
+
+        if not campaign:
+            flash('Campaign not found.', 'error')
+            return redirect(url_for('campaigns.list_campaigns'))
+
+        if campaign.survey_type != 'classic':
+            flash('Preview acknowledgment is only for classic surveys.', 'warning')
+            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign.id))
+
+        campaign.simulation_completed_at = datetime.utcnow()
+        db.session.commit()
+
+        try:
+            from audit_utils import queue_audit_log
+            queue_audit_log(
+                business_account_id=current_account.id,
+                action_type='campaign_simulation_completed',
+                resource_type='campaign',
+                resource_id=campaign.id,
+                resource_name=campaign.name,
+                details={'survey_type': 'classic', 'method': 'preview_acknowledgment'}
+            )
+        except Exception as audit_err:
+            logger.error(f"Failed to audit preview acknowledgment: {audit_err}")
+
+        flash('Preview acknowledged. Campaign marked as previewed.', 'success')
+        return redirect(url_for('campaigns.view_campaign', campaign_id=campaign.id))
+
+    except Exception as e:
+        logger.error(f"Error acknowledging preview: {e}")
+        db.session.rollback()
+        flash('Failed to acknowledge preview. Please try again.', 'error')
+        try:
+            campaign = Campaign.query.filter_by(uuid=str(campaign_uuid), business_account_id=get_current_business_account().id).first()
+            if campaign:
+                return redirect(url_for('campaigns.view_campaign', campaign_id=campaign.id))
+        except Exception:
+            pass
+        return redirect(url_for('campaigns.list_campaigns'))
+
+
+@campaign_bp.route('/<uuid:campaign_uuid>/validate', methods=['POST'])
+@require_business_auth
+@require_permission('manage_participants')
+def validate_campaign(campaign_uuid):
+    """Manager explicitly validates a campaign after simulation/preview"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            flash('Business account context not found.', 'error')
+            return redirect(url_for('business_auth.login'))
+
+        campaign = Campaign.query.filter_by(
+            uuid=str(campaign_uuid),
+            business_account_id=current_account.id
+        ).first()
+
+        if not campaign:
+            flash('Campaign not found.', 'error')
+            return redirect(url_for('campaigns.list_campaigns'))
+
+        from flask import session as flask_session
+        from models import BusinessAccountUser
+        user = BusinessAccountUser.query.get(flask_session.get('business_user_id'))
+        validated_by = user.email if user else flask_session.get('business_email', 'unknown')
+
+        now = datetime.utcnow()
+        simulation_was_already_set = campaign.simulation_completed_at is not None
+        if not simulation_was_already_set:
+            campaign.simulation_completed_at = now
+        campaign.manager_validated_at = now
+        campaign.manager_validated_by = validated_by
+        db.session.commit()
+
+        try:
+            from audit_utils import queue_audit_log
+            if not simulation_was_already_set:
+                queue_audit_log(
+                    business_account_id=current_account.id,
+                    action_type='campaign_simulation_completed',
+                    resource_type='campaign',
+                    resource_id=campaign.id,
+                    resource_name=campaign.name,
+                    details={'survey_type': campaign.survey_type, 'method': 'implicit_via_validate'}
+                )
+            queue_audit_log(
+                business_account_id=current_account.id,
+                action_type='campaign_validated',
+                resource_type='campaign',
+                resource_id=campaign.id,
+                resource_name=campaign.name,
+                details={'validated_by': validated_by}
+            )
+        except Exception as audit_err:
+            logger.error(f"Failed to audit campaign validation: {audit_err}")
+
+        flash('Campaign validated successfully.', 'success')
+        return redirect(url_for('campaigns.view_campaign', campaign_id=campaign.id))
+
+    except Exception as e:
+        logger.error(f"Error validating campaign: {e}")
+        db.session.rollback()
+        flash('Failed to validate campaign. Please try again.', 'error')
+        try:
+            campaign = Campaign.query.filter_by(uuid=str(campaign_uuid), business_account_id=get_current_business_account().id).first()
+            if campaign:
+                return redirect(url_for('campaigns.view_campaign', campaign_id=campaign.id))
+        except Exception:
+            pass
+        return redirect(url_for('campaigns.list_campaigns'))
+
+
 @campaign_bp.route('/<int:campaign_id>')
 @require_business_auth
 def view_campaign(campaign_id):
@@ -982,7 +1109,7 @@ def activate_campaign(campaign_id):
         logger.info(f"Campaign '{campaign.name}' (ID: {campaign_id}) activated by business account {current_account.id}")
         logger.info(f"Token generation results: {token_success_count} successful, {token_error_count} failed")
         
-        # Audit log campaign activation
+        # Audit log campaign activation (includes vetting_status for traceability)
         try:
             from audit_utils import queue_audit_log
             queue_audit_log(
@@ -994,7 +1121,8 @@ def activate_campaign(campaign_id):
                 details={
                     'participants_with_tokens': token_success_count,
                     'token_generation_failures': token_error_count,
-                    'previous_status': 'ready'
+                    'previous_status': 'ready',
+                    'vetting_status': campaign.vetting_status
                 }
             )
         except Exception as audit_error:
@@ -2386,7 +2514,8 @@ def simulate_campaign(campaign_id):
             simulation_campaign_id=campaign_id,
             simulation_role=role,
             simulation_role_label=role_label,
-            simulation_language=language_code
+            simulation_language=language_code,
+            campaign=campaign
         )
 
     except Exception as e:

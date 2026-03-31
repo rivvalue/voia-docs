@@ -286,10 +286,32 @@ class Campaign(db.Model):
     active_bulk_job_id = db.Column(db.Integer, db.ForeignKey('bulk_operation_jobs.id'), nullable=True, index=True)
     active_bulk_operation = db.Column(db.String(50), nullable=True)  # 'add' or 'remove'
     
+    # Vetting tracking (added 2026-03-31)
+    simulation_completed_at = db.Column(db.DateTime, nullable=True)
+    manager_validated_at = db.Column(db.DateTime, nullable=True)
+    manager_validated_by = db.Column(db.String(200), nullable=True)
+    
     # Metadata
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
     completed_at = db.Column(db.DateTime, nullable=True)
-    
+
+    VETTING_FEATURE_DATE = datetime(2026, 3, 31, 0, 0, 0)
+
+    @property
+    def vetting_status(self):
+        """
+        Compute vetting readiness state.
+        Returns None for campaigns predating the vetting feature to avoid misleading badges.
+        Returns 'simulated_and_validated', 'simulated_not_validated', or 'not_simulated'.
+        """
+        if self.created_at and self.created_at < self.VETTING_FEATURE_DATE:
+            return None
+        if self.simulation_completed_at and self.manager_validated_at:
+            return 'simulated_and_validated'
+        if self.simulation_completed_at:
+            return 'simulated_not_validated'
+        return 'not_simulated'
+
     def to_dict(self, include_response_count=False, response_count=None):
         """
         Serialize campaign to dictionary.
@@ -347,7 +369,12 @@ class Campaign(db.Model):
             'use_business_product_focus': self.use_business_product_focus,
             # Role prompt overrides (Dec 2025: 4-tier configuration)
             'role_prompt_overrides': self.role_prompt_overrides or {},
-            'use_business_role_prompts': self.use_business_role_prompts
+            'use_business_role_prompts': self.use_business_role_prompts,
+            # Vetting fields (added 2026-03-31)
+            'simulation_completed_at': self.simulation_completed_at.isoformat() if self.simulation_completed_at else None,
+            'manager_validated_at': self.manager_validated_at.isoformat() if self.manager_validated_at else None,
+            'manager_validated_by': self.manager_validated_by,
+            'vetting_status': self.vetting_status
         }
         
         # OPTIMIZATION: Only include response_count if explicitly requested or pre-computed

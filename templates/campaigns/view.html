@@ -32,6 +32,20 @@
                         <i class="fas fa-flag-checkered me-2"></i>Completed
                     {% endif %}
                 </span>
+                {% if campaign.vetting_status %}
+                <br>
+                <span class="mt-2 d-inline-block"
+                      data-bs-toggle="tooltip" data-bs-placement="bottom"
+                      title="{% if campaign.vetting_status == 'simulated_and_validated' %}Campaign has been simulated/previewed and validated by a manager.{% elif campaign.vetting_status == 'simulated_not_validated' %}Campaign has been simulated/previewed but not yet validated by a manager.{% else %}Campaign has not been simulated or validated.{% endif %}">
+                    {% if campaign.vetting_status == 'simulated_and_validated' %}
+                        <span class="badge bg-success"><i class="fas fa-shield-alt me-1"></i>Simulated &amp; Validated</span>
+                    {% elif campaign.vetting_status == 'simulated_not_validated' %}
+                        <span class="badge bg-warning text-dark"><i class="fas fa-exclamation-triangle me-1"></i>Simulated, Not Validated</span>
+                    {% else %}
+                        <span class="badge bg-danger"><i class="fas fa-times-circle me-1"></i>Not Simulated</span>
+                    {% endif %}
+                </span>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -620,6 +634,15 @@
                                         </button>
                                     </form>
                                     
+                                    {% if campaign.vetting_status == 'simulated_not_validated' %}
+                                    <form method="POST" action="{{ url_for('campaigns.validate_campaign', campaign_uuid=campaign.uuid) }}" class="d-flex flex-fill">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-outline-success flex-fill">
+                                            <i class="fas fa-shield-alt me-2"></i>Validate Campaign
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                    
                                     <button type="button" class="btn btn-outline-danger flex-fill" data-bs-toggle="modal" data-bs-target="#deleteDraftModal">
                                         <i class="fas fa-trash-alt me-2"></i>Delete Draft
                                     </button>
@@ -639,7 +662,7 @@
                         {% elif campaign.status == 'ready' %}
                             <!-- Ready State Actions -->
                             <div class="campaign-actions-content">
-                                <div class="campaign-actions-primary">
+                                <div class="campaign-actions-primary d-flex flex-wrap gap-2">
                                     <form method="POST" action="{{ url_for('campaigns.activate_campaign', campaign_id=campaign.id) }}" id="activateCampaignForm">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                         <button type="button" class="btn btn-primary"
@@ -647,6 +670,14 @@
                                             <i class="fas fa-play me-2"></i>Activate Campaign
                                         </button>
                                     </form>
+                                    {% if campaign.vetting_status == 'simulated_not_validated' %}
+                                    <form method="POST" action="{{ url_for('campaigns.validate_campaign', campaign_uuid=campaign.uuid) }}">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-success">
+                                            <i class="fas fa-shield-alt me-2"></i>Validate Campaign
+                                        </button>
+                                    </form>
+                                    {% endif %}
                                 </div>
                                 
                                 <div class="campaign-actions-helper campaign-actions-helper-info">
@@ -870,6 +901,10 @@
 <script>
 // Transcript upload and management functionality
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Bootstrap tooltips (used for vetting status badge)
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (el) { return new bootstrap.Tooltip(el); });
+
     // Initialize Bootstrap popovers for info icons
     const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
     const popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
@@ -1134,6 +1169,26 @@ function deleteDraft() {
             </div>
             <div class="modal-body">
                 <p><strong>{{ _('Are you sure you want to activate this campaign?') }}</strong></p>
+
+                {% if campaign.vetting_status %}
+                <div class="mb-3">
+                    <strong>{{ _('Vetting Status:') }}</strong>
+                    {% if campaign.vetting_status == 'simulated_and_validated' %}
+                        <span class="badge bg-success ms-1"><i class="fas fa-shield-alt me-1"></i>Simulated &amp; Validated</span>
+                    {% elif campaign.vetting_status == 'simulated_not_validated' %}
+                        <span class="badge bg-warning text-dark ms-1"><i class="fas fa-exclamation-triangle me-1"></i>Simulated, Not Validated</span>
+                    {% else %}
+                        <span class="badge bg-danger ms-1"><i class="fas fa-times-circle me-1"></i>Not Simulated</span>
+                    {% endif %}
+                    {% if campaign.vetting_status != 'simulated_and_validated' %}
+                    <div class="alert alert-warning mt-2 mb-0 py-2">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        {{ _('This campaign has not been fully validated. You may still proceed.') }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
                 <p>{{ _('When you activate this campaign:') }}</p>
                 <ul class="mb-3">
                     <li>{{ _('The campaign will be ready to collect responses') }}</li>
@@ -1150,7 +1205,7 @@ function deleteDraft() {
                     <i class="fas fa-times me-2"></i>{{ _('Cancel') }}
                 </button>
                 <button type="button" class="btn btn-primary" onclick="document.getElementById('activateCampaignForm').submit();">
-                    <i class="fas fa-play me-2"></i>{{ _('Yes, Activate Campaign') }}
+                    <i class="fas fa-play me-2"></i>{{ _('Confirm Activate') }}
                 </button>
             </div>
         </div>

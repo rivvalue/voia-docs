@@ -38,7 +38,10 @@ ACTION_DESCRIPTIONS = {
     'user_added': 'New user added to account',
     'user_removed': 'User removed from account',
     'scheduler_run': 'Campaign scheduler executed',
-    'executive_report_downloaded': 'Executive report downloaded'
+    'executive_report_downloaded': 'Executive report downloaded',
+    'campaign_simulation_completed': 'Campaign simulation completed',
+    'campaign_validated': 'Campaign validated by manager',
+    'campaign_activated': 'Campaign activated'
 }
 
 def get_current_user_context():

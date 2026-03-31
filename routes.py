@@ -3371,6 +3371,9 @@ def finalize_conversation():
                 logger.error(f"Simulation extraction error: {sim_err}")
                 sim_structured = {}
 
+            # Track simulation completion on the campaign for vetting purposes
+            sim_campaign_id = sim_active_conv.campaign_id if sim_active_conv else None
+
             # Delete the ActiveConversation record (no analytics footprint)
             if sim_active_conv:
                 try:
@@ -3378,6 +3381,25 @@ def finalize_conversation():
                     db.session.commit()
                 except Exception as del_err:
                     logger.warning(f"Simulation: could not delete ActiveConversation: {del_err}")
+                    db.session.rollback()
+
+            if sim_campaign_id:
+                try:
+                    from models import Campaign as SimCampaign
+                    sim_campaign = SimCampaign.query.get(sim_campaign_id)
+                    if sim_campaign:
+                        sim_campaign.simulation_completed_at = datetime.utcnow()
+                        db.session.commit()
+                        queue_audit_log(
+                            business_account_id=sim_campaign.business_account_id,
+                            action_type='campaign_simulation_completed',
+                            resource_type='campaign',
+                            resource_id=sim_campaign.id,
+                            resource_name=sim_campaign.name,
+                            details={'survey_type': sim_campaign.survey_type}
+                        )
+                except Exception as vet_err:
+                    logger.warning(f"Simulation: could not update simulation_completed_at: {vet_err}")
                     db.session.rollback()
 
             # Clear simulation session flag

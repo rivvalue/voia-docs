@@ -560,13 +560,30 @@
     </div>
 
     {% if preview_mode %}
-    <div class="alert alert-warning d-flex align-items-center mb-3" style="border-radius: var(--radius-lg); font-size: 0.95rem;">
-        <i class="fas fa-eye me-2" style="font-size: 1.2rem;"></i>
-        <div>
-            <strong>{{ _('Preview Mode') }}</strong> — {{ _('This is a preview of the survey questionnaire. Responses will not be saved.') }}
-            <a href="{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}" class="ms-2 text-decoration-underline">
-                <i class="fas fa-arrow-left me-1"></i>{{ _('Back to Campaign') }}
-            </a>
+    <div class="alert alert-warning mb-3" style="border-radius: var(--radius-lg); font-size: 0.95rem;">
+        <div class="d-flex align-items-center mb-2">
+            <i class="fas fa-eye me-2" style="font-size: 1.2rem;"></i>
+            <div>
+                <strong>{{ _('Preview Mode') }}</strong> — {{ _('This is a preview of the survey questionnaire. Responses will not be saved.') }}
+                <a href="{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}" class="ms-2 text-decoration-underline">
+                    <i class="fas fa-arrow-left me-1"></i>{{ _('Back to Campaign') }}
+                </a>
+            </div>
+        </div>
+        <div class="mt-2 d-flex flex-wrap align-items-center gap-2">
+            <form method="POST" action="{{ url_for('campaigns.acknowledge_preview', campaign_uuid=campaign.uuid) }}" class="d-inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-eye-slash me-1"></i>{{ _('Acknowledge Preview') }}
+                </button>
+            </form>
+            <form method="POST" action="{{ url_for('campaigns.validate_campaign', campaign_uuid=campaign.uuid) }}" class="d-inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-sm btn-success">
+                    <i class="fas fa-shield-alt me-1"></i>{{ _('Validate Campaign') }}
+                </button>
+            </form>
+            <small class="text-muted">{{ _('Acknowledging marks it as previewed; Validating confirms manager approval.') }}</small>
         </div>
     </div>
     {% endif %}
