@@ -8257,7 +8257,9 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
     align-items: center;
     justify-content: center;
     padding: 0.25rem 0.6rem;
-    min-width: 4rem;
+    flex: 1 1 0;
+    min-width: 0;
+    white-space: nowrap;
     border-radius: var(--radius-md);
 }
 
@@ -8321,7 +8323,9 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
     align-items: center;
     justify-content: center;
     padding: 0.25rem 0.6rem;
-    min-width: 4rem;
+    flex: 1 1 0;
+    min-width: 0;
+    white-space: nowrap;
     border-radius: var(--radius-md);
 }
 
@@ -8330,6 +8334,82 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
 .campaign-card-actions .btn .fa {
     line-height: 1;
     vertical-align: middle;
+}
+
+/* Campaign Progress Stepper */
+.campaign-stepper {
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 12px;
+    padding: 1rem 2rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,.07);
+}
+.stepper-steps {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+}
+.stepper-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    flex-shrink: 0;
+}
+.stepper-circle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #e9ecef;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+    border: 2px solid #ced4da;
+    transition: all 0.2s;
+}
+.stepper-step.active .stepper-circle {
+    background: #E13A44;
+    color: #fff;
+    border-color: #E13A44;
+    box-shadow: 0 0 0 4px rgba(225, 58, 68, 0.15);
+}
+.stepper-step.completed .stepper-circle {
+    background: #198754;
+    color: #fff;
+    border-color: #198754;
+}
+.stepper-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #6c757d;
+    text-align: center;
+    white-space: nowrap;
+}
+.stepper-step.active .stepper-label {
+    color: #E13A44;
+    font-weight: 700;
+}
+.stepper-step.completed .stepper-label {
+    color: #198754;
+    font-weight: 600;
+}
+.stepper-connector {
+    flex: 1;
+    height: 2px;
+    background: #ced4da;
+    margin: 0 0.5rem;
+    margin-bottom: 1.2rem;
+}
+.stepper-connector.completed { background: #198754; }
+.stepper-connector.active { background: linear-gradient(90deg, #198754, #E13A44); }
+@media (max-width: 576px) {
+    .campaign-stepper { padding: 0.75rem 1rem; }
+    .stepper-label { font-size: 0.65rem; }
+    .stepper-circle { width: 28px; height: 28px; font-size: 0.75rem; }
 }
 
 /* Ensure images/icons stay within bounds */
