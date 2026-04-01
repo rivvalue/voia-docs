@@ -30,11 +30,11 @@
     <!-- Custom CSS -->
     {% if use_refactored_frontend %}
     <!-- Phase 2: Modular CSS - Load order: base → utilities → components → pages → responsive → print -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/modules/base.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/modules/utilities.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/modules/components.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/modules/pages.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/modules/responsive.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modules/base.css') }}?v=campaign-ux-fix-1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modules/utilities.css') }}?v=campaign-ux-fix-1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modules/components.css') }}?v=campaign-ux-fix-1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modules/pages.css') }}?v=campaign-ux-fix-1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modules/responsive.css') }}?v=campaign-ux-fix-1">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/modules/print.css') }}" media="print">
     {% else %}
     <!-- Legacy: Monolithic CSS -->

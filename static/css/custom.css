@@ -8256,9 +8256,8 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 2.25rem;
-    height: 2.25rem;
-    padding: 0;
+    padding: 0.25rem 0.6rem;
+    min-width: 4rem;
     border-radius: var(--radius-md);
 }
 
@@ -8321,9 +8320,8 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 2.25rem;
-    height: 2.25rem;
-    padding: 0;
+    padding: 0.25rem 0.6rem;
+    min-width: 4rem;
     border-radius: var(--radius-md);
 }
 
