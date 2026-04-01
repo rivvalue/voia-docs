@@ -12572,3 +12572,14 @@ thead th.th-c2 {
 .demo-blur-active #comparisonResults #companyTable tr:hover {
     filter: blur(1.5px);
 }
+
+
+/* ===== JSON Hint Popover ===== */
+.json-hint-popover {
+    max-width: 480px !important;
+}
+.json-hint-popover .popover-body pre {
+    max-width: 100%;
+    white-space: pre-wrap;
+    word-break: break-all;
+}

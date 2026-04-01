@@ -65,8 +65,34 @@
                 Make sure your JSON is valid before saving. Changes apply immediately after save.
             </div>
             
+            <!-- JSON hint example for platform level (hidden, used by popover) -->
+            <div id="platform-json-hint-content" class="d-none">
+                <p style="margin-bottom:0.5rem;font-size:0.8rem;">Nested JSON: industry name → topic name → comma-separated keywords.</p>
+                <pre style="margin:0;font-size:0.72rem;background:#f8f9fa;padding:0.6rem;border-radius:4px;white-space:pre-wrap;">{
+  "YourIndustry": {
+    "Product Quality": "keyword1, keyword2, keyword3",
+    "Support Experience": "keyword4, keyword5, keyword6",
+    "Service Rating": "keyword7, keyword8",
+    "NPS Score": "keyword9, keyword10",
+    "Pricing Value": "keyword11, keyword12",
+    "User Experience": "keyword13, keyword14",
+    "Satisfaction": "keyword15, keyword16",
+    "Improvement Suggestions": "keyword17, keyword18"
+  }
+}</pre>
+                <p style="margin-top:0.5rem;margin-bottom:0;font-size:0.75rem;color:#6c757d;">Edit in an external editor, then paste the full JSON here. Each industry key must match the account-level industry name exactly.</p>
+            </div>
+
             <div class="settings-form-group">
-                <label class="settings-form-label" for="hints_json">Industry Topic Hints JSON</label>
+                <label class="settings-form-label" for="hints_json">
+                    Industry Topic Hints JSON
+                    <button type="button" class="btn btn-link btn-sm p-0 ms-2 json-hint-btn"
+                            style="line-height:1;vertical-align:middle;color:#6c757d;"
+                            data-hint-target="platform-json-hint-content"
+                            title="View expected JSON format">
+                        <i class="fas fa-info-circle" style="font-size:0.85rem;"></i>
+                    </button>
+                </label>
                 <textarea class="form-control" 
                           id="hints_json" 
                           name="hints_json"
@@ -191,6 +217,29 @@ document.addEventListener('DOMContentLoaded', function() {
     } catch (e) {
         console.error('Failed to parse initial JSON:', e);
     }
+
+    // JSON hint popovers
+    document.querySelectorAll('.json-hint-btn').forEach(function(btn) {
+        var targetId = btn.getAttribute('data-hint-target');
+        var contentEl = document.getElementById(targetId);
+        new bootstrap.Popover(btn, {
+            html: true,
+            sanitize: false,
+            trigger: 'click',
+            placement: 'right',
+            title: 'Expected JSON Format',
+            content: contentEl ? contentEl.innerHTML : '',
+            customClass: 'json-hint-popover'
+        });
+    });
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.json-hint-btn') && !e.target.closest('.popover')) {
+            document.querySelectorAll('.json-hint-btn').forEach(function(btn) {
+                var p = bootstrap.Popover.getInstance(btn);
+                if (p) p.hide();
+            });
+        }
+    });
 });
 </script>
 

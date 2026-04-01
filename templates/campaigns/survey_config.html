@@ -358,11 +358,34 @@
                     </div>
                 </div>
                 
+                <!-- JSON hint example (hidden, used by popover) -->
+                <div id="campaign-json-hint-content" class="d-none">
+                    <p style="margin-bottom:0.5rem;font-size:0.8rem;">{{ _('Paste a JSON object with survey topic names as keys and comma-separated focus keywords as values:') }}</p>
+                    <pre style="margin:0;font-size:0.72rem;background:#f8f9fa;padding:0.6rem;border-radius:4px;white-space:pre-wrap;">{
+  "Product Quality": "defects, durability, reliability",
+  "Support Experience": "response time, issue resolution",
+  "Service Rating": "delivery, account management",
+  "NPS Score": "recommendation likelihood",
+  "Pricing Value": "cost competitiveness, ROI",
+  "User Experience": "interface usability, ease of use",
+  "Satisfaction": "overall satisfaction, expectations met",
+  "Improvement Suggestions": "process improvements, communication"
+}</pre>
+                    <p style="margin-top:0.5rem;margin-bottom:0;font-size:0.75rem;color:#6c757d;">{{ _('Edit this in an external editor and paste the result here. Only include the topics you want to override.') }}</p>
+                </div>
+
                 <!-- Advanced: Custom Topic Hints JSON Override (for power users) -->
                 <div class="advanced-section mt-4" style="border: 2px dashed var(--medium-gray); padding: 1.5rem; border-radius: var(--radius-md); background: rgba(189, 189, 189, 0.05);">
                     <h6 class="advanced-toggle" onclick="document.getElementById('advanced_hints_content').classList.toggle('show')">
                         <i class="fas fa-code me-2"></i>
                         {{ _('Advanced: Custom Topic Hints (JSON)') }}
+                        <button type="button" class="btn btn-link btn-sm p-0 ms-2 json-hint-btn"
+                                style="line-height:1;vertical-align:middle;color:var(--gray-dark);"
+                                data-hint-target="campaign-json-hint-content"
+                                title="{{ _('View expected JSON format') }}"
+                                onclick="event.stopPropagation();">
+                            <i class="fas fa-info-circle" style="font-size:0.85rem;"></i>
+                        </button>
                         <i class="fas fa-chevron-down ms-2"></i>
                     </h6>
                     <div id="advanced_hints_content" class="advanced-content">
@@ -1224,6 +1247,31 @@ function removeCampOverride(roleKey, idx) {
     const row = document.getElementById('camp_override_' + roleKey + '_' + idx);
     if (row) row.remove();
 }
+
+// JSON hint popovers
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.json-hint-btn').forEach(function(btn) {
+        var targetId = btn.getAttribute('data-hint-target');
+        var contentEl = document.getElementById(targetId);
+        new bootstrap.Popover(btn, {
+            html: true,
+            sanitize: false,
+            trigger: 'click',
+            placement: 'right',
+            title: '{{ _("Expected JSON Format") }}',
+            content: contentEl ? contentEl.innerHTML : '',
+            customClass: 'json-hint-popover'
+        });
+    });
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.json-hint-btn') && !e.target.closest('.popover')) {
+            document.querySelectorAll('.json-hint-btn').forEach(function(btn) {
+                var p = bootstrap.Popover.getInstance(btn);
+                if (p) p.hide();
+            });
+        }
+    });
+});
 </script>
 
 {{ inheritance_scripts() }}
