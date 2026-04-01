@@ -82,17 +82,6 @@
                     <span class="campaign-status status-{{ campaign.status }}">
                         {{ campaign.status|title }}
                     </span>
-                    <button type="button" class="btn btn-link btn-sm p-0 ms-1 lifecycle-help-btn" 
-                            style="line-height:1; vertical-align:middle; color:var(--gray-dark);"
-                            data-bs-toggle="popover"
-                            data-bs-trigger="click"
-                            data-bs-placement="bottom"
-                            data-bs-html="true"
-                            title="{{ _('Campaign Lifecycle') }}"
-                            data-bs-content="{{ _('<div class=&quot;lifecycle-popover&quot;><div class=&quot;lifecycle-stage&quot;><span class=&quot;lifecycle-dot dot-draft&quot;></span><strong>Draft</strong> &mdash; Campaign is being set up; editable, not yet visible to participants.</div><div class=&quot;lifecycle-stage&quot;><span class=&quot;lifecycle-dot dot-ready&quot;></span><strong>Ready</strong> &mdash; Configuration complete and participants added; awaiting activation.</div><div class=&quot;lifecycle-stage&quot;><span class=&quot;lifecycle-dot dot-active&quot;></span><strong>Active</strong> &mdash; Campaign is live and collecting participant responses.</div><div class=&quot;lifecycle-stage&quot;><span class=&quot;lifecycle-dot dot-completed&quot;></span><strong>Completed</strong> &mdash; Campaign has ended; data is preserved for analysis and reporting.</div></div>') }}"
-                            aria-label="{{ _('Campaign lifecycle help') }}">
-                        <i class="fas fa-question-circle" style="font-size:0.75rem;"></i>
-                    </button>
                     {% if campaign.survey_type == 'classic' %}
                         <span class="badge bg-light text-dark border ms-1" title="{{ _('Classic Survey') }}">
                             <i class="fas fa-clipboard-list me-1"></i>{{ _('Classic') }}
@@ -245,7 +234,15 @@
                 <thead>
                     <tr>
                         <th>{{ _('Campaign Name') }}</th>
-                        <th>{{ _('Status') }}</th>
+                        <th>{{ _('Status') }} <button type="button" class="btn btn-link btn-sm p-0 ms-1 lifecycle-help-btn"
+                                style="line-height:1; vertical-align:middle; color:var(--gray-dark);"
+                                data-bs-toggle="popover"
+                                data-bs-trigger="click"
+                                data-bs-placement="bottom"
+                                data-bs-html="true"
+                                title="{{ _('Campaign Lifecycle') }}"
+                                data-bs-content="{{ _('<div class=&quot;lifecycle-popover&quot;><div class=&quot;lifecycle-stage&quot;><span class=&quot;lifecycle-dot dot-draft&quot;></span><strong>Draft</strong> &mdash; Campaign is being set up; editable, not yet visible to participants.</div><div class=&quot;lifecycle-stage&quot;><span class=&quot;lifecycle-dot dot-ready&quot;></span><strong>Ready</strong> &mdash; Configuration complete and participants added; awaiting activation.</div><div class=&quot;lifecycle-stage&quot;><span class=&quot;lifecycle-dot dot-active&quot;></span><strong>Active</strong> &mdash; Campaign is live and collecting participant responses.</div><div class=&quot;lifecycle-stage&quot;><span class=&quot;lifecycle-dot dot-completed&quot;></span><strong>Completed</strong> &mdash; Campaign has ended; data is preserved for analysis and reporting.</div></div>') }}"
+                                aria-label="{{ _('Campaign lifecycle help') }}"><i class="fas fa-question-circle" style="font-size:0.75rem;"></i></button></th>
                         <th class="hide-on-tablet">{{ _('Start') }} Date</th>
                         <th class="hide-on-tablet">{{ _('End Date') }}</th>
                         <th class="text-center">{{ _('Participants') }}</th>
@@ -268,17 +265,6 @@
                             <span class="campaign-status status-{{ campaign.status }}">
                                 {{ campaign.status|title }}
                             </span>
-                            <button type="button" class="btn btn-link btn-sm p-0 ms-1 lifecycle-help-btn" 
-                                    style="line-height:1; vertical-align:middle; color:var(--gray-dark);"
-                                    data-bs-toggle="popover"
-                                    data-bs-trigger="click"
-                                    data-bs-placement="right"
-                                    data-bs-html="true"
-                                    title="{{ _('Campaign Lifecycle') }}"
-                                    data-bs-content="{{ _('<div class=&quot;lifecycle-popover&quot;><div class=&quot;lifecycle-stage&quot;><span class=&quot;lifecycle-dot dot-draft&quot;></span><strong>Draft</strong> &mdash; Campaign is being set up; editable, not yet visible to participants.</div><div class=&quot;lifecycle-stage&quot;><span class=&quot;lifecycle-dot dot-ready&quot;></span><strong>Ready</strong> &mdash; Configuration complete and participants added; awaiting activation.</div><div class=&quot;lifecycle-stage&quot;><span class=&quot;lifecycle-dot dot-active&quot;></span><strong>Active</strong> &mdash; Campaign is live and collecting participant responses.</div><div class=&quot;lifecycle-stage&quot;><span class=&quot;lifecycle-dot dot-completed&quot;></span><strong>Completed</strong> &mdash; Campaign has ended; data is preserved for analysis and reporting.</div></div>') }}"
-                                    aria-label="{{ _('Campaign lifecycle help') }}">
-                                <i class="fas fa-question-circle" style="font-size:0.75rem;"></i>
-                            </button>
                 {% if campaign.survey_type == 'classic' %}
                     <span class="badge bg-light text-dark border ms-1" title="{{ _('Classic Survey') }}">
                         <i class="fas fa-clipboard-list me-1"></i>{{ _('Classic') }}
