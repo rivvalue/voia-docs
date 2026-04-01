@@ -91,6 +91,8 @@ Chaque campagne suit un processus défini incluant une porte de validation oblig
 **Actif** → Sondage en cours, collecte des réponses  
 **Terminé** → Campagne clôturée, rapports finaux disponibles
 
+La liste des campagnes indique le statut actuel de chaque campagne. Une infobulle d'aide sur le cycle de vie est disponible dans l'en-tête de la colonne **Statut** — survolez ou cliquez sur l'en-tête pour voir la description de chaque étape. Cette infobulle apparaît une seule fois au niveau de la colonne, et non sur chaque ligne de campagne. Chaque ligne affiche également des boutons d'action (Voir, Insights, Participants, Exporter, Rapport) dont la largeur est uniforme, ce qui assure une présentation visuelle cohérente quelle que soit la longueur du libellé.
+
 **Porte de validation — obligatoire avant l'activation**
 
 Une campagne en état Prêt ne peut pas être activée tant qu'elle n'a pas franchi une porte de validation en deux étapes. La porte comporte trois statuts possibles :
@@ -120,6 +122,7 @@ Par défaut, un seul campagne peut être active à la fois par compte. Si votre 
 - Questions
 - Durée estimée
 - Branding
+- **Indices de sujets personnalisés (JSON) :** Guidez optionnellement l'IA vers des sujets spécifiques en saisissant une liste JSON d'indices. Le champ dispose d'un bouton info (?) qui ouvre un exemple formaté illustrant la structure JSON correcte. À l'intérieur de ce panneau d'exemple, un bouton **Copier le JSON** vous permet de copier le modèle directement dans votre presse-papiers pour l'adapter sans avoir à saisir le format manuellement.
 
 **4. Participants**
 - Import CSV ou ajout manuel
@@ -222,7 +225,12 @@ Graphique des sujets principaux, classés et colorés par sentiment.
 ### Insights de campagne (5 onglets)
 
 **Overview**
-- KPI + synthèse IA
+Résumé de haut niveau de la campagne :
+- Score NPS avec courbe de tendance sur la période
+- Taux de réponse et nombre total de réponses
+- Répartition du sentiment (positif, neutre, négatif) sous forme de graphique en anneau
+- Graphique de distribution NPS montrant la proportion de Promoteurs, Passifs et Détracteurs parmi l'ensemble des répondants
+- Synthèse IA en langage clair décrivant le constat le plus important
 
 **Growth**
 - dynamique de croissance / rétention
@@ -232,7 +240,11 @@ Graphique des sujets principaux, classés et colorés par sentiment.
 - priorisation
 
 **Survey Insights**
-- analyse des réponses
+Plonge dans le contenu des retours clients :
+- Graphique des thèmes clés
+- Répartition des réponses question par question
+- Extraits verbatim étiquetés avec le sentiment et les thèmes associés
+- Tableau NPS par entreprise où chaque nom de société est un lien cliquable qui mène directement à la page Account Insights de ce compte, permettant de passer des données du sondage à une vue complète du compte en un seul clic
 
 **Segmentation**
 - analyse par groupe
@@ -249,6 +261,12 @@ Score global par compte basé sur :
 
 **Niveaux de confiance :**
 - élevé / moyen / faible / insuffisant
+
+**Badges de risque**
+Chaque ligne affiche un badge de risque — **Critique**, **Élevé**, **Moyen** ou **Faible** — résumant le niveau de risque global du compte. Survoler le badge ouvre une infobulle qui explique précisément pourquoi ce niveau de risque a été attribué, en décrivant les signaux spécifiques (comme un NPS faible, un risque de churn élevé ou une tendance de sentiment négative) qui ont conduit à cette classification.
+
+**Enrichissement au survol**
+Survoler une ligne de compte ouvre une infobulle qui charge des détails supplémentaires à la demande. L'infobulle comprend les principaux thèmes mentionnés par les répondants de ce compte, une ventilation par sous-métrique couvrant la satisfaction, le service, la tarification et la valeur produit, le score moyen de risque de churn calculé par l'IA, ainsi qu'un résumé en langage clair généré par l'IA synthétisant l'ensemble des retours du compte. Cela permet de garder le tableau principal lisible tout en offrant de la profondeur quand vous en avez besoin.
 
 ---
 

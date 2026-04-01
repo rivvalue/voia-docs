@@ -75,6 +75,8 @@ Every campaign moves through a defined workflow that includes a mandatory vettin
 **Active** → Survey is live, collecting responses  
 **Completed** → Campaign closed, final reports available
 
+The campaign list shows each campaign's current status. A lifecycle help tooltip is available at the **Status** column header — click or hover the header to see a description of every stage. This tooltip appears once at the column level rather than on each individual campaign row. Each campaign row also displays action buttons (View, Insights, Participants, Export, Report) that are all rendered at equal width, so the controls remain visually consistent and easy to scan regardless of label length.
+
 **Vetting gate — required before activation**
 
 A campaign in the Ready state cannot be activated until it passes a two-step vetting gate. The gate has three possible statuses:
@@ -105,6 +107,7 @@ By default, only one campaign can be active at a time per account. Attempting to
 - Customize questions
 - Set completion time estimate
 - Add your branding
+- **Custom Topic Hints (JSON):** Optionally guide the AI toward specific topics by entering a JSON list of hints. The field includes an info (?) button that opens a formatted example showing the correct JSON structure. Inside that example panel, a **Copy JSON** button lets you copy the sample directly to your clipboard so you can adapt it without typing the format from scratch.
 
 **Step 4: Participant Assignment**
 - Choose who receives the survey
@@ -277,6 +280,7 @@ A high-level summary of the campaign so far:
 - NPS score with a trend line showing how it has moved over the campaign period
 - Response rate and total responses received
 - Sentiment distribution (positive, neutral, negative) as a donut chart
+- NPS Distribution chart showing the breakdown of Promoters, Passives, and Detractors as a proportion of all respondents
 - A short AI-written headline that describes the most important finding in plain language
 
 **Growth Analytics**
@@ -299,6 +303,7 @@ Dives into the content of what customers said:
 - Key Themes bar chart (described above)
 - A question-by-question breakdown showing the distribution of answers
 - Verbatim response samples tagged with sentiment and the themes they relate to
+- NPS by Company table where each company name is a clickable link that takes you directly to that company's Account Insights page, so you can move from survey-level data to a full account view in one click
 
 **Segmentation Insights**
 Breaks results down by the groups you care about:
@@ -323,8 +328,11 @@ Because some accounts have responded more than others, every score is accompanie
 - **Low confidence** — Only a small amount of data is available. Treat this as an early indicator rather than a firm conclusion.
 - **Insufficient data** — Too few responses to generate a meaningful score. The account row is still shown so you can decide whether to follow up proactively.
 
+**Risk Badges**
+Each company row displays a risk badge — **Critical**, **High**, **Medium**, or **Low** — that summarizes the overall risk level for that account. Hovering over the badge opens a tooltip that explains exactly why the account received that rating, describing the specific signals (such as low NPS, high churn risk, or negative sentiment trend) that drove the classification. This makes it easy to understand not just what the risk level is, but why it was assigned.
+
 **Hover-Loaded Enrichment**
-Hovering over any account row opens a tooltip that loads additional detail on demand: the top themes that respondents from that company mentioned, sub-metric scores (such as churn risk and growth opportunity individually), and any verbatim highlights. This keeps the main table clean and scannable while still giving you depth when you need it.
+Hovering over any account row opens a tooltip that loads additional detail on demand. The tooltip includes the top themes that respondents from that company mentioned, a sub-metric breakdown covering satisfaction, service, pricing, and product value, the account's average AI churn risk score, and an AI-generated plain-language summary that synthesizes the account's overall feedback picture. This keeps the main table clean and scannable while still giving you depth when you need it.
 
 **Use Account Intelligence to:**
 - Prioritize at-risk accounts for your customer success team
