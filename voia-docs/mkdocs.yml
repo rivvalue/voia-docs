@@ -42,9 +42,19 @@ plugins:
           default: true
           name: English
           build: true
+          nav:
+            - Overview: overview.md
+            - Getting Started: index.md
+            - Features: features.md
+            - Licenses: licenses.md
         - locale: fr
           name: Français
           build: true
+          nav:
+            - Présentation: overview.md
+            - Démarrage: index.md
+            - Fonctionnalités: features.md
+            - Licences: licenses.md
 
 markdown_extensions:
   - admonition
@@ -60,12 +70,6 @@ markdown_extensions:
   - md_in_html
   - toc:
       permalink: true
-
-nav:
-  - Overview: overview.md
-  - Getting Started: index.md
-  - Features: features.md
-  - Licenses: licenses.md
 
 extra_css:
   - overrides/custom.css
