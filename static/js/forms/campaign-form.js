@@ -15,6 +15,7 @@
 // Default English fallback strings (overridden by window.CampaignFormI18n if provided)
 const defaultStrings = {
     endDateAfterStart: "End date must be after start date.",
+    shortDurationWarning: "Note: Campaign duration is only {durationDays} day(s). Consider a longer campaign for better response rates.",
     selectDates: "Select campaign dates to see midpoint reminder timing",
     endDateMustBeAfter: "End date must be after start date",
     midpointLabel: "Midpoint:",
@@ -46,7 +47,7 @@ function t(key, replacements = {}) {
 }
 
 /**
- * Date Validation: Ensure end date is after start date
+ * Date Validation: Inline feedback replacing alert()
  */
 function initializeDateValidation() {
     const startDateInput = document.getElementById('start_date');
@@ -54,26 +55,47 @@ function initializeDateValidation() {
     
     if (!startDateInput || !endDateInput) return;
     
+    function getOrCreateFeedback() {
+        let feedback = document.getElementById('end_date_feedback');
+        if (!feedback) {
+            feedback = document.createElement('div');
+            feedback.id = 'end_date_feedback';
+            feedback.className = 'invalid-feedback';
+            endDateInput.parentNode.appendChild(feedback);
+        }
+        return feedback;
+    }
+    
     function validateDates() {
         const startDate = startDateInput.value;
         const endDate = endDateInput.value;
+        const feedback = getOrCreateFeedback();
         
-        if (startDate && endDate && new Date(endDate) <= new Date(startDate)) {
-            alert(t('endDateAfterStart'));
-            endDateInput.value = '';
+        if (startDate && endDate) {
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            if (end <= start) {
+                endDateInput.classList.add('is-invalid');
+                feedback.textContent = t('endDateAfterStart');
+                feedback.style.display = 'block';
+                return;
+            }
+            const durationDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+            if (durationDays < 7) {
+                endDateInput.classList.remove('is-invalid');
+                feedback.className = 'form-text text-warning';
+                feedback.textContent = t('shortDurationWarning', {durationDays: durationDays});
+                feedback.style.display = 'block';
+                return;
+            }
         }
+        endDateInput.classList.remove('is-invalid');
+        feedback.className = 'invalid-feedback';
+        feedback.style.display = 'none';
     }
     
     endDateInput.addEventListener('change', validateDates);
-    startDateInput.addEventListener('change', function() {
-        const startDate = this.value;
-        const endDate = endDateInput.value;
-        
-        if (startDate && endDate && new Date(endDate) <= new Date(startDate)) {
-            alert(t('endDateAfterStart'));
-            endDateInput.value = '';
-        }
-    });
+    startDateInput.addEventListener('change', validateDates);
 }
 
 /**
@@ -291,6 +313,26 @@ function previewEmail(emailType, campaignId) {
 }
 
 /**
+ * Update Survey Type Consequence Notes
+ * Shows a one-line note based on the selected survey type.
+ */
+function updateSurveyTypeNotes() {
+    const conversationalRadio = document.getElementById('survey_type_conversational');
+    const noteConversational = document.getElementById('noteConversational');
+    const noteClassic = document.getElementById('noteClassic');
+    
+    if (!conversationalRadio || (!noteConversational && !noteClassic)) return;
+    
+    if (conversationalRadio.checked) {
+        if (noteConversational) noteConversational.classList.remove('d-none');
+        if (noteClassic) noteClassic.classList.add('d-none');
+    } else {
+        if (noteClassic) noteClassic.classList.remove('d-none');
+        if (noteConversational) noteConversational.classList.add('d-none');
+    }
+}
+
+/**
  * Initialize All Campaign Form Features
  * Call this function when the DOM is ready
  */
@@ -325,6 +367,17 @@ function initializeCampaignForm() {
         }
         updateMidpointReminderDisplay(); // Initialize on page load
     }
+    
+    // Initialize survey type consequence notes
+    const conversationalCard = document.getElementById('surveyTypeConversationalCard');
+    const classicCard = document.getElementById('surveyTypeClassicCard');
+    if (conversationalCard) {
+        conversationalCard.addEventListener('click', updateSurveyTypeNotes);
+    }
+    if (classicCard) {
+        classicCard.addEventListener('click', updateSurveyTypeNotes);
+    }
+    updateSurveyTypeNotes(); // Initialize on page load
 }
 
 // Auto-initialize when DOM is ready

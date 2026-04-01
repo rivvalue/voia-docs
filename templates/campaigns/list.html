@@ -34,23 +34,23 @@
         <div class="{{ action_class }}" {% if view_type == 'card' %}onclick="event.stopPropagation();"{% endif %}>
             <a href="{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}" 
                class="btn btn-outline-primary btn-sm" title="{{ _('View Details') }}">
-                <i class="fas fa-eye"></i>
+                <i class="fas fa-eye me-1"></i><span class="btn-label">{{ _('View') }}</span>
             </a>
             {% if campaign.status in ['active', 'completed'] %}
             <a href="{{ url_for('campaign_insights') }}?campaign_id={{ campaign.id }}" 
                class="btn btn-outline-success btn-sm" title="{{ _('Campaign Insights') }}">
-                <i class="fas fa-chart-bar"></i>
+                <i class="fas fa-chart-bar me-1"></i><span class="btn-label">{{ _('Insights') }}</span>
             </a>
             {% endif %}
             <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" 
                class="btn btn-outline-secondary btn-sm" title="{{ _('Manage Participants') }}">
-                <i class="fas fa-users"></i>
+                <i class="fas fa-users me-1"></i><span class="btn-label">{{ _('Participants') }}</span>
             </a>
             {% if campaign.status in ['active', 'completed'] %}
             <button type="button" class="btn btn-outline-info btn-sm" 
                     onclick="startCampaignExport({{ campaign.id }}, '{{ campaign.name|e }}')"
                     title="{{ _('Export Data') }}">
-                <i class="fas fa-download"></i>
+                <i class="fas fa-download me-1"></i><span class="btn-label">{{ _('Export') }}</span>
             </button>
             {% endif %}
             {% if campaign.status == 'completed' and campaign.uuid %}
@@ -58,7 +58,7 @@
                     class="btn btn-outline-primary btn-sm" 
                     onclick="downloadExecutiveReport('{{ campaign.uuid }}', '{{ campaign.name|e }}')"
                     title="{{ _('Executive Report') }}">
-                <i class="fas fa-file-pdf"></i>
+                <i class="fas fa-file-pdf me-1"></i><span class="btn-label">{{ _('Report') }}</span>
             </button>
             {% endif %}
         </div>
@@ -78,14 +78,27 @@
         <div class="campaign-card-header">
             <div class="d-flex justify-content-between align-items-start">
                 <h5 class="mb-0 campaign-card-title">{{ campaign.name }}</h5>
-                <span class="campaign-status status-{{ campaign.status }}">
-                    {{ campaign.status|title }}
-                </span>
-                {% if campaign.survey_type == 'classic' %}
-                    <span class="badge bg-light text-dark border ms-1" title="{{ _('Classic Survey') }}">
-                        <i class="fas fa-clipboard-list me-1"></i>{{ _('Classic') }}
+                <div class="d-flex align-items-center gap-1">
+                    <span class="campaign-status status-{{ campaign.status }}">
+                        {{ campaign.status|title }}
                     </span>
-                {% endif %}
+                    <button type="button" class="btn btn-link btn-sm p-0 ms-1 lifecycle-help-btn" 
+                            style="line-height:1; vertical-align:middle; color:var(--gray-dark);"
+                            data-bs-toggle="popover"
+                            data-bs-trigger="click"
+                            data-bs-placement="bottom"
+                            data-bs-html="true"
+                            title="{{ _('Campaign Lifecycle') }}"
+                            data-bs-content="{{ _('<div class=&quot;lifecycle-popover&quot;><div class=&quot;lifecycle-stage&quot;><span class=&quot;lifecycle-dot dot-draft&quot;></span><strong>Draft</strong> &mdash; Campaign is being set up; editable, not yet visible to participants.</div><div class=&quot;lifecycle-stage&quot;><span class=&quot;lifecycle-dot dot-ready&quot;></span><strong>Ready</strong> &mdash; Configuration complete and participants added; awaiting activation.</div><div class=&quot;lifecycle-stage&quot;><span class=&quot;lifecycle-dot dot-active&quot;></span><strong>Active</strong> &mdash; Campaign is live and collecting participant responses.</div><div class=&quot;lifecycle-stage&quot;><span class=&quot;lifecycle-dot dot-completed&quot;></span><strong>Completed</strong> &mdash; Campaign has ended; data is preserved for analysis and reporting.</div></div>') }}"
+                            aria-label="{{ _('Campaign lifecycle help') }}">
+                        <i class="fas fa-question-circle" style="font-size:0.75rem;"></i>
+                    </button>
+                    {% if campaign.survey_type == 'classic' %}
+                        <span class="badge bg-light text-dark border ms-1" title="{{ _('Classic Survey') }}">
+                            <i class="fas fa-clipboard-list me-1"></i>{{ _('Classic') }}
+                        </span>
+                    {% endif %}
+                </div>
             </div>
         </div>
         
@@ -100,11 +113,11 @@
                     <div class="fw-bold small">{{ campaign.start_date }}</div>
                 </div>
                 <div class="col-4">
-                    <div class="small text-muted">Fin</div>
+                    <div class="small text-muted">{{ _('End') }}</div>
                     <div class="fw-bold small">{{ campaign.end_date }}</div>
                 </div>
                 <div class="col-4">
-                    <div class="small text-muted">Participants</div>
+                    <div class="small text-muted">{{ _('Participants') }}</div>
                     <div class="fw-bold small">{{ campaign.participant_count }}</div>
                 </div>
             </div>
@@ -234,7 +247,7 @@
                         <th>{{ _('Campaign Name') }}</th>
                         <th>{{ _('Status') }}</th>
                         <th class="hide-on-tablet">{{ _('Start') }} Date</th>
-                        <th class="hide-on-tablet">{{ _('Fin Date') }}</th>
+                        <th class="hide-on-tablet">{{ _('End Date') }}</th>
                         <th class="text-center">{{ _('Participants') }}</th>
                         <th class="text-center hide-on-tablet">{{ _('Sent/Completed') }}</th>
                         <th class="text-center">{{ _('Actions') }}</th>
@@ -255,6 +268,17 @@
                             <span class="campaign-status status-{{ campaign.status }}">
                                 {{ campaign.status|title }}
                             </span>
+                            <button type="button" class="btn btn-link btn-sm p-0 ms-1 lifecycle-help-btn" 
+                                    style="line-height:1; vertical-align:middle; color:var(--gray-dark);"
+                                    data-bs-toggle="popover"
+                                    data-bs-trigger="click"
+                                    data-bs-placement="right"
+                                    data-bs-html="true"
+                                    title="{{ _('Campaign Lifecycle') }}"
+                                    data-bs-content="{{ _('<div class=&quot;lifecycle-popover&quot;><div class=&quot;lifecycle-stage&quot;><span class=&quot;lifecycle-dot dot-draft&quot;></span><strong>Draft</strong> &mdash; Campaign is being set up; editable, not yet visible to participants.</div><div class=&quot;lifecycle-stage&quot;><span class=&quot;lifecycle-dot dot-ready&quot;></span><strong>Ready</strong> &mdash; Configuration complete and participants added; awaiting activation.</div><div class=&quot;lifecycle-stage&quot;><span class=&quot;lifecycle-dot dot-active&quot;></span><strong>Active</strong> &mdash; Campaign is live and collecting participant responses.</div><div class=&quot;lifecycle-stage&quot;><span class=&quot;lifecycle-dot dot-completed&quot;></span><strong>Completed</strong> &mdash; Campaign has ended; data is preserved for analysis and reporting.</div></div>') }}"
+                                    aria-label="{{ _('Campaign lifecycle help') }}">
+                                <i class="fas fa-question-circle" style="font-size:0.75rem;"></i>
+                            </button>
                 {% if campaign.survey_type == 'classic' %}
                     <span class="badge bg-light text-dark border ms-1" title="{{ _('Classic Survey') }}">
                         <i class="fas fa-clipboard-list me-1"></i>{{ _('Classic') }}
@@ -264,7 +288,7 @@
                         <td data-label="{{ _('Start') }} Date" class="hide-on-tablet">
                             <small>{{ campaign.start_date }}</small>
                         </td>
-                        <td data-label="Fin Date" class="hide-on-tablet">
+                        <td data-label="End Date" class="hide-on-tablet">
                             <small>{{ campaign.end_date }}</small>
                         </td>
                         <td class="text-center" data-label="Participants">
@@ -979,6 +1003,21 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
+    // Initialize lifecycle help popovers
+    document.querySelectorAll('.lifecycle-help-btn').forEach(el => {
+        new bootstrap.Popover(el, { sanitize: false });
+        el.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    });
+    // Close popovers when clicking outside
+    document.addEventListener('click', function() {
+        document.querySelectorAll('.lifecycle-help-btn').forEach(el => {
+            const pop = bootstrap.Popover.getInstance(el);
+            if (pop) pop.hide();
+        });
+    });
+
     console.log('✅ Critical path complete - page interactive');
     
     // ========== DEFERRED PATH: Load executive reports asynchronously (unblock UI) ==========

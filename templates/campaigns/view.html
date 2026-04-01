@@ -32,6 +32,17 @@
                         <i class="fas fa-flag-checkered me-2"></i>Completed
                     {% endif %}
                 </span>
+                <button type="button" class="btn btn-link p-0 ms-2 campaign-lifecycle-help"
+                        style="color:rgba(255,255,255,0.8); vertical-align:middle;"
+                        data-bs-toggle="popover"
+                        data-bs-trigger="click"
+                        data-bs-placement="bottom"
+                        data-bs-html="true"
+                        title="{{ _('Campaign Lifecycle') }}"
+                        data-bs-content="{{ _('<div class=&quot;lifecycle-popover&quot;><div class=&quot;lifecycle-stage&quot;><span class=&quot;lifecycle-dot dot-draft&quot;></span><strong>Draft</strong> &mdash; Campaign is being set up; editable, not yet visible to participants.</div><div class=&quot;lifecycle-stage&quot;><span class=&quot;lifecycle-dot dot-ready&quot;></span><strong>Ready</strong> &mdash; Configuration complete and participants added; awaiting activation.</div><div class=&quot;lifecycle-stage&quot;><span class=&quot;lifecycle-dot dot-active&quot;></span><strong>Active</strong> &mdash; Campaign is live and collecting participant responses.</div><div class=&quot;lifecycle-stage&quot;><span class=&quot;lifecycle-dot dot-completed&quot;></span><strong>Completed</strong> &mdash; Campaign has ended; data is preserved for analysis and reporting.</div></div>') }}"
+                        aria-label="{{ _('Campaign lifecycle help') }}">
+                    <i class="fas fa-question-circle" style="font-size:1rem;"></i>
+                </button>
                 {% if campaign.vetting_status %}
                 <br>
                 <span class="mt-2 d-inline-block"
@@ -52,6 +63,71 @@
 </div>
 
 <div class="container">
+
+    <!-- Campaign Progress Stepper (shown for draft and ready campaigns)
+         Draft:  Create[done] → Configure[active] → Participants → Activate
+         Ready:  Create[done] → Configure[done]   → Participants[done] → Activate[active]
+    -->
+    {% if campaign.status in ['draft', 'ready'] %}
+    <div class="campaign-stepper my-3">
+        <div class="stepper-steps">
+            {# Step 1: Create — always completed when viewing a campaign #}
+            <div class="stepper-step completed">
+                <div class="stepper-circle"><i class="fas fa-check"></i></div>
+                <div class="stepper-label">{{ _('Create') }}</div>
+            </div>
+            <div class="stepper-connector completed"></div>
+
+            {# Step 2: Configure — active for draft, completed for ready #}
+            <div class="stepper-step {% if campaign.status == 'ready' %}completed{% else %}active{% endif %}">
+                <div class="stepper-circle">
+                    {% if campaign.status == 'ready' %}<i class="fas fa-check"></i>{% else %}2{% endif %}
+                </div>
+                <div class="stepper-label">{{ _('Configure') }}</div>
+            </div>
+            <div class="stepper-connector {% if campaign.status == 'ready' %}completed{% endif %}"></div>
+
+            {# Step 3: Participants — pending for draft, completed for ready #}
+            <div class="stepper-step {% if campaign.status == 'ready' %}completed{% endif %}">
+                <div class="stepper-circle">
+                    {% if campaign.status == 'ready' %}<i class="fas fa-check"></i>{% else %}3{% endif %}
+                </div>
+                <div class="stepper-label">{{ _('Participants') }}</div>
+            </div>
+            <div class="stepper-connector {% if campaign.status == 'ready' %}active{% endif %}"></div>
+
+            {# Step 4: Activate — active for ready, pending for draft #}
+            <div class="stepper-step {% if campaign.status == 'ready' %}active{% endif %}">
+                <div class="stepper-circle">4</div>
+                <div class="stepper-label">{{ _('Activate') }}</div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- "Next Step" Contextual Banner (draft and ready only) -->
+    {% if campaign.status == 'draft' and participant_stats.total == 0 %}
+    <div class="alert next-step-banner next-step-warning mb-3" role="alert">
+        <i class="fas fa-arrow-right me-2"></i>
+        <strong>{{ _('Next step:') }}</strong> {{ _('Add participants to proceed — your campaign needs at least one participant before it can be activated.') }}
+        <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" class="btn btn-sm btn-warning ms-3">
+            <i class="fas fa-user-plus me-1"></i>{{ _('Add Participants') }}
+        </a>
+    </div>
+    {% elif campaign.status == 'draft' and participant_stats.total > 0 %}
+    <div class="alert next-step-banner next-step-info mb-3" role="alert">
+        <i class="fas fa-arrow-right me-2"></i>
+        <strong>{{ _('Next step:') }}</strong> {{ _('Review your configuration and mark the campaign as Ready when you\'re satisfied with the setup.') }}
+    </div>
+    {% elif campaign.status == 'ready' %}
+    <div class="alert next-step-banner next-step-success mb-3" role="alert">
+        <i class="fas fa-rocket me-2"></i>
+        <strong>{{ _('Ready to activate:') }}</strong> {{ _('Activate your campaign to begin collecting responses from participants.') }}
+        <a href="#campaign-actions" class="btn btn-sm btn-success ms-3">
+            <i class="fas fa-play me-1"></i>{{ _('Activate Campaign') }}
+        </a>
+    </div>
+    {% endif %}
 
     <!-- Campaign Information Grid -->
     <div class="info-grid">
@@ -613,6 +689,7 @@
         {% endif %}
 
                     <!-- {{ _('Campaign Actions') }} Card -->
+                    <div id="campaign-actions"></div>
                     <div class="campaign-actions-card">
                         <h4 class="campaign-actions-title">{{ _('Campaign Actions') }}</h4>
                         
@@ -1381,5 +1458,20 @@ function startSimulation() {
 }
 </script>
 {% endif %}
+
+<script>
+// Initialize lifecycle help popover (works for all campaign types)
+document.addEventListener('DOMContentLoaded', function() {
+    var helpBtn = document.querySelector('.campaign-lifecycle-help');
+    if (helpBtn) {
+        new bootstrap.Popover(helpBtn, { sanitize: false });
+        helpBtn.addEventListener('click', function(e) { e.stopPropagation(); });
+        document.addEventListener('click', function() {
+            var pop = bootstrap.Popover.getInstance(helpBtn);
+            if (pop) pop.hide();
+        });
+    }
+});
+</script>
 
 {% endblock %}

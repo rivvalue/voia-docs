@@ -24,7 +24,8 @@ window.CampaignFormI18n = {
     loading: "{{ _('Loading...') }}",
     loadingPreview: "{{ _('Loading preview...') }}",
     errorLoadingPreview: "{{ _('Error loading preview') }}",
-    unableToLoadPreview: "{{ _('Unable to load email preview. Please try again.') }}"
+    unableToLoadPreview: "{{ _('Unable to load email preview. Please try again.') }}",
+    shortDurationWarning: "{{ _('Note: Campaign duration is only {durationDays} day(s). Consider a longer campaign for better response rates.') }}"
 };
 </script>
 {% endif %}
@@ -81,6 +82,31 @@ window.CampaignFormI18n = {
 </style>
 
 <div class="container">
+    <!-- Campaign Progress Stepper -->
+    <div class="campaign-stepper my-3">
+        <div class="stepper-steps">
+            <div class="stepper-step active">
+                <div class="stepper-circle">1</div>
+                <div class="stepper-label">{{ _('Create') }}</div>
+            </div>
+            <div class="stepper-connector"></div>
+            <div class="stepper-step">
+                <div class="stepper-circle">2</div>
+                <div class="stepper-label">{{ _('Configure') }}</div>
+            </div>
+            <div class="stepper-connector"></div>
+            <div class="stepper-step">
+                <div class="stepper-circle">3</div>
+                <div class="stepper-label">{{ _('Participants') }}</div>
+            </div>
+            <div class="stepper-connector"></div>
+            <div class="stepper-step">
+                <div class="stepper-circle">4</div>
+                <div class="stepper-label">{{ _('Activate') }}</div>
+            </div>
+        </div>
+    </div>
+
     <!-- Form Header -->
     <div class="form-header">
         <div class="container">
@@ -158,6 +184,16 @@ window.CampaignFormI18n = {
                             </div>
                         </div>
                     </div>
+                    <div class="survey-type-notes mt-2">
+                        <div id="noteConversational" class="alert alert-info py-2 mb-1 survey-type-note" style="font-size:0.85rem;">
+                            <i class="fas fa-robot me-1" style="color:var(--primary-red);"></i>
+                            <strong>VOÏA:</strong> {{ _('Enables AI-driven conversation and transcript analysis.') }}
+                        </div>
+                        <div id="noteClassic" class="alert alert-secondary py-2 mb-1 survey-type-note d-none" style="font-size:0.85rem;">
+                            <i class="fas fa-clipboard-list me-1"></i>
+                            <strong>Classic:</strong> {{ _('Uses structured questions; AI transcript analysis will not be available.') }}
+                        </div>
+                    </div>
                     <div class="form-text">{{ _('Survey type cannot be changed after campaign activation.') }}</div>
                 </div>
             </div>
@@ -187,7 +223,7 @@ window.CampaignFormI18n = {
                 
                 <div class="alert alert-info">
                     <i class="fas fa-lightbulb me-2"></i>
-                    <strong>Next Steps:</strong> After creating your campaign, you'll be able to:
+                    <strong>{{ _('Next Steps:') }}</strong> {{ _("After creating your campaign, you'll be able to:") }}
                     <ul class="mb-0 mt-2">
                         <li>{{ _('Assign participants to the campaign') }}</li>
                         <li>{{ _('Generate personalized survey tokens') }}</li>
@@ -398,15 +434,51 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('end_date').value = futureDate.toISOString().split('T')[0];
 });
 
-// Date validation
-document.getElementById('end_date').addEventListener('change', function() {
+// Date validation — inline feedback (no alert())
+function validateDateInline() {
     const startDate = document.getElementById('start_date').value;
-    const endDate = this.value;
-    
-    if (startDate && endDate && new Date(endDate) <= new Date(startDate)) {
-        alert('End date must be after start date.');
-        this.value = '';
+    const endDate = document.getElementById('end_date').value;
+    const endInput = document.getElementById('end_date');
+    let feedback = document.getElementById('end_date_feedback');
+    if (!feedback) {
+        feedback = document.createElement('div');
+        feedback.id = 'end_date_feedback';
+        feedback.className = 'invalid-feedback';
+        endInput.parentNode.appendChild(feedback);
     }
+    if (startDate && endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        if (end <= start) {
+            endInput.classList.add('is-invalid');
+            feedback.textContent = 'End date must be after start date.';
+            feedback.style.display = 'block';
+            return false;
+        }
+        const durationDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+        if (durationDays < 7) {
+            endInput.classList.remove('is-invalid');
+            feedback.className = 'form-text text-warning';
+            var _warn = (window.CampaignFormI18n && window.CampaignFormI18n.shortDurationWarning) ||
+                'Note: Campaign duration is only {durationDays} day(s). Consider a longer campaign for better response rates.';
+            feedback.textContent = _warn.replace('{durationDays}', durationDays);
+            feedback.style.display = 'block';
+            return true;
+        }
+    }
+    endInput.classList.remove('is-invalid');
+    if (feedback) {
+        feedback.className = 'invalid-feedback';
+        feedback.style.display = 'none';
+    }
+    return true;
+}
+
+document.getElementById('end_date').addEventListener('change', function() {
+    validateDateInline();
+});
+document.getElementById('start_date').addEventListener('change', function() {
+    validateDateInline();
 });
 
 // Toggle custom email content fields
@@ -541,23 +613,29 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(updateMidpointReminderDisplay, 100);
 });
 
-// Survey type card selection
+// Survey type card selection + consequence note
 function updateSurveyTypeCards() {
     const conversationalRadio = document.getElementById('survey_type_conversational');
     const classicRadio = document.getElementById('survey_type_classic');
     const conversationalCard = document.getElementById('surveyTypeConversationalCard');
     const classicCard = document.getElementById('surveyTypeClassicCard');
+    const noteConversational = document.getElementById('noteConversational');
+    const noteClassic = document.getElementById('noteClassic');
     
     if (conversationalRadio.checked) {
         conversationalCard.style.borderColor = 'var(--primary-red)';
         conversationalCard.style.backgroundColor = 'rgba(225, 58, 68, 0.05)';
         classicCard.style.borderColor = '#dee2e6';
         classicCard.style.backgroundColor = '';
+        if (noteConversational) noteConversational.classList.remove('d-none');
+        if (noteClassic) noteClassic.classList.add('d-none');
     } else {
         classicCard.style.borderColor = 'var(--primary-red)';
         classicCard.style.backgroundColor = 'rgba(225, 58, 68, 0.05)';
         conversationalCard.style.borderColor = '#dee2e6';
         conversationalCard.style.backgroundColor = '';
+        if (noteClassic) noteClassic.classList.remove('d-none');
+        if (noteConversational) noteConversational.classList.add('d-none');
     }
 }
 
