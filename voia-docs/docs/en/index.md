@@ -57,13 +57,16 @@ Participants are the customers who will receive your survey:
 
 ---
 
-### 3. Send Invitations
+### 3. Simulate and Validate Your Campaign
 
-Once your campaign is ready, send invitations to your participants:
+Before you can activate a campaign, VOÏA requires you to complete a two-step vetting process to make sure your survey is ready:
 
 1. Open your campaign
-2. Click **Activate Campaign**
-3. Invitations send automatically on your start date
+2. Click **Simulate** (or **Preview** for classic surveys) to run through the survey exactly as a respondent would
+3. Once simulation is complete, a manager reviews the campaign and clicks **Validate**
+4. After both steps are done, click **Activate Campaign** — invitations send automatically on your start date
+
+**Why this step exists:** The simulation and validation gate ensures your survey is configured correctly before it reaches real customers. The Activate button is not available until both steps are complete.
 
 **Automatic reminders:** VOÏA sends reminder emails automatically to boost response rates.
 

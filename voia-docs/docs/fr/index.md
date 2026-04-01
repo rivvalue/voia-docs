@@ -53,12 +53,16 @@ Des synthèses claires et directement exploitables
 
 ---
 
-### 3. Envoyer les invitations
+### 3. Simuler et valider la campagne
+
+Avant de pouvoir activer une campagne, VOÏA exige que vous complétiez une porte de validation en deux étapes :
 
 1. Ouvrir la campagne
-2. Cliquer sur **Activate Campaign**
+2. Cliquer sur **Simuler** (ou **Aperçu** pour les sondages classiques) pour parcourir le sondage comme un répondant
+3. Une fois la simulation terminée, un gestionnaire examine la campagne et clique sur **Valider**
+4. Une fois les deux étapes complètes, cliquer sur **Activate Campaign** — les invitations sont envoyées automatiquement à la date de début
 
-Les invitations sont envoyées automatiquement.
+**Pourquoi cette étape existe :** La simulation et la validation garantissent que votre sondage est correctement configuré avant d'atteindre vos clients. Le bouton Activer n'est pas disponible tant que les deux étapes ne sont pas complètes.
 
 ---
 
