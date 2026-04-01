@@ -193,7 +193,7 @@ HEALTH_RATIO_HIGH_POTENTIAL = 0.65
 HEALTH_RATIO_RISK_HEAVY = 0.35
 
 
-def calculate_weighted_account_balance(opportunities, risk_factors):
+def calculate_weighted_account_balance(opportunities, risk_factors, influence_weight=1.0):
     """
     Weighted scoring for account health balance classification.
 
@@ -206,6 +206,18 @@ def calculate_weighted_account_balance(opportunities, risk_factors):
     (Critical=3, High=2, Medium=1, Low=0.5).  ``count`` is honoured the
     same way.
 
+    influence_weight: optional per-call seniority multiplier (default 1.0).
+    Use this ONLY when passing raw, unweighted counts AND you want a single
+    respondent's influence to scale the whole result.
+
+    IMPORTANT — avoid double-weighting:
+    When opportunities and risk_factors are produced by the company-level
+    aggregation loops in ``get_dashboard_data()``, each item's ``count``
+    field already reflects influence-weighted summing (each response
+    contributes ``influence_weight`` to the count, not 1).  In that case
+    leave this argument at its default value of 1.0 so the pre-weighted
+    counts are not multiplied a second time.
+
     Health ratio = opportunity_score / (opportunity_score + risk_score).
     * > 0.65 → opportunity_heavy  (High Potential)
     * 0.35 – 0.65 → balanced
@@ -213,20 +225,21 @@ def calculate_weighted_account_balance(opportunities, risk_factors):
 
     Returns (balance, opportunity_score, risk_score, health_ratio).
     """
+    influence_weight = influence_weight or 1.0
 
     opp_score = 0.0
     for opp in opportunities:
         opp_type = opp.get('type', '').lower().replace('-', '_')
         weight = OPPORTUNITY_WEIGHTS.get(opp_type, 1.0)
         count = opp.get('count', 1) or 1
-        opp_score += weight * count
+        opp_score += weight * count * influence_weight
 
     risk_score = 0.0
     for risk in risk_factors:
         severity = risk.get('severity', 'Medium')
         weight = RISK_SEVERITY_WEIGHTS.get(severity, 1.0)
         count = risk.get('count', 1) or 1
-        risk_score += weight * count
+        risk_score += weight * count * influence_weight
 
     total = opp_score + risk_score
     health_ratio = (opp_score / total) if total > 0 else 0.5
@@ -561,6 +574,9 @@ def get_dashboard_data(campaign_id=None, business_account_id=None):
                     opportunities = json.loads(response.growth_opportunities)
                     company_name = response.company_name
                     company_key = company_name.upper()  # Use uppercase for case-insensitive grouping
+
+                    # Influence weight for this respondent (1.0 if not set)
+                    resp_influence = (response.influence_weight or 1.0) if hasattr(response, 'influence_weight') else 1.0
                     
                     if company_key not in growth_opportunities_by_company:
                         growth_opportunities_by_company[company_key] = {
@@ -585,10 +601,10 @@ def get_dashboard_data(campaign_id=None, business_account_id=None):
                                 'type': normalized_type.replace('_', ' ').title(),  # Pretty format for display
                                 'descriptions': [],
                                 'actions': [],
-                                'count': 0
+                                'count': 0.0
                             }
                         
-                        # Add to the grouped opportunity
+                        # Add to the grouped opportunity; weight the count by respondent influence
                         type_group = growth_opportunities_by_company[company_key]['opportunities_by_type'][normalized_type]
                         description = opp.get('description', '')
                         action = opp.get('action', '')
@@ -597,7 +613,7 @@ def get_dashboard_data(campaign_id=None, business_account_id=None):
                             type_group['descriptions'].append(description)
                         if action and action not in type_group['actions']:
                             type_group['actions'].append(action)
-                        type_group['count'] += 1
+                        type_group['count'] += resp_influence
                         
                 except json.JSONDecodeError:
                     continue
@@ -625,6 +641,9 @@ def get_dashboard_data(campaign_id=None, business_account_id=None):
                     company_name = response.company_name
                     company_key = company_name.upper()
                     all_companies.add(company_key)
+
+                    # Influence weight for this respondent (1.0 if not set)
+                    resp_influence = (response.influence_weight or 1.0) if hasattr(response, 'influence_weight') else 1.0
                     
                     if company_key not in account_risk_factors_by_company:
                         account_risk_factors_by_company[company_key] = {
@@ -646,7 +665,7 @@ def get_dashboard_data(campaign_id=None, business_account_id=None):
                                 'descriptions': [],
                                 'actions': [],
                                 'severities': [],
-                                'count': 0
+                                'count': 0.0
                             }
                         
                         type_group = account_risk_factors_by_company[company_key]['risk_factors_by_type'][normalized_type]
@@ -660,7 +679,8 @@ def get_dashboard_data(campaign_id=None, business_account_id=None):
                             type_group['actions'].append(action)
                         if severity and severity not in type_group['severities']:
                             type_group['severities'].append(severity)
-                        type_group['count'] += 1
+                        # Weight the count by respondent influence level
+                        type_group['count'] += resp_influence
                         
                 except json.JSONDecodeError:
                     continue

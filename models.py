@@ -60,6 +60,7 @@ class SurveyResponse(db.Model):
     growth_rate = db.Column(db.String(10))  # Expected organic growth rate (e.g., "25%")
     growth_range = db.Column(db.String(20))  # NPS range (e.g., "50-69")
     commercial_value = db.Column(db.Float)  # Commercial value of the client in dollars
+    influence_weight = db.Column(db.Float, nullable=True, default=1.0)  # Respondent seniority multiplier (C-level=5, VP/Dir=3, Manager=2, Team Lead=1.5, End User=1)
     
     csat_score = db.Column(db.Integer, nullable=True)  # Customer Satisfaction Score (1-5)
     ces_score = db.Column(db.Integer, nullable=True)  # Customer Effort Score (1-8)
@@ -139,6 +140,7 @@ class SurveyResponse(db.Model):
             'growth_rate': self.growth_rate,
             'growth_range': self.growth_range,
             'commercial_value': self.commercial_value,
+            'influence_weight': self.influence_weight,
             'analysis_summary': self.analysis_summary,
             'analysis_reasoning': self.analysis_reasoning,
             'campaign_id': self.campaign_id,

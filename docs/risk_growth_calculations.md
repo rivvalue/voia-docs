@@ -1,8 +1,8 @@
 # Risk Factor & Growth Opportunities Calculation Methodology
 
-**Version**: 1.0  
-**Last Updated**: January 2026  
-**Source**: `ai_analysis.py`
+**Version**: 2.0  
+**Last Updated**: April 2026  
+**Source**: `ai_analysis.py`, `data_storage.py`
 
 ---
 
@@ -11,8 +11,45 @@
 VOÏA calculates Risk Factors and Growth Opportunities using a hybrid approach that combines:
 1. **Rule-based scoring** - Deterministic calculations based on NPS scores and ratings
 2. **AI enhancement** - Additional insights extracted from customer feedback text
+3. **Influence weighting** - Each respondent's signals are scaled by their seniority tier
 
 This methodology is **provider-agnostic** and produces consistent results whether using OpenAI or Claude/Anthropic.
+
+---
+
+## 0. Influence Weighting (Phase 1 — April 2026)
+
+Not all respondents carry equal weight in account-level scoring. A C-level Detractor
+who controls contract renewals represents a materially higher churn risk than an end
+user with the same NPS score.
+
+### 0.1 Influence Tier Multipliers
+
+| Seniority Tier | Example Titles | Multiplier |
+|---------------|---------------|-----------|
+| C-Level | CEO, CFO, COO, CTO, President | 5× |
+| VP / Director | VP, Vice President, Director, Head of | 3× |
+| Manager | Manager, Product Manager, Program Manager | 2× |
+| Team Lead | Team Lead, Supervisor, Lead, Coordinator | 1.5× |
+| End User / IC | All others, unknown roles | 1× |
+
+### 0.2 Where Influence Is Applied
+
+| Component | How Influence Is Applied |
+|-----------|------------------------|
+| `SurveyResponse.influence_weight` | Float column set at analysis time |
+| AI prompt (CHURN RISK section) | Model is instructed to weight signals by influence level |
+| AI prompt (GROWTH OPPORTUNITIES section) | Model is instructed to weight positive signals by influence |
+| `enhance_analysis_with_rules()` | NPS override thresholds scale inversely with influence (high-influence respondents trigger High risk at a lower AI score) |
+| `assess_churn_risk_fallback()` | Risk points multiplied by `influence_weight` before threshold comparison |
+| Growth opportunity / risk factor aggregation | `count` incremented by `influence_weight` per response, not by 1 |
+| `calculate_weighted_account_balance()` | `count`-based scores already influence-weighted via aggregation |
+
+### 0.3 Fallback Behaviour
+
+If a participant has no role field, or the role cannot be matched to a known tier, the
+system falls back to a weight of **1.0** (End User equivalent) without error. Historical
+completed campaigns are not affected — their frozen KPI snapshots remain unchanged.
 
 ---
 
@@ -165,7 +202,7 @@ Calculated values are stored on the `SurveyResponse` model:
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `churn_risk_score` | Integer (0-10) | Numeric risk score |
+| `churn_risk_score` | Float (0-10+) | Numeric risk score (influence-scaled in fallback path) |
 | `churn_risk_level` | String | Minimal / Low / Medium / High |
 | `churn_risk_factors` | JSON Array | List of risk factor strings |
 | `account_risk_factors` | JSON Array | Detailed risk objects with severity |
@@ -173,6 +210,7 @@ Calculated values are stored on the `SurveyResponse` model:
 | `growth_factor` | Float | Growth rate as decimal (0.0-0.4) |
 | `growth_rate` | String | Growth rate as percentage |
 | `growth_range` | String | NPS range band |
+| `influence_weight` | Float | Respondent seniority multiplier (1.0–5.0); set at analysis time |
 
 ---
 

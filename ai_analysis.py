@@ -17,6 +17,51 @@ from llm_gateway import (
 
 logger = logging.getLogger(__name__)
 
+# Influence tier weights — maps role tier key to float multiplier
+# Unknown / unrecognized roles fall back to 1.0 (End User equivalent)
+INFLUENCE_TIER_WEIGHTS = {
+    'c_level':    5.0,
+    'vp_director': 3.0,
+    'manager':    2.0,
+    'team_lead':  1.5,
+    'end_user':   1.0,
+    'default':    1.0,
+}
+
+
+def resolve_influence_weight(response) -> float:
+    """
+    Derive the influence multiplier for a survey response.
+
+    Looks up the participant's role via the CampaignParticipant → Participant
+    chain if available, then maps it through _map_role_to_tier() (imported from
+    prompt_template_service) to obtain the tier key and its multiplier.
+
+    Falls back to 1.0 (End User equivalent) when:
+    - The response has no associated CampaignParticipant
+    - The participant has no role field
+    - The role string is unrecognized
+    """
+    try:
+        from prompt_template_service import _map_role_to_tier
+
+        role_string = None
+
+        # Primary path: follow the FK chain to the Participant record
+        if response.campaign_participant_id:
+            cp = response.campaign_participant
+            if cp and cp.participant:
+                role_string = cp.participant.role
+
+        tier = _map_role_to_tier(role_string)
+        weight = INFLUENCE_TIER_WEIGHTS.get(tier, 1.0)
+        return weight
+
+    except Exception as e:
+        logger.warning(f"Could not resolve influence weight for response {getattr(response, 'id', '?')}: {e}")
+        return 1.0
+
+
 # Initialize OpenAI client (fallback when gateway disabled)
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 openai_client = OpenAI(api_key=OPENAI_API_KEY) if OPENAI_API_KEY else None
@@ -132,6 +177,11 @@ def analyze_survey_response(response_id):
             text_content.append(response.additional_comments)
         
         combined_text = " ".join(text_content)
+
+        # Resolve influence weight from participant role (before AI analysis so it
+        # can be passed into the prompt)
+        influence_weight = resolve_influence_weight(response)
+        response.influence_weight = influence_weight
         
         # Perform consolidated AI analysis (gateway or direct OpenAI)
         # Check for either gateway availability or OpenAI client
@@ -173,17 +223,29 @@ def analyze_survey_response(response_id):
 def perform_consolidated_ai_analysis(response, combined_text):
     """Perform all AI analysis in a single OpenAI call for maximum efficiency"""
     try:
-        # Build comprehensive context about the response
-        response_context = {
-            'nps_score': response.nps_score,
-            'satisfaction_rating': response.satisfaction_rating,
-            'service_rating': response.service_rating,
-            'product_value_rating': response.product_value_rating,
-            'pricing_rating': response.pricing_rating,
-            'company_name': response.company_name,
-            'tenure': response.tenure_with_fc
-        }
-        
+        # Resolve participant role label and influence weight for prompt context
+        influence_weight = getattr(response, 'influence_weight', None) or 1.0
+        participant_role = "Unknown"
+        try:
+            if response.campaign_participant_id and response.campaign_participant:
+                cp = response.campaign_participant
+                if cp and cp.participant and cp.participant.role:
+                    participant_role = cp.participant.role
+        except Exception:
+            pass
+
+        # Human-readable influence level description for the prompt
+        if influence_weight >= 5.0:
+            influence_level_desc = "C-level executive (highest influence — 5×)"
+        elif influence_weight >= 3.0:
+            influence_level_desc = "VP/Director (high influence — 3×)"
+        elif influence_weight >= 2.0:
+            influence_level_desc = "Manager (moderate influence — 2×)"
+        elif influence_weight >= 1.5:
+            influence_level_desc = "Team Lead (moderate-low influence — 1.5×)"
+        else:
+            influence_level_desc = "End User / individual contributor (baseline influence — 1×)"
+
         # Create consolidated prompt that handles all analysis types
         consolidated_prompt = f"""You are a comprehensive customer feedback analysis expert. Analyze this customer feedback and provide a complete analysis covering all aspects below.
 
@@ -197,6 +259,8 @@ CONTEXT:
 - Service Rating: {response.service_rating}/5  
 - Product Value Rating: {response.product_value_rating}/5
 - Pricing Rating: {response.pricing_rating}/5
+- Participant Role: {participant_role}
+- Influence Level: {influence_level_desc}
 
 ANALYSIS REQUIREMENTS:
 Provide a comprehensive JSON response with the following analysis:
@@ -214,12 +278,18 @@ Provide a comprehensive JSON response with the following analysis:
    - risk_level: "Minimal", "Low", "Medium", or "High"  
    - risk_score: integer 0-10
    - risk_factors: array of specific risk indicators found
+   - IMPORTANT: Weight churn signals proportionally to the participant's influence level.
+     A dissatisfied C-level executive or VP has significantly greater contract-cancellation
+     authority than an end user, so their negative signals should produce higher risk scores.
 
 4. GROWTH OPPORTUNITIES:
    - Array of genuine growth opportunities (upsell, cross-sell, expansion)
    - Only include positive signals from satisfied customers
    - Each opportunity: type, description, action
    - DO NOT include problems/issues as opportunities
+   - IMPORTANT: Weight growth signals proportionally to the participant's influence level.
+     Positive signals from senior stakeholders (C-level, VP) carry more strategic weight
+     than those from end users.
 
 5. ACCOUNT RISK FACTORS:
    - Array of account-specific risks (pricing concerns, service issues, etc.)
@@ -291,24 +361,38 @@ Return ONLY valid JSON in this exact format:
 
 def enhance_analysis_with_rules(ai_result, response, text):
     """Enhance AI analysis with rule-based logic for consistency"""
-    # Enhance churn risk with NPS-based rules
-    if response.nps_score <= 3 and ai_result['churn']['risk_score'] < 5:
-        ai_result['churn']['risk_score'] = max(5, ai_result['churn']['risk_score'])
+    # Retrieve influence weight (default 1.0 if not yet set)
+    influence_weight = getattr(response, 'influence_weight', None) or 1.0
+
+    # NPS-based churn risk floor scaled upward by influence weight.
+    # Higher-influence respondents (C-level, VP) have greater contract authority,
+    # so their dissatisfaction must produce materially higher churn scores.
+    # Base floors: NPS ≤ 3 → 5, NPS 4-6 → 3. Both are multiplied by influence_weight
+    # and capped at 10 to keep the score in range.
+    high_floor = min(10, round(5 * influence_weight))
+    medium_floor = min(10, round(3 * influence_weight))
+
+    if response.nps_score <= 3:
+        if ai_result['churn']['risk_score'] < high_floor:
+            ai_result['churn']['risk_score'] = high_floor
         ai_result['churn']['risk_level'] = 'High'
-        ai_result['churn']['risk_factors'].append('Critical NPS score')
-    elif response.nps_score <= 6 and ai_result['churn']['risk_score'] < 3:
-        ai_result['churn']['risk_score'] = max(3, ai_result['churn']['risk_score'])
+        if 'Critical NPS score' not in ai_result['churn']['risk_factors']:
+            ai_result['churn']['risk_factors'].append('Critical NPS score')
+    elif response.nps_score <= 6:
+        if ai_result['churn']['risk_score'] < medium_floor:
+            ai_result['churn']['risk_score'] = medium_floor
         if ai_result['churn']['risk_level'] == 'Minimal':
             ai_result['churn']['risk_level'] = 'Medium'
-    
-    # Add growth opportunities for high NPS
+
+    # Add growth opportunities for high NPS.
+    # Advocacy description carries the influence tier so downstream aggregation
+    # (via influence_weight on the SurveyResponse) reflects seniority.
     if response.nps_score >= 9:
         advocacy_opportunity = {
             'type': 'advocacy',
             'description': 'High NPS score - potential brand advocate',
             'action': 'Engage for case studies, referrals, or testimonials'
         }
-        # Check if similar opportunity already exists
         existing_types = [opp.get('type', '') for opp in ai_result.get('growth_opportunities', [])]
         if 'advocacy' not in existing_types:
             ai_result['growth_opportunities'].append(advocacy_opportunity)
@@ -365,23 +449,26 @@ def extract_themes_fallback(text):
     return themes
 
 def assess_churn_risk_fallback(response, text):
-    """Fallback churn risk assessment"""
+    """Fallback churn risk assessment with influence-weighted thresholds"""
     risk_factors = []
     risk_points = 0
     text_lower = text.lower()
-    
-    # Check for churn indicators
+
+    # Retrieve influence weight (default 1.0 if not set)
+    influence_weight = getattr(response, 'influence_weight', None) or 1.0
+
+    # Check for churn indicators — base points scaled by influence
     churn_keywords = ['churn', 'leave', 'switch', 'competitor', 'cancel', 'terminate']
     if any(keyword in text_lower for keyword in churn_keywords):
-        risk_points += 5
+        risk_points += round(5 * influence_weight)
         risk_factors.append("Explicit churn indicators detected")
     
-    # NPS-based risk
+    # NPS-based risk — base points scaled by influence
     if response.nps_score <= 6:
-        risk_points += 3
+        risk_points += round(3 * influence_weight)
         risk_factors.append("Low NPS score indicating dissatisfaction")
     
-    # Convert to risk level
+    # Convert to risk level using standard thresholds
     if risk_points >= 5:
         risk_level = "High"
     elif risk_points >= 3:

@@ -513,6 +513,15 @@ with app.app_context():
         )
 
     try:
+        from migrations.add_influence_weight import run as _migrate_influence_weight
+        _migrate_influence_weight(db)
+    except Exception as e:
+        logger.error(
+            f"CRITICAL: Startup migration add_influence_weight FAILED: {e}. "
+            "influence_weight will not persist until this column is added."
+        )
+
+    try:
         from sqlalchemy import text as sa_text, inspect as sa_inspect
         inspector = sa_inspect(db.engine)
         available_tables = inspector.get_table_names()
