@@ -8256,18 +8256,23 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.25rem 0.6rem;
-    flex: 1 1 0;
-    min-width: 0;
-    white-space: nowrap;
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    flex: none;
     border-radius: var(--radius-md);
+}
+
+.table-actions .btn .btn-label {
+    display: none;
 }
 
 .table-actions .btn .fas,
 .table-actions .btn .far,
 .table-actions .btn .fa {
     line-height: 1;
-    vertical-align: middle;
+    margin: 0 !important;
+    font-size: 0.875rem;
 }
 
 /* Grid View Styles */
@@ -8322,18 +8327,23 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.25rem 0.6rem;
-    flex: 1 1 0;
-    min-width: 0;
-    white-space: nowrap;
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    flex: none;
     border-radius: var(--radius-md);
+}
+
+.campaign-card-actions .btn .btn-label {
+    display: none;
 }
 
 .campaign-card-actions .btn .fas,
 .campaign-card-actions .btn .far,
 .campaign-card-actions .btn .fa {
     line-height: 1;
-    vertical-align: middle;
+    margin: 0 !important;
+    font-size: 0.875rem;
 }
 
 /* Campaign Progress Stepper */
