@@ -155,6 +155,12 @@
             <!-- JSON hint example for BA level (hidden, used by popover) -->
             <div id="ba-json-hint-content" class="d-none">
                 <p style="margin-bottom:0.5rem;font-size:0.8rem;">{{ _('Flat JSON: survey topic names as keys, comma-separated focus keywords as values.') }}</p>
+                <div class="d-flex justify-content-end mb-1">
+                    <button type="button" class="btn btn-sm btn-outline-secondary json-copy-btn"
+                            style="font-size:0.72rem;padding:2px 8px;">
+                        <i class="fas fa-copy me-1"></i>Copy JSON
+                    </button>
+                </div>
                 <pre style="margin:0;font-size:0.72rem;background:#f8f9fa;padding:0.6rem;border-radius:4px;white-space:pre-wrap;">{
   "Product Quality": "defects, durability, feature completeness, reliability",
   "Support Experience": "response time, technical expertise, issue resolution",
@@ -205,6 +211,25 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (p) p.hide();
             });
         }
+    });
+});
+
+// Copy JSON button (delegated — works inside cloned popover body)
+document.addEventListener('click', function(e) {
+    var copyBtn = e.target.closest('.json-copy-btn');
+    if (!copyBtn) return;
+    var container = copyBtn.closest('.popover-body') ||
+                    copyBtn.parentElement.closest('[id$="-json-hint-content"]');
+    var pre = container ? container.querySelector('pre') : null;
+    if (!pre) return;
+    var origHtml = copyBtn.innerHTML;
+    navigator.clipboard.writeText(pre.textContent.trim()).then(function() {
+        copyBtn.innerHTML = '<i class="fas fa-check me-1"></i>Copied \u2713';
+        copyBtn.disabled = true;
+        setTimeout(function() { copyBtn.innerHTML = origHtml; copyBtn.disabled = false; }, 1500);
+    }).catch(function() {
+        copyBtn.textContent = 'Failed';
+        setTimeout(function() { copyBtn.innerHTML = origHtml; }, 1500);
     });
 });
 </script>
