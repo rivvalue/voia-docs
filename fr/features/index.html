@@ -26,7 +26,7 @@
     
     
       
-        <title>Features - VOÏA Documentation</title>
+        <title>Fonctionnalités - VOÏA Documentation</title>
       
     
     
@@ -111,7 +111,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Features
+              Fonctionnalités
             
           </span>
         </div>
@@ -218,7 +218,7 @@
   
     
   
-  Overview
+  Présentation
 
       </a>
     </li>
@@ -237,7 +237,7 @@
   
     
   
-  Getting Started
+  Démarrage
 
       </a>
     </li>
@@ -258,7 +258,7 @@
   
     
   
-  Features
+  Fonctionnalités
 
       </a>
     </li>
@@ -277,7 +277,7 @@
   
     
   
-  Licenses
+  Licences
 
       </a>
     </li>
@@ -328,7 +328,7 @@
   
   
   <span class="md-ellipsis">
-    Overview
+    Présentation
     
   </span>
   
@@ -350,7 +350,7 @@
   
   
   <span class="md-ellipsis">
-    Getting Started
+    Démarrage
     
   </span>
   
@@ -381,7 +381,7 @@
   
   
   <span class="md-ellipsis">
-    Features
+    Fonctionnalités
     
   </span>
   
@@ -394,7 +394,7 @@
   
   
   <span class="md-ellipsis">
-    Features
+    Fonctionnalités
     
   </span>
   
@@ -862,7 +862,7 @@
   
   
   <span class="md-ellipsis">
-    Licenses
+    Licences
     
   </span>
   
@@ -1404,6 +1404,7 @@ Met en évidence les axes d’amélioration ou d’expansion</p>
 <strong>[Porte de validation]</strong> → Simuler le sondage, puis le faire valider par un gestionnaire<br />
 <strong>Actif</strong> → Sondage en cours, collecte des réponses<br />
 <strong>Terminé</strong> → Campagne clôturée, rapports finaux disponibles</p>
+<p>La liste des campagnes indique le statut actuel de chaque campagne. Une infobulle d'aide sur le cycle de vie est disponible dans l'en-tête de la colonne <strong>Statut</strong> — survolez ou cliquez sur l'en-tête pour voir la description de chaque étape. Cette infobulle apparaît une seule fois au niveau de la colonne, et non sur chaque ligne de campagne. Chaque ligne affiche également des boutons d'action (Voir, Insights, Participants, Exporter, Rapport) dont la largeur est uniforme, ce qui assure une présentation visuelle cohérente quelle que soit la longueur du libellé.</p>
 <p><strong>Porte de validation — obligatoire avant l'activation</strong></p>
 <p>Une campagne en état Prêt ne peut pas être activée tant qu'elle n'a pas franchi une porte de validation en deux étapes. La porte comporte trois statuts possibles :</p>
 <ul>
@@ -1425,7 +1426,8 @@ Met en évidence les axes d’amélioration ou d’expansion</p>
 <p><strong>3. Personnalisation</strong>
 - Questions
 - Durée estimée
-- Branding</p>
+- Branding
+- <strong>Indices de sujets personnalisés (JSON) :</strong> Guidez optionnellement l'IA vers des sujets spécifiques en saisissant une liste JSON d'indices. Le champ dispose d'un bouton info (?) qui ouvre un exemple formaté illustrant la structure JSON correcte. À l'intérieur de ce panneau d'exemple, un bouton <strong>Copier le JSON</strong> vous permet de copier le modèle directement dans votre presse-papiers pour l'adapter sans avoir à saisir le format manuellement.</p>
 <p><strong>4. Participants</strong>
 - Import CSV ou ajout manuel</p>
 <hr />
@@ -1500,14 +1502,23 @@ Met en évidence les axes d’amélioration ou d’expansion</p>
 <hr />
 <h3 id="insights-de-campagne-5-onglets">Insights de campagne (5 onglets)<a class="headerlink" href="#insights-de-campagne-5-onglets" title="Permanent link">&para;</a></h3>
 <p><strong>Overview</strong>
-- KPI + synthèse IA</p>
+Résumé de haut niveau de la campagne :
+- Score NPS avec courbe de tendance sur la période
+- Taux de réponse et nombre total de réponses
+- Répartition du sentiment (positif, neutre, négatif) sous forme de graphique en anneau
+- Graphique de distribution NPS montrant la proportion de Promoteurs, Passifs et Détracteurs parmi l'ensemble des répondants
+- Synthèse IA en langage clair décrivant le constat le plus important</p>
 <p><strong>Growth</strong>
 - dynamique de croissance / rétention</p>
 <p><strong>Account Intelligence</strong>
 - score par compte
 - priorisation</p>
 <p><strong>Survey Insights</strong>
-- analyse des réponses</p>
+Plonge dans le contenu des retours clients :
+- Graphique des thèmes clés
+- Répartition des réponses question par question
+- Extraits verbatim étiquetés avec le sentiment et les thèmes associés
+- Tableau NPS par entreprise où chaque nom de société est un lien cliquable qui mène directement à la page Account Insights de ce compte, permettant de passer des données du sondage à une vue complète du compte en un seul clic</p>
 <p><strong>Segmentation</strong>
 - analyse par groupe</p>
 <hr />
@@ -1519,6 +1530,10 @@ Met en évidence les axes d’amélioration ou d’expansion</p>
 - opportunités</p>
 <p><strong>Niveaux de confiance :</strong>
 - élevé / moyen / faible / insuffisant</p>
+<p><strong>Badges de risque</strong>
+Chaque ligne affiche un badge de risque — <strong>Critique</strong>, <strong>Élevé</strong>, <strong>Moyen</strong> ou <strong>Faible</strong> — résumant le niveau de risque global du compte. Survoler le badge ouvre une infobulle qui explique précisément pourquoi ce niveau de risque a été attribué, en décrivant les signaux spécifiques (comme un NPS faible, un risque de churn élevé ou une tendance de sentiment négative) qui ont conduit à cette classification.</p>
+<p><strong>Enrichissement au survol</strong>
+Survoler une ligne de compte ouvre une infobulle qui charge des détails supplémentaires à la demande. L'infobulle comprend les principaux thèmes mentionnés par les répondants de ce compte, une ventilation par sous-métrique couvrant la satisfaction, le service, la tarification et la valeur produit, le score moyen de risque de churn calculé par l'IA, ainsi qu'un résumé en langage clair généré par l'IA synthétisant l'ensemble des retours du compte. Cela permet de garder le tableau principal lisible tout en offrant de la profondeur quand vous en avez besoin.</p>
 <hr />
 <h3 id="comparaison-de-campagnes">Comparaison de campagnes<a class="headerlink" href="#comparaison-de-campagnes" title="Permanent link">&para;</a></h3>
 <p>Comparer plusieurs campagnes :</p>
