@@ -487,6 +487,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#survey-simulation-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      Survey Simulation Mode
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#automated-reminders" class="md-nav__link">
     <span class="md-ellipsis">
       Automated Reminders
@@ -1056,6 +1065,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#survey-simulation-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      Survey Simulation Mode
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#automated-reminders" class="md-nav__link">
     <span class="md-ellipsis">
       Automated Reminders
@@ -1556,11 +1574,21 @@ An interactive overlay that opens when you click <strong>View Trends</strong> in
 <hr />
 <h2 id="campaign-management">Campaign Management<a class="headerlink" href="#campaign-management" title="Permanent link">&para;</a></h2>
 <h3 id="campaign-lifecycle">Campaign Lifecycle<a class="headerlink" href="#campaign-lifecycle" title="Permanent link">&para;</a></h3>
-<p>Every campaign follows a simple workflow:</p>
+<p>Every campaign moves through a defined workflow that includes a mandatory vetting gate between Ready and Active:</p>
 <p><strong>Draft</strong> → Create and configure your survey<br />
-<strong>Ready</strong> → Review before launching<br />
+<strong>Ready</strong> → Review your campaign and complete the vetting gate<br />
+<strong>[Vetting gate]</strong> → Simulate the survey, then have a manager validate it<br />
 <strong>Active</strong> → Survey is live, collecting responses<br />
 <strong>Completed</strong> → Campaign closed, final reports available</p>
+<p><strong>Vetting gate — required before activation</strong></p>
+<p>A campaign in the Ready state cannot be activated until it passes a two-step vetting gate. The gate has three possible statuses:</p>
+<ul>
+<li><strong>Not simulated</strong> — The campaign has not yet been simulated. You must run a simulation before the Activate button becomes available.</li>
+<li><strong>Simulated, not validated</strong> — The simulation is complete, but a manager has not yet reviewed and validated the results. Validation is required before activation.</li>
+<li><strong>Ready to activate</strong> — Both steps are complete. The Activate button is now available.</li>
+</ul>
+<p><strong>Single active campaign per account</strong></p>
+<p>By default, only one campaign can be active at a time per account. Attempting to activate a second campaign while one is already active will be blocked. If your team needs to run multiple campaigns simultaneously, parallel campaign activation is available on request — contact your account administrator or VOÏA support to enable it.</p>
 <hr />
 <h3 id="creating-a-campaign">Creating a Campaign<a class="headerlink" href="#creating-a-campaign" title="Permanent link">&para;</a></h3>
 <p><strong>Step 1: Basic Information</strong>
@@ -1578,6 +1606,26 @@ An interactive overlay that opens when you click <strong>View Trends</strong> in
 <p><strong>Step 4: Participant Assignment</strong>
 - Choose who receives the survey
 - Import from CSV or add manually</p>
+<hr />
+<h3 id="survey-simulation-mode">Survey Simulation Mode<a class="headerlink" href="#survey-simulation-mode" title="Permanent link">&para;</a></h3>
+<p>Survey Simulation Mode lets you experience your campaign's survey exactly as a respondent would, before any real invitations are sent. It is a required step in the vetting gate — you cannot activate a campaign until a simulation has been completed.</p>
+<p><strong>What simulation is</strong></p>
+<p>Simulation runs a live, interactive preview of the survey using the same AI engine and configuration that real respondents will encounter. For conversational surveys, the AI conducts the full conversation. For classic surveys, you walk through the complete questionnaire as it will appear to participants.</p>
+<p><strong>Why it exists</strong></p>
+<p>Simulation protects you from sending a misconfigured or confusing survey to your customer base. It gives your team confidence that questions are phrased correctly, the flow makes sense, and the survey behaves as intended — all before a single invitation goes out.</p>
+<p><strong>How to launch a simulation</strong></p>
+<ol>
+<li>Open a campaign in Draft or Ready status</li>
+<li>Click <strong>Simulate</strong> (or <strong>Preview</strong> for classic surveys) in the campaign detail view</li>
+<li>Complete the survey as a respondent would — try different answers to test the AI's follow-up behavior</li>
+<li>When finished, confirm that the simulation is complete; the campaign's vetting status updates to <strong>Simulated, not validated</strong></li>
+</ol>
+<p><strong>What the manager sees</strong></p>
+<p>After simulation, the campaign detail page shows the simulation timestamp and the current vetting status badge. The manager can then review the results and click <strong>Validate</strong> to move the status to <strong>Ready to activate</strong>.</p>
+<p><strong>Testing different respondent personas</strong></p>
+<p>For conversational surveys, you can run the simulation multiple times using different simulated personas — for example, a satisfied promoter, a neutral passive, or a frustrated detractor — to verify that the AI adapts its follow-up questions appropriately for each scenario. Each run updates the simulation timestamp.</p>
+<p><strong>Prerequisite for activation</strong></p>
+<p>The Activate button remains disabled until both steps of the vetting gate are complete: the simulation must be finished and a manager must have validated the campaign. Once both conditions are met, the Activate button becomes available.</p>
 <hr />
 <h3 id="automated-reminders">Automated Reminders<a class="headerlink" href="#automated-reminders" title="Permanent link">&para;</a></h3>
 <p>VOÏA automatically sends reminder emails to boost response rates:</p>

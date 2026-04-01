@@ -487,6 +487,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#mode-simulation-de-sondage" class="md-nav__link">
+    <span class="md-ellipsis">
+      Mode simulation de sondage
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#relances-automatiques" class="md-nav__link">
     <span class="md-ellipsis">
       Relances automatiques
@@ -960,6 +969,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#mode-simulation-de-sondage" class="md-nav__link">
+    <span class="md-ellipsis">
+      Mode simulation de sondage
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#relances-automatiques" class="md-nav__link">
     <span class="md-ellipsis">
       Relances automatiques
@@ -1380,7 +1398,21 @@ Met en évidence les axes d’amélioration ou d’expansion</p>
 <hr />
 <h2 id="gestion-des-campagnes">Gestion des campagnes<a class="headerlink" href="#gestion-des-campagnes" title="Permanent link">&para;</a></h2>
 <h3 id="cycle-de-vie">Cycle de vie<a class="headerlink" href="#cycle-de-vie" title="Permanent link">&para;</a></h3>
-<p><strong>Brouillon → Prêt → Actif → Terminé</strong></p>
+<p>Chaque campagne suit un processus défini incluant une porte de validation obligatoire entre Prêt et Actif :</p>
+<p><strong>Brouillon</strong> → Créer et configurer le sondage<br />
+<strong>Prêt</strong> → Réviser et compléter la porte de validation<br />
+<strong>[Porte de validation]</strong> → Simuler le sondage, puis le faire valider par un gestionnaire<br />
+<strong>Actif</strong> → Sondage en cours, collecte des réponses<br />
+<strong>Terminé</strong> → Campagne clôturée, rapports finaux disponibles</p>
+<p><strong>Porte de validation — obligatoire avant l'activation</strong></p>
+<p>Une campagne en état Prêt ne peut pas être activée tant qu'elle n'a pas franchi une porte de validation en deux étapes. La porte comporte trois statuts possibles :</p>
+<ul>
+<li><strong>Non simulée</strong> — La campagne n'a pas encore été simulée. La simulation est requise avant que le bouton Activer devienne disponible.</li>
+<li><strong>Simulée, non validée</strong> — La simulation est terminée, mais un gestionnaire n'a pas encore validé la campagne. La validation est requise avant l'activation.</li>
+<li><strong>Prête à activer</strong> — Les deux étapes sont complètes. Le bouton Activer est maintenant disponible.</li>
+</ul>
+<p><strong>Une seule campagne active à la fois</strong></p>
+<p>Par défaut, un seul campagne peut être active à la fois par compte. Si votre équipe a besoin d'exécuter plusieurs campagnes simultanément, l'activation parallèle est disponible sur demande — contactez votre administrateur de compte ou le support VOÏA.</p>
 <hr />
 <h3 id="creation-dune-campagne">Création d’une campagne<a class="headerlink" href="#creation-dune-campagne" title="Permanent link">&para;</a></h3>
 <p><strong>1. Informations</strong>
@@ -1396,6 +1428,20 @@ Met en évidence les axes d’amélioration ou d’expansion</p>
 - Branding</p>
 <p><strong>4. Participants</strong>
 - Import CSV ou ajout manuel</p>
+<hr />
+<h3 id="mode-simulation-de-sondage">Mode simulation de sondage<a class="headerlink" href="#mode-simulation-de-sondage" title="Permanent link">&para;</a></h3>
+<p>Le mode simulation vous permet de vivre l'expérience du sondage exactement comme un répondant, avant l'envoi de toute invitation réelle. C'est une étape obligatoire de la porte de validation — vous ne pouvez pas activer une campagne sans avoir effectué une simulation.</p>
+<p><strong>Lancement d'une simulation</strong></p>
+<ol>
+<li>Ouvrir une campagne en état Brouillon ou Prêt</li>
+<li>Cliquer sur <strong>Simuler</strong> (ou <strong>Aperçu</strong> pour les sondages classiques)</li>
+<li>Compléter le sondage comme un répondant</li>
+<li>Confirmer la fin de la simulation — le statut de validation passe à <strong>Simulée, non validée</strong></li>
+</ol>
+<p><strong>Validation par le gestionnaire</strong></p>
+<p>Après la simulation, le gestionnaire examine la campagne et clique sur <strong>Valider</strong> pour passer le statut à <strong>Prête à activer</strong>.</p>
+<p><strong>Prérequis pour l'activation</strong></p>
+<p>Le bouton Activer reste désactivé tant que les deux étapes ne sont pas complètes : la simulation doit être terminée et un gestionnaire doit avoir validé la campagne.</p>
 <hr />
 <h3 id="relances-automatiques">Relances automatiques<a class="headerlink" href="#relances-automatiques" title="Permanent link">&para;</a></h3>
 <ul>
