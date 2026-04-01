@@ -504,6 +504,15 @@ with app.app_context():
             raise
 
     try:
+        from migrations.add_simulation_completed_at import run as _migrate_simulation_completed_at
+        _migrate_simulation_completed_at(db)
+    except Exception as e:
+        logger.error(
+            f"CRITICAL: Startup migration add_simulation_completed_at FAILED: {e}. "
+            "The campaigns page will crash with UndefinedColumn until this is resolved."
+        )
+
+    try:
         from sqlalchemy import text as sa_text, inspect as sa_inspect
         inspector = sa_inspect(db.engine)
         available_tables = inspector.get_table_names()
