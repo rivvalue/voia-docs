@@ -1288,14 +1288,18 @@ document.addEventListener('click', function(e) {
     var pre = container ? container.querySelector('pre') : null;
     if (!pre) return;
     var origHtml = copyBtn.innerHTML;
-    navigator.clipboard.writeText(pre.textContent.trim()).then(function() {
-        copyBtn.innerHTML = '<i class="fas fa-check me-1"></i>Copied \u2713';
-        copyBtn.disabled = true;
-        setTimeout(function() { copyBtn.innerHTML = origHtml; copyBtn.disabled = false; }, 1500);
-    }).catch(function() {
+    function showFail() {
         copyBtn.textContent = 'Failed';
-        setTimeout(function() { copyBtn.innerHTML = origHtml; }, 1500);
-    });
+        setTimeout(function() { copyBtn.innerHTML = origHtml; copyBtn.disabled = false; }, 1500);
+    }
+    try {
+        if (!navigator.clipboard || !navigator.clipboard.writeText) { showFail(); return; }
+        navigator.clipboard.writeText(pre.textContent).then(function() {
+            copyBtn.innerHTML = '<i class="fas fa-check me-1"></i>Copied \u2713';
+            copyBtn.disabled = true;
+            setTimeout(function() { copyBtn.innerHTML = origHtml; copyBtn.disabled = false; }, 1500);
+        }).catch(showFail);
+    } catch (err) { showFail(); }
 });
 </script>
 
