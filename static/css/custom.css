@@ -12597,7 +12597,7 @@ thead th.th-c2 {
     word-break: break-all;
 }
 
-/* ===== Responsive Tab Bar — Icon-Only Below 1800px ===== */
+/* ===== Responsive Tab Bar — Horizontally Scrollable ===== */
 #dashboardNav {
     flex-wrap: nowrap;
     overflow-x: auto;
@@ -12605,19 +12605,3 @@ thead th.th-c2 {
     scrollbar-width: none;
 }
 #dashboardNav::-webkit-scrollbar { display: none; }
-
-@media (max-width: 1799.98px) {
-    #dashboardNav .nav-link .tab-label {
-        display: none;
-    }
-
-    #dashboardNav .nav-link i {
-        margin-right: 0 !important;
-        font-size: 1.1rem;
-    }
-
-    #dashboardNav .nav-link {
-        padding-left: 0.75rem;
-        padding-right: 0.75rem;
-    }
-}
