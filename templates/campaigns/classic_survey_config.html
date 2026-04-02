@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% set has_responses = has_responses if has_responses is defined else false %}
 
 {% block title %}{{ _('Classic Survey Configuration') }} - {{ campaign.name }}{% endblock %}
 
@@ -59,22 +60,7 @@
     line-height: var(--line-height-relaxed);
 }
 
-.driver-row {
-    display: flex;
-    gap: 0.75rem;
-    align-items: center;
-    margin-bottom: 0.75rem;
-    background: var(--primary-white);
-    padding: 0.75rem;
-    border-radius: var(--radius-md);
-    border: 1px solid var(--medium-gray);
-}
-
-.driver-row .form-control {
-    flex: 1;
-    min-width: 0;
-}
-
+.driver-row,
 .feature-row {
     display: flex;
     gap: 0.75rem;
@@ -86,20 +72,34 @@
     border: 1px solid var(--medium-gray);
 }
 
+.driver-row .form-control,
 .feature-row .form-control {
     flex: 1;
     min-width: 0;
 }
 
-.feature-row .feature-number {
+.row-number {
     font-weight: 600;
     color: var(--primary-red);
     min-width: 24px;
     text-align: center;
     font-size: var(--font-size-sm);
+    flex-shrink: 0;
 }
 
-.btn-remove-driver {
+.key-badge {
+    font-size: 0.7rem;
+    font-family: monospace;
+    background: #f0f0f0;
+    border: 1px solid #ddd;
+    color: #666;
+    padding: 2px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.btn-remove-row {
     background: none;
     border: 1px solid var(--primary-red);
     color: var(--primary-red);
@@ -116,9 +116,15 @@
     transition: background-color 0.2s, color 0.2s;
 }
 
-.btn-remove-driver:hover {
+.btn-remove-row:hover {
     background: var(--primary-red);
     color: var(--primary-white);
+}
+
+.btn-remove-row:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
 }
 
 .section-toggle-item {
@@ -164,6 +170,24 @@
     flex-shrink: 0;
 }
 
+.responses-banner {
+    background-color: #e8f4fd;
+    border: 1px solid #90cdf4;
+    color: #2b6cb0;
+    border-radius: var(--radius-md);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.responses-banner i {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+}
+
 .action-buttons {
     display: flex;
     gap: 0.75rem;
@@ -174,22 +198,19 @@
 }
 
 @media (max-width: 768px) {
-    .driver-row {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .driver-row .btn-remove-driver {
-        align-self: flex-end;
-    }
-
+    .driver-row,
     .feature-row {
         flex-direction: column;
         align-items: stretch;
     }
 
-    .feature-row .feature-number {
-        text-align: left;
+    .driver-row .btn-remove-row,
+    .feature-row .btn-remove-row {
+        align-self: flex-end;
+    }
+
+    .key-badge {
+        align-self: flex-start;
     }
 
     .action-buttons {
@@ -228,6 +249,15 @@
         <div class="frozen-banner" role="alert">
             <i class="fas fa-lock"></i>
             <span>{{ _('This survey configuration is locked because the campaign has been activated. Changes are no longer allowed.') }}</span>
+        </div>
+        {% endif %}
+
+        {% if has_responses and not is_frozen %}
+        <div class="responses-banner" role="alert">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>{{ _('Responses recorded') }}</strong> — {{ _('This campaign already has survey responses. Feature and driver keys are locked to protect data integrity. You can still edit English and French labels, but you cannot add, delete, or change the internal keys of existing items.') }}
+            </div>
         </div>
         {% endif %}
 
@@ -279,80 +309,85 @@
                 </div>
             </div>
 
+            {# ==================== LOYALTY DRIVERS ==================== #}
             <div class="form-section">
                 <h3 class="section-title">
-                    <i class="fas fa-tags"></i>{{ _('NPS Driver Labels') }}
+                    <i class="fas fa-tags"></i>{{ _('Loyalty Drivers') }}
                 </h3>
                 <p class="section-description">
-                    {{ _('Customize the driver labels that appear as checkbox options when participants explain their NPS score. Provide labels in both English and French.') }}
+                    {{ _('Customize the driver labels that appear as checkbox options when participants explain their NPS score. Both English and French labels are required for each driver.') }}
                 </p>
 
                 <div id="driverList">
                     {% for driver in classic_config.driver_labels %}
-                    <div class="driver-row" data-index="{{ loop.index0 }}">
+                    <div class="driver-row" data-index="{{ loop.index0 }}" data-existing="true">
+                        <span class="row-number">{{ loop.index }}</span>
                         <input type="hidden" name="driver_key_{{ loop.index0 }}" value="{{ driver.key }}">
+                        <span class="key-badge" title="{{ _('Internal key') }}">{{ driver.key }}</span>
                         <input type="text" class="form-control" name="driver_label_en_{{ loop.index0 }}"
                                value="{{ driver.label_en }}"
-                               placeholder="{{ _('English label') }}"
+                               placeholder="{{ _('English label') }} *"
+                               required
                                {% if is_frozen %}disabled{% endif %}>
                         <input type="text" class="form-control" name="driver_label_fr_{{ loop.index0 }}"
                                value="{{ driver.label_fr }}"
-                               placeholder="{{ _('French label') }}"
+                               placeholder="{{ _('French label') }} *"
+                               required
                                {% if is_frozen %}disabled{% endif %}>
-                        <button type="button" class="btn-remove-driver" onclick="removeDriverRow(this)"
+                        <button type="button" class="btn-remove-row" onclick="removeRow(this, 'driverList')"
                                 title="{{ _('Remove driver') }}"
-                                {% if is_frozen %}disabled{% endif %}>&times;</button>
+                                {% if is_frozen or has_responses %}disabled{% endif %}>&times;</button>
                     </div>
                     {% endfor %}
                 </div>
 
-                {% if not is_frozen %}
+                {% if not is_frozen and not has_responses %}
                 <button type="button" class="btn btn-outline-secondary btn-sm mt-2" onclick="addDriverRow()">
                     <i class="fas fa-plus me-1"></i>{{ _('Add Driver') }}
                 </button>
                 {% endif %}
-                <div class="hint-text">{{ _('You can add up to 15 driver labels.') }}</div>
+                <div class="hint-text">{{ _('You can add up to 15 drivers. Both English and French labels are required. Keys are auto-generated from the English label.') }}</div>
             </div>
 
+            {# ==================== FEATURE LIST ==================== #}
             <div class="form-section">
                 <h3 class="section-title">
-                    <i class="fas fa-star"></i>{{ _('Feature Evaluation') }}
+                    <i class="fas fa-star"></i>{{ _('Feature List') }}
                 </h3>
                 <p class="section-description">
-                    {{ _('Define the product features or services that participants will evaluate for usage, importance, and satisfaction.') }}
+                    {{ _('Define the product features or services that participants will evaluate for usage, importance, and satisfaction. Both English and French names are required for each feature.') }}
                 </p>
 
-                <div class="mb-3">
-                    <label for="featureCount" class="form-label fw-semibold">{{ _('Number of Features') }}</label>
-                    <select class="form-select" id="featureCount" name="feature_count" onchange="updateFeatureCount()"
-                            style="max-width: 200px;"
-                            {% if is_frozen %}disabled{% endif %}>
-                        {% for i in range(1, (template_info.max_features or 9) + 1) %}
-                        <option value="{{ i }}" {% if classic_config.feature_count == i %}selected{% endif %}>{{ i }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
                 <div id="featureList">
-                    {% for i in range(template_info.max_features or 9) %}
-                    {% set feature = classic_config.features[i] if i < classic_config.features|length else none %}
-                    <div class="feature-row" id="featureRow{{ i }}" {% if i >= classic_config.feature_count %}style="display: none;"{% endif %}>
-                        <span class="feature-number">{{ i + 1 }}</span>
-                        <input type="hidden" name="feature_key_{{ i }}" value="{{ feature.key if feature else 'feature_' ~ (i + 1) }}">
-                        <input type="text" class="form-control" name="feature_name_en_{{ i }}"
-                               value="{{ feature.name_en if feature else '' }}"
-                               placeholder="{{ _('Feature name (English)') }}"
+                    {% for feature in classic_config.features %}
+                    <div class="feature-row" data-index="{{ loop.index0 }}" data-existing="true">
+                        <span class="row-number">{{ loop.index }}</span>
+                        <input type="hidden" name="feature_key_{{ loop.index0 }}" value="{{ feature.key }}">
+                        <span class="key-badge" title="{{ _('Internal key') }}">{{ feature.key }}</span>
+                        <input type="text" class="form-control" name="feature_name_en_{{ loop.index0 }}"
+                               value="{{ feature.name_en }}"
+                               placeholder="{{ _('Feature name (English)') }} *"
+                               required
                                {% if is_frozen %}disabled{% endif %}>
-                        <input type="text" class="form-control" name="feature_name_fr_{{ i }}"
-                               value="{{ feature.name_fr if feature else '' }}"
-                               placeholder="{{ _('Feature name (French)') }}"
+                        <input type="text" class="form-control" name="feature_name_fr_{{ loop.index0 }}"
+                               value="{{ feature.name_fr }}"
+                               placeholder="{{ _('Feature name (French)') }} *"
+                               required
                                {% if is_frozen %}disabled{% endif %}>
+                        <button type="button" class="btn-remove-row" onclick="removeRow(this, 'featureList')"
+                                title="{{ _('Remove feature') }}"
+                                {% if is_frozen or has_responses %}disabled{% endif %}>&times;</button>
                     </div>
                     {% endfor %}
                 </div>
 
+                {% if not is_frozen and not has_responses %}
+                <button type="button" class="btn btn-outline-secondary btn-sm mt-2" onclick="addFeatureRow()">
+                    <i class="fas fa-plus me-1"></i>{{ _('Add Feature') }}
+                </button>
+                {% endif %}
                 <div class="hint-text">
-                    {{ _('Give each feature a clear, specific name so participants understand what they\'re evaluating.') }}
+                    {{ _('You can add up to 9 features. Both English and French names are required. Keys are auto-generated from the English name.') }}
                 </div>
             </div>
 
@@ -380,9 +415,41 @@
 <script>
 (function() {
     var driverIndex = {{ classic_config.driver_labels|length }};
+    var featureIndex = {{ classic_config.features|length }};
     var maxDrivers = 15;
-    var maxFeatures = {{ template_info.max_features or 9 }};
+    var maxFeatures = 9;
     var isFrozen = {{ 'true' if is_frozen else 'false' }};
+    var hasResponses = {{ 'true' if has_responses else 'false' }};
+
+    function slugify(text) {
+        return text
+            .toString()
+            .toLowerCase()
+            .trim()
+            .replace(/[\s\-]+/g, '_')
+            .replace(/[^a-z0-9_]/g, '')
+            .replace(/_+/g, '_')
+            .replace(/^_|_$/g, '')
+            .substring(0, 40) || 'item';
+    }
+
+    function updateRowNumbers(listId) {
+        var list = document.getElementById(listId);
+        var rows = list.querySelectorAll('.driver-row, .feature-row');
+        rows.forEach(function(row, i) {
+            var num = row.querySelector('.row-number');
+            if (num) num.textContent = i + 1;
+        });
+    }
+
+    window.removeRow = function(btn, listId) {
+        if (isFrozen) return;
+        var row = btn.closest('.driver-row, .feature-row');
+        if (!row) return;
+        if (hasResponses && row.getAttribute('data-existing') === 'true') return;
+        row.remove();
+        updateRowNumbers(listId);
+    };
 
     window.addDriverRow = function() {
         if (isFrozen) return;
@@ -393,34 +460,123 @@
             return;
         }
 
+        var idx = driverIndex++;
         var row = document.createElement('div');
         row.className = 'driver-row';
-        row.setAttribute('data-index', driverIndex);
-        row.innerHTML =
-            '<input type="hidden" name="driver_key_' + driverIndex + '" value="custom_driver_' + driverIndex + '">' +
-            '<input type="text" class="form-control" name="driver_label_en_' + driverIndex + '" placeholder="' + '{{ _("English label") }}' + '">' +
-            '<input type="text" class="form-control" name="driver_label_fr_' + driverIndex + '" placeholder="' + '{{ _("French label") }}' + '">' +
-            '<button type="button" class="btn-remove-driver" onclick="removeDriverRow(this)" title="' + '{{ _("Remove driver") }}' + '">&times;</button>';
-        list.appendChild(row);
-        driverIndex++;
-    };
+        row.setAttribute('data-index', idx);
 
-    window.removeDriverRow = function(btn) {
-        if (isFrozen) return;
-        var row = btn.closest('.driver-row');
-        if (row) {
-            row.remove();
-        }
-    };
+        var keyInput = document.createElement('input');
+        keyInput.type = 'hidden';
+        keyInput.name = 'driver_key_' + idx;
+        keyInput.value = '';
 
-    window.updateFeatureCount = function() {
-        var count = parseInt(document.getElementById('featureCount').value, 10);
-        for (var i = 0; i < maxFeatures; i++) {
-            var row = document.getElementById('featureRow' + i);
-            if (row) {
-                row.style.display = (i < count) ? '' : 'none';
+        var enInput = document.createElement('input');
+        enInput.type = 'text';
+        enInput.className = 'form-control';
+        enInput.name = 'driver_label_en_' + idx;
+        enInput.placeholder = '{{ _("English label") }} *';
+        enInput.required = true;
+        enInput.addEventListener('blur', function() {
+            if (!keyInput.value && enInput.value.trim()) {
+                keyInput.value = slugify(enInput.value.trim());
+                badge.textContent = keyInput.value;
             }
+        });
+
+        var frInput = document.createElement('input');
+        frInput.type = 'text';
+        frInput.className = 'form-control';
+        frInput.name = 'driver_label_fr_' + idx;
+        frInput.placeholder = '{{ _("French label") }} *';
+        frInput.required = true;
+
+        var badge = document.createElement('span');
+        badge.className = 'key-badge';
+        badge.title = '{{ _("Internal key — auto-generated") }}';
+        badge.textContent = '...';
+
+        var removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'btn-remove-row';
+        removeBtn.title = '{{ _("Remove driver") }}';
+        removeBtn.innerHTML = '&times;';
+        removeBtn.onclick = function() { window.removeRow(removeBtn, 'driverList'); };
+
+        var numSpan = document.createElement('span');
+        numSpan.className = 'row-number';
+        numSpan.textContent = list.querySelectorAll('.driver-row').length + 1;
+
+        row.appendChild(numSpan);
+        row.appendChild(keyInput);
+        row.appendChild(badge);
+        row.appendChild(enInput);
+        row.appendChild(frInput);
+        row.appendChild(removeBtn);
+        list.appendChild(row);
+    };
+
+    window.addFeatureRow = function() {
+        if (isFrozen) return;
+        var list = document.getElementById('featureList');
+        var currentRows = list.querySelectorAll('.feature-row').length;
+        if (currentRows >= maxFeatures) {
+            alert('{{ _("Maximum of 9 features reached.") }}');
+            return;
         }
+
+        var idx = featureIndex++;
+        var row = document.createElement('div');
+        row.className = 'feature-row';
+        row.setAttribute('data-index', idx);
+
+        var keyInput = document.createElement('input');
+        keyInput.type = 'hidden';
+        keyInput.name = 'feature_key_' + idx;
+        keyInput.value = '';
+
+        var enInput = document.createElement('input');
+        enInput.type = 'text';
+        enInput.className = 'form-control';
+        enInput.name = 'feature_name_en_' + idx;
+        enInput.placeholder = '{{ _("Feature name (English)") }} *';
+        enInput.required = true;
+        enInput.addEventListener('blur', function() {
+            if (!keyInput.value && enInput.value.trim()) {
+                keyInput.value = slugify(enInput.value.trim());
+                badge.textContent = keyInput.value;
+            }
+        });
+
+        var frInput = document.createElement('input');
+        frInput.type = 'text';
+        frInput.className = 'form-control';
+        frInput.name = 'feature_name_fr_' + idx;
+        frInput.placeholder = '{{ _("Feature name (French)") }} *';
+        frInput.required = true;
+
+        var badge = document.createElement('span');
+        badge.className = 'key-badge';
+        badge.title = '{{ _("Internal key — auto-generated") }}';
+        badge.textContent = '...';
+
+        var removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'btn-remove-row';
+        removeBtn.title = '{{ _("Remove feature") }}';
+        removeBtn.innerHTML = '&times;';
+        removeBtn.onclick = function() { window.removeRow(removeBtn, 'featureList'); };
+
+        var numSpan = document.createElement('span');
+        numSpan.className = 'row-number';
+        numSpan.textContent = list.querySelectorAll('.feature-row').length + 1;
+
+        row.appendChild(numSpan);
+        row.appendChild(keyInput);
+        row.appendChild(badge);
+        row.appendChild(enInput);
+        row.appendChild(frInput);
+        row.appendChild(removeBtn);
+        list.appendChild(row);
     };
 
     if (isFrozen) {

@@ -18,6 +18,7 @@ from jinja2 import Template
 import weasyprint
 from sqlalchemy.orm import joinedload
 from sqlalchemy import and_, desc
+from survey_config_utils import normalize_driver_labels, normalize_features
 
 # Configure matplotlib for non-interactive use
 plt.switch_backend('Agg')
@@ -173,8 +174,8 @@ class ExecutiveReportGenerator:
         try:
             from models import ClassicSurveyConfig
             classic_config = ClassicSurveyConfig.query.filter_by(campaign_id=campaign.id).first()
-            if classic_config and classic_config.driver_labels:
-                for dl in classic_config.driver_labels:
+            if classic_config:
+                for dl in normalize_driver_labels(classic_config.driver_labels):
                     driver_label_map[dl['key']] = dl.get('label_en', dl['key'])
         except Exception:
             classic_config = None
@@ -222,8 +223,8 @@ class ExecutiveReportGenerator:
         
         feature_data = {}
         feature_label_map = {}
-        if classic_config and hasattr(classic_config, 'features') and classic_config.features:
-            for f in classic_config.features:
+        if classic_config:
+            for f in normalize_features(classic_config.features):
                 feature_label_map[f['key']] = f.get('name_en', f['key'])
         
         for r in responses:

@@ -5,6 +5,7 @@ Dedicated routes for campaign lifecycle management with email invitation functio
 
 import logging
 import os
+import re
 import uuid
 import json
 from datetime import datetime, timedelta
@@ -22,6 +23,16 @@ from sqlalchemy import func, text
 campaign_bp = Blueprint('campaigns', __name__, url_prefix='/business/campaigns')
 
 logger = logging.getLogger(__name__)
+
+
+from survey_config_utils import (
+    PLATFORM_DEFAULT_FEATURES,
+    PLATFORM_DEFAULT_DRIVERS,
+    normalize_driver_labels as _normalize_driver_labels,
+    normalize_features as _normalize_features,
+    slugify_key as _slugify,
+    unique_key as _unique_key,
+)
 
 
 def seed_default_survey_template():
@@ -279,12 +290,9 @@ def create_campaign():
                 config.campaign_id = campaign.id
                 config.template_id = template.id
                 config.sections_enabled = {'section_1': True, 'section_2': True, 'section_3': True}
-                config.feature_count = template.default_feature_count
-                config.features = [
-                    {'key': f'feature_{chr(97+i)}', 'name_en': f'Feature {chr(65+i)}', 'name_fr': f'Fonctionnalité {chr(65+i)}'}
-                    for i in range(template.default_feature_count)
-                ]
-                config.driver_labels = template.default_driver_labels.copy() if template.default_driver_labels else []
+                config.feature_count = len(PLATFORM_DEFAULT_FEATURES)
+                config.features = list(PLATFORM_DEFAULT_FEATURES)
+                config.driver_labels = list(PLATFORM_DEFAULT_DRIVERS)
                 config.custom_prompts = {}
                 db.session.add(config)
                 db.session.commit()
@@ -365,13 +373,8 @@ def preview_classic_survey(campaign_id):
 
             lang = campaign_lang
 
-            driver_labels = []
-            if classic_config and classic_config.driver_labels:
-                driver_labels = classic_config.driver_labels
-
-            features = []
-            if classic_config and classic_config.features:
-                features = classic_config.features
+            driver_labels = _normalize_driver_labels(classic_config.driver_labels if classic_config else None)
+            features = _normalize_features(classic_config.features if classic_config else None)
 
             sections_enabled = {'section_1': True, 'section_2': True, 'section_3': True}
             if classic_config and classic_config.sections_enabled:
@@ -1782,12 +1785,9 @@ def classic_survey_config(campaign_id):
             classic_config.campaign_id = campaign.id
             classic_config.template_id = template.id
             classic_config.sections_enabled = {'section_1': True, 'section_2': True, 'section_3': True}
-            classic_config.feature_count = template.default_feature_count
-            classic_config.features = [
-                {'key': f'feature_{chr(97+i)}', 'name_en': f'Feature {chr(65+i)}', 'name_fr': f'Fonctionnalité {chr(65+i)}'}
-                for i in range(template.default_feature_count)
-            ]
-            classic_config.driver_labels = template.default_driver_labels.copy() if template.default_driver_labels else []
+            classic_config.features = list(PLATFORM_DEFAULT_FEATURES)
+            classic_config.feature_count = len(PLATFORM_DEFAULT_FEATURES)
+            classic_config.driver_labels = list(PLATFORM_DEFAULT_DRIVERS)
             classic_config.custom_prompts = {}
             db.session.add(classic_config)
             db.session.commit()
@@ -1795,11 +1795,18 @@ def classic_survey_config(campaign_id):
         
         template = classic_config.template
         
+        has_responses = SurveyResponse.query.filter_by(campaign_id=campaign.id).count() > 0
+        
+        config_dict = classic_config.to_dict()
+        config_dict['features'] = _normalize_features(config_dict.get('features'))
+        config_dict['driver_labels'] = _normalize_driver_labels(config_dict.get('driver_labels'))
+        
         return render_template('campaigns/classic_survey_config.html',
                              campaign=campaign.to_dict(),
-                             classic_config=classic_config.to_dict(),
+                             classic_config=config_dict,
                              template_info=template.to_dict() if template else {'max_features': 9},
-                             is_frozen=False)
+                             is_frozen=False,
+                             has_responses=has_responses)
         
     except Exception as e:
         logger.error(f"Classic survey config display error for campaign {campaign_id}: {e}")
@@ -1840,6 +1847,13 @@ def save_classic_survey_config(campaign_id):
             flash('La configuration est verrouillée car la campagne a été activée.', 'error')
             return redirect(url_for('campaigns.classic_survey_config', campaign_id=campaign_id))
         
+        has_responses = SurveyResponse.query.filter_by(campaign_id=campaign.id).count() > 0
+        
+        existing_driver_labels = _normalize_driver_labels(classic_config.driver_labels)
+        existing_feature_list = _normalize_features(classic_config.features)
+        existing_driver_keys = {d['key']: d for d in existing_driver_labels}
+        existing_feature_keys = {f['key']: f for f in existing_feature_list}
+        
         sections_enabled = {
             'section_1': True,
             'section_2': request.form.get('sections_enabled_section_2') == 'true',
@@ -1847,43 +1861,133 @@ def save_classic_survey_config(campaign_id):
         }
         classic_config.sections_enabled = sections_enabled
         
+        validation_errors = []
+        
+        driver_form_indices = sorted(
+            int(m.group(1))
+            for m in (re.match(r'^driver_label_en_(\d+)$', k) for k in request.form.keys())
+            if m
+        )
+        
         driver_labels = []
-        idx = 0
-        while idx < 50:
-            key = request.form.get(f'driver_key_{idx}')
-            if key is None:
-                break
+        claimed_driver_keys = set()
+        all_driver_keys_used = set(existing_driver_keys.keys())
+        for idx in driver_form_indices:
             label_en = request.form.get(f'driver_label_en_{idx}', '').strip()
             label_fr = request.form.get(f'driver_label_fr_{idx}', '').strip()
-            if label_en or label_fr:
-                driver_labels.append({
-                    'key': key,
-                    'label_en': label_en,
-                    'label_fr': label_fr
-                })
-            idx += 1
-        if len(driver_labels) > 15:
-            driver_labels = driver_labels[:15]
-        classic_config.driver_labels = driver_labels
+            submitted_key = (request.form.get(f'driver_key_{idx}') or '').strip()
+            if not label_en and not label_fr:
+                continue
+            if has_responses:
+                if submitted_key not in existing_driver_keys or submitted_key in claimed_driver_keys:
+                    continue
+                final_key = submitted_key
+                claimed_driver_keys.add(final_key)
+            else:
+                if not label_en:
+                    validation_errors.append(f'Driver #{len(driver_labels) + 1}: English label is required.')
+                if not label_fr:
+                    validation_errors.append(f'Driver #{len(driver_labels) + 1}: French label is required.')
+                if submitted_key in existing_driver_keys and submitted_key not in claimed_driver_keys:
+                    final_key = submitted_key
+                    claimed_driver_keys.add(final_key)
+                else:
+                    base = _slugify(label_en or f'driver_{idx}')
+                    final_key = _unique_key(base, all_driver_keys_used)
+                    all_driver_keys_used.add(final_key)
+            driver_labels.append({'key': final_key, 'label_en': label_en, 'label_fr': label_fr})
         
-        feature_count = int(request.form.get('feature_count', 5))
-        feature_count = max(1, min(feature_count, 9))
-        classic_config.feature_count = feature_count
+        if has_responses:
+            restored_driver_keys = []
+            final_driver_keys = {d['key'] for d in driver_labels}
+            for orig_key, orig_driver in existing_driver_keys.items():
+                if orig_key not in final_driver_keys:
+                    driver_labels.append(orig_driver)
+                    restored_driver_keys.append(orig_key)
+            if restored_driver_keys:
+                flash(
+                    f'The following driver keys could not be removed because responses exist: '
+                    f'{", ".join(restored_driver_keys)}. They have been restored.',
+                    'warning'
+                )
+            for d in driver_labels:
+                if not d.get('label_en'):
+                    validation_errors.append(f'Driver "{d["key"]}": English label is required.')
+                if not d.get('label_fr'):
+                    validation_errors.append(f'Driver "{d["key"]}": French label is required.')
+        else:
+            if len(driver_labels) > 15:
+                driver_labels = driver_labels[:15]
+        
+        if len(driver_labels) < 1:
+            validation_errors.append('At least one loyalty driver is required.')
+        
+        feature_form_indices = sorted(
+            int(m.group(1))
+            for m in (re.match(r'^feature_name_en_(\d+)$', k) for k in request.form.keys())
+            if m
+        )
         
         features = []
-        for i in range(feature_count):
-            key = request.form.get(f'feature_key_{i}', f'feature_{chr(97+i)}')
-            name_en = request.form.get(f'feature_name_en_{i}', '').strip()
-            name_fr = request.form.get(f'feature_name_fr_{i}', '').strip()
-            if not name_en:
-                name_en = f'Feature {chr(65+i)}'
-            if not name_fr:
-                name_fr = f'Fonctionnalité {chr(65+i)}'
-            features.append({
-                'key': key,
-                'name_en': name_en,
-                'name_fr': name_fr
-            })
+        claimed_feature_keys = set()
+        all_feature_keys_used = set(existing_feature_keys.keys())
+        for fidx in feature_form_indices:
+            name_en = request.form.get(f'feature_name_en_{fidx}', '').strip()
+            name_fr = request.form.get(f'feature_name_fr_{fidx}', '').strip()
+            submitted_key = (request.form.get(f'feature_key_{fidx}') or '').strip()
+            if not name_en and not name_fr:
+                continue
+            if has_responses:
+                if submitted_key not in existing_feature_keys or submitted_key in claimed_feature_keys:
+                    continue
+                final_key = submitted_key
+                claimed_feature_keys.add(final_key)
+            else:
+                if not name_en:
+                    validation_errors.append(f'Feature #{len(features) + 1}: English name is required.')
+                if not name_fr:
+                    validation_errors.append(f'Feature #{len(features) + 1}: French name is required.')
+                if submitted_key in existing_feature_keys and submitted_key not in claimed_feature_keys:
+                    final_key = submitted_key
+                    claimed_feature_keys.add(final_key)
+                else:
+                    base = _slugify(name_en or f'feature_{fidx}')
+                    final_key = _unique_key(base, all_feature_keys_used)
+                    all_feature_keys_used.add(final_key)
+            features.append({'key': final_key, 'name_en': name_en, 'name_fr': name_fr})
+        
+        if has_responses:
+            restored_feature_keys = []
+            final_feature_keys = {f['key'] for f in features}
+            for orig_key, orig_feature in existing_feature_keys.items():
+                if orig_key not in final_feature_keys:
+                    features.append(orig_feature)
+                    restored_feature_keys.append(orig_key)
+            if restored_feature_keys:
+                flash(
+                    f'The following feature keys could not be removed because responses exist: '
+                    f'{", ".join(restored_feature_keys)}. They have been restored.',
+                    'warning'
+                )
+            for f in features:
+                if not f.get('name_en'):
+                    validation_errors.append(f'Feature "{f["key"]}": English name is required.')
+                if not f.get('name_fr'):
+                    validation_errors.append(f'Feature "{f["key"]}": French name is required.')
+        else:
+            if len(features) > 9:
+                features = features[:9]
+        
+        if len(features) < 1:
+            validation_errors.append('At least one feature is required.')
+        
+        if validation_errors:
+            for err in validation_errors:
+                flash(err, 'error')
+            return redirect(url_for('campaigns.classic_survey_config', campaign_id=campaign_id))
+        
+        classic_config.feature_count = len(features)
+        classic_config.driver_labels = driver_labels
         classic_config.features = features
         
         db.session.commit()
@@ -1899,7 +2003,7 @@ def save_classic_survey_config(campaign_id):
                 details={
                     'sections_enabled': sections_enabled,
                     'driver_count': len(driver_labels),
-                    'feature_count': feature_count
+                    'feature_count': len(features)
                 }
             )
         except Exception as audit_error:
@@ -2159,9 +2263,8 @@ def individual_response(campaign_id, participant_id):
             
             classic_config = ClassicSurveyConfig.query.filter_by(campaign_id=campaign_id).first()
             if classic_config and survey_response.loyalty_drivers:
-                driver_labels_data = classic_config.driver_labels or {}
-                nps_cat = (survey_response.nps_category or 'detractor').lower()
-                available_drivers = driver_labels_data.get(nps_cat, driver_labels_data.get('detractor', {}))
+                normalized_drivers = _normalize_driver_labels(classic_config.driver_labels)
+                driver_key_map = {d['key']: d for d in normalized_drivers}
                 drivers_raw = survey_response.loyalty_drivers
                 if isinstance(drivers_raw, str):
                     try:
@@ -2169,7 +2272,11 @@ def individual_response(campaign_id, participant_id):
                     except (json_mod.JSONDecodeError, TypeError):
                         drivers_raw = []
                 for driver_key in (drivers_raw or []):
-                    label = available_drivers.get(driver_key, driver_key.replace('_', ' ').title())
+                    driver_entry = driver_key_map.get(driver_key)
+                    if driver_entry:
+                        label = driver_entry.get('label_en', driver_key.replace('_', ' ').title())
+                    else:
+                        label = driver_key.replace('_', ' ').title()
                     loyalty_driver_labels.append({'key': driver_key, 'label': label})
         
         # Parse conversation history for chat display (conversational surveys only)

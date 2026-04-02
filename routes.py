@@ -1038,15 +1038,10 @@ def classic_survey():
     # Determine language
     lang = session.get('language', 'en')
     
-    # Prepare driver labels from config
-    driver_labels = []
-    if classic_config and classic_config.driver_labels:
-        driver_labels = classic_config.driver_labels
-    
-    # Prepare features from config  
-    features = []
-    if classic_config and classic_config.features:
-        features = classic_config.features
+    from survey_config_utils import normalize_driver_labels, normalize_features
+
+    driver_labels = normalize_driver_labels(classic_config.driver_labels if classic_config else None)
+    features = normalize_features(classic_config.features if classic_config else None)
     
     # Prepare sections enabled
     sections_enabled = {'section_1': True, 'section_2': True, 'section_3': True}
@@ -3986,9 +3981,10 @@ def classic_survey_analytics():
                         driver_data[d]['detractors'] += 1
 
         classic_config = ClassicSurveyConfig.query.filter_by(campaign_id=campaign_id).first()
+        from survey_config_utils import normalize_driver_labels as _norm_drivers
         driver_label_map = {}
-        if classic_config and classic_config.driver_labels:
-            for dl in classic_config.driver_labels:
+        if classic_config:
+            for dl in _norm_drivers(classic_config.driver_labels):
                 driver_label_map[dl['key']] = {
                     'label_en': dl.get('label_en', dl['key']),
                     'label_fr': dl.get('label_fr', dl['key'])
@@ -4036,12 +4032,12 @@ def classic_survey_analytics():
 
         feature_data = {}
         feature_label_map = {}
-        if classic_config and classic_config.features:
-            for f in classic_config.features:
-                feature_label_map[f['key']] = {
-                    'name_en': f.get('name_en', f['key']),
-                    'name_fr': f.get('name_fr', f['key'])
-                }
+        from survey_config_utils import normalize_features as _norm_features
+        for f in _norm_features(classic_config.features if classic_config else None):
+            feature_label_map[f['key']] = {
+                'name_en': f.get('name_en', f['key']),
+                'name_fr': f.get('name_fr', f['key'])
+            }
 
         for r in responses:
             if r.general_feedback:

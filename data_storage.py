@@ -2,6 +2,7 @@ import json
 import re
 import os
 import logging
+from survey_config_utils import normalize_driver_labels, normalize_features
 from datetime import datetime, timedelta
 from sqlalchemy import func, case
 from app import db, cache
@@ -2141,8 +2142,8 @@ def generate_campaign_kpi_snapshot(campaign_id):
             
             classic_config = ClassicSurveyConfig.query.filter_by(campaign_id=campaign_id).first()
             driver_label_map = {}
-            if classic_config and classic_config.driver_labels:
-                for dl in classic_config.driver_labels:
+            if classic_config:
+                for dl in normalize_driver_labels(classic_config.driver_labels):
                     driver_label_map[dl['key']] = {
                         'label_en': dl.get('label_en', dl['key']),
                         'label_fr': dl.get('label_fr', dl['key'])
@@ -2193,8 +2194,8 @@ def generate_campaign_kpi_snapshot(campaign_id):
             
             feature_data = {}
             feature_label_map = {}
-            if classic_config and classic_config.features:
-                for f in classic_config.features:
+            if classic_config:
+                for f in normalize_features(classic_config.features):
                     feature_label_map[f['key']] = {
                         'name_en': f.get('name_en', f['key']),
                         'name_fr': f.get('name_fr', f['key'])
