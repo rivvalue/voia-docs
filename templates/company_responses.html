@@ -111,6 +111,34 @@
                         </div>
                     </div>
 
+                    {% if account_insights.nps_by_tier %}
+                    <div class="mt-3">
+                        <a class="text-muted" style="font-size: 0.85rem; cursor: pointer; text-decoration: none;" data-bs-toggle="collapse" href="#npsByTierCollapse" role="button" aria-expanded="false" aria-controls="npsByTierCollapse">
+                            <i class="fas fa-user-tie me-1"></i>{{ _('NPS by Influence Tier') }} <i class="fas fa-chevron-down ms-1" style="font-size: 0.7rem;"></i>
+                        </a>
+                        <div class="collapse mt-2" id="npsByTierCollapse">
+                            <div class="p-3 rounded" style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
+                                <p class="text-muted mb-2" style="font-size: 0.78rem;">Shows average NPS per respondent role tier for this account. High-influence tiers (C-Level, VP/Director) are marked.</p>
+                                {% for tier_row in account_insights.nps_by_tier %}
+                                <div class="d-flex align-items-center justify-content-between py-1" style="border-bottom: 1px solid #e9ecef;">
+                                    <span style="font-size: 0.82rem; color: #555;">
+                                        {% if tier_row.is_high_influence %}<i class="fas fa-user-tie me-1" style="color: #2E5090;" title="{{ _('High-influence tier') }}"></i>{% endif %}
+                                        <strong>{{ tier_row.tier }}</strong>
+                                        <span class="text-muted ms-1" style="font-size: 0.75rem;">({{ tier_row.count }} resp.)</span>
+                                    </span>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="text-muted" style="font-size: 0.75rem;">avg {{ tier_row.avg_score }}</span>
+                                        <span class="badge {% if tier_row.nps >= 30 %}bg-success{% elif tier_row.nps >= 0 %}bg-warning text-dark{% else %}bg-danger{% endif %}" style="font-size: 0.78rem;">
+                                            {{ '+' if tier_row.nps > 0 }}{{ tier_row.nps }}
+                                        </span>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
                     {% if account_insights.analysis_summary %}
                     <div class="mt-3">
                         <a class="text-muted" style="font-size: 0.85rem; cursor: pointer; text-decoration: none;" data-bs-toggle="collapse" href="#aiSummaryCollapse" role="button" aria-expanded="false" aria-controls="aiSummaryCollapse">

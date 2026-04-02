@@ -7,7 +7,7 @@ import json
 from datetime import datetime, timedelta
 from sqlalchemy import func, text, case
 from app import db
-from models import SurveyResponse, Campaign, CampaignKPISnapshot, CampaignParticipant
+from models import SurveyResponse, Campaign, CampaignKPISnapshot, CampaignParticipant, Participant
 
 
 def get_optimized_dashboard_data(campaign_id=None, business_account_id=None):
@@ -133,7 +133,7 @@ def get_optimized_dashboard_data(campaign_id=None, business_account_id=None):
     # QUERY 3: Company-Level Data - Single aggregated query for all companies
     # ============================================================================
     
-    # Get all company-level data in a single query
+    # Get all company-level data in a single query, joining Participant for role/influence data
     company_base_query = db.session.query(
         SurveyResponse.company_name,
         SurveyResponse.churn_risk_level,
@@ -144,7 +144,12 @@ def get_optimized_dashboard_data(campaign_id=None, business_account_id=None):
         SurveyResponse.key_themes,
         SurveyResponse.tenure_with_fc,
         SurveyResponse.commercial_value,
-        SurveyResponse.created_at
+        SurveyResponse.created_at,
+        Participant.role.label('participant_role')
+    ).outerjoin(
+        CampaignParticipant, SurveyResponse.campaign_participant_id == CampaignParticipant.id
+    ).outerjoin(
+        Participant, CampaignParticipant.participant_id == Participant.id
     ).filter(SurveyResponse.company_name.isnot(None))
     
     if campaign_id:
@@ -166,7 +171,33 @@ def get_optimized_dashboard_data(campaign_id=None, business_account_id=None):
     account_risk_factors_by_company = {}
     all_themes = {}
     all_companies = set()
-    
+    # Influence tracking: stores role-level NPS, executive coverage, high-influence detractors
+    influence_by_company = {}
+
+    # Influence tier classification helper
+    HIGH_INFLUENCE_ROLES = {'c-level', 'c level', 'clevel', 'ceo', 'cto', 'cfo', 'coo', 'cmo', 'cso',
+                            'vp', 'vp/', 'vice president', 'vp/director', 'director', 'svp', 'evp', 'president'}
+
+    def get_influence_tier(role):
+        """Map a participant role string to an influence tier label."""
+        if not role:
+            return 'Unknown'
+        role_lower = role.lower().strip()
+        if any(kw in role_lower for kw in ('c-level', 'c level', 'clevel', 'ceo', 'cto', 'cfo',
+                                            'coo', 'cmo', 'cso', 'president', 'chief')):
+            return 'C-Level'
+        if any(kw in role_lower for kw in ('vp', 'vice president', 'director', 'svp', 'evp')):
+            return 'VP/Director'
+        if 'manager' in role_lower or 'mgr' in role_lower:
+            return 'Manager'
+        if any(kw in role_lower for kw in ('team lead', 'lead', 'supervisor')):
+            return 'Team Lead'
+        return 'End User'
+
+    def is_high_influence(role):
+        tier = get_influence_tier(role)
+        return tier in ('C-Level', 'VP/Director')
+
     for response in all_company_responses:
         company_key = response.company_name.upper()
         all_companies.add(company_key)
@@ -208,6 +239,13 @@ def get_optimized_dashboard_data(campaign_id=None, business_account_id=None):
                 else:
                     growth_opportunities_by_company[company_key]['display_name'] = response.company_name
                 
+                # Determine if this response qualifies as a strategic advocate source
+                opp_role = getattr(response, 'participant_role', None)
+                opp_nps = response.nps_score
+                is_strategic_advocate_source = (
+                    is_high_influence(opp_role) and opp_nps is not None and opp_nps >= 9
+                )
+
                 for opp in opportunities:
                     if not isinstance(opp, dict):
                         continue
@@ -219,7 +257,8 @@ def get_optimized_dashboard_data(campaign_id=None, business_account_id=None):
                             'type': normalized_type.replace('_', ' ').title(),
                             'descriptions': [],
                             'actions': [],
-                            'count': 0
+                            'count': 0,
+                            'strategic_advocate': False,
                         }
                     
                     type_group = growth_opportunities_by_company[company_key]['opportunities_by_type'][normalized_type]
@@ -231,6 +270,8 @@ def get_optimized_dashboard_data(campaign_id=None, business_account_id=None):
                     if action and action not in type_group['actions']:
                         type_group['actions'].append(action)
                     type_group['count'] += 1
+                    if is_strategic_advocate_source:
+                        type_group['strategic_advocate'] = True
             except json.JSONDecodeError:
                 continue
         
@@ -291,7 +332,30 @@ def get_optimized_dashboard_data(campaign_id=None, business_account_id=None):
                     all_themes[consolidated_theme_name]['sentiments'].append(theme.get('sentiment', 'neutral'))
             except json.JSONDecodeError:
                 continue
-    
+
+        # Process influence data
+        role = getattr(response, 'participant_role', None)
+        tier = get_influence_tier(role)
+        nps = response.nps_score
+        if company_key not in influence_by_company:
+            influence_by_company[company_key] = {
+                'nps_by_tier': {},
+                'has_executive_response': False,
+                'high_influence_detractor_nps': [],
+                'c_level_promoter_opps': False,
+            }
+        inf = influence_by_company[company_key]
+        if tier not in inf['nps_by_tier']:
+            inf['nps_by_tier'][tier] = []
+        if nps is not None:
+            inf['nps_by_tier'][tier].append(nps)
+        if tier in ('C-Level', 'VP/Director'):
+            inf['has_executive_response'] = True
+            if nps is not None and nps <= 6:
+                inf['high_influence_detractor_nps'].append(nps)
+            if nps is not None and nps >= 9:
+                inf['c_level_promoter_opps'] = True
+
     # Format high risk accounts
     high_risk_accounts = []
     for company_key, company_data in high_risk_by_company.items():
@@ -378,7 +442,8 @@ def get_optimized_dashboard_data(campaign_id=None, business_account_id=None):
                     'type': type_info['type'],
                     'description': '; '.join(type_info['descriptions'][:2]),
                     'action': '; '.join(type_info['actions'][:2]),
-                    'count': type_info['count']
+                    'count': type_info['count'],
+                    'strategic_advocate': type_info.get('strategic_advocate', False),
                 })
         
         risks_list = []
@@ -400,6 +465,33 @@ def get_optimized_dashboard_data(campaign_id=None, business_account_id=None):
         )
         critical_risk_count = sum(1 for r in risks_list if r.get('severity') == 'Critical')
 
+        # Compute influence-weighted indicators for this company
+        inf_data = influence_by_company.get(company_key, {})
+        nps_by_tier_raw = inf_data.get('nps_by_tier', {})
+        has_executive_response = inf_data.get('has_executive_response', False)
+        high_influence_detractor_nps = inf_data.get('high_influence_detractor_nps', [])
+        c_level_promoter_opps = inf_data.get('c_level_promoter_opps', False)
+
+        # Build NPS-by-tier summary (avg NPS per tier)
+        nps_by_tier = {}
+        tier_order = ['C-Level', 'VP/Director', 'Manager', 'Team Lead', 'End User', 'Unknown']
+        for tier_name in tier_order:
+            scores = nps_by_tier_raw.get(tier_name, [])
+            if scores:
+                promoters_t = sum(1 for s in scores if s >= 9)
+                detractors_t = sum(1 for s in scores if s <= 6)
+                tier_nps = round((promoters_t - detractors_t) / len(scores) * 100, 0)
+                nps_by_tier[tier_name] = {
+                    'nps': int(tier_nps),
+                    'count': len(scores),
+                    'avg_score': round(sum(scores) / len(scores), 1)
+                }
+
+        # Decision-maker risk: high-influence detractors are present
+        decision_maker_risk = len(high_influence_detractor_nps) > 0
+        # Influence coverage warning: no executive (C-Level or VP) responded
+        missing_executive_coverage = not has_executive_response
+
         account_intelligence.append({
             'company_name': display_name,
             'opportunities': opps_list,
@@ -413,6 +505,11 @@ def get_optimized_dashboard_data(campaign_id=None, business_account_id=None):
             'opportunity_score': round(opp_score, 1),
             'risk_score': round(risk_score_val, 1),
             'health_ratio': round(health_ratio, 2),
+            'decision_maker_risk': decision_maker_risk,
+            'missing_executive_coverage': missing_executive_coverage,
+            'nps_by_tier': nps_by_tier,
+            'c_level_promoter_opps': c_level_promoter_opps,
+            'high_influence_detractor_count': len(high_influence_detractor_nps),
         })
     
     priority_order = {'risk_heavy': 0, 'balanced': 1, 'opportunity_heavy': 2}

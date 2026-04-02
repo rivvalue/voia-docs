@@ -2364,9 +2364,14 @@ def get_company_detail_data(campaign_id, company_name, business_account_id=None)
     from sqlalchemy import func, case
     import json as json_module
 
+    from models import CampaignParticipant, Participant
+    from sqlalchemy.orm import joinedload as _joinedload
+
     responses = SurveyResponse.query.filter(
         func.upper(SurveyResponse.company_name) == company_name.upper(),
         SurveyResponse.campaign_id == campaign_id
+    ).options(
+        _joinedload(SurveyResponse.campaign_participant).joinedload(CampaignParticipant.participant)
     ).all()
 
     if not responses:
@@ -2442,6 +2447,51 @@ def get_company_detail_data(campaign_id, company_name, business_account_id=None)
     latest_churn_risk = latest_response.churn_risk_level if latest_response else None
     latest_response_date = latest_response.created_at.strftime('%Y-%m-%d') if latest_response and latest_response.created_at else None
 
+    # --- Influence-tier NPS breakdown ---
+    def _get_tier(role):
+        if not role:
+            return 'Unknown'
+        r = role.lower().strip()
+        if any(kw in r for kw in ('c-level', 'c level', 'clevel', 'ceo', 'cto', 'cfo', 'coo', 'cmo', 'cso', 'president', 'chief')):
+            return 'C-Level'
+        if any(kw in r for kw in ('vp', 'vice president', 'director', 'svp', 'evp')):
+            return 'VP/Director'
+        if 'manager' in r or 'mgr' in r:
+            return 'Manager'
+        if any(kw in r for kw in ('team lead', 'lead', 'supervisor')):
+            return 'Team Lead'
+        return 'End User'
+
+    tier_nps_scores = {}
+    for resp in responses:
+        if resp.nps_score is None:
+            continue
+        role = None
+        cp = resp.campaign_participant
+        if cp and cp.participant:
+            role = cp.participant.role
+        tier = _get_tier(role)
+        tier_nps_scores.setdefault(tier, []).append(resp.nps_score)
+
+    tier_order = ['C-Level', 'VP/Director', 'Manager', 'Team Lead', 'End User', 'Unknown']
+    nps_by_tier = []
+    for tier_name in tier_order:
+        scores = tier_nps_scores.get(tier_name, [])
+        if not scores:
+            continue
+        p_count = sum(1 for s in scores if s >= 9)
+        d_count = sum(1 for s in scores if s <= 6)
+        tier_nps_val = round((p_count - d_count) / len(scores) * 100)
+        nps_by_tier.append({
+            'tier': tier_name,
+            'nps': tier_nps_val,
+            'count': len(scores),
+            'avg_score': round(sum(scores) / len(scores), 1),
+            'promoters': p_count,
+            'detractors': d_count,
+            'is_high_influence': tier_name in ('C-Level', 'VP/Director'),
+        })
+
     result = {
         "nps_summary": {
             "company_nps": company_nps,
@@ -2458,7 +2508,8 @@ def get_company_detail_data(campaign_id, company_name, business_account_id=None)
         "sub_metrics": sub_metrics,
         "weakest_metric": weakest_metric,
         "avg_churn_risk_score": avg_churn_risk_score,
-        "analysis_summary": analysis_summary
+        "analysis_summary": analysis_summary,
+        "nps_by_tier": nps_by_tier,
     }
 
     if use_cache and result is not None:

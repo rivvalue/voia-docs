@@ -253,6 +253,17 @@
         
         console.log('✅ Enriched account data:', accountData.slice(0, 2));
         
+        // Compute campaign-level strategic advocate summary
+        const strategicAdvocateAccounts = accountData.filter(a =>
+            (a.opportunities || []).some(o => o.strategic_advocate)
+        );
+        const strategicAdvocateSummary = strategicAdvocateAccounts.length > 0
+            ? `<div class="mt-2 pt-2" style="border-top: 1px solid #C0BDB7;">
+                <span class="fw-semibold" style="font-size:0.8em; color:#1A5E20;"><i class="fas fa-star me-1"></i>Strategic Advocate</span>
+                <span class="text-muted ms-1" style="font-size:0.8em;">— Growth opportunities backed by C-Level or VP/Director Promoters are labeled in ${strategicAdvocateAccounts.length} account${strategicAdvocateAccounts.length > 1 ? 's' : ''}.</span>
+              </div>`
+            : '';
+
         // Create legend
         const legendHtml = `
             <div class="account-health-legend mb-4 p-3 rounded" style="background-color: #E9E8E4; border: 1px solid #BDBDBD;">
@@ -266,6 +277,7 @@
                             <span class="badge bg-light text-dark">Advocacy</span>
                             <span class="badge bg-light text-dark">High NPS</span>
                         </div>
+                        ${strategicAdvocateSummary}
                     </div>
                     <div class="col-md-6">
                         <h6 class="text-danger mb-2">Risk Factors</h6>
@@ -299,11 +311,15 @@
                 
                 if (opportunityMap.has(normalizedType)) {
                     opportunityMap.get(normalizedType).count += (opp.count || 1);
+                    if (opp.strategic_advocate) {
+                        opportunityMap.get(normalizedType).strategic_advocate = true;
+                    }
                 } else {
                     opportunityMap.set(normalizedType, {
                         type: opp.type,
                         normalizedType: normalizedType,
-                        count: opp.count || 1
+                        count: opp.count || 1,
+                        strategic_advocate: opp.strategic_advocate || false,
                     });
                 }
             });
@@ -311,11 +327,14 @@
             // Create visual indicators for opportunities
             const opportunityIndicators = Array.from(opportunityMap.values()).map(opp => {
                 const visual = getVisualIndicator(opp.normalizedType, 'opportunity');
+                const advocateLabel = opp.strategic_advocate
+                    ? ` <span style="background:#1A5E20; color:#fff; border-radius:6px; font-size:0.7em; padding:1px 5px; vertical-align:middle;" title="This opportunity is backed by a C-Level or VP/Director Promoter — a high-value reference candidate.">Strategic Advocate</span>`
+                    : '';
                 return `
                     <span class="visual-indicator opportunity-indicator" 
                           style="background-color: ${visual.color}20; border: 2px solid ${visual.color}; padding: 4px 8px; margin: 2px; border-radius: 12px; display: inline-block;"
-                          title="${escapeHtml(opp.type)}${opp.count > 1 ? ` (${opp.count} opportunities)` : ''}">
-                        ${escapeHtml(visual.label)}${opp.count > 1 ? ` (${opp.count})` : ''}
+                          title="${escapeHtml(opp.type)}${opp.count > 1 ? ` (${opp.count} opportunities)` : ''}${opp.strategic_advocate ? ' — Strategic Advocate source' : ''}">
+                        ${escapeHtml(visual.label)}${opp.count > 1 ? ` (${opp.count})` : ''}${advocateLabel}
                     </span>
                 `;
             }).join('');
@@ -360,22 +379,49 @@
             const campaignSelect = document.getElementById('campaignFilter');
             const campaignId = campaignSelect ? campaignSelect.value : null;
             const campaignName = campaignSelect && campaignId ? campaignSelect.options[campaignSelect.selectedIndex].text : 'Current Campaign';
+
+            // Build influence insight badges
+            const decisionMakerRiskBadge = account.decision_maker_risk
+                ? `<span class="badge ms-1" style="background-color: #7B1B1B; color: #fff; font-size: 0.72em; cursor: help;"
+                       title="Churn risk driven by decision-makers: ${account.high_influence_detractor_count || 1} C-Level or VP/Director respondent(s) are Detractors. This is not just user-level dissatisfaction — executive sponsors are at risk.">
+                       <i class="fas fa-user-tie me-1"></i>DM Risk
+                   </span>`
+                : '';
+
+            const coverageWarningBadge = account.missing_executive_coverage
+                ? `<span class="badge ms-1" style="background-color: #6C4A00; color: #fff; font-size: 0.72em; cursor: help;"
+                       title="Incomplete account picture: No C-Level or VP/Director response has been captured for this company. The account health view may not reflect executive sentiment.">
+                       <i class="fas fa-eye-slash me-1"></i>No Exec Coverage
+                   </span>`
+                : '';
+
+            const strategicAdvocateBadge = account.c_level_promoter_opps
+                ? `<span class="badge ms-1" style="background-color: #1A5E20; color: #fff; font-size: 0.72em; cursor: help;"
+                       title="Strategic Advocate opportunity: a C-Level or VP/Director respondent gave a Promoter score (9–10). This is a high-value reference candidate.">
+                       <i class="fas fa-star me-1"></i>Strategic Advocate
+                   </span>`
+                : '';
+
+            const influenceBadges = [decisionMakerRiskBadge, coverageWarningBadge, strategicAdvocateBadge].filter(Boolean).join('');
             
             return `
                 <div class="account-visual-card card mb-3 ${balanceClass}" style="border-width: 2px;">
                     <div class="card-body p-3">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5 class="mb-0">
-                                <a href="#" onclick="openCompanyResponsesModal('${escapeHtml(account.company_name).replace(/'/g, "\\'")}', ${campaignId}, '${escapeHtml(campaignName).replace(/'/g, "\\'")}'); return false;" 
-                                   style="color: #2E5090; text-decoration: none; cursor: pointer;"
-                                   onmouseover="this.style.textDecoration='underline';"
-                                   onmouseout="this.style.textDecoration='none';"
-                                   title="Click to view all responses from ${escapeHtml(account.company_name)}">
-                                    ${escapeHtml(account.company_name)}
-                                    <i class="fas fa-external-link-alt ms-2" style="font-size: 0.7em; color: #8A8A8A;"></i>
-                                </a>
-                            </h5>
-                            <div class="d-flex align-items-center">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h5 class="mb-1">
+                                    <a href="#" onclick="openCompanyResponsesModal('${escapeHtml(account.company_name).replace(/'/g, "\\'")}', ${campaignId}, '${escapeHtml(campaignName).replace(/'/g, "\\'")}'); return false;" 
+                                       style="color: #2E5090; text-decoration: none; cursor: pointer;"
+                                       onmouseover="this.style.textDecoration='underline';"
+                                       onmouseout="this.style.textDecoration='none';"
+                                       title="Click to view all responses from ${escapeHtml(account.company_name)}">
+                                        ${escapeHtml(account.company_name)}
+                                        <i class="fas fa-external-link-alt ms-2" style="font-size: 0.7em; color: #8A8A8A;"></i>
+                                    </a>
+                                </h5>
+                                ${influenceBadges ? `<div class="d-flex flex-wrap gap-1 mt-1">${influenceBadges}</div>` : ''}
+                            </div>
+                            <div class="d-flex align-items-center ms-2">
                                 <span style="font-size: 1.2em; margin-right: 5px; color: ${balanceIconColor};">${balanceIcon}</span>
                                 <span class="badge" style="background-color: ${balanceIconColor}20; color: ${balanceIconColor}; border: 1px solid ${balanceIconColor};">${balanceLabel}</span>
                             </div>
@@ -404,6 +450,26 @@
                             </div>
                         </div>
                         
+                        ${account.nps_by_tier && Object.keys(account.nps_by_tier).length > 0 ? (() => {
+                            const tierOrder = ['C-Level', 'VP/Director', 'Manager', 'Team Lead', 'End User'];
+                            const tierRows = tierOrder
+                                .filter(t => account.nps_by_tier[t])
+                                .map(t => {
+                                    const td = account.nps_by_tier[t];
+                                    const nps = td.nps;
+                                    const color = nps >= 30 ? '#1A5E20' : nps >= 0 ? '#856600' : '#7B1B1B';
+                                    const isHighInfluence = t === 'C-Level' || t === 'VP/Director';
+                                    return `<div class="d-flex align-items-center justify-content-between py-1" style="border-bottom: 1px solid #E0E0E0;">
+                                        <span style="font-size:0.78em; color: #555;">${isHighInfluence ? '<i class="fas fa-user-tie me-1" style="color:#2E5090;" title="High-influence tier"></i>' : ''}<span>${t}</span> <span class="text-muted">(${td.count})</span></span>
+                                        <span class="badge" style="background-color:${color}20; color:${color}; border: 1px solid ${color}; font-size:0.78em;">${nps > 0 ? '+' : ''}${nps}</span>
+                                    </div>`;
+                                }).join('');
+                            return `<div class="mb-3 p-2 rounded" style="background-color:#F4F3F0; border: 1px solid #BDBDBD;">
+                                <div class="fw-bold mb-1" style="font-size:0.8em; color:#555;">NPS by Influence Tier</div>
+                                ${tierRows}
+                            </div>`;
+                        })() : ''}
+
                         <div class="account-indicators">
                             ${opportunityIndicators ? `
                                 <div class="mb-2">
@@ -498,6 +564,17 @@
             return;
         }
         
+        // Compute campaign-level strategic advocate summary (API version)
+        const strategicAdvocateAccountsApi = accountData.filter(a =>
+            (a.opportunities || []).some(o => o.strategic_advocate)
+        );
+        const strategicAdvocateSummaryApi = strategicAdvocateAccountsApi.length > 0
+            ? `<div class="mt-2 pt-2" style="border-top: 1px solid #C0BDB7;">
+                <span class="fw-semibold" style="font-size:0.8em; color:#1A5E20;"><i class="fas fa-star me-1"></i>Strategic Advocate</span>
+                <span class="text-muted ms-1" style="font-size:0.8em;">— Growth opportunities backed by C-Level or VP/Director Promoters are labeled in ${strategicAdvocateAccountsApi.length} account${strategicAdvocateAccountsApi.length > 1 ? 's' : ''}.</span>
+              </div>`
+            : '';
+
         // Create legend (same as snapshot version)
         const legendHtml = `
             <div class="account-health-legend mb-4 p-3 rounded" style="background-color: #E9E8E4; border: 1px solid #BDBDBD;">
@@ -511,6 +588,7 @@
                             <span class="badge bg-light text-dark">Advocacy</span>
                             <span class="badge bg-light text-dark">High NPS</span>
                         </div>
+                        ${strategicAdvocateSummaryApi}
                     </div>
                     <div class="col-md-6">
                         <h6 class="text-danger mb-2">Risk Factors</h6>
@@ -538,28 +616,35 @@
             const balanceLabel = account.balance === 'risk_heavy' ? 'Risk-Heavy' : 
                                account.balance === 'opportunity_heavy' ? 'High Potential' : 'Balanced';
             
-            // Consolidate opportunities
+            // Consolidate opportunities (with strategic advocate tracking)
             const opportunityMap = new Map();
             account.opportunities.forEach(opp => {
                 const normalizedType = normalizeTypeForVisual(opp.type);
                 if (opportunityMap.has(normalizedType)) {
                     opportunityMap.get(normalizedType).count += (opp.count || 1);
+                    if (opp.strategic_advocate) {
+                        opportunityMap.get(normalizedType).strategic_advocate = true;
+                    }
                 } else {
                     opportunityMap.set(normalizedType, {
                         type: opp.type,
                         normalizedType: normalizedType,
-                        count: opp.count || 1
+                        count: opp.count || 1,
+                        strategic_advocate: opp.strategic_advocate || false,
                     });
                 }
             });
             
             const opportunityIndicators = Array.from(opportunityMap.values()).map(opp => {
                 const visual = getVisualIndicator(opp.normalizedType, 'opportunity');
+                const advocateLabel = opp.strategic_advocate
+                    ? ` <span style="background:#1A5E20; color:#fff; border-radius:6px; font-size:0.7em; padding:1px 5px; vertical-align:middle;" title="This opportunity is backed by a C-Level or VP/Director Promoter — a high-value reference candidate.">Strategic Advocate</span>`
+                    : '';
                 return `
                     <span class="visual-indicator opportunity-indicator" 
                           style="background-color: ${visual.color}20; border: 2px solid ${visual.color}; padding: 4px 8px; margin: 2px; border-radius: 12px; display: inline-block;"
-                          title="${escapeHtml(opp.type)}${opp.count > 1 ? ` (${opp.count} opportunities)` : ''}">
-                        ${escapeHtml(visual.label)}${opp.count > 1 ? ` (${opp.count})` : ''}
+                          title="${escapeHtml(opp.type)}${opp.count > 1 ? ` (${opp.count} opportunities)` : ''}${opp.strategic_advocate ? ' — Strategic Advocate source' : ''}">
+                        ${escapeHtml(visual.label)}${opp.count > 1 ? ` (${opp.count})` : ''}${advocateLabel}
                     </span>
                 `;
             }).join('');
@@ -602,22 +687,49 @@
             const campaignSelect = document.getElementById('campaignFilter');
             const campaignId = campaignSelect ? campaignSelect.value : null;
             const campaignName = campaignSelect && campaignId ? campaignSelect.options[campaignSelect.selectedIndex].text : 'Current Campaign';
+
+            // Build influence insight badges
+            const decisionMakerRiskBadge = account.decision_maker_risk
+                ? `<span class="badge ms-1" style="background-color: #7B1B1B; color: #fff; font-size: 0.72em; cursor: help;"
+                       title="Churn risk driven by decision-makers: ${account.high_influence_detractor_count || 1} C-Level or VP/Director respondent(s) are Detractors. This is not just user-level dissatisfaction — executive sponsors are at risk.">
+                       <i class="fas fa-user-tie me-1"></i>DM Risk
+                   </span>`
+                : '';
+
+            const coverageWarningBadge = account.missing_executive_coverage
+                ? `<span class="badge ms-1" style="background-color: #6C4A00; color: #fff; font-size: 0.72em; cursor: help;"
+                       title="Incomplete account picture: No C-Level or VP/Director response has been captured for this company. The account health view may not reflect executive sentiment.">
+                       <i class="fas fa-eye-slash me-1"></i>No Exec Coverage
+                   </span>`
+                : '';
+
+            const strategicAdvocateBadge = account.c_level_promoter_opps
+                ? `<span class="badge ms-1" style="background-color: #1A5E20; color: #fff; font-size: 0.72em; cursor: help;"
+                       title="Strategic Advocate opportunity: a C-Level or VP/Director respondent gave a Promoter score (9–10). This is a high-value reference candidate.">
+                       <i class="fas fa-star me-1"></i>Strategic Advocate
+                   </span>`
+                : '';
+
+            const influenceBadges = [decisionMakerRiskBadge, coverageWarningBadge, strategicAdvocateBadge].filter(Boolean).join('');
             
             return `
                 <div class="account-visual-card card mb-3 ${balanceClass}" style="border-width: 2px;">
                     <div class="card-body p-3">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5 class="mb-0">
-                                <a href="#" onclick="openCompanyResponsesModal('${escapeHtml(account.company_name).replace(/'/g, "\\'")}', ${campaignId}, '${escapeHtml(campaignName).replace(/'/g, "\\'")}'); return false;" 
-                                   style="color: #2E5090; text-decoration: none; cursor: pointer;"
-                                   onmouseover="this.style.textDecoration='underline';"
-                                   onmouseout="this.style.textDecoration='none';"
-                                   title="Click to view all responses from ${escapeHtml(account.company_name)}">
-                                    ${escapeHtml(account.company_name)}
-                                    <i class="fas fa-external-link-alt ms-2" style="font-size: 0.7em; color: #8A8A8A;"></i>
-                                </a>
-                            </h5>
-                            <div class="d-flex align-items-center">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h5 class="mb-1">
+                                    <a href="#" onclick="openCompanyResponsesModal('${escapeHtml(account.company_name).replace(/'/g, "\\'")}', ${campaignId}, '${escapeHtml(campaignName).replace(/'/g, "\\'")}'); return false;" 
+                                       style="color: #2E5090; text-decoration: none; cursor: pointer;"
+                                       onmouseover="this.style.textDecoration='underline';"
+                                       onmouseout="this.style.textDecoration='none';"
+                                       title="Click to view all responses from ${escapeHtml(account.company_name)}">
+                                        ${escapeHtml(account.company_name)}
+                                        <i class="fas fa-external-link-alt ms-2" style="font-size: 0.7em; color: #8A8A8A;"></i>
+                                    </a>
+                                </h5>
+                                ${influenceBadges ? `<div class="d-flex flex-wrap gap-1 mt-1">${influenceBadges}</div>` : ''}
+                            </div>
+                            <div class="d-flex align-items-center ms-2">
                                 <span style="font-size: 1.2em; margin-right: 5px; color: ${balanceIconColor};">${balanceIcon}</span>
                                 <span class="badge" style="background-color: ${balanceIconColor}20; color: ${balanceIconColor}; border: 1px solid ${balanceIconColor};">${balanceLabel}</span>
                             </div>
@@ -646,6 +758,26 @@
                             </div>
                         </div>
                         
+                        ${account.nps_by_tier && Object.keys(account.nps_by_tier).length > 0 ? (() => {
+                            const tierOrder = ['C-Level', 'VP/Director', 'Manager', 'Team Lead', 'End User'];
+                            const tierRows = tierOrder
+                                .filter(t => account.nps_by_tier[t])
+                                .map(t => {
+                                    const td = account.nps_by_tier[t];
+                                    const nps = td.nps;
+                                    const color = nps >= 30 ? '#1A5E20' : nps >= 0 ? '#856600' : '#7B1B1B';
+                                    const isHighInfluence = t === 'C-Level' || t === 'VP/Director';
+                                    return `<div class="d-flex align-items-center justify-content-between py-1" style="border-bottom: 1px solid #E0E0E0;">
+                                        <span style="font-size:0.78em; color: #555;">${isHighInfluence ? '<i class="fas fa-user-tie me-1" style="color:#2E5090;" title="High-influence tier"></i>' : ''}<span>${t}</span> <span class="text-muted">(${td.count})</span></span>
+                                        <span class="badge" style="background-color:${color}20; color:${color}; border: 1px solid ${color}; font-size:0.78em;">${nps > 0 ? '+' : ''}${nps}</span>
+                                    </div>`;
+                                }).join('');
+                            return `<div class="mb-3 p-2 rounded" style="background-color:#F4F3F0; border: 1px solid #BDBDBD;">
+                                <div class="fw-bold mb-1" style="font-size:0.8em; color:#555;">NPS by Influence Tier</div>
+                                ${tierRows}
+                            </div>`;
+                        })() : ''}
+
                         <div class="account-indicators">
                             ${opportunityIndicators ? `
                                 <div class="mb-2">

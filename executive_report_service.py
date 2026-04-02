@@ -105,6 +105,8 @@ class ExecutiveReportGenerator:
         seg_charts = self._generate_segmentation_charts(seg_data, chart_colors)
         recommendations = self._generate_recommendations(seg_data, current_kpis, average_ratings)
         
+        decision_maker_risk_accounts = self._calculate_decision_maker_risk_accounts(responses)
+        
         report_data = {
             'campaign': campaign,
             'business_account': business_account,
@@ -121,7 +123,8 @@ class ExecutiveReportGenerator:
             'survey_type': survey_type,
             'segmentation_data': seg_data,
             'segmentation_charts': seg_charts,
-            'recommendations': recommendations
+            'recommendations': recommendations,
+            'decision_maker_risk_accounts': decision_maker_risk_accounts,
         }
         
         if survey_type == 'classic':
@@ -823,7 +826,87 @@ class ExecutiveReportGenerator:
         ))
         
         return high_risk_accounts[:10]  # Top 10 high risk accounts
-    
+
+    def _get_influence_tier(self, role: Optional[str]) -> str:
+        """Map a participant role string to an influence tier label."""
+        if not role:
+            return 'Unknown'
+        role_lower = role.lower().strip()
+        if any(kw in role_lower for kw in ('c-level', 'c level', 'clevel', 'ceo', 'cto', 'cfo',
+                                            'coo', 'cmo', 'cso', 'president', 'chief')):
+            return 'C-Level'
+        if any(kw in role_lower for kw in ('vp', 'vice president', 'director', 'svp', 'evp')):
+            return 'VP/Director'
+        if 'manager' in role_lower or 'mgr' in role_lower:
+            return 'Manager'
+        if any(kw in role_lower for kw in ('team lead', 'lead', 'supervisor')):
+            return 'Team Lead'
+        return 'End User'
+
+    def _calculate_decision_maker_risk_accounts(self, responses: List) -> List[Dict]:
+        """
+        Identify accounts where C-Level or VP/Director respondents are Detractors (NPS <= 6).
+        Returns a list of dicts with company_name, detractor_count, min_nps, roles,
+        and verbatim_risk_factors extracted from the respondents' account_risk_factors JSON.
+        """
+        import json as _json
+
+        dm_risk_by_company = {}
+        for response in responses:
+            if not response.company_name:
+                continue
+            # Null-safe participant role access via loaded relationship
+            role = None
+            cp = response.campaign_participant
+            if cp is not None and cp.participant is not None:
+                role = cp.participant.role
+            tier = self._get_influence_tier(role)
+            if tier not in ('C-Level', 'VP/Director'):
+                continue
+            nps = response.nps_score
+            if nps is None or nps > 6:
+                continue
+            company_key = response.company_name.upper()
+            if company_key not in dm_risk_by_company:
+                dm_risk_by_company[company_key] = {
+                    'company_name': response.company_name,
+                    'detractor_count': 0,
+                    'nps_scores': [],
+                    'roles': [],
+                    'verbatim_risk_factors': [],
+                }
+            entry = dm_risk_by_company[company_key]
+            entry['detractor_count'] += 1
+            entry['nps_scores'].append(nps)
+            if role and role not in entry['roles']:
+                entry['roles'].append(role)
+            # Extract verbatim risk factor descriptions from this respondent
+            if response.account_risk_factors:
+                try:
+                    risk_factors = _json.loads(response.account_risk_factors) if isinstance(response.account_risk_factors, str) else response.account_risk_factors
+                    if isinstance(risk_factors, list):
+                        for rf in risk_factors:
+                            if not isinstance(rf, dict):
+                                continue
+                            desc = rf.get('description') or rf.get('description_verbatim') or ''
+                            if desc and desc not in entry['verbatim_risk_factors']:
+                                entry['verbatim_risk_factors'].append(desc)
+                except (ValueError, TypeError) as parse_err:
+                    logger.warning(f"DM Risk: could not parse account_risk_factors for response {response.id}: {parse_err}")
+
+        result = []
+        for company_key, entry in dm_risk_by_company.items():
+            result.append({
+                'company_name': entry['company_name'],
+                'detractor_count': entry['detractor_count'],
+                'min_nps': min(entry['nps_scores']),
+                'avg_nps': round(sum(entry['nps_scores']) / len(entry['nps_scores']), 1),
+                'roles': entry['roles'],
+                'verbatim_risk_factors': entry['verbatim_risk_factors'][:4],
+            })
+        result.sort(key=lambda x: (x['min_nps'], -x['detractor_count']))
+        return result
+
     def _calculate_key_themes(self, responses: List) -> List[Dict]:
         """Calculate key themes from responses similar to dashboard implementation"""
         import json
@@ -1888,6 +1971,43 @@ class ExecutiveReportGenerator:
                 <p>No high-risk accounts identified in this campaign period. All customer relationships appear stable based on current feedback.</p>
                 {% endif %}
             </div>
+
+            <!-- Decision-Maker Risk -->
+            {% if decision_maker_risk_accounts %}
+            <div class="section page-break">
+                <h2 class="section-title">👔 Decision-Maker Risk</h2>
+                <p style="color: #666; margin-bottom: 15px;">
+                    The following accounts have C-Level or VP/Director respondents who scored as Detractors (NPS ≤ 6).
+                    Executive-level dissatisfaction represents elevated churn risk that cannot be attributed solely to end-user sentiment.
+                </p>
+                <div class="insights-list">
+                    {% for account in decision_maker_risk_accounts[:8] %}
+                    <div class="insight-item" style="border-left: 4px solid #7B1B1B; padding-left: 15px; margin-bottom: 18px;">
+                        <strong>{{ account.company_name }}</strong>
+                        <div style="color: #666; font-size: 0.9em; margin-top: 5px;">
+                            Decision-Maker Detractors: <span style="color: #7B1B1B; font-weight: bold;">{{ account.detractor_count }}</span>
+                            | Lowest NPS: <span style="color: #7B1B1B; font-weight: bold;">{{ account.min_nps }}</span>
+                            | Avg NPS: {{ account.avg_nps }}
+                            {% if account.roles %} | Roles: {{ account.roles | join(', ') }}{% endif %}
+                        </div>
+                        {% if account.verbatim_risk_factors %}
+                        <div style="margin-top: 8px;">
+                            <span style="font-size: 0.82em; color: #888; font-style: italic;">Captured risk factors:</span>
+                            <ul style="margin: 4px 0 0 16px; padding: 0; font-size: 0.85em; color: #555;">
+                                {% for rf in account.verbatim_risk_factors %}
+                                <li style="margin-bottom: 2px;">{{ rf }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                <p style="font-size: 0.85em; color: #888; margin-top: 10px;">
+                    Prioritize executive outreach for these accounts — sponsor-level intervention may be necessary to prevent churn.
+                </p>
+            </div>
+            {% endif %}
 
             <!-- Key Themes Analysis -->
             <div class="section">
