@@ -742,6 +742,18 @@ document.addEventListener('DOMContentLoaded', function() {
     tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
+
+    // Initialize tooltips on tab bar buttons (icon-only mode below 1400px).
+    // We use a class selector (.tab-icon-tooltip) instead of data-bs-toggle="tooltip"
+    // because these buttons already use data-bs-toggle="tab" and Bootstrap cannot
+    // bind two toggles on the same element via that attribute.
+    // Tooltips are only initialized below 1400px where labels are hidden by CSS.
+    if (window.matchMedia('(max-width: 1399.98px)').matches) {
+        const tabTooltipList = [].slice.call(document.querySelectorAll('.tab-icon-tooltip'));
+        tabTooltipList.map(function (el) {
+            return new bootstrap.Tooltip(el, { trigger: 'hover focus' });
+        });
+    }
     
     // Force remove yellow colors immediately
     forceRemoveYellowColors();
