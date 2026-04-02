@@ -5536,6 +5536,7 @@ function setupTabEventListeners() {
 
             // Load Strategic Accounts on first tab activation
             if (targetTab === '#strategic-accounts') {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
                 if (window.dashboardModules && window.dashboardModules.strategicAccounts?.loadStrategicAccounts) {
                     window.dashboardModules.strategicAccounts.loadStrategicAccounts();
                 }

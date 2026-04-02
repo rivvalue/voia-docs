@@ -185,6 +185,7 @@
             const strategicTab = document.getElementById('strategic-accounts-tab');
             if (strategicTab && strategicTab.classList.contains('active')) {
                 if (window.dashboardModules?.strategicAccounts?.loadStrategicAccounts) {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                     setTimeout(() => window.dashboardModules.strategicAccounts.loadStrategicAccounts(), 350);
                 }
             }

@@ -12597,8 +12597,16 @@ thead th.th-c2 {
     word-break: break-all;
 }
 
-/* ===== Responsive Tab Bar — Icon-Only Below 1400px ===== */
-@media (max-width: 1399.98px) {
+/* ===== Responsive Tab Bar — Icon-Only Below 1800px ===== */
+#dashboardNav {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+#dashboardNav::-webkit-scrollbar { display: none; }
+
+@media (max-width: 1799.98px) {
     #dashboardNav .nav-link .tab-label {
         display: none;
     }
