@@ -180,6 +180,14 @@
                     window.dashboardModules.surveyInsights.loadTenureNpsData();
                 }, 300);
             }
+
+            // Reload strategic accounts if that tab is currently active (campaign filter changed)
+            const strategicTab = document.getElementById('strategic-accounts-tab');
+            if (strategicTab && strategicTab.classList.contains('active')) {
+                if (window.dashboardModules?.strategicAccounts?.loadStrategicAccounts) {
+                    setTimeout(() => window.dashboardModules.strategicAccounts.loadStrategicAccounts(), 350);
+                }
+            }
             
             console.log('✅ Deferred data loading scheduled');
         });

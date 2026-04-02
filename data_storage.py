@@ -2534,3 +2534,169 @@ def bust_company_detail_cache(campaign_id, company_name, business_account_id):
         logger.info(f"🗑️ COMPANY DETAIL CACHE BUSTED | Campaign: {campaign_id} | Company: {company_name} | Tenant: {business_account_id}")
     except Exception as e:
         logger.warning(f"⚠️ Failed to bust company detail cache: {e}")
+
+
+def get_strategic_accounts_data(campaign_id, business_account_id=None):
+    """
+    Return account intelligence data filtered to Strategic and Key tier accounts only.
+
+    Pulls from the existing dashboard account_intelligence structure (so all risk
+    badges, opportunity indicators, and influence signals are already computed) and
+    enriches each record with:
+      - customer_tier   : tier string from Participant
+      - response_count  : number of survey responses in this campaign for the company
+      - has_responses   : bool (False = coverage warning)
+
+    Also computes campaign-level KPI strip values:
+      - at_risk_count      : accounts with churn risk above Minimal (High/Critical)
+      - growth_count       : accounts with at least one growth opportunity
+      - no_response_count  : accounts with zero survey responses (coverage gap)
+      - coverage_rate      : float 0-1, responded / total strategic accounts
+
+    Args:
+        campaign_id: Required campaign ID for filtering.
+        business_account_id: Business account for multi-tenant isolation.
+
+    Returns:
+        dict with 'accounts' list and 'kpi' dict, or None on error.
+    """
+    try:
+        if not campaign_id:
+            return {'accounts': [], 'kpi': {'at_risk_count': 0, 'growth_count': 0, 'no_response_count': 0, 'coverage_rate': 0.0}}
+
+        TIER_PRIORITY = {'strategic': 0, 'key': 1}
+        STRATEGIC_TIERS = {'strategic', 'key'}
+        RISK_SEVERITY_ORDER = {'Critical': 0, 'High': 1, 'Medium': 2, 'Low': 3, 'Minimal': 4}
+
+        # --- Step 1: Build the canonical company set from campaign participants ---
+        # This is the primary set: ALL Strategic/Key companies in the campaign,
+        # including those with zero survey responses.
+        tier_rows = db.session.query(
+            Participant.company_name,
+            func.upper(Participant.company_name).label('upper_company'),
+            Participant.customer_tier
+        ).join(
+            CampaignParticipant,
+            CampaignParticipant.participant_id == Participant.id
+        ).filter(
+            CampaignParticipant.campaign_id == campaign_id,
+            Participant.customer_tier.isnot(None),
+            Participant.company_name.isnot(None)
+        ).all()
+
+        # For each company keep the display name and most specific Strategic/Key tier
+        company_tier_map = {}       # upper -> {'tier': str, 'display_name': str}
+        for row in tier_rows:
+            upper = row.upper_company
+            tier = (row.customer_tier or '').strip()
+            tier_lower = tier.lower()
+            if tier_lower not in STRATEGIC_TIERS:
+                continue  # Skip non-strategic companies entirely
+            if upper not in company_tier_map:
+                company_tier_map[upper] = {'tier': tier, 'display_name': row.company_name}
+            else:
+                existing_priority = TIER_PRIORITY.get(company_tier_map[upper]['tier'].lower(), 999)
+                new_priority = TIER_PRIORITY.get(tier_lower, 999)
+                if new_priority < existing_priority:
+                    company_tier_map[upper] = {'tier': tier, 'display_name': row.company_name}
+
+        if not company_tier_map:
+            return {'accounts': [], 'kpi': {'at_risk_count': 0, 'growth_count': 0, 'no_response_count': 0, 'coverage_rate': 0.0}}
+
+        # --- Step 2: Build response-count map ---
+        response_count_rows = db.session.query(
+            func.upper(SurveyResponse.company_name).label('upper_company'),
+            func.count(SurveyResponse.id).label('response_count')
+        ).filter(
+            SurveyResponse.campaign_id == campaign_id,
+            SurveyResponse.company_name.isnot(None)
+        ).group_by(func.upper(SurveyResponse.company_name)).all()
+
+        response_count_map = {row.upper_company: row.response_count for row in response_count_rows}
+
+        # --- Step 3: Fetch account intelligence data (cached) and build lookup ---
+        dashboard_data = get_dashboard_data_cached(campaign_id=campaign_id, business_account_id=business_account_id)
+        all_accounts = dashboard_data.get('account_intelligence', [])
+        intelligence_map = {}
+        for account in all_accounts:
+            upper = (account.get('company_name') or '').upper()
+            if upper:
+                intelligence_map[upper] = account
+
+        # --- Step 4: Build strategic accounts from participant set (left-join intelligence) ---
+        strategic_accounts = []
+        for upper, tier_info in company_tier_map.items():
+            response_count = response_count_map.get(upper, 0)
+            intel = intelligence_map.get(upper)
+
+            if intel:
+                enriched = dict(intel)
+            else:
+                # Zero-response account: create a minimal stub
+                enriched = {
+                    'company_name': tier_info['display_name'],
+                    'company_nps': None,
+                    'risk_factors': [],
+                    'opportunities': [],
+                    'risk_count': 0,
+                    'critical_risks': 0,
+                    'opportunity_count': 0,
+                    'balance': 'balanced',
+                    'max_tenure': None,
+                    'nps_by_tier': {},
+                    'decision_maker_risk': False,
+                    'missing_executive_coverage': False,
+                    'c_level_promoter_opps': False,
+                }
+
+            enriched['customer_tier'] = tier_info['tier']
+            enriched['response_count'] = response_count
+            enriched['has_responses'] = response_count > 0
+            strategic_accounts.append(enriched)
+
+        # --- Step 5: Sort by churn risk severity (Critical > High > Medium > Low > Minimal > no-risk) ---
+        def risk_sort_key(acc):
+            # Use risk_factors severity levels for full ordering
+            if acc.get('risk_factors'):
+                max_sev = min(
+                    RISK_SEVERITY_ORDER.get(rf.get('severity', 'Minimal'), 4)
+                    for rf in acc['risk_factors']
+                )
+                return max_sev
+            # Fall back to structural fields
+            if acc.get('critical_risks', 0) > 0:
+                return 0  # Critical
+            if acc.get('risk_count', 0) > 0:
+                return 3  # Low (has risks but not categorised)
+            return 5  # No risk / no data
+
+        strategic_accounts.sort(key=risk_sort_key)
+
+        # --- KPI strip values ---
+        at_risk_count = sum(1 for a in strategic_accounts if a.get('critical_risks', 0) > 0 or a.get('risk_count', 0) > 0)
+        growth_count = sum(1 for a in strategic_accounts if a.get('opportunity_count', 0) > 0)
+        no_response_count = sum(1 for a in strategic_accounts if not a.get('has_responses', False))
+        total = len(strategic_accounts)
+        responded = total - no_response_count
+        coverage_rate = round(responded / total, 2) if total > 0 else 0.0
+
+        logger.info(
+            f"📊 Strategic accounts data: {total} accounts "
+            f"(at_risk={at_risk_count}, growth={growth_count}, no_response={no_response_count}) "
+            f"for campaign {campaign_id}"
+        )
+
+        return {
+            'accounts': strategic_accounts,
+            'kpi': {
+                'at_risk_count': at_risk_count,
+                'growth_count': growth_count,
+                'no_response_count': no_response_count,
+                'coverage_rate': coverage_rate,
+                'total_count': total
+            }
+        }
+
+    except Exception as e:
+        logger.error(f"Error getting strategic accounts data: {e}")
+        return None

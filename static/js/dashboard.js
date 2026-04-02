@@ -5521,6 +5521,13 @@ function setupTabEventListeners() {
             }
             
             // Campaign management access will be handled by server-side business authentication
+
+            // Load Strategic Accounts on first tab activation
+            if (targetTab === '#strategic-accounts') {
+                if (window.dashboardModules && window.dashboardModules.strategicAccounts?.loadStrategicAccounts) {
+                    window.dashboardModules.strategicAccounts.loadStrategicAccounts();
+                }
+            }
         });
     });
 }

@@ -2965,6 +2965,83 @@ def api_account_intelligence():
         logger.error(f"Error getting account intelligence data: {e}")
         return jsonify({'error': 'Failed to get account intelligence data'}), 500
 
+
+@app.route('/api/strategic_accounts')
+@rate_limit(limit=100)
+def api_strategic_accounts():
+    """API endpoint for Strategic Accounts dashboard view.
+
+    Returns account intelligence filtered to Strategic and Key tier participants
+    for the specified campaign, along with KPI strip metrics.
+
+    Query params:
+        campaign_id (int, required): The campaign to analyse.
+    """
+    try:
+        from models import Campaign
+        from data_storage import get_strategic_accounts_data
+        from business_auth_routes import get_current_business_account
+
+        campaign_id = request.args.get('campaign_id', type=int)
+
+        current_account = get_current_business_account()
+        if current_account:
+            target_business_account_id = current_account.id
+            account_context = f"business account {current_account.name}"
+        else:
+            target_business_account_id = 1
+            account_context = "demo account"
+
+        if not campaign_id:
+            active_campaign = Campaign.query.filter_by(
+                business_account_id=target_business_account_id,
+                status='active'
+            ).order_by(Campaign.id.desc()).first()
+            if active_campaign:
+                campaign_id = active_campaign.id
+                logger.info(f"📊 /api/strategic_accounts defaulting to {account_context} active campaign: {active_campaign.name} (ID: {campaign_id})")
+            else:
+                logger.info(f"📊 /api/strategic_accounts - No active campaign for {account_context}")
+                return jsonify({
+                    'success': True,
+                    'accounts': [],
+                    'kpi': {
+                        'at_risk_count': 0,
+                        'growth_count': 0,
+                        'no_response_count': 0,
+                        'coverage_rate': 0.0,
+                        'total_count': 0
+                    }
+                })
+
+        campaign = Campaign.query.filter_by(
+            id=campaign_id,
+            business_account_id=target_business_account_id
+        ).first()
+        if not campaign:
+            logger.warning(f"🔒 /api/strategic_accounts - Campaign {campaign_id} access denied for {account_context}")
+            return jsonify({'error': 'Campaign not found or access denied'}), 404
+
+        result = get_strategic_accounts_data(
+            campaign_id=campaign_id,
+            business_account_id=target_business_account_id
+        )
+
+        if result is None:
+            return jsonify({'error': 'Failed to load strategic accounts data'}), 500
+
+        return jsonify({
+            'success': True,
+            'accounts': result['accounts'],
+            'kpi': result['kpi'],
+            'campaign_id': campaign_id
+        })
+
+    except Exception as e:
+        logger.error(f"Error getting strategic accounts data: {e}")
+        return jsonify({'error': 'Failed to get strategic accounts data'}), 500
+
+
 # Conversational Survey Routes
 @app.route('/conversational_survey')
 def conversational_survey():

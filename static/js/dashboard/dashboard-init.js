@@ -314,6 +314,38 @@
         updateGlobalCampaignIndicator();
     }
     
+    /**
+     * Wire Bootstrap tab shown events for modular on-demand loading.
+     * Exposed as window.setupTabEventListeners so kpi-overview.js can call it
+     * via its existing: if (typeof setupTabEventListeners === 'function') check.
+     * Uses a one-time guard to prevent duplicate handler registration across
+     * dashboard repopulation cycles.
+     */
+    let tabListenersRegistered = false;
+    function setupModularTabListeners() {
+        if (tabListenersRegistered) {
+            console.log('⏭️ Modular tab event listeners already registered, skipping');
+            return;
+        }
+        const tabButtons = document.querySelectorAll('[data-bs-toggle="tab"]');
+        tabButtons.forEach(button => {
+            button.addEventListener('shown.bs.tab', function(event) {
+                const targetTab = event.target.getAttribute('data-bs-target');
+
+                if (targetTab === '#strategic-accounts') {
+                    if (window.dashboardModules.strategicAccounts?.loadStrategicAccounts) {
+                        window.dashboardModules.strategicAccounts.loadStrategicAccounts();
+                    }
+                }
+            });
+        });
+        tabListenersRegistered = true;
+        console.log('✅ Modular tab event listeners registered');
+    }
+
+    // Expose as global so kpi-overview.js's setupTabEventListeners() call works in modular mode
+    window.setupTabEventListeners = setupModularTabListeners;
+
     // Register event listener for dashboard ready (all critical modules loaded)
     window.addEventListener('dashboardReady', initializeCampaigns);
     

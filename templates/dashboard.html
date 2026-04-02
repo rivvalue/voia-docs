@@ -374,6 +374,11 @@
                 <i class="fas fa-users me-2"></i>{{ _('Segmentation Insights') }}
             </button>
         </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="strategic-accounts-tab" data-bs-toggle="tab" data-bs-target="#strategic-accounts" type="button" role="tab" aria-controls="strategic-accounts" aria-selected="false">
+                <i class="fas fa-crown me-2"></i>{{ _('Strategic Accounts') }}
+            </button>
+        </li>
     </ul>
 </div>
 
@@ -1029,6 +1034,78 @@
         </div>
         <!-- End Segmentation Insights Tab -->
 
+        <!-- Strategic Accounts Tab -->
+        <div class="tab-pane fade" id="strategic-accounts" role="tabpanel" aria-labelledby="strategic-accounts-tab">
+            <!-- KPI Strip -->
+            <div class="row mb-4 g-3" id="strategicAccountsKpiStrip">
+                <div class="col-md-3">
+                    <div class="kpi-card text-center">
+                        <div class="kpi-value text-danger" id="strategicAtRiskCount">—</div>
+                        <div class="kpi-label">{{ _('Accounts at Risk') }}</div>
+                        <div class="kpi-trend">{{ _('Any risk level above Minimal') }}</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="kpi-card text-center">
+                        <div class="kpi-value text-success" id="strategicGrowthCount">—</div>
+                        <div class="kpi-label">{{ _('Growth Opportunities') }}</div>
+                        <div class="kpi-trend">{{ _('Accounts with active opportunities') }}</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="kpi-card text-center">
+                        <div class="kpi-value" id="strategicCoverageRate">—</div>
+                        <div class="kpi-label">{{ _('Response Coverage') }}</div>
+                        <div class="kpi-trend">{{ _('Accounts with responses / total') }}</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="kpi-card text-center">
+                        <div class="kpi-value text-warning" id="strategicNoResponseCount">—</div>
+                        <div class="kpi-label">{{ _('No Response') }}</div>
+                        <div class="kpi-trend">{{ _('Accounts missing survey coverage') }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Account Cards -->
+            <div class="chart-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-crown me-2" style="color: #E13A44;"></i>{{ _('Strategic & Key Accounts') }}
+                        <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" data-bs-placement="top"
+                           data-bs-title="{{ _('Showing only Strategic and Key tier accounts. Sorted by churn risk level descending.') }}"
+                           style="font-size: 0.8em; opacity: 0.7;"></i>
+                    </h5>
+                    <small class="text-muted">{{ _('Account health cards for your highest-tier customers') }}</small>
+                </div>
+                <div class="card-body">
+                    {% if use_refactored_frontend %}
+                    <!-- Loading State (modular mode: JS module takes over) -->
+                    <div id="strategicAccountsLoading" class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">{{ _('Loading...') }}</span>
+                        </div>
+                        <div class="mt-2 text-muted">{{ _('Loading strategic accounts...') }}</div>
+                    </div>
+                    <!-- Account Cards Container -->
+                    <div id="strategicAccountsList" class="d-none">
+                        <!-- Populated by strategic-accounts.js -->
+                    </div>
+                    {% else %}
+                    <!-- Legacy mode: strategic-accounts.js is not loaded -->
+                    <div id="strategicAccountsLoading" class="d-none"></div>
+                    <div id="strategicAccountsList" class="text-center py-5">
+                        <i class="fas fa-crown fa-3x mb-3" style="color:#BDBDBD;"></i>
+                        <h5 class="text-muted">{{ _('Strategic Accounts') }}</h5>
+                        <p class="text-muted">{{ _('This view requires the updated dashboard. Please enable the new UI version to access Strategic Accounts.') }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <!-- End Strategic Accounts Tab -->
+
     </div>
         <!-- End Tab Content -->
 
@@ -1284,6 +1361,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <script src="{{ url_for('static', filename='js/dashboard/account-intelligence.js') }}?v={{ range(1000, 9999) | random }}"></script>
 <script src="{{ url_for('static', filename='js/dashboard/survey-insights.js') }}?v={{ range(1000, 9999) | random }}"></script>
 <script src="{{ url_for('static', filename='js/dashboard/kpi-overview.js') }}?v={{ range(1000, 9999) | random }}"></script>
+<script src="{{ url_for('static', filename='js/dashboard/strategic-accounts.js') }}?v={{ range(1000, 9999) | random }}"></script>
 <script src="{{ url_for('static', filename='js/dashboard/dashboard-init.js') }}?v={{ range(1000, 9999) | random }}"></script>
 {% else %}
 <!-- Legacy: Monolithic Dashboard JavaScript -->
