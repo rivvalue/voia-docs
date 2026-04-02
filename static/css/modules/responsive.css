@@ -4024,6 +4024,31 @@
     border-bottom-left-radius: 4px;
 }
 
+/* ===== Responsive Tab Bar — Icon-Only Below 1800px ===== */
+#dashboardNav {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+#dashboardNav::-webkit-scrollbar { display: none; }
+
+@media (max-width: 1799.98px) {
+    #dashboardNav .nav-link .tab-label {
+        display: none;
+    }
+
+    #dashboardNav .nav-link i {
+        margin-right: 0 !important;
+        font-size: 1.1rem;
+    }
+
+    #dashboardNav .nav-link {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+}
+
 /* Form Input Preview */
 .brand-preview-panel .preview-form-group {
     margin-bottom: 0;
