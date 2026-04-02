@@ -332,12 +332,32 @@ Because some accounts have responded more than others, every score is accompanie
 Each company row displays a risk badge — **Critical**, **High**, **Medium**, or **Low** — that summarizes the overall risk level for that account. Hovering over the badge opens a tooltip that explains exactly why the account received that rating, describing the specific signals (such as low NPS, high churn risk, or negative sentiment trend) that drove the classification. This makes it easy to understand not just what the risk level is, but why it was assigned.
 
 **Hover-Loaded Enrichment**
-Hovering over any account row opens a tooltip that loads additional detail on demand. The tooltip includes the top themes that respondents from that company mentioned, a sub-metric breakdown covering satisfaction, service, pricing, and product value, the account's average AI churn risk score, and an AI-generated plain-language summary that synthesizes the account's overall feedback picture. This keeps the main table clean and scannable while still giving you depth when you need it.
+Hovering over any account row opens a tooltip that loads additional detail on demand. The tooltip includes the top themes that respondents from that company mentioned, a sub-metric breakdown covering satisfaction, service, pricing, and product value, the account's average AI churn risk score, and an AI-generated plain-language summary that synthesizes the account's overall feedback picture. This tooltip now also shows a **weighted enrichment breakdown** that reflects the influence of each respondent's seniority level — feedback from C-level executives and VP-level contacts is highlighted so you can see at a glance whether the signals are coming from decision-makers or from end users. This keeps the main table clean and scannable while still giving you depth when you need it.
 
 **Use Account Intelligence to:**
 - Prioritize at-risk accounts for your customer success team
 - Identify expansion opportunities with healthy, engaged accounts
 - Allocate outreach effort where it will have the most impact
+
+---
+
+### Influence-Weighted Scoring
+
+VOÏA's scoring engine weights each survey response by the seniority of the person who submitted it. This means that feedback from senior stakeholders — the people with the most authority over renewal, expansion, and contract decisions — carries proportionally more weight than feedback from end users when calculating risk and growth signals.
+
+VOÏA recognizes the following seniority tiers, from highest influence to baseline: C-level executives, VP/Director, Manager, Team Lead, and End user / individual contributor. C-level and VP-level respondents carry the most weight; end users serve as the baseline.
+
+**How this affects risk signals**
+When a C-level executive gives a low NPS score or signals dissatisfaction, the churn risk score for that account rises significantly more than it would for the same score submitted by an end user. This reflects the real-world reality that a dissatisfied executive has the authority to cancel or not renew a contract, while an end user typically does not.
+
+**How this affects growth signals**
+Positive feedback from senior stakeholders — a VP expressing strong satisfaction, a C-level executive indicating willingness to expand the relationship — is weighted more heavily in the growth opportunity calculations. This helps your customer success and sales teams prioritize the accounts where expansion signals are genuinely strategic.
+
+**Where you see the effect**
+- **Risk level badge** on each account row in Account Intelligence reflects influence-weighted churn risk
+- **Balance score indicator** incorporates influence-weighted opportunity and risk totals
+- **Hover enrichment tooltip** shows a weighted breakdown so you can see whether the signals are coming from decision-makers or end users
+- **Growth signals** in the Growth Analytics tab reflect the weighted contribution of senior advocates
 
 ---
 
@@ -377,6 +397,42 @@ Account Insights is a per-company panel that appears on the **Company Responses*
 - You are preparing for a customer review or renewal conversation and need a quick summary of how that account feels
 - Your customer success team wants to understand a specific company's feedback without reading through every individual response
 - You need to decide whether to escalate an account to senior leadership based on their current sentiment and churn risk
+
+---
+
+### Strategic Accounts Dashboard
+
+The Strategic Accounts dashboard is a dedicated view that focuses exclusively on your highest-priority customer relationships — those whose participants are tagged as **Strategic** or **Key** tier in the participant database. It is designed for customer success leaders and account executives who need to monitor their most important accounts without the noise of the full account list.
+
+**How to access it**
+
+Open the main dashboard and click the **Strategic Accounts** tab (marked with a crown icon). The view loads automatically for the active campaign. If you want to see data for a different campaign, you can pass a campaign ID via the URL. If no campaign is specified and one is active, the dashboard defaults to the active campaign.
+
+**What the dashboard shows**
+
+At the top of the view, a KPI strip gives you an instant snapshot of the overall health of your strategic account portfolio:
+
+- **At-risk accounts** — the number of strategic accounts that have at least one active risk factor
+- **Growth opportunities** — the number of strategic accounts showing at least one positive growth signal
+- **No response** — the number of strategic accounts that have not yet submitted any survey responses in the current campaign (a coverage gap you may want to address)
+- **Coverage rate** — the percentage of strategic accounts that have responded so far
+
+Below the KPI strip, the account list shows every Strategic and Key tier account in the campaign, sorted from highest to lowest churn risk. Each row displays:
+
+- **Company name** and their customer tier (Strategic or Key)
+- **Risk badge** (Critical, High, Medium, or Low) derived from their influence-weighted churn risk
+- **Balance score** indicator showing whether the account is risk-heavy, balanced, or opportunity-heavy
+- **Response count** for the current campaign — accounts with zero responses are flagged visually so you know where coverage is missing
+- **Hover-loaded enrichment** with the same detailed tooltip available in Account Intelligence, including the weighted breakdown of seniority tiers for that account's respondents
+
+**How it differs from Account Intelligence**
+
+Account Intelligence (in the Insights workspace) shows every company that has submitted at least one response in the campaign. The Strategic Accounts dashboard shows every company in the Strategic or Key tier, regardless of whether they have responded — this means you can see at a glance which of your most important accounts have not yet engaged with the survey.
+
+**Use Strategic Accounts when:**
+- You need to review the health of your top accounts before a QBR or leadership meeting
+- You want to identify which key accounts have gone silent and may need proactive outreach
+- You are prioritizing where your customer success team should focus their time this week
 
 ---
 
