@@ -4,6 +4,7 @@ Provides CRUD operations for campaign participants with proper tenant scoping
 """
 
 from flask import Blueprint, request, render_template, redirect, url_for, flash, jsonify, session
+from flask_babel import gettext as _
 from sqlalchemy.orm import joinedload
 from business_auth_routes import require_business_auth, require_permission, current_tenant_id, get_current_business_account
 from models import Participant, Campaign, BusinessAccount, CampaignParticipant, EmailDelivery, db
@@ -205,7 +206,7 @@ def list_participants():
         # Get current business account context
         current_account = get_current_business_account()
         if not current_account or not current_account.id:
-            flash('Contexte du compte entreprise introuvable.', 'error')
+            flash(_('Business account context not found.'), 'error')
             return redirect(url_for('business_auth.login'))
         
         per_page = 20
@@ -355,7 +356,7 @@ def create_participant():
         # Show create form
         current_account = get_current_business_account()
         if not current_account or not current_account.id:
-            flash('Contexte du compte entreprise introuvable.', 'error')
+            flash(_('Business account context not found.'), 'error')
             return redirect(url_for('business_auth.login'))
         
         return render_template('participants/create.html',
@@ -365,7 +366,7 @@ def create_participant():
     try:
         current_account = get_current_business_account()
         if not current_account or not current_account.id:
-            flash('Contexte du compte entreprise introuvable.', 'error')
+            flash(_('Business account context not found.'), 'error')
             return redirect(url_for('business_auth.login'))
         
         # Note: License limits are enforced per-campaign when participants are assigned to campaigns
@@ -509,7 +510,7 @@ def edit_participant(participant_id):
     try:
         current_account = get_current_business_account()
         if not current_account or not current_account.id:
-            flash('Contexte du compte entreprise introuvable.', 'error')
+            flash(_('Business account context not found.'), 'error')
             return redirect(url_for('business_auth.login'))
         
         # Get participant (scoped to current business account)
@@ -694,7 +695,7 @@ def upload_participants():
         # Show upload form
         current_account = get_current_business_account()
         if not current_account or not current_account.id:
-            flash('Contexte du compte entreprise introuvable.', 'error')
+            flash(_('Business account context not found.'), 'error')
             return redirect(url_for('business_auth.login'))
         
         return render_template('participants/upload.html',
@@ -704,7 +705,7 @@ def upload_participants():
     try:
         current_account = get_current_business_account()
         if not current_account or not current_account.id:
-            flash('Contexte du compte entreprise introuvable.', 'error')
+            flash(_('Business account context not found.'), 'error')
             return redirect(url_for('business_auth.login'))
             
         # No campaign validation needed for independent participants
@@ -927,7 +928,7 @@ def delete_participant(participant_id):
     try:
         current_account = get_current_business_account()
         if not current_account or not current_account.id:
-            flash('Contexte du compte entreprise introuvable.', 'error')
+            flash(_('Business account context not found.'), 'error')
             return redirect(url_for('participants.list_participants'))
         
         # Get participant (scoped to current business account)
@@ -986,7 +987,7 @@ def regenerate_token(participant_id):
     try:
         current_account = get_current_business_account()
         if not current_account or not current_account.id:
-            flash('Contexte du compte entreprise introuvable.', 'error')
+            flash(_('Business account context not found.'), 'error')
             return redirect(url_for('participants.list_participants'))
         
         # Get participant (scoped to current business account)
@@ -1243,7 +1244,7 @@ def manage_campaign_participants(campaign_id: int):
     try:
         current_account = get_current_business_account()
         if not current_account or not current_account.id:
-            flash('Contexte du compte entreprise introuvable.', 'error')
+            flash(_('Business account context not found.'), 'error')
             return redirect(url_for('business_auth.login'))
         
         # Get campaign (scoped to current business account)
@@ -1253,7 +1254,7 @@ def manage_campaign_participants(campaign_id: int):
         ).first()
         
         if not campaign:
-            flash('Campagne introuvable.', 'error')
+            flash(_('Campaign not found.'), 'error')
             return redirect(url_for('participants.list_participants'))
         
         if request.method == 'GET':
@@ -1669,7 +1670,7 @@ def remove_campaign_participant(campaign_id, association_id):
     try:
         current_account = get_current_business_account()
         if not current_account or not current_account.id:
-            flash('Contexte du compte entreprise introuvable.', 'error')
+            flash(_('Business account context not found.'), 'error')
             return redirect(url_for('participants.list_participants'))
         
         # Get campaign (scoped to current business account)
@@ -1679,7 +1680,7 @@ def remove_campaign_participant(campaign_id, association_id):
         ).first()
         
         if not campaign:
-            flash('Campagne introuvable.', 'error')
+            flash(_('Campaign not found.'), 'error')
             return redirect(url_for('participants.list_participants'))
         
         # Validate campaign status - can only remove participants if campaign is draft or ready
@@ -1997,7 +1998,7 @@ def send_individual_invitation(participant_id):
     try:
         current_account = get_current_business_account()
         if not current_account:
-            flash('Contexte du compte entreprise introuvable.', 'error')
+            flash(_('Business account context not found.'), 'error')
             return redirect(url_for('participants.list_participants'))
         
         # Get participant (scoped to current business account)
@@ -2012,7 +2013,7 @@ def send_individual_invitation(participant_id):
         
         # Check if email service is configured for this business account
         if not email_service.is_configured(current_account.id):
-            flash('Le service de messagerie n’est pas configuré. Veuillez d’abord configurer les paramètres SMTP.', 'error')
+            flash(_('The email service is not configured. Please configure your SMTP settings first.'), 'error')
             return redirect(url_for('participants.list_participants'))
         
         # Get active campaigns for this participant
@@ -2112,7 +2113,7 @@ def send_campaign_participant_invitation(campaign_id, participant_id):
     try:
         current_account = get_current_business_account()
         if not current_account:
-            flash('Contexte du compte entreprise introuvable.', 'error')
+            flash(_('Business account context not found.'), 'error')
             return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
         
         # Get campaign (scoped to current business account)
@@ -2122,7 +2123,7 @@ def send_campaign_participant_invitation(campaign_id, participant_id):
         ).first()
         
         if not campaign:
-            flash('Campagne introuvable.', 'error')
+            flash(_('Campaign not found.'), 'error')
             return redirect(url_for('participants.list_participants'))
         
         # Get campaign-participant association
@@ -2143,7 +2144,7 @@ def send_campaign_participant_invitation(campaign_id, participant_id):
         
         # Check if email service is configured for this business account
         if not email_service.is_configured(current_account.id):
-            flash('Le service de messagerie n’est pas configuré. Veuillez d’abord configurer les paramètres SMTP.', 'error')
+            flash(_('The email service is not configured. Please configure your SMTP settings first.'), 'error')
             return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
         
         # Check if there's already a successful delivery

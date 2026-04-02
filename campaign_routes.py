@@ -14,6 +14,7 @@ from sqlalchemy import desc
 from sqlalchemy.orm import joinedload
 
 from business_auth_routes import require_business_auth, require_permission, get_current_business_account
+from flask_babel import gettext as _
 from models import Campaign, CampaignParticipant, Participant, BusinessAccount, EmailDelivery, SurveyResponse, SurveyTemplate, ClassicSurveyConfig, db
 from task_queue import add_email_task
 from email_service import email_service
@@ -82,7 +83,7 @@ def list_campaigns():
     try:
         current_account = get_current_business_account()
         if not current_account:
-            flash('Contexte du compte entreprise introuvable.', 'error')
+            flash(_('Business account context not found.'), 'error')
             return redirect(url_for('business_auth.login'))
         
         # Get all campaigns for this business account
@@ -164,7 +165,7 @@ def list_campaigns():
         
     except Exception as e:
         logger.error(f"Campaign list error: {e}")
-        flash('Erreur lors du chargement des campagnes.', 'error')
+        flash(_('Error loading campaigns.'), 'error')
         return redirect(url_for('business_auth.admin_panel'))
 
 
@@ -176,7 +177,7 @@ def create_campaign():
     try:
         current_account = get_current_business_account()
         if not current_account:
-            flash('Contexte du compte entreprise introuvable.', 'error')
+            flash(_('Business account context not found.'), 'error')
             return redirect(url_for('business_auth.login'))
         
         if request.method == 'GET':
@@ -201,7 +202,7 @@ def create_campaign():
         
         # Validate required fields
         if not name or not start_date or not end_date:
-            flash('Le nom de la campagne, la date de début et la date de fin sont requis.', 'error')
+            flash(_('Campaign name, start date, and end date are required.'), 'error')
             return render_template('campaigns/create.html',
                                  business_account=current_account.to_dict())
         
@@ -211,7 +212,7 @@ def create_campaign():
             end_datetime = datetime.strptime(end_date, '%Y-%m-%d')
             
             if start_datetime >= end_datetime:
-                flash('La date de fin doit être postérieure à la date de début.', 'error')
+                flash(_('The end date must be after the start date.'), 'error')
                 return render_template('campaigns/create.html',
                                      business_account=current_account.to_dict())
             
@@ -220,7 +221,7 @@ def create_campaign():
             end_date_obj = end_datetime.date()
             
         except ValueError:
-            flash('Format de date invalide.', 'error')
+            flash(_('Invalid date format.'), 'error')
             return render_template('campaigns/create.html',
                                  business_account=current_account.to_dict())
         
@@ -329,7 +330,7 @@ def create_campaign():
     except Exception as e:
         logger.error(f"Campaign creation error: {e}")
         db.session.rollback()
-        flash('Échec de la création de la campagne. Veuillez réessayer.', 'error')
+        flash(_('Failed to create campaign. Please try again.'), 'error')
         current_account = get_current_business_account()
         return render_template('campaigns/create.html',
                              business_account=current_account.to_dict() if current_account else {})
@@ -542,7 +543,7 @@ def view_campaign(campaign_id):
     try:
         current_account = get_current_business_account()
         if not current_account:
-            flash('Contexte du compte entreprise introuvable.', 'error')
+            flash(_('Business account context not found.'), 'error')
             return redirect(url_for('business_auth.login'))
         
         # Get campaign (scoped to current business account)
@@ -552,7 +553,7 @@ def view_campaign(campaign_id):
         ).first()
         
         if not campaign:
-            flash('Campagne introuvable.', 'error')
+            flash(_('Campaign not found.'), 'error')
             return redirect(url_for('campaigns.list_campaigns'))
         
         # Get participant summary stats (optimized - no full list loading)
@@ -633,7 +634,7 @@ def view_campaign(campaign_id):
         
     except Exception as e:
         logger.error(f"Campaign view error: {e}")
-        flash('Erreur lors du chargement des détails de la campagne.', 'error')
+        flash(_('Error loading campaign details.'), 'error')
         return redirect(url_for('campaigns.list_campaigns'))
 
 
@@ -645,7 +646,7 @@ def edit_draft_campaign(campaign_id):
     try:
         current_account = get_current_business_account()
         if not current_account:
-            flash('Contexte du compte entreprise introuvable.', 'error')
+            flash(_('Business account context not found.'), 'error')
             return redirect(url_for('business_auth.login'))
         
         # Get campaign (scoped to current business account)
@@ -655,7 +656,7 @@ def edit_draft_campaign(campaign_id):
         ).first()
         
         if not campaign:
-            flash('Campagne introuvable.', 'error')
+            flash(_('Campaign not found.'), 'error')
             return redirect(url_for('campaigns.list_campaigns'))
         
         # Validate: Only draft campaigns can be edited
@@ -677,7 +678,7 @@ def edit_draft_campaign(campaign_id):
         
         # Validate required fields
         if not name or not start_date or not end_date:
-            flash('Le nom de la campagne, la date de début et la date de fin sont requis.', 'error')
+            flash(_('Campaign name, start date, and end date are required.'), 'error')
             return render_template('campaigns/edit.html',
                                  campaign=campaign.to_dict(),
                                  business_account=current_account.to_dict())
@@ -688,7 +689,7 @@ def edit_draft_campaign(campaign_id):
             end_datetime = datetime.strptime(end_date, '%Y-%m-%d')
             
             if start_datetime >= end_datetime:
-                flash('La date de fin doit être postérieure à la date de début.', 'error')
+                flash(_('The end date must be after the start date.'), 'error')
                 return render_template('campaigns/edit.html',
                                      campaign=campaign.to_dict(),
                                      business_account=current_account.to_dict())
@@ -697,7 +698,7 @@ def edit_draft_campaign(campaign_id):
             end_date_obj = end_datetime.date()
             
         except ValueError:
-            flash('Format de date invalide.', 'error')
+            flash(_('Invalid date format.'), 'error')
             return render_template('campaigns/edit.html',
                                  campaign=campaign.to_dict(),
                                  business_account=current_account.to_dict())
@@ -839,7 +840,7 @@ def edit_draft_campaign(campaign_id):
     except Exception as e:
         logger.error(f"Campaign edit error: {e}")
         db.session.rollback()
-        flash('Échec de la mise à jour de la campagne. Veuillez réessayer.', 'error')
+        flash(_('Failed to update campaign. Please try again.'), 'error')
         return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
 
 
@@ -851,7 +852,7 @@ def delete_draft_campaign(campaign_id):
     try:
         current_account = get_current_business_account()
         if not current_account:
-            flash('Contexte du compte entreprise introuvable.', 'error')
+            flash(_('Business account context not found.'), 'error')
             return redirect(url_for('business_auth.login'))
         
         # Get campaign (scoped to current business account)
@@ -861,7 +862,7 @@ def delete_draft_campaign(campaign_id):
         ).first()
         
         if not campaign:
-            flash('Campagne introuvable.', 'error')
+            flash(_('Campaign not found.'), 'error')
             return redirect(url_for('campaigns.list_campaigns'))
         
         # Validate: Only draft campaigns can be deleted
@@ -923,7 +924,7 @@ def delete_draft_campaign(campaign_id):
     except Exception as e:
         logger.error(f"Campaign deletion error: {e}")
         db.session.rollback()
-        flash('Échec de la suppression de la campagne. Veuillez réessayer.', 'error')
+        flash(_('Failed to delete campaign. Please try again.'), 'error')
         return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
 
 
@@ -935,7 +936,7 @@ def mark_ready(campaign_id):
     try:
         current_account = get_current_business_account()
         if not current_account:
-            flash('Contexte du compte entreprise introuvable.', 'error')
+            flash(_('Business account context not found.'), 'error')
             return redirect(url_for('business_auth.login'))
         
         # Get campaign (scoped to current business account)
@@ -945,7 +946,7 @@ def mark_ready(campaign_id):
         ).first()
         
         if not campaign:
-            flash('Campagne introuvable.', 'error')
+            flash(_('Campaign not found.'), 'error')
             return redirect(url_for('campaigns.list_campaigns'))
         
         # Validate campaign can be marked ready
@@ -955,7 +956,7 @@ def mark_ready(campaign_id):
         
         # Check if campaign has basic requirements
         if not campaign.name or not campaign.description:
-            flash('La campagne doit comporter un nom et une description pour être marquée comme prête.', 'error')
+            flash(_('The campaign must have a name and description to be marked as ready.'), 'error')
             return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
         
         # Check if campaign has participants
@@ -965,7 +966,7 @@ def mark_ready(campaign_id):
         ).count()
         
         if participant_count == 0:
-            flash('La campagne doit comporter au moins un participant pour être marquée comme prête.', 'error')
+            flash(_('The campaign must have at least one participant to be marked as ready.'), 'error')
             return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
         
         # Mark as ready
@@ -980,7 +981,7 @@ def mark_ready(campaign_id):
     except Exception as e:
         logger.error(f"Error marking campaign as ready: {e}")
         db.session.rollback()
-        flash('Échec du marquage de la campagne comme prête. Veuillez réessayer.', 'error')
+        flash(_('Failed to mark campaign as ready. Please try again.'), 'error')
         return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
 
 
@@ -992,7 +993,7 @@ def activate_campaign(campaign_id):
     try:
         current_account = get_current_business_account()
         if not current_account:
-            flash('Contexte du compte entreprise introuvable.', 'error')
+            flash(_('Business account context not found.'), 'error')
             return redirect(url_for('business_auth.login'))
         
         # Get campaign (scoped to current business account)
@@ -1002,7 +1003,7 @@ def activate_campaign(campaign_id):
         ).first()
         
         if not campaign:
-            flash('Campagne introuvable.', 'error')
+            flash(_('Campaign not found.'), 'error')
             return redirect(url_for('campaigns.list_campaigns'))
         
         if campaign.status == 'active':
@@ -1144,7 +1145,7 @@ def activate_campaign(campaign_id):
     except Exception as e:
         logger.error(f"Error activating campaign: {e}")
         db.session.rollback()
-        flash('Échec de l’activation de la campagne. Veuillez réessayer.', 'error')
+        flash(_('Failed to activate campaign. Please try again.'), 'error')
         return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
 
 
@@ -1156,7 +1157,7 @@ def complete_campaign(campaign_id):
     try:
         current_account = get_current_business_account()
         if not current_account:
-            flash('Contexte du compte entreprise introuvable.', 'error')
+            flash(_('Business account context not found.'), 'error')
             return redirect(url_for('business_auth.login'))
         
         # Get campaign (scoped to current business account)
@@ -1166,7 +1167,7 @@ def complete_campaign(campaign_id):
         ).first()
         
         if not campaign:
-            flash('Campagne introuvable.', 'error')
+            flash(_('Campaign not found.'), 'error')
             return redirect(url_for('campaigns.list_campaigns'))
         
         # Validate campaign can be completed
@@ -1204,7 +1205,7 @@ def complete_campaign(campaign_id):
     except Exception as e:
         logger.error(f"Error completing campaign: {e}")
         db.session.rollback()
-        flash('Échec de la finalisation de la campagne. Veuillez réessayer.', 'error')
+        flash(_('Failed to complete campaign. Please try again.'), 'error')
         return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
 
 
@@ -1220,7 +1221,7 @@ def send_bulk_invitations(campaign_id):
     try:
         current_account = get_current_business_account()
         if not current_account:
-            flash('Contexte du compte entreprise introuvable.', 'error')
+            flash(_('Business account context not found.'), 'error')
             return redirect(url_for('business_auth.login'))
         
         # Get campaign (scoped to current business account)
@@ -1230,7 +1231,7 @@ def send_bulk_invitations(campaign_id):
         ).first()
         
         if not campaign:
-            flash('Campagne introuvable.', 'error')
+            flash(_('Campaign not found.'), 'error')
             return redirect(url_for('campaigns.list_campaigns'))
         
         # Validate campaign status - only send invitations for active campaigns
@@ -1240,7 +1241,7 @@ def send_bulk_invitations(campaign_id):
         
         # Check if email service is configured for this business account
         if not email_service.is_configured(current_account.id):
-            flash('Le service de messagerie n’est pas configuré. Veuillez d’abord configurer les paramètres SMTP.', 'error')
+            flash(_('The email service is not configured. Please configure your SMTP settings first.'), 'error')
             return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
         
         # Get all campaign participants that haven't been invited yet
@@ -1250,7 +1251,7 @@ def send_bulk_invitations(campaign_id):
         ).all()
         
         if not campaign_participants:
-            flash('Aucun participant trouvé pour cette campagne.', 'warning')
+            flash(_('No participants found for this campaign.'), 'warning')
             return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
         
         # Filter participants - only send to those who haven't been invited or failed previous attempts
@@ -1268,7 +1269,7 @@ def send_bulk_invitations(campaign_id):
                     invitable_participants.append(cp)
         
         if not invitable_participants:
-            flash('Tous les participants ont déjà été invités avec succès.', 'info')
+            flash(_('All participants have already been successfully invited.'), 'info')
             return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
         
         # Create email delivery records and add to task queue
@@ -1335,7 +1336,7 @@ def send_bulk_invitations(campaign_id):
     except Exception as e:
         logger.error(f"Error sending bulk invitations for campaign {campaign_id}: {e}")
         db.session.rollback()
-        flash('Échec de l’envoi des invitations. Veuillez réessayer.', 'error')
+        flash(_('Failed to send invitations. Please try again.'), 'error')
         return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
 
 
@@ -1420,7 +1421,7 @@ def resend_failed_invitations(campaign_id):
     try:
         current_account = get_current_business_account()
         if not current_account:
-            flash('Contexte du compte entreprise introuvable.', 'error')
+            flash(_('Business account context not found.'), 'error')
             return redirect(url_for('business_auth.login'))
         
         # Get campaign (scoped to current business account)
@@ -1430,12 +1431,12 @@ def resend_failed_invitations(campaign_id):
         ).first()
         
         if not campaign:
-            flash('Campagne introuvable.', 'error')
+            flash(_('Campaign not found.'), 'error')
             return redirect(url_for('campaigns.list_campaigns'))
         
         # Check if email service is configured for this business account
         if not email_service.is_configured(current_account.id):
-            flash('Le service de messagerie n’est pas configuré. Veuillez d’abord configurer les paramètres SMTP.', 'error')
+            flash(_('The email service is not configured. Please configure your SMTP settings first.'), 'error')
             return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
         
         # Find failed email deliveries that can be retried
@@ -1449,7 +1450,7 @@ def resend_failed_invitations(campaign_id):
         ).all()
         
         if not failed_deliveries:
-            flash('Aucune invitation échouée ne peut être renvoyée.', 'info')
+            flash(_('No failed invitations can be resent.'), 'info')
             return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
         
         # Resend failed invitations
@@ -1484,7 +1485,7 @@ def resend_failed_invitations(campaign_id):
         if resent_count > 0:
             flash(f'Successfully queued {resent_count} failed invitation(s) for retry.', 'success')
         else:
-            flash('Aucune invitation n’a été mise en file d’attente pour un nouvel envoi.', 'warning')
+            flash(_('No invitations were queued for resend.'), 'warning')
         
         logger.info(f"Resent {resent_count} failed invitations for campaign '{campaign.name}' (ID: {campaign_id})")
         
@@ -1493,7 +1494,7 @@ def resend_failed_invitations(campaign_id):
     except Exception as e:
         logger.error(f"Error resending failed invitations for campaign {campaign_id}: {e}")
         db.session.rollback()
-        flash('Échec du renvoi des invitations. Veuillez réessayer.', 'error')
+        flash(_('Failed to resend invitations. Please try again.'), 'error')
         return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
 
 
@@ -1505,7 +1506,7 @@ def survey_config(campaign_id):
     try:
         current_account = get_current_business_account()
         if not current_account:
-            flash('Contexte du compte entreprise introuvable.', 'error')
+            flash(_('Business account context not found.'), 'error')
             return redirect(url_for('business_auth.login'))
         
         # Get campaign (scoped to current business account)
@@ -1515,7 +1516,7 @@ def survey_config(campaign_id):
         ).first()
         
         if not campaign:
-            flash('Campagne introuvable.', 'error')
+            flash(_('Campaign not found.'), 'error')
             return redirect(url_for('campaigns.list_campaigns'))
         
         # Import industry topic hints config for industry verticalization (Phase 2)
@@ -1571,7 +1572,7 @@ def survey_config(campaign_id):
         
     except Exception as e:
         logger.error(f"Survey config display error for campaign {campaign_id}: {e}")
-        flash('Erreur lors du chargement de la configuration de l’enquête.', 'error')
+        flash(_('Error loading survey configuration.'), 'error')
         return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
 
 
@@ -1583,7 +1584,7 @@ def save_survey_config(campaign_id):
     try:
         current_account = get_current_business_account()
         if not current_account:
-            flash('Contexte du compte entreprise introuvable.', 'error')
+            flash(_('Business account context not found.'), 'error')
             return redirect(url_for('business_auth.login'))
         
         # Get campaign (scoped to current business account)
@@ -1593,7 +1594,7 @@ def save_survey_config(campaign_id):
         ).first()
         
         if not campaign:
-            flash('Campagne introuvable.', 'error')
+            flash(_('Campaign not found.'), 'error')
             return redirect(url_for('campaigns.list_campaigns'))
         
         # Check if campaign can be modified
@@ -1630,24 +1631,24 @@ def save_survey_config(campaign_id):
             try:
                 max_questions = int(request.form.get('max_questions', 8))
                 if not (3 <= max_questions <= 15):
-                    flash('Le nombre maximal de questions doit être compris entre 3 et 15.', 'error')
+                    flash(_('The maximum number of questions must be between 3 and 15.'), 'error')
                     return redirect(url_for('campaigns.survey_config', campaign_id=campaign_id))
                 campaign.max_questions = max_questions
                 
                 max_duration = int(request.form.get('max_duration_seconds', 120))
                 if not (60 <= max_duration <= 300):
-                    flash('La durée maximale doit être comprise entre 60 et 300 secondes.', 'error')
+                    flash(_('The maximum duration must be between 60 and 300 seconds.'), 'error')
                     return redirect(url_for('campaigns.survey_config', campaign_id=campaign_id))
                 campaign.max_duration_seconds = max_duration
                 
                 max_follow_ups = int(request.form.get('max_follow_ups_per_topic', 2))
                 if not (1 <= max_follow_ups <= 3):
-                    flash('Le nombre maximal de relances par sujet doit être compris entre 1 et 3.', 'error')
+                    flash(_('The maximum number of follow-ups per topic must be between 1 and 3.'), 'error')
                     return redirect(url_for('campaigns.survey_config', campaign_id=campaign_id))
                 campaign.max_follow_ups_per_topic = max_follow_ups
                 
             except ValueError:
-                flash('Valeurs numériques invalides dans les contrôles de l’enquête.', 'error')
+                flash(_('Invalid numeric values in survey controls.'), 'error')
                 return redirect(url_for('campaigns.survey_config', campaign_id=campaign_id))
         
         # Topic Prioritization section - only save if not inheriting
@@ -1739,14 +1740,14 @@ def save_survey_config(campaign_id):
             logger.error(f"Failed to audit survey config update: {audit_error}")
         
         logger.info(f"Survey configuration updated for campaign '{campaign.name}' (ID: {campaign_id}) by business account {current_account.id}")
-        flash('Configuration de l’enquête enregistrée avec succès !', 'success')
+        flash(_('Survey configuration saved successfully!'), 'success')
         
         return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
         
     except Exception as e:
         logger.error(f"Error saving survey config for campaign {campaign_id}: {e}")
         db.session.rollback()
-        flash('Échec de l’enregistrement de la configuration de l’enquête. Veuillez réessayer.', 'error')
+        flash(_('Failed to save survey configuration. Please try again.'), 'error')
         return redirect(url_for('campaigns.survey_config', campaign_id=campaign_id))
 
 
@@ -1758,7 +1759,7 @@ def classic_survey_config(campaign_id):
     try:
         current_account = get_current_business_account()
         if not current_account:
-            flash('Contexte du compte entreprise introuvable.', 'error')
+            flash(_('Business account context not found.'), 'error')
             return redirect(url_for('business_auth.login'))
         
         campaign = Campaign.query.filter_by(
@@ -1767,7 +1768,7 @@ def classic_survey_config(campaign_id):
         ).first()
         
         if not campaign:
-            flash('Campagne introuvable.', 'error')
+            flash(_('Campaign not found.'), 'error')
             return redirect(url_for('campaigns.list_campaigns'))
         
         if campaign.survey_type != 'classic':
@@ -1776,7 +1777,7 @@ def classic_survey_config(campaign_id):
         
         classic_config = ClassicSurveyConfig.query.filter_by(campaign_id=campaign.id).first()
         if classic_config and classic_config.is_frozen():
-            flash('La configuration de l\'enquête est verrouillée car la campagne a été activée. Les modifications ne sont plus possibles.', 'warning')
+            flash(_('The survey configuration is locked because the campaign has been activated. No further changes are possible.'), 'warning')
             return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
         
         if not classic_config:
@@ -1810,7 +1811,7 @@ def classic_survey_config(campaign_id):
         
     except Exception as e:
         logger.error(f"Classic survey config display error for campaign {campaign_id}: {e}")
-        flash('Erreur lors du chargement de la configuration.', 'error')
+        flash(_('Error loading configuration.'), 'error')
         return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
 
 
@@ -1822,7 +1823,7 @@ def save_classic_survey_config(campaign_id):
     try:
         current_account = get_current_business_account()
         if not current_account:
-            flash('Contexte du compte entreprise introuvable.', 'error')
+            flash(_('Business account context not found.'), 'error')
             return redirect(url_for('business_auth.login'))
         
         campaign = Campaign.query.filter_by(
@@ -1831,7 +1832,7 @@ def save_classic_survey_config(campaign_id):
         ).first()
         
         if not campaign:
-            flash('Campagne introuvable.', 'error')
+            flash(_('Campaign not found.'), 'error')
             return redirect(url_for('campaigns.list_campaigns'))
         
         if campaign.survey_type != 'classic':
@@ -1840,11 +1841,11 @@ def save_classic_survey_config(campaign_id):
         
         classic_config = ClassicSurveyConfig.query.filter_by(campaign_id=campaign.id).first()
         if not classic_config:
-            flash('Configuration introuvable.', 'error')
+            flash(_('Configuration not found.'), 'error')
             return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
         
         if classic_config.is_frozen():
-            flash('La configuration est verrouillée car la campagne a été activée.', 'error')
+            flash(_('The configuration is locked because the campaign has been activated.'), 'error')
             return redirect(url_for('campaigns.classic_survey_config', campaign_id=campaign_id))
         
         has_responses = SurveyResponse.query.filter_by(campaign_id=campaign.id).count() > 0
@@ -2010,14 +2011,14 @@ def save_classic_survey_config(campaign_id):
             logger.error(f"Failed to audit classic survey config update: {audit_error}")
         
         logger.info(f"Classic survey config updated for campaign '{campaign.name}' (ID: {campaign_id}) by business account {current_account.id}")
-        flash('Configuration de l\'enquête classique enregistrée avec succès !', 'success')
+        flash(_('Classic survey configuration saved successfully!'), 'success')
         
         return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
         
     except Exception as e:
         logger.error(f"Error saving classic survey config for campaign {campaign_id}: {e}")
         db.session.rollback()
-        flash('Échec de l\'enregistrement de la configuration. Veuillez réessayer.', 'error')
+        flash(_('Failed to save configuration. Please try again.'), 'error')
         return redirect(url_for('campaigns.classic_survey_config', campaign_id=campaign_id))
 
 
@@ -2073,7 +2074,7 @@ def campaign_responses(campaign_id):
         if not current_account:
             if request.is_json:
                 return jsonify({'error': 'Business account context not found'}), 401
-            flash('Contexte du compte entreprise introuvable.', 'error')
+            flash(_('Business account context not found.'), 'error')
             return redirect(url_for('business_auth.login'))
         
         # Get campaign (scoped to current business account)
@@ -2085,7 +2086,7 @@ def campaign_responses(campaign_id):
         if not campaign:
             if request.is_json:
                 return jsonify({'error': 'Campaign not found'}), 404
-            flash('Campagne introuvable.', 'error')
+            flash(_('Campaign not found.'), 'error')
             return redirect(url_for('campaigns.list_campaigns'))
         
         # Get pagination parameters
@@ -2174,7 +2175,7 @@ def campaign_responses(campaign_id):
         logger.error(f"Error loading campaign responses for campaign {campaign_id}: {e}")
         if request.is_json:
             return jsonify({'error': 'Failed to load campaign responses'}), 500
-        flash('Erreur lors du chargement des réponses de la campagne.', 'error')
+        flash(_('Error loading campaign responses.'), 'error')
         return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
 
 
@@ -2188,7 +2189,7 @@ def individual_response(campaign_id, participant_id):
         if not current_account:
             if request.is_json:
                 return jsonify({'error': 'Business account context not found'}), 401
-            flash('Contexte du compte entreprise introuvable.', 'error')
+            flash(_('Business account context not found.'), 'error')
             return redirect(url_for('business_auth.login'))
         
         # Get campaign (scoped to current business account)
@@ -2200,7 +2201,7 @@ def individual_response(campaign_id, participant_id):
         if not campaign:
             if request.is_json:
                 return jsonify({'error': 'Campaign not found'}), 404
-            flash('Campagne introuvable.', 'error')
+            flash(_('Campaign not found.'), 'error')
             return redirect(url_for('campaigns.list_campaigns'))
         
         # Get the survey response for this participant in this campaign through campaign_participants
@@ -2217,7 +2218,7 @@ def individual_response(campaign_id, participant_id):
         if not survey_response:
             if request.is_json:
                 return jsonify({'error': 'Survey response not found for this participant'}), 404
-            flash('Réponse à l’enquête introuvable pour ce participant.', 'error')
+            flash(_('Survey response not found for this participant.'), 'error')
             return redirect(url_for('campaigns.campaign_responses', campaign_id=campaign_id))
         
         # Get participant through the campaign_participants relationship  
@@ -2230,7 +2231,7 @@ def individual_response(campaign_id, participant_id):
         if not campaign_participant:
             if request.is_json:
                 return jsonify({'error': 'Participant not found in this campaign'}), 404
-            flash('Participant introuvable dans cette campagne.', 'error')
+            flash(_('Participant not found in this campaign.'), 'error')
             return redirect(url_for('campaigns.campaign_responses', campaign_id=campaign_id))
         
         participant = campaign_participant.participant
@@ -2324,7 +2325,7 @@ def individual_response(campaign_id, participant_id):
         logger.error(f"Error loading individual response for participant {participant_id} in campaign {campaign_id}: {e}")
         if request.is_json:
             return jsonify({'error': 'Failed to load individual response'}), 500
-        flash('Erreur lors du chargement de la réponse individuelle.', 'error')
+        flash(_('Error loading individual response.'), 'error')
         return redirect(url_for('campaigns.campaign_responses', campaign_id=campaign_id))
 
 
@@ -2637,7 +2638,6 @@ def simulate_campaign(campaign_id):
 def get_timeline_data():
     """Get campaign timeline data for visualization"""
     try:
-        from flask_babel import gettext as _
         from dateutil.relativedelta import relativedelta
         
         current_account = get_current_business_account()

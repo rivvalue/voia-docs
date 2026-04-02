@@ -5200,7 +5200,7 @@ def save_survey_config():
     except Exception as e:
         logger.error(f"Error saving survey configuration: {e}")
         db.session.rollback()
-        flash('Échec de l’enregistrement de la configuration de l’enquête. Veuillez réessayer.', 'error')
+        flash(_('Failed to save survey configuration. Please try again.'), 'error')
         return redirect(url_for('business_auth.survey_config'))
 
 

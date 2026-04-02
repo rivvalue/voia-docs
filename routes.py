@@ -1,4 +1,5 @@
 from flask import render_template, request, jsonify, flash, redirect, url_for, g, session, send_file
+from flask_babel import gettext as _
 from app import app, db, cache
 # Models imported inside functions to avoid circular imports
 from models import SurveyResponse, Participant, CampaignParticipant, Campaign, BusinessAccount
@@ -1735,14 +1736,14 @@ def public_survey_response(response_id):
             else:
                 # Business user doesn't own this campaign
                 logger.warning(f"Business user {current_business_user.email} denied access to response {response_id} - not their campaign")
-                flash('Vous n’avez pas l’autorisation d’afficher cette réponse à l’enquête.', 'error')
+                flash(_('You do not have permission to view this survey response.'), 'error')
                 return redirect(url_for('business_auth.business_analytics'))
         
         # Check if this is a trial response (public access allowed)
         if response.campaign_participant_id is not None:
             # This is a business response and user is not authenticated - redirect to login
             logger.warning(f"Access denied to business response {response_id} - redirecting to login")
-            flash('Cette réponse à l’enquête nécessite une authentification. Veuillez vous connecter pour la consulter.', 'info')
+            flash(_('This survey response requires authentication. Please log in to view it.'), 'info')
             return redirect(url_for('business_auth.login'))
         
         # This is a trial response - allow public access
@@ -1784,7 +1785,7 @@ def public_survey_response(response_id):
     
     except Exception as e:
         logger.error(f"Error accessing survey response {response_id}: {e}")
-        flash('Réponse à l’enquête introuvable ou indisponible.', 'error')
+        flash(_('Survey response not found or unavailable.'), 'error')
         return redirect(url_for('dashboard'))
 
 @app.route('/dashboard')
@@ -4406,7 +4407,7 @@ def company_responses_page(company_name):
         # Get campaign ID from query parameter
         campaign_id = request.args.get('campaign', type=int)
         if not campaign_id:
-            flash('L’identifiant de la campagne est requis.', 'error')
+            flash(_('Campaign identifier is required.'), 'error')
             # Redirect based on auth status
             current_user_check = get_current_business_user()
             return redirect(url_for('executive_summary') if current_user_check else url_for('dashboard'))
@@ -4425,11 +4426,11 @@ def company_responses_page(company_name):
             if demo_account:
                 campaign = Campaign.query.filter_by(id=campaign_id, business_account_id=demo_account.id).first()
             else:
-                flash('Compte de démonstration non disponible.', 'error')
+                flash(_('Demo account not available.'), 'error')
                 return redirect(url_for('dashboard'))  # Public users only reach here
         
         if not campaign:
-            flash('Campagne introuvable ou inaccessible.', 'error')
+            flash(_('Campaign not found or inaccessible.'), 'error')
             return redirect(url_for('executive_summary') if current_business_user else url_for('dashboard'))
         
         # Check if user is authenticated as business user
@@ -4474,7 +4475,7 @@ def company_responses_page(company_name):
     
     except Exception as e:
         logger.error(f"Error loading company responses page: {e}")
-        flash('Erreur lors du chargement des réponses de l’entreprise.', 'error')
+        flash(_('Error loading company responses.'), 'error')
         # Redirect based on authentication  
         current_user_check = get_current_business_user()
         return redirect(url_for('executive_summary') if current_user_check else url_for('dashboard'))
