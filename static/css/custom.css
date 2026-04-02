@@ -12539,6 +12539,19 @@ thead th.th-c2 {
     filter: blur(1.5px);
 }
 
+/* Strategic Accounts tab - KPI cards and account cards */
+.demo-blur-active #strategic-accounts .kpi-card,
+.demo-blur-active #strategic-accounts .card {
+    filter: blur(2.5px);
+    transition: filter 0.2s ease;
+    pointer-events: none;
+}
+
+.demo-blur-active #strategic-accounts .kpi-card:hover,
+.demo-blur-active #strategic-accounts .card:hover {
+    filter: blur(1.5px);
+}
+
 /* Company Responses page - blur all content when demo blur active */
 .demo-blur-active .company-responses-blur-target {
     filter: blur(2.5px);
