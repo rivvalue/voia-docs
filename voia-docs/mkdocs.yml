@@ -46,6 +46,7 @@ plugins:
             - Overview: overview.md
             - Getting Started: index.md
             - Features: features.md
+            - QBR Intelligence: qbr.md
             - Licenses: licenses.md
         - locale: fr
           name: Français
@@ -54,6 +55,7 @@ plugins:
             - Présentation: overview.md
             - Démarrage: index.md
             - Fonctionnalités: features.md
+            - Intelligence QBR: qbr.md
             - Licences: licenses.md
 
 markdown_extensions:
