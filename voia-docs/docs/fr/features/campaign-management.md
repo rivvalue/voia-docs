@@ -24,29 +24,31 @@ Une campagne en état Prêt ne peut pas être activée tant qu'elle n'a pas fran
 
 **Une seule campagne active à la fois**
 
-Par défaut, un seul campagne peut être active à la fois par compte. Si votre équipe a besoin d'exécuter plusieurs campagnes simultanément, l'activation parallèle est disponible sur demande — contactez votre administrateur de compte ou le support VOÏA.
+Par défaut, une seule campagne peut être active à la fois par compte. Si votre équipe a besoin d'exécuter plusieurs campagnes simultanément, l'activation parallèle est disponible sur demande — contactez votre administrateur de compte ou le support VOÏA.
 
 ---
 
 ## Création d'une campagne
 
-**1. Informations**
-- Nom
-- Dates
-- Description
+**Étape 1 : Informations de base**
+- Nom de la campagne
+- Date de début (envoi des invitations)
+- Date de fin (dernier jour pour répondre)
+- Description (notes internes)
 
-**2. Type de sondage**
-- Classique
-- Conversationnel
+**Étape 2 : Type de sondage**
+- **Sondage classique :** Questions fixes
+- **Sondage conversationnel :** Conversations pilotées par l'IA
 
-**3. Personnalisation**
-- Questions
-- Durée estimée
-- Branding
+**Étape 3 : Personnalisation**
+- Personnaliser les questions
+- Définir la durée estimée de complétion
+- Ajouter votre image de marque
 - **Indices de sujets personnalisés (JSON) :** Guidez optionnellement l'IA vers des sujets spécifiques en saisissant une liste JSON d'indices. Le champ dispose d'un bouton info (?) qui ouvre un exemple formaté illustrant la structure JSON correcte. À l'intérieur de ce panneau d'exemple, un bouton **Copier le JSON** vous permet de copier le modèle directement dans votre presse-papiers pour l'adapter sans avoir à saisir le format manuellement.
 
-**4. Participants**
-- Import CSV ou ajout manuel
+**Étape 4 : Assignation des participants**
+- Choisir qui reçoit le sondage
+- Importer via CSV ou ajouter manuellement
 
 ---
 
@@ -54,24 +56,43 @@ Par défaut, un seul campagne peut être active à la fois par compte. Si votre 
 
 Le mode simulation vous permet de vivre l'expérience du sondage exactement comme un répondant, avant l'envoi de toute invitation réelle. C'est une étape obligatoire de la porte de validation — vous ne pouvez pas activer une campagne sans avoir effectué une simulation.
 
-**Lancement d'une simulation**
+**Ce qu'est la simulation**
+
+La simulation lance un aperçu interactif en direct du sondage, en utilisant le même moteur IA et la même configuration que ceux rencontrés par les vrais répondants. Pour les sondages conversationnels, l'IA mène la conversation complète. Pour les sondages classiques, vous parcourez le questionnaire tel qu'il apparaîtra aux participants.
+
+**Pourquoi elle existe**
+
+La simulation vous protège d'envoyer un sondage mal configuré ou confus à vos clients. Elle donne à votre équipe la certitude que les questions sont bien formulées, que le déroulement est logique et que le sondage se comporte comme prévu — avant qu'une seule invitation ne soit envoyée.
+
+**Comment lancer une simulation**
 
 1. Ouvrir une campagne en état Brouillon ou Prêt
-2. Cliquer sur **Simuler** (ou **Aperçu** pour les sondages classiques)
-3. Compléter le sondage comme un répondant
+2. Cliquer sur **Simuler** (ou **Aperçu** pour les sondages classiques) dans la vue détail de la campagne
+3. Compléter le sondage comme un répondant — essayez différentes réponses pour tester le comportement de relance de l'IA
 4. Confirmer la fin de la simulation — le statut de validation passe à **Simulée, non validée**
 
-**Validation par le gestionnaire**
+**Ce que voit le gestionnaire**
 
-Après la simulation, le gestionnaire examine la campagne et clique sur **Valider** pour passer le statut à **Prête à activer**.
+Après la simulation, la page détail de la campagne affiche l'horodatage de la simulation et le badge de statut de validation. Le gestionnaire peut alors examiner les résultats et cliquer sur **Valider** pour faire passer le statut à **Prête à activer**.
+
+**Tester différentes personas de répondants**
+
+Pour les sondages conversationnels, vous pouvez exécuter la simulation plusieurs fois en utilisant différentes personas simulées — par exemple, un promoteur satisfait, un passif neutre ou un détracteur frustré — pour vérifier que l'IA adapte bien ses questions de relance à chaque scénario. Chaque exécution met à jour l'horodatage de simulation.
 
 **Prérequis pour l'activation**
 
-Le bouton Activer reste désactivé tant que les deux étapes ne sont pas complètes : la simulation doit être terminée et un gestionnaire doit avoir validé la campagne.
+Le bouton Activer reste désactivé tant que les deux étapes ne sont pas complètes : la simulation doit être terminée et un gestionnaire doit avoir validé la campagne. Une fois les deux conditions remplies, le bouton Activer devient disponible.
 
 ---
 
 ## Relances automatiques
 
-- Rappel mi-campagne
-- Dernière relance avant clôture
+VOÏA envoie automatiquement des emails de relance pour augmenter les taux de réponse :
+
+**Rappel mi-campagne**  
+Envoyé à mi-parcours de votre campagne (ex. : jour 45 d'une campagne de 90 jours)
+
+**Dernière relance**  
+Envoyée 7 à 14 jours avant la clôture de la campagne (vous choisissez)
+
+**Automatique et intelligent** — Aucune intervention manuelle requise.
