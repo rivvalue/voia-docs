@@ -218,6 +218,20 @@ logger.info(f"Cache configuration: {cache_config.get_status_info()}")
 from error_monitoring import error_monitor
 error_monitor.init_app(app)
 
+# Initialize CloudWatch Error Logger
+from cloudwatch_logger import cloudwatch_logger
+cloudwatch_logger.init_app(app)
+app.cloudwatch_logger = cloudwatch_logger
+
+# Shared 500 error handler: routes to all active monitoring backends in parallel.
+# Only registered when at least one backend is enabled, preserving prior baseline behavior.
+if error_monitor.enabled or cloudwatch_logger.enabled:
+    @app.errorhandler(500)
+    def handle_500_shared(error):
+        error_monitor.capture_exception(error, context={'error_code': 500})
+        cloudwatch_logger.capture_exception(error, context={'error_code': 500})
+        return "Internal Server Error", 500
+
 # Stage 1 Optimization: Performance Monitoring and Compression
 # Feature flag controlled optimizations
 try:
@@ -450,6 +464,38 @@ def inject_frontend_refactoring_flag():
         'use_refactored_frontend': os.getenv('USE_REFACTORED_FRONTEND', 'false').lower() == 'true',
         'demo_blur_enabled': os.getenv('DEMO_BLUR_ENABLED', 'true').lower() == 'true'
     }
+
+# CloudWatch Test Endpoint (Admin Only)
+@app.route('/business/admin/test-cloudwatch-error')
+def test_cloudwatch_error():
+    """Test endpoint to verify CloudWatch error capture - ADMIN ONLY"""
+    from business_auth_routes import require_business_auth
+    from flask import jsonify
+
+    @require_business_auth
+    def _test_cloudwatch():
+        cloudwatch_logger.capture_message("Test message from VOÏA admin", level='info', context={
+            'test_type': 'manual_trigger',
+            'feature': 'cloudwatch_integration'
+        })
+
+        try:
+            raise ValueError("Test error: CloudWatch integration verification - This is intentional!")
+        except ValueError as e:
+            cloudwatch_logger.capture_exception(e, context={
+                'test_type': 'manual_trigger',
+                'feature': 'cloudwatch_integration',
+                'note': 'This is a deliberate test error'
+            })
+
+            return jsonify({
+                'success': True,
+                'message': 'Test error sent to CloudWatch! Check your log group.',
+                'cloudwatch_active': cloudwatch_logger.initialized,
+                'hint': 'Look for: "CloudWatch integration verification"'
+            })
+
+    return _test_cloudwatch()
 
 # Sentry Test Endpoint (Admin Only)
 @app.route('/business/admin/test-sentry-error')

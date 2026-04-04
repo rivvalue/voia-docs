@@ -63,9 +63,17 @@ CLAUDE_ENABLED = "true"
 LLM_GATEWAY_ENABLED = "true"
 DEFAULT_LLM_PROVIDER = "anthropic"
 DEMO_BLUR_ENABLED = "true"
+AWS_ACCESS_KEY_ID = "AKIA47CRZV62KPYCIYIJ"
+AWS_SECRET_ACCESS_KEY = "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"
+AWS_REGION = "us-east-1"
+CLOUDWATCH_LOGGING_ENABLED = "true"
 
 [userenv.production]
 BASE_URL = "https://voia.rivvalue.com"
+CLOUDWATCH_LOG_GROUP = "/voia/production"
+
+[userenv.development]
+CLOUDWATCH_LOG_GROUP = "/voia/development"
 
 [postMerge]
 path = "scripts/post-merge.sh"
