@@ -888,43 +888,53 @@
 <li><strong>Prête à activer</strong> — Les deux étapes sont complètes. Le bouton Activer est maintenant disponible.</li>
 </ul>
 <p><strong>Une seule campagne active à la fois</strong></p>
-<p>Par défaut, un seul campagne peut être active à la fois par compte. Si votre équipe a besoin d'exécuter plusieurs campagnes simultanément, l'activation parallèle est disponible sur demande — contactez votre administrateur de compte ou le support VOÏA.</p>
+<p>Par défaut, une seule campagne peut être active à la fois par compte. Si votre équipe a besoin d'exécuter plusieurs campagnes simultanément, l'activation parallèle est disponible sur demande — contactez votre administrateur de compte ou le support VOÏA.</p>
 <hr />
 <h2 id="creation-dune-campagne">Création d'une campagne<a class="headerlink" href="#creation-dune-campagne" title="Permanent link">&para;</a></h2>
-<p><strong>1. Informations</strong>
-- Nom
-- Dates
-- Description</p>
-<p><strong>2. Type de sondage</strong>
-- Classique
-- Conversationnel</p>
-<p><strong>3. Personnalisation</strong>
-- Questions
-- Durée estimée
-- Branding
+<p><strong>Étape 1 : Informations de base</strong>
+- Nom de la campagne
+- Date de début (envoi des invitations)
+- Date de fin (dernier jour pour répondre)
+- Description (notes internes)</p>
+<p><strong>Étape 2 : Type de sondage</strong>
+- <strong>Sondage classique :</strong> Questions fixes
+- <strong>Sondage conversationnel :</strong> Conversations pilotées par l'IA</p>
+<p><strong>Étape 3 : Personnalisation</strong>
+- Personnaliser les questions
+- Définir la durée estimée de complétion
+- Ajouter votre image de marque
 - <strong>Indices de sujets personnalisés (JSON) :</strong> Guidez optionnellement l'IA vers des sujets spécifiques en saisissant une liste JSON d'indices. Le champ dispose d'un bouton info (?) qui ouvre un exemple formaté illustrant la structure JSON correcte. À l'intérieur de ce panneau d'exemple, un bouton <strong>Copier le JSON</strong> vous permet de copier le modèle directement dans votre presse-papiers pour l'adapter sans avoir à saisir le format manuellement.</p>
-<p><strong>4. Participants</strong>
-- Import CSV ou ajout manuel</p>
+<p><strong>Étape 4 : Assignation des participants</strong>
+- Choisir qui reçoit le sondage
+- Importer via CSV ou ajouter manuellement</p>
 <hr />
 <h2 id="mode-simulation-de-sondage">Mode simulation de sondage<a class="headerlink" href="#mode-simulation-de-sondage" title="Permanent link">&para;</a></h2>
 <p>Le mode simulation vous permet de vivre l'expérience du sondage exactement comme un répondant, avant l'envoi de toute invitation réelle. C'est une étape obligatoire de la porte de validation — vous ne pouvez pas activer une campagne sans avoir effectué une simulation.</p>
-<p><strong>Lancement d'une simulation</strong></p>
+<p><strong>Ce qu'est la simulation</strong></p>
+<p>La simulation lance un aperçu interactif en direct du sondage, en utilisant le même moteur IA et la même configuration que ceux rencontrés par les vrais répondants. Pour les sondages conversationnels, l'IA mène la conversation complète. Pour les sondages classiques, vous parcourez le questionnaire tel qu'il apparaîtra aux participants.</p>
+<p><strong>Pourquoi elle existe</strong></p>
+<p>La simulation vous protège d'envoyer un sondage mal configuré ou confus à vos clients. Elle donne à votre équipe la certitude que les questions sont bien formulées, que le déroulement est logique et que le sondage se comporte comme prévu — avant qu'une seule invitation ne soit envoyée.</p>
+<p><strong>Comment lancer une simulation</strong></p>
 <ol>
 <li>Ouvrir une campagne en état Brouillon ou Prêt</li>
-<li>Cliquer sur <strong>Simuler</strong> (ou <strong>Aperçu</strong> pour les sondages classiques)</li>
-<li>Compléter le sondage comme un répondant</li>
+<li>Cliquer sur <strong>Simuler</strong> (ou <strong>Aperçu</strong> pour les sondages classiques) dans la vue détail de la campagne</li>
+<li>Compléter le sondage comme un répondant — essayez différentes réponses pour tester le comportement de relance de l'IA</li>
 <li>Confirmer la fin de la simulation — le statut de validation passe à <strong>Simulée, non validée</strong></li>
 </ol>
-<p><strong>Validation par le gestionnaire</strong></p>
-<p>Après la simulation, le gestionnaire examine la campagne et clique sur <strong>Valider</strong> pour passer le statut à <strong>Prête à activer</strong>.</p>
+<p><strong>Ce que voit le gestionnaire</strong></p>
+<p>Après la simulation, la page détail de la campagne affiche l'horodatage de la simulation et le badge de statut de validation. Le gestionnaire peut alors examiner les résultats et cliquer sur <strong>Valider</strong> pour faire passer le statut à <strong>Prête à activer</strong>.</p>
+<p><strong>Tester différentes personas de répondants</strong></p>
+<p>Pour les sondages conversationnels, vous pouvez exécuter la simulation plusieurs fois en utilisant différentes personas simulées — par exemple, un promoteur satisfait, un passif neutre ou un détracteur frustré — pour vérifier que l'IA adapte bien ses questions de relance à chaque scénario. Chaque exécution met à jour l'horodatage de simulation.</p>
 <p><strong>Prérequis pour l'activation</strong></p>
-<p>Le bouton Activer reste désactivé tant que les deux étapes ne sont pas complètes : la simulation doit être terminée et un gestionnaire doit avoir validé la campagne.</p>
+<p>Le bouton Activer reste désactivé tant que les deux étapes ne sont pas complètes : la simulation doit être terminée et un gestionnaire doit avoir validé la campagne. Une fois les deux conditions remplies, le bouton Activer devient disponible.</p>
 <hr />
 <h2 id="relances-automatiques">Relances automatiques<a class="headerlink" href="#relances-automatiques" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Rappel mi-campagne</li>
-<li>Dernière relance avant clôture</li>
-</ul>
+<p>VOÏA envoie automatiquement des emails de relance pour augmenter les taux de réponse :</p>
+<p><strong>Rappel mi-campagne</strong><br />
+Envoyé à mi-parcours de votre campagne (ex. : jour 45 d'une campagne de 90 jours)</p>
+<p><strong>Dernière relance</strong><br />
+Envoyée 7 à 14 jours avant la clôture de la campagne (vous choisissez)</p>
+<p><strong>Automatique et intelligent</strong> — Aucune intervention manuelle requise.</p>
 
 
 
