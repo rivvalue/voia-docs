@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#campaign-management" class="md-skip">
+        <a href="#gestion-des-campagnes" class="md-skip">
           Aller au contenu
         </a>
       
@@ -512,36 +512,36 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#campaign-lifecycle" class="md-nav__link">
+  <a href="#cycle-de-vie" class="md-nav__link">
     <span class="md-ellipsis">
-      Campaign Lifecycle
+      Cycle de vie
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#creating-a-campaign" class="md-nav__link">
+  <a href="#creation-dune-campagne" class="md-nav__link">
     <span class="md-ellipsis">
-      Creating a Campaign
+      Création d'une campagne
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#survey-simulation-mode" class="md-nav__link">
+  <a href="#mode-simulation-de-sondage" class="md-nav__link">
     <span class="md-ellipsis">
-      Survey Simulation Mode
+      Mode simulation de sondage
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#automated-reminders" class="md-nav__link">
+  <a href="#relances-automatiques" class="md-nav__link">
     <span class="md-ellipsis">
-      Automated Reminders
+      Relances automatiques
     </span>
   </a>
   
@@ -819,36 +819,36 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#campaign-lifecycle" class="md-nav__link">
+  <a href="#cycle-de-vie" class="md-nav__link">
     <span class="md-ellipsis">
-      Campaign Lifecycle
+      Cycle de vie
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#creating-a-campaign" class="md-nav__link">
+  <a href="#creation-dune-campagne" class="md-nav__link">
     <span class="md-ellipsis">
-      Creating a Campaign
+      Création d'une campagne
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#survey-simulation-mode" class="md-nav__link">
+  <a href="#mode-simulation-de-sondage" class="md-nav__link">
     <span class="md-ellipsis">
-      Survey Simulation Mode
+      Mode simulation de sondage
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#automated-reminders" class="md-nav__link">
+  <a href="#relances-automatiques" class="md-nav__link">
     <span class="md-ellipsis">
-      Automated Reminders
+      Relances automatiques
     </span>
   </a>
   
@@ -870,71 +870,61 @@
 
 
 
-<h1 id="campaign-management">Campaign Management<a class="headerlink" href="#campaign-management" title="Permanent link">&para;</a></h1>
+<h1 id="gestion-des-campagnes">Gestion des campagnes<a class="headerlink" href="#gestion-des-campagnes" title="Permanent link">&para;</a></h1>
 <hr />
-<h2 id="campaign-lifecycle">Campaign Lifecycle<a class="headerlink" href="#campaign-lifecycle" title="Permanent link">&para;</a></h2>
-<p>Every campaign moves through a defined workflow that includes a mandatory vetting gate between Ready and Active:</p>
-<p><strong>Draft</strong> → Create and configure your survey<br />
-<strong>Ready</strong> → Review your campaign and complete the vetting gate<br />
-<strong>[Vetting gate]</strong> → Simulate the survey, then have a manager validate it<br />
-<strong>Active</strong> → Survey is live, collecting responses<br />
-<strong>Completed</strong> → Campaign closed, final reports available</p>
-<p>The campaign list shows each campaign's current status. A lifecycle help tooltip is available at the <strong>Status</strong> column header — click or hover the header to see a description of every stage. This tooltip appears once at the column level rather than on each individual campaign row. Each campaign row also displays action buttons (View, Insights, Participants, Export, Report) that are all rendered at equal width, so the controls remain visually consistent and easy to scan regardless of label length.</p>
-<p><strong>Vetting gate — required before activation</strong></p>
-<p>A campaign in the Ready state cannot be activated until it passes a two-step vetting gate. The gate has three possible statuses:</p>
+<h2 id="cycle-de-vie">Cycle de vie<a class="headerlink" href="#cycle-de-vie" title="Permanent link">&para;</a></h2>
+<p>Chaque campagne suit un processus défini incluant une porte de validation obligatoire entre Prêt et Actif :</p>
+<p><strong>Brouillon</strong> → Créer et configurer le sondage<br />
+<strong>Prêt</strong> → Réviser et compléter la porte de validation<br />
+<strong>[Porte de validation]</strong> → Simuler le sondage, puis le faire valider par un gestionnaire<br />
+<strong>Actif</strong> → Sondage en cours, collecte des réponses<br />
+<strong>Terminé</strong> → Campagne clôturée, rapports finaux disponibles</p>
+<p>La liste des campagnes indique le statut actuel de chaque campagne. Une infobulle d'aide sur le cycle de vie est disponible dans l'en-tête de la colonne <strong>Statut</strong> — survolez ou cliquez sur l'en-tête pour voir la description de chaque étape. Cette infobulle apparaît une seule fois au niveau de la colonne, et non sur chaque ligne de campagne. Chaque ligne affiche également des boutons d'action (Voir, Insights, Participants, Exporter, Rapport) dont la largeur est uniforme, ce qui assure une présentation visuelle cohérente quelle que soit la longueur du libellé.</p>
+<p><strong>Porte de validation — obligatoire avant l'activation</strong></p>
+<p>Une campagne en état Prêt ne peut pas être activée tant qu'elle n'a pas franchi une porte de validation en deux étapes. La porte comporte trois statuts possibles :</p>
 <ul>
-<li><strong>Not simulated</strong> — The campaign has not yet been simulated. You must run a simulation before the Activate button becomes available.</li>
-<li><strong>Simulated, not validated</strong> — The simulation is complete, but a manager has not yet reviewed and validated the results. Validation is required before activation.</li>
-<li><strong>Ready to activate</strong> — Both steps are complete. The Activate button is now available.</li>
+<li><strong>Non simulée</strong> — La campagne n'a pas encore été simulée. La simulation est requise avant que le bouton Activer devienne disponible.</li>
+<li><strong>Simulée, non validée</strong> — La simulation est terminée, mais un gestionnaire n'a pas encore validé la campagne. La validation est requise avant l'activation.</li>
+<li><strong>Prête à activer</strong> — Les deux étapes sont complètes. Le bouton Activer est maintenant disponible.</li>
 </ul>
-<p><strong>Single active campaign per account</strong></p>
-<p>By default, only one campaign can be active at a time per account. Attempting to activate a second campaign while one is already active will be blocked. If your team needs to run multiple campaigns simultaneously, parallel campaign activation is available on request — contact your account administrator or VOÏA support to enable it.</p>
+<p><strong>Une seule campagne active à la fois</strong></p>
+<p>Par défaut, un seul campagne peut être active à la fois par compte. Si votre équipe a besoin d'exécuter plusieurs campagnes simultanément, l'activation parallèle est disponible sur demande — contactez votre administrateur de compte ou le support VOÏA.</p>
 <hr />
-<h2 id="creating-a-campaign">Creating a Campaign<a class="headerlink" href="#creating-a-campaign" title="Permanent link">&para;</a></h2>
-<p><strong>Step 1: Basic Information</strong>
-- Campaign name
-- Start date (when invitations send)
-- End date (last day to respond)
-- Description (internal notes)</p>
-<p><strong>Step 2: Survey Type</strong>
-- <strong>Traditional Survey:</strong> Fixed questions
-- <strong>Conversational Survey:</strong> AI-powered conversations</p>
-<p><strong>Step 3: Customization</strong>
-- Customize questions
-- Set completion time estimate
-- Add your branding
-- <strong>Custom Topic Hints (JSON):</strong> Optionally guide the AI toward specific topics by entering a JSON list of hints. The field includes an info (?) button that opens a formatted example showing the correct JSON structure. Inside that example panel, a <strong>Copy JSON</strong> button lets you copy the sample directly to your clipboard so you can adapt it without typing the format from scratch.</p>
-<p><strong>Step 4: Participant Assignment</strong>
-- Choose who receives the survey
-- Import from CSV or add manually</p>
+<h2 id="creation-dune-campagne">Création d'une campagne<a class="headerlink" href="#creation-dune-campagne" title="Permanent link">&para;</a></h2>
+<p><strong>1. Informations</strong>
+- Nom
+- Dates
+- Description</p>
+<p><strong>2. Type de sondage</strong>
+- Classique
+- Conversationnel</p>
+<p><strong>3. Personnalisation</strong>
+- Questions
+- Durée estimée
+- Branding
+- <strong>Indices de sujets personnalisés (JSON) :</strong> Guidez optionnellement l'IA vers des sujets spécifiques en saisissant une liste JSON d'indices. Le champ dispose d'un bouton info (?) qui ouvre un exemple formaté illustrant la structure JSON correcte. À l'intérieur de ce panneau d'exemple, un bouton <strong>Copier le JSON</strong> vous permet de copier le modèle directement dans votre presse-papiers pour l'adapter sans avoir à saisir le format manuellement.</p>
+<p><strong>4. Participants</strong>
+- Import CSV ou ajout manuel</p>
 <hr />
-<h2 id="survey-simulation-mode">Survey Simulation Mode<a class="headerlink" href="#survey-simulation-mode" title="Permanent link">&para;</a></h2>
-<p>Survey Simulation Mode lets you experience your campaign's survey exactly as a respondent would, before any real invitations are sent. It is a required step in the vetting gate — you cannot activate a campaign until a simulation has been completed.</p>
-<p><strong>What simulation is</strong></p>
-<p>Simulation runs a live, interactive preview of the survey using the same AI engine and configuration that real respondents will encounter. For conversational surveys, the AI conducts the full conversation. For classic surveys, you walk through the complete questionnaire as it will appear to participants.</p>
-<p><strong>Why it exists</strong></p>
-<p>Simulation protects you from sending a misconfigured or confusing survey to your customer base. It gives your team confidence that questions are phrased correctly, the flow makes sense, and the survey behaves as intended — all before a single invitation goes out.</p>
-<p><strong>How to launch a simulation</strong></p>
+<h2 id="mode-simulation-de-sondage">Mode simulation de sondage<a class="headerlink" href="#mode-simulation-de-sondage" title="Permanent link">&para;</a></h2>
+<p>Le mode simulation vous permet de vivre l'expérience du sondage exactement comme un répondant, avant l'envoi de toute invitation réelle. C'est une étape obligatoire de la porte de validation — vous ne pouvez pas activer une campagne sans avoir effectué une simulation.</p>
+<p><strong>Lancement d'une simulation</strong></p>
 <ol>
-<li>Open a campaign in Draft or Ready status</li>
-<li>Click <strong>Simulate</strong> (or <strong>Preview</strong> for classic surveys) in the campaign detail view</li>
-<li>Complete the survey as a respondent would — try different answers to test the AI's follow-up behavior</li>
-<li>When finished, confirm that the simulation is complete; the campaign's vetting status updates to <strong>Simulated, not validated</strong></li>
+<li>Ouvrir une campagne en état Brouillon ou Prêt</li>
+<li>Cliquer sur <strong>Simuler</strong> (ou <strong>Aperçu</strong> pour les sondages classiques)</li>
+<li>Compléter le sondage comme un répondant</li>
+<li>Confirmer la fin de la simulation — le statut de validation passe à <strong>Simulée, non validée</strong></li>
 </ol>
-<p><strong>What the manager sees</strong></p>
-<p>After simulation, the campaign detail page shows the simulation timestamp and the current vetting status badge. The manager can then review the results and click <strong>Validate</strong> to move the status to <strong>Ready to activate</strong>.</p>
-<p><strong>Testing different respondent personas</strong></p>
-<p>For conversational surveys, you can run the simulation multiple times using different simulated personas — for example, a satisfied promoter, a neutral passive, or a frustrated detractor — to verify that the AI adapts its follow-up questions appropriately for each scenario. Each run updates the simulation timestamp.</p>
-<p><strong>Prerequisite for activation</strong></p>
-<p>The Activate button remains disabled until both steps of the vetting gate are complete: the simulation must be finished and a manager must have validated the campaign. Once both conditions are met, the Activate button becomes available.</p>
+<p><strong>Validation par le gestionnaire</strong></p>
+<p>Après la simulation, le gestionnaire examine la campagne et clique sur <strong>Valider</strong> pour passer le statut à <strong>Prête à activer</strong>.</p>
+<p><strong>Prérequis pour l'activation</strong></p>
+<p>Le bouton Activer reste désactivé tant que les deux étapes ne sont pas complètes : la simulation doit être terminée et un gestionnaire doit avoir validé la campagne.</p>
 <hr />
-<h2 id="automated-reminders">Automated Reminders<a class="headerlink" href="#automated-reminders" title="Permanent link">&para;</a></h2>
-<p>VOÏA automatically sends reminder emails to boost response rates:</p>
-<p><strong>Midpoint Reminder</strong><br />
-Sent halfway through your campaign (e.g., Day 45 of a 90-day campaign)</p>
-<p><strong>Last Chance Reminder</strong><br />
-Sent 7-14 days before campaign closes (you choose)</p>
-<p><strong>Automatic and smart</strong> - No manual work needed.</p>
+<h2 id="relances-automatiques">Relances automatiques<a class="headerlink" href="#relances-automatiques" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Rappel mi-campagne</li>
+<li>Dernière relance avant clôture</li>
+</ul>
 
 
 

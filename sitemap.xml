@@ -29,13 +29,6 @@
         <xhtml:link rel="alternate" hreflang="fr" href="https://voia-docs.rivvalue.com/fr/overview/"/>
     </url>
     <url>
-        <loc>https://voia-docs.rivvalue.com/qbr/</loc>
-        <lastmod>2026-04-04</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="https://voia-docs.rivvalue.com/qbr/"/>
-        <xhtml:link rel="alternate" hreflang="fr" href="https://voia-docs.rivvalue.com/fr/qbr/"/>
-    </url>
-    <url>
         <loc>https://voia-docs.rivvalue.com/features/ai-survey-intelligence/</loc>
         <lastmod>2026-04-04</lastmod>
         <changefreq>daily</changefreq>
@@ -139,13 +132,6 @@
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="fr" href="https://voia-docs.rivvalue.com/fr/overview/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://voia-docs.rivvalue.com/overview/"/>
-    </url>
-    <url>
-        <loc>https://voia-docs.rivvalue.com/fr/qbr/</loc>
-        <lastmod>2026-04-04</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="fr" href="https://voia-docs.rivvalue.com/fr/qbr/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://voia-docs.rivvalue.com/qbr/"/>
     </url>
     <url>
         <loc>https://voia-docs.rivvalue.com/fr/features/ai-survey-intelligence/</loc>
