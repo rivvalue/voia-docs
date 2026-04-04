@@ -38,25 +38,47 @@ plugins:
       reconfigure_material: true
       reconfigure_search: true
       languages:
-        - locale: en
-          default: true
-          name: English
-          build: true
-          nav:
-            - Overview: overview.md
-            - Getting Started: index.md
-            - Features: features.md
-            - QBR Intelligence: qbr.md
-            - Licenses: licenses.md
-        - locale: fr
-          name: Français
-          build: true
-          nav:
-            - Présentation: overview.md
-            - Démarrage: index.md
-            - Fonctionnalités: features.md
-            - Intelligence QBR: qbr.md
-            - Licences: licenses.md
+         - locale: en
+           default: true
+           name: English
+           build: true
+           nav:
+             - Overview: overview.md
+             - Getting Started: index.md
+             - Features:
+               - Overview: features.md
+               - AI Survey Intelligence: features/ai-survey-intelligence.md
+               - Campaign Management: features/campaign-management.md
+               - Participant Management: features/participant-management.md
+               - Analytics & BI: features/analytics.md
+               - Communication & Email: features/communication.md
+               - User Management: features/user-management.md
+               - Branding & Customization: features/branding.md
+               - Security & Privacy: features/security.md
+               - Data Export & Integration: features/data-export.md
+               - QBR Intelligence: features/qbr.md
+               - Getting Support: features/support.md
+             - Licenses: licenses.md
+         - locale: fr
+           name: Français
+           build: true
+           nav:
+             - Présentation: overview.md
+             - Démarrage: index.md
+             - Fonctionnalités:
+               - Aperçu: features.md
+               - Intelligence IA: features/ai-survey-intelligence.md
+               - Gestion des campagnes: features/campaign-management.md
+               - Gestion des participants: features/participant-management.md
+               - Analytique & BI: features/analytics.md
+               - Communication & Courriel: features/communication.md
+               - Gestion des utilisateurs: features/user-management.md
+               - Image de marque: features/branding.md
+               - Sécurité & Confidentialité: features/security.md
+               - Export & Intégration: features/data-export.md
+               - Intelligence QBR: features/qbr.md
+               - Assistance: features/support.md
+             - Licences: licenses.md
 
 markdown_extensions:
   - admonition

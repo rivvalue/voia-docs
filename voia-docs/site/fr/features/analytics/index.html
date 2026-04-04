@@ -1,0 +1,1182 @@
+
+<!doctype html>
+<html lang="fr" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Voice of Client - AI-Powered Voice Of Client Platform for B2B.">
+      
+      
+        <meta name="author" content="VOÏA Platform">
+      
+      
+        <link rel="canonical" href="https://voia-docs.rivvalue.com/fr/features/analytics/">
+      
+      
+        <link rel="prev" href="../participant-management/">
+      
+      
+        <link rel="next" href="../communication/">
+      
+      
+      <link rel="icon" href="../../../assets/logo.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.23">
+    
+    
+      
+        <title>Analytique & BI - VOÏA Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.84d31ad4.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Karla:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Karla";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../overrides/custom.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#analytics-business-intelligence" class="md-skip">
+          Aller au contenu
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="En-tête">
+    <a href="../../" title="VOÏA Documentation" class="md-header__button md-logo" aria-label="VOÏA Documentation" data-md-component="logo">
+      
+  <img src="../../../assets/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            VOÏA Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Analytique & BI
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Sélectionner la langue">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="../../../features/analytics/" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="fr" class="md-select__link">
+              Français
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Rechercher" placeholder="Rechercher" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Recherche">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Effacer" aria-label="Effacer" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initialisation de la recherche
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Onglets" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../overview/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Présentation
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Démarrage
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+  Fonctionnalités
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../licenses/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Licences
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../" title="VOÏA Documentation" class="md-nav__button md-logo" aria-label="VOÏA Documentation" data-md-component="logo">
+      
+  <img src="../../../assets/logo.png" alt="logo">
+
+    </a>
+    VOÏA Documentation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Présentation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Démarrage
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Fonctionnalités
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Fonctionnalités
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Aperçu
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ai-survey-intelligence/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Intelligence IA
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../campaign-management/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Gestion des campagnes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../participant-management/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Gestion des participants
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Analytique & BI
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Analytique & BI
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table des matières">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#dashboard" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dashboard
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nps" class="md-nav__link">
+    <span class="md-ellipsis">
+      NPS
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#analyse-de-sentiment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Analyse de sentiment
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#themes-cles" class="md-nav__link">
+    <span class="md-ellipsis">
+      Thèmes clés
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#insights-de-campagne-5-onglets" class="md-nav__link">
+    <span class="md-ellipsis">
+      Insights de campagne (5 onglets)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#account-intelligence" class="md-nav__link">
+    <span class="md-ellipsis">
+      Account Intelligence
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scoring-pondere-par-linfluence" class="md-nav__link">
+    <span class="md-ellipsis">
+      Scoring pondéré par l'influence
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#comparaison-de-campagnes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Comparaison de campagnes
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#account-insights" class="md-nav__link">
+    <span class="md-ellipsis">
+      Account Insights
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tableau-de-bord-comptes-strategiques" class="md-nav__link">
+    <span class="md-ellipsis">
+      Tableau de bord Comptes stratégiques
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../communication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Communication & Courriel
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-management/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Gestion des utilisateurs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../branding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Image de marque
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../security/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Sécurité & Confidentialité
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data-export/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Export & Intégration
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../qbr/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Intelligence QBR
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../support/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Assistance
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../licenses/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Licences
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table des matières">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#dashboard" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dashboard
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nps" class="md-nav__link">
+    <span class="md-ellipsis">
+      NPS
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#analyse-de-sentiment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Analyse de sentiment
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#themes-cles" class="md-nav__link">
+    <span class="md-ellipsis">
+      Thèmes clés
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#insights-de-campagne-5-onglets" class="md-nav__link">
+    <span class="md-ellipsis">
+      Insights de campagne (5 onglets)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#account-intelligence" class="md-nav__link">
+    <span class="md-ellipsis">
+      Account Intelligence
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scoring-pondere-par-linfluence" class="md-nav__link">
+    <span class="md-ellipsis">
+      Scoring pondéré par l'influence
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#comparaison-de-campagnes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Comparaison de campagnes
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#account-insights" class="md-nav__link">
+    <span class="md-ellipsis">
+      Account Insights
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tableau-de-bord-comptes-strategiques" class="md-nav__link">
+    <span class="md-ellipsis">
+      Tableau de bord Comptes stratégiques
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="analytics-business-intelligence">Analytics &amp; Business Intelligence<a class="headerlink" href="#analytics-business-intelligence" title="Permanent link">&para;</a></h1>
+<hr />
+<h2 id="dashboard">Dashboard<a class="headerlink" href="#dashboard" title="Permanent link">&para;</a></h2>
+<ul>
+<li>NPS</li>
+<li>Taux de réponse</li>
+<li>Sentiment</li>
+<li>Campagnes actives</li>
+<li>Réponses récentes</li>
+</ul>
+<p>Mise à jour en temps réel</p>
+<hr />
+<h2 id="nps">NPS<a class="headerlink" href="#nps" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Promoteurs (9-10)</li>
+<li>Passifs (7-8)</li>
+<li>Détracteurs (0-6)</li>
+</ul>
+<p><strong>NPS = % Promoteurs - % Détracteurs</strong></p>
+<hr />
+<h2 id="analyse-de-sentiment">Analyse de sentiment<a class="headerlink" href="#analyse-de-sentiment" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Positif</li>
+<li>Neutre</li>
+<li>Négatif</li>
+</ul>
+<hr />
+<h2 id="themes-cles">Thèmes clés<a class="headerlink" href="#themes-cles" title="Permanent link">&para;</a></h2>
+<p>Graphique des sujets principaux, classés et colorés par sentiment.</p>
+<hr />
+<h2 id="insights-de-campagne-5-onglets">Insights de campagne (5 onglets)<a class="headerlink" href="#insights-de-campagne-5-onglets" title="Permanent link">&para;</a></h2>
+<p><strong>Overview</strong>
+Résumé de haut niveau de la campagne :
+- Score NPS avec courbe de tendance sur la période
+- Taux de réponse et nombre total de réponses
+- Répartition du sentiment (positif, neutre, négatif) sous forme de graphique en anneau
+- Graphique de distribution NPS montrant la proportion de Promoteurs, Passifs et Détracteurs parmi l'ensemble des répondants
+- Synthèse IA en langage clair décrivant le constat le plus important</p>
+<p><strong>Growth</strong>
+- Dynamique de croissance / rétention</p>
+<p><strong>Account Intelligence</strong>
+- Score par compte
+- Priorisation</p>
+<p><strong>Survey Insights</strong>
+Plonge dans le contenu des retours clients :
+- Graphique des thèmes clés
+- Répartition des réponses question par question
+- Extraits verbatim étiquetés avec le sentiment et les thèmes associés
+- Tableau NPS par entreprise où chaque nom de société est un lien cliquable qui mène directement à la page Account Insights de ce compte, permettant de passer des données du sondage à une vue complète du compte en un seul clic</p>
+<p><strong>Segmentation</strong>
+- Analyse par groupe</p>
+<hr />
+<h2 id="account-intelligence">Account Intelligence<a class="headerlink" href="#account-intelligence" title="Permanent link">&para;</a></h2>
+<p>Account Intelligence vous donne une vue compte par compte des performances de vos relations clients.</p>
+<p><strong>Score de balance</strong>
+Chaque compte reçoit un score de balance — un indicateur unique combinant le NPS, le sentiment, le risque de churn et les signaux d'opportunité de croissance. Un score positif indique une relation saine ; un score négatif est un signal d'alerte.</p>
+<p><strong>Niveaux de confiance</strong>
+Chaque score est accompagné d'un niveau de confiance indiquant le poids à lui accorder :</p>
+<ul>
+<li><strong>Élevé</strong> — Suffisamment de réponses et de données pour être statistiquement fiable. Vous pouvez agir en confiance sur ce score.</li>
+<li><strong>Moyen</strong> — Signal raisonnable, mais envisagez un contact direct pour confirmer.</li>
+<li><strong>Faible</strong> — Peu de données disponibles. Considérez-le comme un indicateur précoce plutôt qu'une conclusion ferme.</li>
+<li><strong>Insuffisant</strong> — Trop peu de réponses pour générer un score significatif. La ligne du compte reste visible pour vous permettre de décider d'un suivi proactif.</li>
+</ul>
+<p><strong>Badges de risque</strong>
+Chaque ligne affiche un badge de risque — <strong>Critique</strong>, <strong>Élevé</strong>, <strong>Moyen</strong> ou <strong>Faible</strong> — résumant le niveau de risque global du compte. Survoler le badge ouvre une infobulle qui explique précisément pourquoi ce niveau de risque a été attribué, en décrivant les signaux spécifiques (comme un NPS faible, un risque de churn élevé ou une tendance de sentiment négative) qui ont conduit à cette classification.</p>
+<p><strong>Enrichissement au survol</strong>
+Survoler une ligne de compte ouvre une infobulle qui charge des détails supplémentaires à la demande. L'infobulle comprend les principaux thèmes mentionnés par les répondants de ce compte, une ventilation par sous-métrique couvrant la satisfaction, le service, la tarification et la valeur produit, le score moyen de risque de churn calculé par l'IA, ainsi qu'un résumé en langage clair généré par l'IA synthétisant l'ensemble des retours du compte. L'infobulle affiche également une <strong>ventilation pondérée par l'influence</strong> qui reflète le niveau hiérarchique de chaque répondant — les retours des dirigeants C-level et des VP sont mis en valeur pour vous indiquer si les signaux proviennent de décideurs ou d'utilisateurs finaux. Cela permet de garder le tableau principal lisible tout en offrant de la profondeur quand vous en avez besoin.</p>
+<hr />
+<h2 id="scoring-pondere-par-linfluence">Scoring pondéré par l'influence<a class="headerlink" href="#scoring-pondere-par-linfluence" title="Permanent link">&para;</a></h2>
+<p>Le moteur de scoring de VOÏA pondère chaque réponse en fonction du niveau hiérarchique de la personne qui l'a soumise. Les retours des parties prenantes seniors — celles qui disposent de la plus grande autorité sur le renouvellement, l'expansion et les décisions contractuelles — ont un poids proportionnellement plus élevé que les retours des utilisateurs finaux dans le calcul des signaux de risque et de croissance.</p>
+<p>VOÏA reconnaît les niveaux hiérarchiques suivants, du plus influent au niveau de référence : dirigeants C-level, VP/Directeur, Manager, Team Lead, et utilisateur final / collaborateur individuel. Les répondants C-level et VP ont le poids le plus élevé ; les utilisateurs finaux servent de référence.</p>
+<p><strong>Impact sur les signaux de risque</strong>
+Lorsqu'un dirigeant C-level donne un NPS faible ou signale son insatisfaction, le score de risque de churn du compte augmente nettement plus que pour le même score soumis par un utilisateur final. Cela reflète la réalité : un dirigeant insatisfait a l'autorité de résilier ou de ne pas renouveler un contrat, ce qui n'est généralement pas le cas d'un utilisateur final.</p>
+<p><strong>Impact sur les signaux de croissance</strong>
+Les retours positifs des parties prenantes seniors — un VP exprimant une forte satisfaction, un dirigeant C-level indiquant une volonté d'élargir la relation — sont pondérés plus fortement dans les calculs d'opportunités de croissance. Cela aide vos équipes de customer success et de vente à prioriser les comptes où les signaux d'expansion sont véritablement stratégiques.</p>
+<p><strong>Où voir l'effet</strong>
+- <strong>Badge de risque</strong> sur chaque ligne de compte dans Account Intelligence reflète le risque de churn pondéré par l'influence
+- <strong>Indicateur de score de balance</strong> intègre les totaux d'opportunités et de risques pondérés par l'influence
+- <strong>Infobulle d'enrichissement au survol</strong> affiche une ventilation pondérée pour voir si les signaux viennent de décideurs ou d'utilisateurs finaux
+- <strong>Signaux de croissance</strong> dans l'onglet Growth Analytics reflètent la contribution pondérée des promoteurs seniors</p>
+<hr />
+<h2 id="comparaison-de-campagnes">Comparaison de campagnes<a class="headerlink" href="#comparaison-de-campagnes" title="Permanent link">&para;</a></h2>
+<p>Comparer plusieurs campagnes :</p>
+<ul>
+<li>KPI</li>
+<li>Tendances</li>
+<li>Évolution par compte</li>
+</ul>
+<hr />
+<h2 id="account-insights">Account Insights<a class="headerlink" href="#account-insights" title="Permanent link">&para;</a></h2>
+<p>Vue détaillée par entreprise :
+- NPS
+- Churn
+- Thèmes
+- Résumé IA</p>
+<hr />
+<h2 id="tableau-de-bord-comptes-strategiques">Tableau de bord Comptes stratégiques<a class="headerlink" href="#tableau-de-bord-comptes-strategiques" title="Permanent link">&para;</a></h2>
+<p>Le tableau de bord Comptes stratégiques est une vue dédiée qui se concentre exclusivement sur vos relations clients les plus prioritaires — celles dont les participants sont classés en niveau <strong>Stratégique</strong> ou <strong>Clé</strong> dans la base de données des participants. Il est conçu pour les responsables customer success et les chargés de comptes qui doivent surveiller leurs comptes les plus importants sans être noyés dans la liste complète des comptes.</p>
+<p><strong>Comment y accéder</strong></p>
+<p>Ouvrez le tableau de bord principal et cliquez sur l'onglet <strong>Comptes stratégiques</strong> (signalé par une icône de couronne). La vue se charge automatiquement pour la campagne active. Si vous souhaitez voir les données d'une autre campagne, vous pouvez passer un identifiant de campagne via l'URL. Si aucune campagne n'est spécifiée et qu'une campagne est active, le tableau de bord utilise la campagne active par défaut.</p>
+<p><strong>Ce que le tableau de bord affiche</strong></p>
+<p>En haut de la vue, un bandeau de KPI vous donne un aperçu instantané de la santé globale de votre portefeuille de comptes stratégiques :</p>
+<ul>
+<li><strong>Comptes à risque</strong> — le nombre de comptes stratégiques présentant au moins un facteur de risque actif</li>
+<li><strong>Opportunités de croissance</strong> — le nombre de comptes stratégiques présentant au moins un signal de croissance positif</li>
+<li><strong>Sans réponse</strong> — le nombre de comptes stratégiques n'ayant pas encore soumis de réponse dans la campagne en cours (un manque de couverture à adresser)</li>
+<li><strong>Taux de couverture</strong> — le pourcentage de comptes stratégiques ayant répondu jusqu'à présent</li>
+</ul>
+<p>En dessous du bandeau de KPI, la liste des comptes affiche tous les comptes de niveau Stratégique et Clé dans la campagne, triés du risque de churn le plus élevé au plus faible. Chaque ligne affiche :</p>
+<ul>
+<li><strong>Nom de l'entreprise</strong> et son niveau client (Stratégique ou Clé)</li>
+<li><strong>Badge de risque</strong> (Critique, Élevé, Moyen ou Faible) dérivé du risque de churn pondéré par l'influence</li>
+<li><strong>Indicateur de score de balance</strong> indiquant si le compte est dominé par les risques, équilibré ou dominé par les opportunités</li>
+<li><strong>Nombre de réponses</strong> pour la campagne en cours — les comptes sans réponse sont signalés visuellement pour indiquer où la couverture manque</li>
+<li><strong>Enrichissement au survol</strong> avec la même infobulle détaillée disponible dans Account Intelligence, incluant la ventilation pondérée des niveaux hiérarchiques des répondants de ce compte</li>
+</ul>
+<p><strong>Différence avec Account Intelligence</strong></p>
+<p>Account Intelligence (dans l'espace de travail Insights) affiche toutes les entreprises ayant soumis au moins une réponse dans la campagne. Le tableau de bord Comptes stratégiques affiche toutes les entreprises de niveau Stratégique ou Clé, qu'elles aient répondu ou non — vous pouvez ainsi voir d'un coup d'œil quels sont vos comptes les plus importants qui n'ont pas encore participé au sondage.</p>
+<p><strong>Utilisez Comptes stratégiques pour :</strong>
+- Passer en revue la santé de vos comptes principaux avant une réunion QBR ou un comité de direction
+- Identifier quels comptes clés n'ont pas répondu et pourraient nécessiter une prise de contact proactive
+- Prioriser le temps de votre équipe customer success</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Retour en haut de la page
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2026 VOÏA - By Rivvalue inc.
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://rivvalue.com/voia" target="_blank" rel="noopener" title="VOÏA - AI Powered Voice Of Client platform for B2B, By Rivvalue inc." class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M351.9 280H161c2.9 64.5 17.2 123.9 37.5 167.4 11.4 24.5 23.7 41.8 35.1 52.4 11.2 10.5 18.9 12.2 22.9 12.2s11.7-1.7 22.9-12.2c11.4-10.6 23.7-28 35.1-52.4 20.3-43.5 34.6-102.9 37.5-167.4zm-191-48h190.9c-2.8-64.5-17.1-123.9-37.4-167.4-11.4-24.4-23.7-41.8-35.1-52.4C268.1 1.7 260.4 0 256.4 0s-11.7 1.7-22.9 12.2c-11.4 10.6-23.7 28-35.1 52.4-20.3 43.5-34.6 102.9-37.5 167.4m-48 0c3.5-85.6 25.6-165.1 57.9-217.3C78.7 47.3 10.9 131.2 1.5 232zM1.5 280c9.4 100.8 77.2 184.7 169.3 217.3-32.3-52.2-54.4-131.7-57.9-217.3zm398.4 0c-3.5 85.6-25.6 165.1-57.9 217.3 92.1-32.7 159.9-116.5 169.3-217.3zm111.4-48C501.9 131.2 434.1 47.3 342 14.7c32.3 52.2 54.4 131.7 57.9 217.3z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy"], "search": "../../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copi\u00e9 dans le presse-papier", "clipboard.copy": "Copier dans le presse-papier", "search.result.more.one": "1 de plus sur cette page", "search.result.more.other": "# de plus sur cette page", "search.result.none": "Aucun document trouv\u00e9", "search.result.one": "1 document trouv\u00e9", "search.result.other": "# documents trouv\u00e9s", "search.result.placeholder": "Taper pour d\u00e9marrer la recherche", "search.result.term.missing": "Non trouv\u00e9", "select.version": "S\u00e9lectionner la version"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.f55a23d4.min.js"></script>
+      
+    
+  </body>
+</html>
