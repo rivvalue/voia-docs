@@ -71,6 +71,7 @@
                         <th>{{ _('Status') }}</th>
                         <th>{{ _('Campaigns') }}</th>
                         <th>{{ _('Users') }}</th>
+                        <th>{{ _('Client Companies') }}</th>
                         <th>{{ _('Respondents') }}</th>
                         <th>{{ _('Invitations') }}</th>
                         <th>{{ _('Parallel') }}</th>
@@ -127,6 +128,21 @@
                                         {% elif user_percent >= 75 %}bg-warning
                                         {% else %}bg-info{% endif %}" 
                                         style="width: {{ user_percent }}%"></div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="usage-info">
+                                <strong>{{ account.get('company_count', 0) }}/{{ account.get('company_limit', 'Unlimited') }}</strong>
+                                {% if account.get('company_limit') %}
+                                <div class="progress progress-sm mt-1">
+                                    {% set company_percent = ((account.get('company_count', 0) / account.get('company_limit', 1)) * 100)|round(1) %}
+                                    <div class="progress-bar 
+                                        {% if company_percent >= 90 %}bg-danger
+                                        {% elif company_percent >= 75 %}bg-warning
+                                        {% else %}bg-success{% endif %}" 
+                                        style="width: {{ company_percent }}%"></div>
                                 </div>
                                 {% endif %}
                             </div>

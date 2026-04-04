@@ -289,7 +289,14 @@
                                 <label for="max_invitations_per_campaign" class="form-label">{{ _('Maximum Invitations per Campaign') }}</label>
                                 <input type="number" class="form-control" id="max_invitations_per_campaign" name="max_invitations_per_campaign" 
                                        min="1" max="5000000" value="{{ current_license.max_invitations_per_campaign if current_license and current_license.type == 'pro' else 50000 }}">
-                                <div class="form-text">{{ _('Hard limit on survey invitations (typically 5x responses for ~20% response rate)') }}</div>
+                                <div class="form-text">{{ _('Guideline on survey invitations (typically 5x responses for a 20 percent response rate)') }}</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="max_client_companies" class="form-label">{{ _('Maximum Client Companies') }}</label>
+                                <input type="number" class="form-control" id="max_client_companies" name="max_client_companies" 
+                                       min="1" value="{{ current_license.max_client_companies if current_license and current_license.type == 'pro' and current_license.max_client_companies else '' }}"
+                                       placeholder="{{ _('Leave empty for unlimited') }}">
+                                <div class="form-text">{{ _('Maximum distinct client companies (by email domain). Leave empty for unlimited.') }}</div>
                             </div>
                         </div>
                     </div>

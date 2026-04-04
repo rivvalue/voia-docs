@@ -4807,10 +4807,20 @@ def license_info():
         
         # Add business account object to the context
         license_data['business_account'] = business_account
-        
+
+        # Client company count and limit
+        current_license = LicenseService.get_current_license(business_account.id)
+        license_data['company_count'] = LicenseService.get_unique_company_domain_count(business_account.id)
+        license_data['company_limit'] = current_license.max_client_companies if current_license else None
+
+        # Total participant count across all time
+        from models import Campaign, CampaignParticipant, Participant
+        license_data['participant_count'] = Participant.query.filter_by(
+            business_account_id=business_account.id
+        ).count()
+
         # Get all active campaigns information for display (supports parallel campaigns)
         try:
-            from models import Campaign, CampaignParticipant
             active_campaigns = Campaign.query.filter(
                 Campaign.business_account_id == business_account.id,
                 Campaign.status == 'active'
@@ -4820,14 +4830,14 @@ def license_info():
             campaigns_with_participants = []
             total_active_participants = 0
             for campaign in active_campaigns:
-                participant_count = CampaignParticipant.query.filter_by(
+                cp_count = CampaignParticipant.query.filter_by(
                     campaign_id=campaign.id
                 ).count()
                 campaigns_with_participants.append({
                     'campaign': campaign,
-                    'participants': participant_count
+                    'participants': cp_count
                 })
-                total_active_participants += participant_count
+                total_active_participants += cp_count
                 
             license_data.update({
                 'active_campaigns': campaigns_with_participants,
@@ -5380,6 +5390,14 @@ def business_license_overview():
             campaigns_used = LicenseService.get_campaigns_used_in_current_period(business_account.id)
             users_count = getattr(business_account, 'current_users_count', 0)
             
+            company_count = LicenseService.get_unique_company_domain_count(business_account.id)
+            company_limit = current_license.max_client_companies if current_license else None
+
+            from models import Participant as _Participant
+            participant_count = _Participant.query.filter_by(
+                business_account_id=business_account.id
+            ).count()
+
             account_data = {
                 'id': business_account.id,
                 'name': business_account.name,
@@ -5395,7 +5413,10 @@ def business_license_overview():
                 'users_count': users_count,
                 'users_limit': license_info.get('users_limit', 5),
                 'expires_soon': license_info.get('expires_soon', False),
-                'days_remaining': license_info.get('days_remaining', 0)
+                'days_remaining': license_info.get('days_remaining', 0),
+                'company_count': company_count,
+                'company_limit': company_limit,
+                'participant_count': participant_count,
             }
             
             # Set page context based on filter
@@ -5477,7 +5498,9 @@ def admin_licenses():
                 'unactivated_admin_uuid': unactivated_admin.uuid if unactivated_admin else None,
                 'unactivated_admin_email': unactivated_admin.email if unactivated_admin else None,
                 'allow_parallel_campaigns': getattr(account, 'allow_parallel_campaigns', False),
-                'active_campaigns_count': active_campaigns_count
+                'active_campaigns_count': active_campaigns_count,
+                'company_count': LicenseService.get_unique_company_domain_count(account.id),
+                'company_limit': license_info.get('current_license').max_client_companies if license_info.get('current_license') else None,
             }
             licenses_data.append(account_data)
         
@@ -5663,6 +5686,16 @@ def process_license_assignment():
                         flash('Maximum invitations per campaign must be between 1 and 5,000,000.', 'error')
                         return redirect(url_for('business_auth.license_assignment_form', business_id=business_account.uuid))
                     custom_config['max_invitations_per_campaign'] = invitations_value
+                
+                client_companies_limit = request.form.get('max_client_companies', '').strip()
+                if client_companies_limit:
+                    client_companies_value = int(client_companies_limit)
+                    if client_companies_value < 1:
+                        flash(_('Maximum client companies must be a positive number.'), 'error')
+                        return redirect(url_for('business_auth.license_assignment_form', business_id=business_account.uuid))
+                    custom_config['max_client_companies'] = client_companies_value
+                else:
+                    custom_config['max_client_companies'] = None  # Unlimited
                     
             except ValueError:
                 flash('Custom limit values must be valid positive numbers.', 'error')

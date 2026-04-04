@@ -433,6 +433,20 @@ def create_participant():
             flash(f'Participant with email {email} already exists in your account.', 'error')
             return redirect(url_for('participants.create_participant'))
         
+        # Company domain limit check (hard enforcement)
+        if not LicenseService.can_add_participant_from_domain(current_account.id, email):
+            current_license = LicenseService.get_current_license(current_account.id)
+            max_companies = current_license.max_client_companies if current_license else None
+            domain_count = LicenseService.get_unique_company_domain_count(current_account.id)
+            flash(
+                _('Cannot add participant: your license allows a maximum of %(max)d distinct client companies '
+                  '(identified by email domain), and you already have %(count)d. '
+                  'Participants from existing client companies can always be added.',
+                  max=max_companies, count=domain_count),
+                'error'
+            )
+            return redirect(url_for('participants.create_participant'))
+        
         # Create participant with origin tracking and unified token system
         participant = Participant()
         participant.business_account_id = current_account.id
@@ -742,8 +756,57 @@ def upload_participants():
         participant_rows = list(csv_reader)
         participant_count = len(participant_rows)
         
-        # Note: License limits are enforced per-campaign when participants are assigned to campaigns
-        # Standalone participant creation doesn't have global limits
+        # Pre-validate: check company domain limits upfront before processing any rows
+        current_license = LicenseService.get_current_license(current_account.id)
+        max_companies = current_license.max_client_companies if current_license else None
+        if max_companies is not None:
+            # Check platform admin bypass
+            current_user_id = session.get('business_user_id')
+            is_admin_bypass = False
+            if current_user_id:
+                from models import BusinessAccountUser
+                _current_user = BusinessAccountUser.query.get(current_user_id)
+                if _current_user and _current_user.is_platform_admin():
+                    is_admin_bypass = True
+            
+            if not is_admin_bypass:
+                # Get existing domains in account
+                existing_participants = Participant.query.filter_by(
+                    business_account_id=current_account.id
+                ).with_entities(Participant.email).all()
+                existing_domains = set()
+                for (ep_email,) in existing_participants:
+                    if ep_email and '@' in ep_email:
+                        ep_domain = ep_email.split('@', 1)[1].lower().strip()
+                        if ep_domain and ep_domain not in LicenseService.CONSUMER_EMAIL_DOMAINS:
+                            existing_domains.add(ep_domain)
+                
+                current_domain_count = len(existing_domains)
+                
+                # Find new domains introduced by this upload
+                new_domains_in_file = set()
+                rejected_rows = []
+                for row_num, row in enumerate(participant_rows, start=2):
+                    row_email = row.get('email', '').strip().lower()
+                    if row_email and '@' in row_email:
+                        row_domain = row_email.split('@', 1)[1].lower().strip()
+                        if row_domain and row_domain not in LicenseService.CONSUMER_EMAIL_DOMAINS and row_domain not in existing_domains:
+                            new_domains_in_file.add(row_domain)
+                            if current_domain_count + len(new_domains_in_file) > max_companies:
+                                rejected_rows.append((row_num, row_email, row_domain))
+                
+                if rejected_rows:
+                    flash(
+                        _('CSV upload rejected: adding these participants would exceed your client company limit of %(max)d '
+                          '(currently at %(count)d). The following rows introduce new client companies that would breach the limit:',
+                          max=max_companies, count=current_domain_count),
+                        'error'
+                    )
+                    for row_num, row_email, row_domain in rejected_rows[:15]:
+                        flash(_('Row %(num)d: %(email)s (domain: %(domain)s)', num=row_num, email=row_email, domain=row_domain), 'error')
+                    if len(rejected_rows) > 15:
+                        flash(_('... and %(count)d more rows.', count=len(rejected_rows) - 15), 'error')
+                    return redirect(url_for('participants.upload_participants'))
         
         # Pre-validate commercial_value consistency across same companies
         company_commercial_values = {}
@@ -1512,21 +1575,21 @@ def manage_campaign_participants(campaign_id: int):
                 flash('No participants selected.', 'error')
                 return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
             
-            # License enforcement: Check if adding these participants would exceed license limit
+            # License soft-check: Warn if adding these participants would exceed invitation guideline
             if not LicenseService.can_add_participants(
                 business_account_id=current_account.id,
                 campaign_id=campaign_id,
                 additional_count=len(participant_ids)
             ):
-                # Get license details for user-friendly message
+                # Soft warning only - do not block the operation
                 current_license = LicenseService.get_current_license(current_account.id)
                 if current_license:
                     limit = current_license.max_invitations_per_campaign
                     license_name = current_license.license_type.title()
-                    flash(f'Cannot add {len(participant_ids)} participant(s). Your {license_name} license allows a maximum of {limit:,} participants per campaign. Please upgrade your license to add more participants.', 'error')
+                    flash(_('Note: Adding %(count)d participant(s) exceeds the %(license)s license guideline of %(limit)d participants per campaign. Proceeding anyway.',
+                            count=len(participant_ids), license=license_name, limit=limit), 'warning')
                 else:
-                    flash('Cannot add participants. License limit exceeded.', 'error')
-                return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
+                    flash(_('Note: Participant count exceeds license guideline. Proceeding anyway.'), 'warning')
             
             # Determine processing strategy based on count
             BULK_THRESHOLD = 100  # Process asynchronously if adding 100+ participants

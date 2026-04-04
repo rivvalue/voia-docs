@@ -522,6 +522,15 @@ with app.app_context():
         )
 
     try:
+        from migrations.add_max_client_companies import run as _migrate_max_client_companies
+        _migrate_max_client_companies(db)
+    except Exception as e:
+        logger.error(
+            f"CRITICAL: Startup migration add_max_client_companies FAILED: {e}. "
+            "License company domain limits will not work until max_client_companies column is added."
+        )
+
+    try:
         from sqlalchemy import text as sa_text, inspect as sa_inspect
         inspector = sa_inspect(db.engine)
         available_tables = inspector.get_table_names()

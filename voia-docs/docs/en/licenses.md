@@ -8,12 +8,12 @@ Understanding your account limits and license options.
 
 Your VOÏA license determines:
 - How many campaigns you can run per year
-- Maximum number of participants per campaign
+- How many distinct **client companies** you can survey across all campaigns
 - How many team members can use the platform
 - Which features are available
 - Support level
 
-**Check your current license:** Navigate to Settings → License Overview
+**Check your current license:** Navigate to Settings → License Info
 
 ---
 
@@ -26,7 +26,7 @@ Your VOÏA license determines:
 **Limits:**
 - **4 campaigns per year**
 - **5 users maximum**
-- **200 participants per campaign**
+- **20 client companies** (across all campaigns, all time)
 - **12-month duration**
 
 **Features included:**
@@ -47,7 +47,7 @@ Your VOÏA license determines:
 **Limits:**
 - **4 campaigns per year**
 - **10 users maximum**
-- **2,000 participants per campaign**
+- **100 client companies** (across all campaigns, all time)
 - **12-month duration**
 
 **Features included:**
@@ -69,7 +69,7 @@ Your VOÏA license determines:
 **Limits (Customizable):**
 - **12+ campaigns per year** (customizable)
 - **25+ users maximum** (customizable)
-- **10,000+ participants per campaign** (customizable)
+- **Unlimited client companies** (configurable by your platform admin)
 - **12+ month duration** (customizable)
 
 **Features included:**
@@ -93,7 +93,7 @@ Your VOÏA license determines:
 **Limits:**
 - **1 campaign**
 - **2 users maximum**
-- **50 participants per campaign**
+- **Unlimited client companies**
 - **1-month duration**
 
 **Features included:**
@@ -102,6 +102,28 @@ Your VOÏA license determines:
 - ✓ Sample survey templates
 
 **Pricing:** Free trial
+
+---
+
+## Understanding Client Companies
+
+### What is a Client Company?
+
+A **client company** is any organisation whose employees participate in your VOÏA surveys, identified by their **email domain** (the part after `@` in their email address).
+
+For example, participants with `alice@acme.com` and `bob@acme.com` both count as one client company: `acme.com`.
+
+### What doesn't count as a client company?
+
+Personal email providers are excluded from the count entirely — participants using addresses such as Gmail, Yahoo, Hotmail, Outlook, iCloud, and similar consumer domains never consume a company slot.
+
+### How is the count measured?
+
+The count is **account-wide and cumulative across all campaigns, all time**. It is not reset per campaign or per year. Adding a participant from a new company domain in any campaign — past or present — contributes to the total.
+
+### Existing companies are always allowed
+
+If a company domain is already known to your account (i.e., at least one participant with that domain was previously added), you can always add more participants from that same domain, even if you are at your company limit.
 
 ---
 
@@ -116,7 +138,7 @@ Licenses operate on an annual anniversary basis:
 - License renews: January 15, 2026
 - Campaign limit resets: January 15, 2026
 
-**Important:** Campaign limits reset on your anniversary date, not January 1st
+**Important:** Campaign limits reset on your anniversary date, not January 1st. Client company counts do **not** reset — they accumulate over the life of your account.
 
 ---
 
@@ -139,16 +161,18 @@ You'll receive renewal reminders
 
 ### How to Check Usage
 
-Navigate to **Settings → License Overview** to see:
+Navigate to **Settings → License Info** to see:
 - Campaigns used this year (e.g., "3 of 4")
 - Current user count (e.g., "7 of 10")
+- Client companies loaded (e.g., "14 of 20")
+- Total participants loaded in VOÏA
 - Days remaining in license period
 - License expiration date
 
-**Color indicators:**
+**Color indicators on progress bars:**
 - **Green:** Plenty of capacity remaining
-- **Yellow:** Approaching limit (80%+)
-- **Red:** At or over limit
+- **Yellow/Orange:** Approaching limit (75%+)
+- **Red:** At or near limit (90%+)
 
 ---
 
@@ -164,9 +188,15 @@ Navigate to **Settings → License Overview** to see:
 - Deactivated users: Don't count
 - Invited (not yet accepted): Count toward limit
 
+**Client Companies:**
+- Each distinct corporate email domain counts as one company
+- Personal email providers (Gmail, Yahoo, Outlook, etc.) never count
+- Count is cumulative across all campaigns and all time
+- A domain already in your account never consumes an additional slot
+
 **Participants:**
-- Counted per campaign (not total across all campaigns)
-- Adding 300 participants to one campaign uses 300 of your per-campaign limit
+- Tracked as an informational counter (total across all campaigns)
+- No hard per-campaign enforcement — exceeding a guideline shows a warning only
 
 ---
 
@@ -178,7 +208,7 @@ Navigate to **Settings → License Overview** to see:
 - You hit your campaign limit mid-year
 - You need more users
 - You want advanced features (API access, white-label)
-- You need larger campaigns (more participants)
+- You are approaching your client company limit
 
 **Upgrade process:**
 1. Contact your account administrator
@@ -190,12 +220,11 @@ Navigate to **Settings → License Overview** to see:
 
 ### Downgrading
 
-**Downgrades typically happen at renewal:**
-- Cannot downgrade mid-cycle (except in special cases)
-- Existing campaigns continue running
-- New campaigns follow new limits
+**Downgrades typically happen at renewal.**
 
-**Important:** If downgrading reduces user limit below current user count, you'll need to deactivate users first
+**Important downgrade restrictions:**
+- If downgrading reduces the user limit below your current user count, you must deactivate users first.
+- If downgrading from Plus to Core and your account already has more than 20 client companies loaded, the downgrade will be blocked until you are within the Core limit.
 
 ---
 
@@ -211,7 +240,6 @@ Navigate to **Settings → License Overview** to see:
 **Solutions:**
 - Wait for annual renewal
 - Upgrade license
-- Delete draft campaigns (if not needed)
 
 ---
 
@@ -224,20 +252,28 @@ Navigate to **Settings → License Overview** to see:
 **Solutions:**
 - Deactivate inactive users
 - Upgrade license
-- Wait for annual renewal
 
 ---
 
-### Participant Limit Exceeded
+### Client Company Limit Reached
 
-**What happens per campaign:**
-- Cannot add more participants to that campaign
-- Other campaigns unaffected
+**What happens:**
+- You cannot add participants whose email domain is new to your account
+- Participants from companies **already in your account** can always be added
+- Participants using personal email addresses (Gmail, Yahoo, etc.) can always be added
+- Bulk CSV uploads that would breach the limit are rejected upfront with a clear error report listing each affected row
+- Platform administrators are never blocked
 
 **Solutions:**
-- Create a second campaign (if you have campaign quota)
-- Reduce participant list
-- Upgrade to higher participant limit
+- Add participants from existing client companies only
+- Upgrade to Plus (100 companies) or Pro (unlimited)
+- Contact VOÏA sales
+
+---
+
+### Participant Volume (Soft Guideline)
+
+Participant counts per campaign are tracked as a soft guideline. Exceeding the guideline will display an informational warning, but will **not** block you from adding participants or assigning them to campaigns.
 
 ---
 
@@ -263,7 +299,7 @@ Navigate to **Settings → License Overview** to see:
 **Can include:**
 - Custom campaign limits (50+/year)
 - Custom user limits (100+)
-- Unlimited participants
+- Custom client company limits (or unlimited)
 - Multi-year agreements
 - Volume discounts
 - Custom integrations
@@ -276,7 +312,7 @@ Navigate to **Settings → License Overview** to see:
 
 ### Can I exceed my campaign limit temporarily?
 
-No, the system enforces limits strictly. Contact sales for emergency upgrades.
+No, the system enforces campaign limits strictly. Contact sales for emergency upgrades.
 
 ### What happens to my data if my license expires?
 
@@ -284,17 +320,33 @@ Your data is preserved for 90 days after expiration. You can still log in and vi
 
 ### Can I transfer campaigns from one license year to the next?
 
-No, campaigns are tied to the license year they were created in. A new year means fresh campaign quota.
+No, campaigns are tied to the license year they were created in. A new year means a fresh campaign quota.
 
 ### How do I know when I'm approaching my limits?
 
-VOÏA displays warnings when you reach 80% of any limit (campaigns, users, or participants).
+VOÏA displays colour-coded progress bars on the License Info page. Bars turn orange at 75% and red at 90% of the client company limit.
+
+### Does the client company count reset each year?
+
+No. The client company count is cumulative and never resets. It reflects every distinct corporate domain ever added to your account across all campaigns.
+
+### Can I add more participants from a company that's already in my account, even if I'm at my limit?
+
+Yes. Once a company domain is known to your account, you can always add more participants from that same domain. Only **new** domains are blocked when the limit is reached.
+
+### What if a participant uses a personal email (Gmail, Yahoo, etc.)?
+
+Personal email addresses are never counted as a client company and are always allowed regardless of your company limit.
+
+### What is the difference between "client companies" and "participants"?
+
+A **participant** is an individual contact. A **client company** is the organisation they work for, identified by their email domain. One company can have many participants.
 
 ### Can I buy additional campaigns mid-year?
 
 Yes, contact sales for campaign add-on packages. Pricing varies based on your current license.
 
-### What if I deactivate a campaign - does it free up my quota?
+### What if I deactivate a campaign — does it free up my quota?
 
 No, once a campaign is activated, it counts toward your annual limit even if you later close it.
 
@@ -310,7 +362,7 @@ Yes, anyone with access to your VOÏA account counts as a user.
 |---------|------|------|-----|-------|
 | Campaigns/year | 4 | 4 | 12+ (custom) | 1 |
 | Users | 5 | 10 | 25+ (custom) | 2 |
-| Participants/campaign | 200 | 2,000 | 10,000+ (custom) | 50 |
+| **Client companies** | **20** | **100** | **Unlimited (configurable)** | **Unlimited** |
 | Duration | 12 months | 12 months | 12+ months (custom) | 1 month |
 | Conversational surveys | ✓ | ✓ | ✓ | ✓ |
 | NPS tracking | ✓ | ✓ | ✓ | ✓ |

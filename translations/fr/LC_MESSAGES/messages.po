@@ -6883,9 +6883,8 @@ msgid "Usage"
 msgstr "Utilisation"
 
 #: templates/business_auth/licenses/overview.html:365
-#, fuzzy
 msgid "Unlimited"
-msgstr "Limite d'utilisateurs"
+msgstr "Illimité"
 
 #: templates/business_auth/licenses/overview.html:391
 msgid "Assign License"
@@ -11273,3 +11272,96 @@ msgstr "Voir la transcription"
 #: templates/qbr/qbr_session_detail.html
 msgid "characters"
 msgstr "caractères"
+
+#: templates/business_auth/licenses/assignment_form.html
+msgid "Maximum Client Companies"
+msgstr "Nombre maximal d'entreprises clientes"
+
+#: templates/business_auth/licenses/assignment_form.html
+msgid "Leave empty for unlimited"
+msgstr "Laisser vide pour illimité"
+
+#: templates/business_auth/licenses/assignment_form.html
+msgid "Maximum distinct client companies (by email domain). Leave empty for unlimited."
+msgstr "Nombre maximal d'entreprises clientes distinctes (par domaine d'e-mail). Laisser vide pour illimité."
+
+#: templates/business_auth/licenses/assignment_form.html
+msgid "Guideline on survey invitations (typically 5x responses for a 20 percent response rate)"
+msgstr "Recommandation pour les invitations au sondage (environ 5 fois les réponses attendues pour un taux de réponse de 20 pourcent)"
+
+#: templates/business_auth/admin_licenses.html
+msgid "Client Companies"
+msgstr "Entreprises clientes"
+
+#: templates/business_auth/license_overview.html
+msgid "Distinct client companies across all campaigns"
+msgstr "Entreprises clientes distinctes sur toutes les campagnes"
+
+#: templates/business_auth/license_overview.html
+msgid "Approaching client company limit. Only participants from existing companies can be added."
+msgstr "Limite d'entreprises clientes atteinte. Seuls les participants des entreprises existantes peuvent être ajoutés."
+
+#: participant_routes.py
+#, python-format
+msgid ""
+"Cannot add participant: your license allows a maximum of %(max)d distinct "
+"client companies (identified by email domain), and you already have "
+"%(count)d. Participants from existing client companies can always be added."
+msgstr ""
+"Impossible d'ajouter le participant : votre licence autorise un maximum de "
+"%(max)d entreprises clientes distinctes (identifiées par domaine d'e-mail), "
+"et vous en avez déjà %(count)d. Les participants des entreprises clientes "
+"existantes peuvent toujours être ajoutés."
+
+#: participant_routes.py
+#, python-format
+msgid ""
+"CSV upload rejected: adding these participants would exceed your client "
+"company limit of %(max)d (currently at %(count)d). The following rows "
+"introduce new client companies that would breach the limit:"
+msgstr ""
+"Importation CSV rejetée : l'ajout de ces participants dépasserait votre "
+"limite d'entreprises clientes de %(max)d (actuellement à %(count)d). "
+"Les lignes suivantes introduisent de nouvelles entreprises clientes qui "
+"dépasseraient la limite :"
+
+#: participant_routes.py
+#, python-format
+msgid "Row %(num)d: %(email)s (domain: %(domain)s)"
+msgstr "Ligne %(num)d : %(email)s (domaine : %(domain)s)"
+
+#: participant_routes.py
+#, python-format
+msgid "... and %(count)d more rows."
+msgstr "... et %(count)d ligne(s) supplémentaire(s)."
+
+#: participant_routes.py
+#, python-format
+msgid ""
+"Note: Adding %(count)d participant(s) exceeds the %(license)s license "
+"guideline of %(limit)d participants per campaign. Proceeding anyway."
+msgstr ""
+"Remarque : l'ajout de %(count)d participant(s) dépasse la recommandation "
+"de la licence %(license)s de %(limit)d participants par campagne. "
+"L'opération est tout de même effectuée."
+
+#: participant_routes.py
+msgid "Note: Participant count exceeds license guideline. Proceeding anyway."
+msgstr "Remarque : le nombre de participants dépasse la recommandation de la licence. L'opération est tout de même effectuée."
+
+#: business_auth_routes.py
+msgid "Maximum client companies must be a positive number."
+msgstr "Le nombre maximal d'entreprises clientes doit être un nombre positif."
+
+#: templates/business_auth/license_overview.html
+#: templates/business_auth/license_info.html
+msgid "Total participants loaded in VOÏA"
+msgstr "Total de participants chargés dans VOÏA"
+
+#: templates/business_auth/license_info.html
+msgid "company slots remaining"
+msgstr "créneaux entreprises restants"
+
+#: templates/business_auth/license_info.html
+msgid "Approaching client company limit"
+msgstr "Limite d'entreprises clientes presque atteinte"

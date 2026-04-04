@@ -2849,6 +2849,7 @@ class LicenseHistory(db.Model):
     max_users = db.Column(db.Integer, nullable=False, default=5)
     max_participants_per_campaign = db.Column(db.Integer, nullable=False, default=500)  # Target responses
     max_invitations_per_campaign = db.Column(db.Integer, nullable=False, default=2500)  # Hard limit for invitations
+    max_client_companies = db.Column(db.Integer, nullable=True)  # Null = unlimited (Trial, Pro default)
     
     # Pricing
     annual_price = db.Column(db.Numeric(10, 2), nullable=True)  # Annual price in USD (null for trial/custom pricing)
@@ -2878,6 +2879,7 @@ class LicenseHistory(db.Model):
             'max_users': self.max_users,
             'max_participants_per_campaign': self.max_participants_per_campaign,
             'max_invitations_per_campaign': self.max_invitations_per_campaign,
+            'max_client_companies': self.max_client_companies,
             'annual_price': float(self.annual_price) if self.annual_price else None,
             'migrated_from_business_account': self.migrated_from_business_account,
             'migration_notes': self.migration_notes,

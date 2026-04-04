@@ -47,6 +47,13 @@ class LicenseService:
     - Performance-optimized license lookups
     """
     
+    # Consumer email domains excluded from client company counting
+    CONSUMER_EMAIL_DOMAINS = frozenset([
+        'gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com',
+        'live.com', 'icloud.com', 'me.com', 'msn.com', 'aol.com',
+        'protonmail.com', 'proton.me', 'ymail.com', 'googlemail.com',
+    ])
+    
     # ==== CORE LICENSE LOOKUP METHODS ====
     
     @staticmethod
@@ -364,6 +371,104 @@ class LicenseService:
             logger.error(f"Failed to check invitation limit for campaign {campaign_id}: {e}")
             return False
     
+    @staticmethod
+    def get_unique_company_domain_count(business_account_id: int) -> int:
+        """
+        Count distinct email domains (excluding consumer domains) across all participants
+        in the business account, all-time regardless of campaign status.
+        
+        Args:
+            business_account_id: Business account ID to count for
+            
+        Returns:
+            int: Number of distinct client company domains
+        """
+        try:
+            from models import Participant
+            participants = db.session.query(Participant.email).filter(
+                Participant.business_account_id == business_account_id,
+                Participant.email.isnot(None)
+            ).all()
+            
+            domains = set()
+            for (email,) in participants:
+                if email and '@' in email:
+                    domain = email.split('@', 1)[1].lower().strip()
+                    if domain and domain not in LicenseService.CONSUMER_EMAIL_DOMAINS:
+                        domains.add(domain)
+            
+            return len(domains)
+        except Exception as e:
+            logger.error(f"Failed to count unique company domains for business_account_id {business_account_id}: {e}")
+            return 0
+
+    @staticmethod
+    def can_add_participant_from_domain(business_account_id: int, email: str) -> bool:
+        """
+        Check if a participant with the given email can be added based on client company limits.
+        
+        Returns True if:
+        - The email domain is a consumer domain (always allowed)
+        - The domain is already known to the account (existing client company)
+        - max_client_companies is null (unlimited)
+        - The current domain count is below the limit
+        - The current user is a platform admin
+        
+        Returns False if the domain would be new and the limit is already reached.
+        
+        Args:
+            business_account_id: Business account ID to check
+            email: Email address of the participant being added
+            
+        Returns:
+            bool: True if the participant can be added, False if blocked
+        """
+        try:
+            # Platform admin bypass
+            from flask import session
+            current_user_id = session.get('business_user_id')
+            if current_user_id:
+                from models import BusinessAccountUser
+                current_user = BusinessAccountUser.query.get(current_user_id)
+                if current_user and current_user.is_platform_admin():
+                    return True
+            
+            # Extract domain
+            if not email or '@' not in email:
+                return True  # Invalid email - let other validation handle it
+            
+            domain = email.split('@', 1)[1].lower().strip()
+            
+            # Consumer domains are always allowed
+            if domain in LicenseService.CONSUMER_EMAIL_DOMAINS:
+                return True
+            
+            # Get the current license to check limit
+            current_license = LicenseService.get_current_license(business_account_id)
+            max_companies = current_license.max_client_companies if current_license else None
+            
+            # Null means unlimited
+            if max_companies is None:
+                return True
+            
+            # Check if this domain is already in the account
+            from models import Participant
+            existing_with_domain = db.session.query(Participant.id).filter(
+                Participant.business_account_id == business_account_id,
+                Participant.email.ilike(f'%@{domain}')
+            ).first()
+            
+            if existing_with_domain:
+                return True  # Domain already known - always allowed
+            
+            # Domain would be new - check if we're at the limit
+            current_count = LicenseService.get_unique_company_domain_count(business_account_id)
+            return current_count < max_companies
+            
+        except Exception as e:
+            logger.error(f"Failed to check company domain limit for business_account_id {business_account_id}: {e}")
+            return True  # Fail open to avoid blocking valid participants on error
+
     @staticmethod
     def can_use_transcript_analysis(business_account_id: int) -> bool:
         """
@@ -956,6 +1061,7 @@ class LicenseService:
                 max_users=license_config['max_users'],
                 max_participants_per_campaign=license_config['max_participants_per_campaign'],
                 max_invitations_per_campaign=license_config['max_invitations_per_campaign'],
+                max_client_companies=license_config.get('max_client_companies'),
                 created_by=created_by,
                 notes=f"Created from {template.display_name} template"
             )
@@ -1141,6 +1247,7 @@ class LicenseService:
                 max_users=license_config['max_users'], 
                 max_participants_per_campaign=license_config['max_participants_per_campaign'],
                 max_invitations_per_campaign=license_config['max_invitations_per_campaign'],
+                max_client_companies=license_config.get('max_client_companies'),
                 annual_price=license_config.get('annual_price'),
                 created_by=created_by,
                 notes=assignment_notes
@@ -1255,6 +1362,11 @@ class LicenseService:
                     value = custom_config['duration_months']
                     if not isinstance(value, int) or value <= 0 or value > 120:
                         validation_errors.append("duration_months must be a positive integer between 1 and 120")
+                
+                if 'max_client_companies' in custom_config:
+                    value = custom_config['max_client_companies']
+                    if value is not None and (not isinstance(value, int) or value <= 0):
+                        validation_errors.append("max_client_companies must be a positive integer or null (for unlimited)")
                 
                 if validation_errors:
                     return False, "Custom limits validation failed: " + "; ".join(validation_errors)
@@ -1514,25 +1626,19 @@ class LicenseService:
             except Exception as e:
                 logger.warning(f"Could not validate campaign usage for business_id {business_id}: {e}")
             
-            # Check 3: Max invitations across active campaigns vs target limit
+            # Check 3: Company domain count vs target max_client_companies limit
             try:
-                from models import CampaignParticipant
-                max_invitations_query = db.session.query(
-                    func.max(func.count(CampaignParticipant.id))
-                ).join(Campaign).filter(
-                    Campaign.business_account_id == business_id,
-                    Campaign.status.in_(['active', 'ready'])  # Only check active campaigns
-                ).group_by(Campaign.id)
-                
-                max_invitations_result = max_invitations_query.scalar()
-                max_invitations_used = max_invitations_result or 0
-                
-                if max_invitations_used > target_template.max_invitations_per_campaign:
-                    validation_errors.append(
-                        f"Max invitations in active campaign ({max_invitations_used}) exceeds target limit ({target_template.max_invitations_per_campaign})"
-                    )
+                target_max_companies = getattr(target_template, 'max_client_companies', None)
+                if target_max_companies is not None:
+                    current_domain_count = LicenseService.get_unique_company_domain_count(business_id)
+                    if current_domain_count > target_max_companies:
+                        validation_errors.append(
+                            f"Current client company count ({current_domain_count}) exceeds target limit ({target_max_companies}). "
+                            f"The account has participants from {current_domain_count} distinct client companies, "
+                            f"but the target license only allows {target_max_companies}."
+                        )
             except Exception as e:
-                logger.warning(f"Could not validate participant usage for business_id {business_id}: {e}")
+                logger.warning(f"Could not validate company domain count for business_id {business_id}: {e}")
             
             # Return validation results
             if validation_errors:

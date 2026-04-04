@@ -85,6 +85,7 @@ class LicenseTemplate:
     max_users: int
     max_participants_per_campaign: int  # Target responses (informational)
     max_invitations_per_campaign: int   # Hard limit for invitations
+    max_client_companies: Optional[int] = None  # Null = unlimited (Trial, Pro default)
     
     # Pricing
     annual_price: Optional[float] = None  # Annual price in USD (None for trial/custom)
@@ -132,6 +133,7 @@ class LicenseTemplate:
             'max_users': self.max_users,
             'max_participants_per_campaign': self.max_participants_per_campaign,
             'max_invitations_per_campaign': self.max_invitations_per_campaign,
+            'max_client_companies': self.max_client_companies,
             'annual_price': self.annual_price,
             'is_custom': self.is_custom,
             'is_trial': self.is_trial,
@@ -184,6 +186,12 @@ class LicenseTemplate:
                 raise ValueError("duration_months must be a positive integer")
             config['default_duration_months'] = custom_config['duration_months']
         
+        if 'max_client_companies' in custom_config:
+            value = custom_config['max_client_companies']
+            if value is not None and (not isinstance(value, int) or value <= 0):
+                raise ValueError("max_client_companies must be a positive integer or null")
+            config['max_client_companies'] = value
+        
         return config
 
 
@@ -202,6 +210,7 @@ class LicenseTemplateManager:
         max_users=5,
         max_participants_per_campaign=200,
         max_invitations_per_campaign=1000,
+        max_client_companies=20,
         annual_price=8000.00,
         default_duration_months=12,
         features=['Basic Analytics', 'Email Support', 'Standard Templates']
@@ -215,6 +224,7 @@ class LicenseTemplateManager:
         max_users=10,
         max_participants_per_campaign=1000,
         max_invitations_per_campaign=5000,
+        max_client_companies=100,
         annual_price=12000.00,
         default_duration_months=12,
         features=['Advanced Analytics', 'Priority Support', 'Custom Templates', 'API Access']
@@ -228,6 +238,7 @@ class LicenseTemplateManager:
         max_users=25,  # Default for Pro, but customizable
         max_participants_per_campaign=10000,  # Default for Pro, but customizable
         max_invitations_per_campaign=50000,  # Default for Pro, but customizable
+        max_client_companies=None,  # Unlimited by default, configurable by admin
         is_custom=True,
         default_duration_months=12,
         features=['Custom Analytics', 'Dedicated Support', 'White Label', 'Custom Integrations', 'SLA Guarantee']
@@ -241,6 +252,7 @@ class LicenseTemplateManager:
         max_users=2,
         max_participants_per_campaign=50,
         max_invitations_per_campaign=250,
+        max_client_companies=None,  # Unlimited for trial
         is_trial=True,
         default_duration_months=1,
         features=['Basic Features', 'Limited Support']
@@ -423,6 +435,7 @@ class LicenseTemplateManager:
             'max_campaigns_per_year': license_config['max_campaigns_per_year'],
             'max_users': license_config['max_users'], 
             'max_participants_per_campaign': license_config['max_participants_per_campaign'],
+            'max_client_companies': license_config.get('max_client_companies'),
             'created_by': created_by,
             'notes': notes,
             'migrated_from_business_account': False,
