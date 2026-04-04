@@ -41,7 +41,11 @@ ACTION_DESCRIPTIONS = {
     'executive_report_downloaded': 'Executive report downloaded',
     'campaign_simulation_completed': 'Campaign simulation completed',
     'campaign_validated': 'Campaign validated by manager',
-    'campaign_activated': 'Campaign activated'
+    'campaign_activated': 'Campaign activated',
+    'qbr_transcript_uploaded': 'QBR transcript uploaded',
+    'qbr_analysis_completed': 'QBR analysis completed',
+    'qbr_analysis_failed': 'QBR analysis failed',
+    'qbr_session_deleted': 'QBR session deleted',
 }
 
 def get_current_user_context():

@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Upload QBR Transcript') }} — VOÏA{% endblock %}
+{% block page_class %}page-qbr-upload{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 700px;">
+    <div class="mb-4">
+        <a href="{{ url_for('qbr.qbr_dashboard') }}" class="btn btn-sm btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i> {{ _('Back to QBR Dashboard') }}
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-header border-0 py-4 px-4" style="background: #ffffff !important; border-bottom: 3px solid var(--primary-red, #E13A44) !important;">
+            <h4 class="fw-bold mb-1" style="color: var(--neutral-dark, #2B2B2B);">
+                <i class="fas fa-upload me-2" style="color: #E13A44;"></i>{{ _('Upload QBR Transcript') }}
+            </h4>
+            <p class="text-muted mb-0 small">{{ _('Upload a .txt transcript file to generate an AI-powered strategic brief') }}</p>
+        </div>
+        <div class="card-body p-4">
+            <form method="POST" action="{{ url_for('qbr.qbr_upload') }}" enctype="multipart/form-data" id="qbrUploadForm">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <!-- Company Name -->
+                <div class="mb-4">
+                    <label for="company_name" class="form-label fw-semibold">
+                        {{ _('Client Company Name') }} <span class="text-danger">*</span>
+                    </label>
+                    {% if companies %}
+                    <input
+                        type="text"
+                        id="company_name"
+                        name="company_name"
+                        class="form-control"
+                        list="company_suggestions"
+                        placeholder="{{ _('Type to search client companies…') }}"
+                        required
+                        autocomplete="off"
+                        value="{{ request.form.get('company_name', '') }}"
+                    >
+                    <datalist id="company_suggestions">
+                        {% for company in companies %}
+                        <option value="{{ company }}">
+                        {% endfor %}
+                    </datalist>
+                    <div class="form-text text-muted">
+                        {{ _('Select a company from the list. Only known client companies are accepted.') }}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-warning border-0 py-3" style="border-radius: 8px;">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>{{ _('No client companies found.') }}</strong>
+                        {{ _('Add participants with company names before uploading a QBR transcript.') }}
+                    </div>
+                    <input type="hidden" name="company_name" value="">
+                    {% endif %}
+                </div>
+
+                <!-- Quarter & Year -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label for="quarter" class="form-label fw-semibold">
+                            {{ _('Quarter') }} <span class="text-danger">*</span>
+                        </label>
+                        <select id="quarter" name="quarter" class="form-select" required>
+                            <option value="">{{ _('Select quarter…') }}</option>
+                            {% for q in [1, 2, 3, 4] %}
+                            <option value="{{ q }}" {% if request.form.get('quarter') == q|string %}selected{% endif %}>Q{{ q }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="year" class="form-label fw-semibold">
+                            {{ _('Year') }} <span class="text-danger">*</span>
+                        </label>
+                        <input
+                            type="number"
+                            id="year"
+                            name="year"
+                            class="form-control"
+                            min="2020"
+                            max="2030"
+                            value="{{ request.form.get('year', current_year) }}"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <!-- File Upload -->
+                <div class="mb-4">
+                    <label for="transcript_file" class="form-label fw-semibold">
+                        {{ _('Transcript File (.txt)') }} <span class="text-danger">*</span>
+                    </label>
+                    <input
+                        type="file"
+                        id="transcript_file"
+                        name="transcript_file"
+                        class="form-control"
+                        accept=".txt"
+                        required
+                    >
+                    <div class="form-text text-muted">{{ _('Only .txt files are accepted. Maximum size: 500 KB.') }}</div>
+                </div>
+
+                <!-- Info Box -->
+                <div class="alert alert-info border-0 mb-4" style="background: rgba(13,110,253,0.07); border-left: 4px solid #0d6efd !important; border-radius: 8px;">
+                    <div class="d-flex align-items-start gap-2">
+                        <i class="fas fa-robot mt-1 text-primary"></i>
+                        <div>
+                            <strong class="d-block mb-1">{{ _('AI-powered analysis') }}</strong>
+                            <span class="small text-muted">{{ _('After upload, VOÏA will extract renewal sentiment, relationship health, top concerns, action items, competitive mentions, and an executive summary. Analysis runs in the background — you\'ll be notified when it\'s ready.') }}</span>
+                            <div class="mt-2 small text-muted">
+                                <i class="fas fa-language me-1"></i>
+                                {{ _('Transcripts in French and other languages are automatically detected and analysed — the brief will be returned in the transcript\'s language.') }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-danger" id="submitBtn" {% if not companies %}disabled title="{{ _('Add client companies (participants) before uploading') }}"{% endif %}>
+                        <i class="fas fa-upload me-1"></i> {{ _('Upload & Analyze') }}
+                    </button>
+                    <a href="{{ url_for('qbr.qbr_dashboard') }}" class="btn btn-outline-secondary">{{ _('Cancel') }}</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('qbrUploadForm').addEventListener('submit', function() {
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> {{ _("Uploading…") }}';
+});
+</script>
+{% endblock %}

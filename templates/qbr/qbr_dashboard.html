@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('QBR Intelligence') }} — VOÏA{% endblock %}
+{% block page_class %}page-qbr-dashboard{% endblock %}
+
+{% block content %}
+<style>
+.modal { z-index: 10010 !important; }
+.modal-backdrop { z-index: 10005 !important; }
+</style>
+<div class="container-fluid px-0">
+    <!-- Header -->
+    <div class="border-0 mb-0 px-4 py-4 d-flex justify-content-between align-items-center flex-wrap gap-3" style="background: #ffffff; border-bottom: 3px solid var(--primary-red, #E13A44);">
+        <div>
+            <h1 class="mb-1 fw-bold" style="font-size: 1.75rem; color: var(--neutral-dark, #2B2B2B);">
+                <i class="fas fa-handshake me-2" style="color: #E13A44;"></i>{{ _('QBR Intelligence') }}
+            </h1>
+            <p class="text-muted mb-0" style="font-size: 0.9rem;">{{ _('Quarterly Business Review transcript analysis and strategic briefs') }}</p>
+        </div>
+        <a href="{{ url_for('qbr.qbr_upload') }}" class="btn btn-danger">
+            <i class="fas fa-upload me-1"></i> {{ _('Upload Transcript') }}
+        </a>
+    </div>
+
+    <!-- Breadcrumb -->
+    <div class="px-4 py-2 mb-3" style="background: #f8f9fb; border-bottom: 1px solid #e9ecef;">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0 small">
+                <li class="breadcrumb-item active" aria-current="page">
+                    <i class="fas fa-handshake me-1"></i>{{ _('QBR Intelligence') }}
+                </li>
+            </ol>
+        </nav>
+    </div>
+
+    <div class="px-4">
+        <!-- Filters -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body py-3">
+                <form method="GET" action="{{ url_for('qbr.qbr_dashboard') }}" class="row g-3 align-items-end">
+                    <div class="col-md-5">
+                        <label class="form-label fw-semibold small text-muted">{{ _('Company') }}</label>
+                        <input type="text" name="company" class="form-control" placeholder="{{ _('Filter by company name…') }}" value="{{ company_filter }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold small text-muted">{{ _('Quarter') }}</label>
+                        <select name="quarter" class="form-select">
+                            <option value="">{{ _('All Quarters') }}</option>
+                            {% for q in [1, 2, 3, 4] %}
+                            <option value="{{ q }}" {% if quarter_filter == q|string %}selected{% endif %}>Q{{ q }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-auto">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-filter me-1"></i> {{ _('Filter') }}
+                        </button>
+                        {% if company_filter or quarter_filter %}
+                        <a href="{{ url_for('qbr.qbr_dashboard') }}" class="btn btn-outline-secondary ms-1">
+                            <i class="fas fa-times me-1"></i> {{ _('Clear') }}
+                        </a>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Sessions Table -->
+        {% if sessions %}
+        <div class="card border-0 shadow-sm">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead style="background: #f8f9fb;">
+                        <tr>
+                            <th class="px-4 py-3 fw-semibold text-muted small">{{ _('Company') }}</th>
+                            <th class="py-3 fw-semibold text-muted small">{{ _('Period') }}</th>
+                            <th class="py-3 fw-semibold text-muted small">{{ _('Status') }}</th>
+                            <th class="py-3 fw-semibold text-muted small">{{ _('Renewal Sentiment') }}</th>
+                            <th class="py-3 fw-semibold text-muted small">{{ _('Uploaded') }}</th>
+                            <th class="py-3 fw-semibold text-muted small text-end pe-4">{{ _('Actions') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in sessions %}
+                        <tr>
+                            <td class="px-4 py-3">
+                                <a href="{{ url_for('qbr.qbr_company_history', company_name=s.company_name) }}" class="fw-semibold text-decoration-none" style="color: #1a1a1a;">
+                                    {{ s.company_name }}
+                                </a>
+                            </td>
+                            <td class="py-3">
+                                <span class="badge bg-secondary-subtle text-secondary fw-semibold">Q{{ s.quarter }} {{ s.year }}</span>
+                            </td>
+                            <td class="py-3">
+                                {% if s.status == 'complete' %}
+                                <span class="badge bg-success-subtle text-success"><i class="fas fa-check-circle me-1"></i>{{ _('Complete') }}</span>
+                                {% elif s.status == 'processing' %}
+                                <span class="badge bg-info-subtle text-info"><i class="fas fa-spinner fa-spin me-1"></i>{{ _('Processing') }}</span>
+                                {% elif s.status == 'pending' %}
+                                <span class="badge bg-warning-subtle text-warning"><i class="fas fa-clock me-1"></i>{{ _('Pending') }}</span>
+                                {% else %}
+                                <span class="badge bg-danger-subtle text-danger"><i class="fas fa-exclamation-circle me-1"></i>{{ _('Failed') }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="py-3">
+                                {% if s.status == 'complete' and s.extracted_insights %}
+                                    {% set sentiment = s.extracted_insights.get('renewal_sentiment', 'neutral') %}
+                                    {% if sentiment == 'positive' %}
+                                    <span class="badge" style="background: rgba(25,135,84,0.12); color: #198754; border: 1px solid #198754;"><i class="fas fa-thumbs-up me-1"></i>{{ _('Positive') }}</span>
+                                    {% elif sentiment == 'at_risk' %}
+                                    <span class="badge" style="background: rgba(220,53,69,0.12); color: #dc3545; border: 1px solid #dc3545;"><i class="fas fa-exclamation-triangle me-1"></i>{{ _('At Risk') }}</span>
+                                    {% else %}
+                                    <span class="badge" style="background: rgba(255,193,7,0.12); color: #856404; border: 1px solid #ffc107;"><i class="fas fa-minus me-1"></i>{{ _('Neutral') }}</span>
+                                    {% endif %}
+                                {% else %}
+                                <span class="text-muted small">—</span>
+                                {% endif %}
+                            </td>
+                            <td class="py-3">
+                                <span class="text-muted small">{{ s.created_at.strftime('%b %d, %Y') if s.created_at else '—' }}</span>
+                            </td>
+                            <td class="py-3 text-end pe-4">
+                                {% if s.status == 'complete' %}
+                                <a href="{{ url_for('qbr.qbr_session_detail', session_uuid=s.uuid) }}" class="btn btn-sm btn-outline-primary me-1">
+                                    <i class="fas fa-eye me-1"></i>{{ _('View Brief') }}
+                                </a>
+                                {% endif %}
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteQBRSession('{{ s.uuid }}', '{{ s.company_name }}', 'Q{{ s.quarter }} {{ s.year }}')" title="{{ _('Delete session') }}">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if pagination.pages > 1 %}
+            <div class="card-footer border-0 bg-white py-3 d-flex justify-content-center">
+                <nav aria-label="{{ _('QBR sessions pagination') }}">
+                    <ul class="pagination pagination-sm mb-0">
+                        {% if pagination.has_prev %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('qbr.qbr_dashboard', page=pagination.prev_num, company=company_filter, quarter=quarter_filter) }}">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        </li>
+                        {% endif %}
+                        {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                            {% if page_num %}
+                            <li class="page-item {% if page_num == pagination.page %}active{% endif %}">
+                                <a class="page-link" href="{{ url_for('qbr.qbr_dashboard', page=page_num, company=company_filter, quarter=quarter_filter) }}">{{ page_num }}</a>
+                            </li>
+                            {% else %}
+                            <li class="page-item disabled"><span class="page-link">…</span></li>
+                            {% endif %}
+                        {% endfor %}
+                        {% if pagination.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('qbr.qbr_dashboard', page=pagination.next_num, company=company_filter, quarter=quarter_filter) }}">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+
+        {% else %}
+        <!-- Empty State -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center py-5">
+                <div class="mb-3" style="font-size: 3rem; color: #dee2e6;">
+                    <i class="fas fa-handshake"></i>
+                </div>
+                <h5 class="fw-semibold text-muted mb-2">{{ _('No QBR Sessions Yet') }}</h5>
+                {% if company_filter or quarter_filter %}
+                <p class="text-muted mb-3">{{ _('No sessions match the current filters.') }}</p>
+                <a href="{{ url_for('qbr.qbr_dashboard') }}" class="btn btn-outline-secondary me-2">{{ _('Clear Filters') }}</a>
+                {% else %}
+                <p class="text-muted mb-3">{{ _('Upload a QBR transcript to get started with AI-powered strategic briefs.') }}</p>
+                {% endif %}
+                <a href="{{ url_for('qbr.qbr_upload') }}" class="btn btn-danger">
+                    <i class="fas fa-upload me-1"></i> {{ _('Upload Transcript') }}
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h6 class="modal-title fw-bold" id="deleteModalLabel">
+                    <i class="fas fa-trash-alt text-danger me-2"></i>{{ _('Delete QBR Session') }}
+                </h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-0 small">{{ _('Are you sure you want to delete the QBR session for') }} <strong id="deleteSessionLabel"></strong>? {{ _('This action cannot be undone.') }}</p>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+                <button type="button" class="btn btn-sm btn-danger" id="confirmDeleteBtn">{{ _('Delete') }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let pendingDeleteUuid = null;
+
+function deleteQBRSession(sessionUuid, companyName, period) {
+    pendingDeleteUuid = sessionUuid;
+    document.getElementById('deleteSessionLabel').textContent = companyName + ' — ' + period;
+    new bootstrap.Modal(document.getElementById('deleteModal')).show();
+}
+
+document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+    if (!pendingDeleteUuid) return;
+    const uuid = pendingDeleteUuid;
+    this.disabled = true;
+    this.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>{{ _("Deleting…") }}';
+
+    fetch('/api/qbr/sessions/' + uuid, {
+        method: 'DELETE',
+        headers: {
+            'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').content
+        }
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            window.location.reload();
+        } else {
+            alert(data.error || '{{ _("Failed to delete session.") }}');
+            bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
+        }
+    })
+    .catch(() => {
+        alert('{{ _("An error occurred. Please try again.") }}');
+        bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
+    });
+});
+</script>
+{% endblock %}

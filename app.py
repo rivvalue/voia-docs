@@ -635,6 +635,11 @@ with app.app_context():
     from language_routes import language_bp
     app.register_blueprint(language_bp)
     
+    # Register QBR (Quarterly Business Review) blueprints
+    from qbr_routes import qbr_bp, qbr_api_bp
+    app.register_blueprint(qbr_bp)
+    app.register_blueprint(qbr_api_bp)
+    
     # Initialize Rivvalue admin user (Phase 2)
     try:
         init_result = init_rivvalue_admin_user()

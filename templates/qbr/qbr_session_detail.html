@@ -1,0 +1,738 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('QBR Brief') }} — {{ qbr_session.company_name }} Q{{ qbr_session.quarter }} {{ qbr_session.year }} — VOÏA{% endblock %}
+{% block page_class %}page-qbr-session-detail{% endblock %}
+
+{% block content %}
+<style>
+/* Fix modal z-index — app notification panel is at 9999 */
+.modal { z-index: 10010 !important; }
+.modal-backdrop { z-index: 10005 !important; }
+.qbr-quote {
+    font-style: italic;
+    font-size: 0.8rem;
+    color: var(--gray-dark, #8A8A8A);
+    border-left: 3px solid var(--light-gray, #E9E8E4);
+    padding-left: 0.6rem;
+    margin-top: 0.4rem;
+    line-height: 1.5;
+}
+.qbr-quote::before { content: '"'; }
+.qbr-quote::after  { content: '"'; }
+.stakeholder-badge-client { background: rgba(26, 26, 26, 0.10); color: #1a1a1a; border: 1px solid rgba(26, 26, 26, 0.2); }
+.stakeholder-badge-vendor { background: rgba(225, 58, 68, 0.10); color: var(--primary-red, #E13A44); border: 1px solid rgba(225, 58, 68, 0.2); }
+.stakeholder-badge-unknown { background: rgba(138, 138, 138, 0.10); color: var(--gray-dark, #8A8A8A); border: 1px solid var(--medium-gray, #BDBDBD); }
+.transcript-viewer { font-family: 'Courier New', monospace; font-size: 0.82rem; line-height: 1.7;
+    background: var(--light-gray, #E9E8E4); border-radius: 8px; padding: 1.25rem; max-height: 500px;
+    overflow-y: auto; white-space: pre-wrap; word-break: break-word; color: var(--neutral-dark, #2B2B2B); }
+.qbr-highlight { background: rgba(225, 58, 68, 0.15); border-radius: 3px; padding: 1px 3px;
+    outline: 1px solid var(--primary-red, #E13A44); scroll-margin-top: 40px; }
+.qbr-jump-btn { font-size: 0.72rem; color: var(--gray-dark, #8A8A8A); text-decoration: none; border: none;
+    background: none; padding: 0; white-space: nowrap; transition: color .15s; }
+.qbr-jump-btn:hover { color: var(--primary-red, #E13A44); }
+
+.qbr-card-title { font-family: var(--font-family-headings, 'Montserrat', sans-serif); }
+.qbr-body-text { font-family: var(--font-family-base, 'Karla', sans-serif); }
+.qbr-icon-accent { color: var(--primary-red, #E13A44); }
+.qbr-icon-neutral { color: var(--gray-dark, #8A8A8A); }
+</style>
+
+<div class="container-fluid px-0 qbr-body-text">
+
+    <!-- Dark Header -->
+    <div class="border-0 mb-0 px-4 py-4" style="background: #ffffff; border-bottom: 3px solid var(--primary-red, #E13A44);">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+            <div>
+                <h1 class="fw-bold mb-1 qbr-card-title" style="font-size: 1.6rem; color: var(--neutral-dark, #2B2B2B);">
+                    <i class="fas fa-file-alt me-2 qbr-icon-accent"></i>
+                    {{ qbr_session.company_name }} — Q{{ qbr_session.quarter }} {{ qbr_session.year }}
+                </h1>
+                <div class="d-flex align-items-center gap-3 mt-1 flex-wrap">
+                    <span class="text-muted small"><i class="fas fa-calendar me-1"></i>{{ _('Uploaded') }} {{ qbr_session.created_at.strftime('%b %d, %Y') if qbr_session.created_at else '—' }}</span>
+                    {% if qbr_session.transcript_filename %}
+                    <span class="text-muted small"><i class="fas fa-file-alt me-1"></i>{{ qbr_session.transcript_filename }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="d-flex gap-2 align-items-center">
+                {% if qbr_session.status == 'complete' %}
+                <span class="badge bg-success fs-6 px-3 py-2"><i class="fas fa-check-circle me-1"></i>{{ _('Analysis Complete') }}</span>
+                {% elif qbr_session.status == 'processing' %}
+                <span class="badge bg-secondary fs-6 px-3 py-2"><i class="fas fa-spinner fa-spin me-1"></i>{{ _('Processing…') }}</span>
+                {% elif qbr_session.status == 'pending' %}
+                <span class="badge bg-secondary fs-6 px-3 py-2"><i class="fas fa-clock me-1"></i>{{ _('Pending') }}</span>
+                {% else %}
+                <span class="badge bg-danger fs-6 px-3 py-2"><i class="fas fa-exclamation-circle me-1"></i>{{ _('Analysis Failed') }}</span>
+                {% endif %}
+                <button class="btn btn-outline-secondary btn-sm" id="openDeleteModalBtn">
+                    <i class="fas fa-trash-alt me-1"></i>{{ _('Delete') }}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Breadcrumb -->
+    <div class="px-4 py-2" style="background: var(--light-gray, #f8f9fb); border-bottom: 1px solid var(--medium-gray, #e9ecef);">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0 small">
+                <li class="breadcrumb-item">
+                    <a href="{{ url_for('qbr.qbr_dashboard') }}" class="text-decoration-none text-muted">
+                        <i class="fas fa-handshake me-1"></i>{{ _('QBR Intelligence') }}
+                    </a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="{{ url_for('qbr.qbr_company_history', company_name=qbr_session.company_name) }}" class="text-decoration-none text-muted">{{ qbr_session.company_name }}</a>
+                </li>
+                <li class="breadcrumb-item active text-dark" aria-current="page">Q{{ qbr_session.quarter }} {{ qbr_session.year }}</li>
+            </ol>
+        </nav>
+    </div>
+
+    <div class="px-4 py-4">
+
+        {% if qbr_session.status in ['pending', 'processing'] %}
+        <div class="alert alert-secondary border-0 text-center py-4" style="border-radius: 12px; background-color: var(--light-gray, #E9E8E4);">
+            <i class="fas fa-robot fa-2x mb-2 qbr-icon-neutral d-block"></i>
+            <strong class="text-dark">{{ _('AI analysis is in progress…') }}</strong>
+            <p class="text-muted mb-0 mt-1 small">{{ _('Refresh this page or check notifications when the brief is ready.') }}</p>
+            <button class="btn btn-sm btn-outline-secondary mt-3" onclick="location.reload()">
+                <i class="fas fa-sync me-1"></i> {{ _('Refresh') }}
+            </button>
+        </div>
+
+        {% elif qbr_session.status == 'failed' %}
+        <div class="alert alert-danger border-0 text-center py-4" style="border-radius: 12px;">
+            <i class="fas fa-exclamation-circle fa-2x mb-2 d-block"></i>
+            <strong>{{ _('Analysis failed') }}</strong>
+            <p class="text-muted mb-0 mt-1 small">{{ _('The AI was unable to process this transcript. Please try re-uploading the file.') }}</p>
+        </div>
+
+        {% elif qbr_session.extracted_insights %}
+        {% set ins = qbr_session.extracted_insights %}
+        {% set sentiment = ins.get('renewal_sentiment', 'neutral') %}
+        {% set health = ins.get('overall_relationship_health', 'stable') %}
+
+        <!-- ── Hero KPI Row ─────────────────────────────────── -->
+        <div class="row g-3 mb-4">
+
+            <!-- Renewal Sentiment -->
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100 text-center py-4" style="border-radius: 12px; background-color: #f8f9fb;">
+                    <div class="small fw-semibold text-muted text-uppercase mb-2 qbr-card-title">
+                        {{ _('Renewal Sentiment') }}
+                        <i class="fas fa-circle-question ms-1 text-muted"
+                           data-bs-toggle="tooltip"
+                           data-bs-placement="top"
+                           title="{{ _('AI assessment of the client\'s renewal likelihood, based on tone, explicit statements, and buying signals found in the transcript. Confidence shows how clearly those signals support the classification.') }}"
+                           style="cursor:help;font-size:0.8rem;"></i>
+                    </div>
+                    {% if sentiment == 'positive' %}
+                    <div class="d-inline-flex align-items-center gap-2 px-3 py-2 rounded-pill fw-bold mx-auto" style="background:rgba(25,135,84,.12);color:#198754;font-size:1rem;">
+                        <i class="fas fa-thumbs-up"></i> {{ _('Positive') }}
+                    </div>
+                    {% elif sentiment == 'at_risk' %}
+                    <div class="d-inline-flex align-items-center gap-2 px-3 py-2 rounded-pill fw-bold mx-auto" style="background:rgba(225,58,68,.12);color:var(--primary-red);font-size:1rem;">
+                        <i class="fas fa-exclamation-triangle"></i> {{ _('At Risk') }}
+                    </div>
+                    {% else %}
+                    <div class="d-inline-flex align-items-center gap-2 px-3 py-2 rounded-pill fw-bold mx-auto" style="background:var(--light-gray);color:var(--neutral-dark);font-size:1rem;">
+                        <i class="fas fa-minus-circle"></i> {{ _('Neutral') }}
+                    </div>
+                    {% endif %}
+                    <div class="mt-2 small text-muted">{{ _('Confidence') }}: {{ (ins.get('renewal_confidence_score', 0) * 100)|int }}%</div>
+                </div>
+            </div>
+
+            <!-- Relationship Health -->
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100 text-center py-4" style="border-radius: 12px; background-color: #f8f9fb;">
+                    <div class="small fw-semibold text-muted text-uppercase mb-2 qbr-card-title">{{ _('Relationship Health') }}</div>
+                    {% if health == 'strong' %}
+                    <div class="d-inline-flex align-items-center gap-2 px-3 py-2 rounded-pill fw-bold mx-auto" style="background:rgba(25,135,84,.12);color:#198754;font-size:1rem;">
+                        <i class="fas fa-heart"></i> {{ _('Strong') }}
+                    </div>
+                    {% elif health == 'fragile' %}
+                    <div class="d-inline-flex align-items-center gap-2 px-3 py-2 rounded-pill fw-bold mx-auto" style="background:rgba(225,58,68,.12);color:var(--primary-red);font-size:1rem;">
+                        <i class="fas fa-heart-broken"></i> {{ _('Fragile') }}
+                    </div>
+                    {% else %}
+                    <div class="d-inline-flex align-items-center gap-2 px-3 py-2 rounded-pill fw-bold mx-auto" style="background:var(--light-gray);color:var(--neutral-dark);font-size:1rem;">
+                        <i class="fas fa-heartbeat"></i> {{ _('Stable') }}
+                    </div>
+                    {% endif %}
+                    {% set hs = ins.get('relationship_health_score', 0) %}
+                    <div class="mt-3 px-3">
+                        <div class="progress" style="height:5px;border-radius:4px;background-color:var(--red-light);">
+                            <div class="progress-bar"
+                                 style="width:{{ (hs * 100)|int }}%;background-color:var(--primary-red);"></div>
+                        </div>
+                        <div class="small text-muted mt-1">{{ _('Score') }}: {{ (hs * 100)|int }}%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analysis Quality -->
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100 text-center py-4" style="border-radius: 12px; background-color: #f8f9fb;">
+                    <div class="small fw-semibold text-muted text-uppercase mb-2 qbr-card-title">
+                        {{ _('Analysis Quality') }}
+                        <i class="fas fa-circle-question ms-1 text-muted"
+                           data-bs-toggle="tooltip"
+                           data-bs-placement="top"
+                           title="{{ _('Reflects how complete and clear the transcript is. High means the AI found sufficient context to make confident judgements. Low means the transcript may be too short, unclear, or missing key discussion.') }}"
+                           style="cursor:help;font-size:0.8rem;"></i>
+                    </div>
+                    {% set ac = ins.get('analysis_confidence', 0) %}
+                    {% set ac_pct = (ac * 100)|int %}
+                    <div class="fw-bold mx-auto mb-1" style="font-size:1.8rem; color: var(--neutral-dark);">{{ ac_pct }}%</div>
+                    <div class="px-3">
+                        <div class="progress" style="height:5px;border-radius:4px;background-color:var(--light-gray);">
+                            <div class="progress-bar"
+                                 style="width:{{ ac_pct }}%;background-color:var(--gray-dark);"></div>
+                        </div>
+                        <div class="small text-muted mt-1">
+                            {% if ac_pct >= 75 %}{{ _('High confidence') }}
+                            {% elif ac_pct >= 50 %}{{ _('Moderate confidence') }}
+                            {% else %}{{ _('Low confidence — transcript may be incomplete') }}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ── Key Themes Row ──────────────────────────────────── -->
+        {% set themes = ins.get('key_themes', []) %}
+        <div class="card border-0 shadow-sm mb-4 py-3 px-4" style="border-radius: 12px; background-color: #f8f9fb;">
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <i class="fas fa-tags qbr-icon-accent" style="font-size:.9rem;"></i>
+                <span class="small fw-semibold text-muted text-uppercase qbr-card-title">{{ _('Key Themes') }}</span>
+            </div>
+            {% if themes %}
+            <div class="d-flex flex-wrap gap-2">
+                {% for t in themes %}
+                <span class="badge rounded-pill" style="background:var(--light-gray);color:var(--neutral-dark);border:1px solid var(--medium-gray);font-size:.8rem;font-weight:500;padding:.4em .85em;">{{ t }}</span>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-muted small mb-0">{{ _('No themes extracted.') }}</p>
+            {% endif %}
+        </div>
+
+        <!-- ── Executive Summary ───────────────────────────────── -->
+        {% if ins.get('executive_summary') %}
+        <div class="card border-0 shadow-sm mb-4" style="border-radius:12px;border-left:4px solid var(--primary-red) !important; background-color: #f8f9fb;">
+            <div class="card-body py-4 px-4 d-flex align-items-start gap-3">
+                <div style="width:36px;height:36px;background:rgba(225,58,68,.10);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <i class="fas fa-star qbr-icon-accent"></i>
+                </div>
+                <div>
+                    <h6 class="fw-bold mb-2 qbr-card-title">{{ _('Executive Summary') }}</h6>
+                    <p class="mb-0 text-dark" style="font-size:.95rem;line-height:1.7;">{{ ins.get('executive_summary') }}</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- ── Meeting Context Banner ─────────────────────────── -->
+        {% set meeting_date = ins.get('meeting_date', 'Not specified') %}
+        {% set meeting_time = ins.get('meeting_time_range', 'Not specified') %}
+        {% set stakeholders = ins.get('stakeholders', []) %}
+        <div class="card border-0 shadow-sm mb-4" style="border-radius:12px; background: #ffffff; border-left: 4px solid var(--primary-red) !important; border: 1px solid var(--light-gray);">
+            <div class="card-body py-3 px-4" style="background: transparent;">
+                <div class="d-flex align-items-center gap-4 flex-wrap">
+                    <div class="d-flex align-items-center gap-3">
+                        <div style="width:42px;height:42px;background:rgba(225,58,68,.10);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="fas fa-calendar-days qbr-icon-accent" style="font-size:1.1rem;"></i>
+                        </div>
+                        <div>
+                            <div class="small fw-semibold text-muted text-uppercase qbr-card-title" style="font-size:.65rem;letter-spacing:.05em;">{{ _('Meeting Date') }}</div>
+                            <div class="fw-semibold text-dark" style="font-size:.9rem;">
+                                {% if meeting_date and meeting_date != 'Not specified' %}{{ meeting_date }}
+                                {% else %}<span class="text-muted fst-italic">{{ _('Not found in transcript') }}</span>{% endif %}
+                            </div>
+                            {% if meeting_time and meeting_time != 'Not specified' %}
+                            <div class="text-muted" style="font-size:.78rem;"><i class="fas fa-clock me-1"></i>{{ meeting_time }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% if ins.get('detected_language') %}
+                    <span class="badge rounded-pill" style="background:var(--light-gray);color:var(--neutral-dark);border:1px solid var(--medium-gray);font-size:.78rem;font-weight:500;padding:.4em .85em;">
+                        <i class="fas fa-language me-1"></i>{{ _('Transcript') }}: {{ ins.get('detected_language')|upper }}
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Stakeholders ───────────────────────────────────── -->
+        {% set stakeholders = ins.get('stakeholders', []) %}
+        <div class="card border-0 shadow-sm mb-4" style="border-radius:12px; background-color: #f8f9fb;">
+            <div class="card-header border-0 bg-transparent py-3 px-4" style="border-radius:12px 12px 0 0;" data-bs-toggle="collapse" data-bs-target="#stakeholdersCollapse" role="button">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h6 class="fw-bold mb-0 qbr-card-title text-dark">
+                        <i class="fas fa-users me-2 qbr-icon-neutral"></i>{{ _('Identified Stakeholders') }}
+                        <span class="badge bg-secondary ms-1 small" style="background-color: var(--gray-dark) !important;">{{ stakeholders|length }}</span>
+                    </h6>
+                    <i class="fas fa-chevron-down text-muted small"></i>
+                </div>
+            </div>
+            <div class="collapse show" id="stakeholdersCollapse">
+                <div class="card-body px-4 pb-4 pt-0">
+                    {% if stakeholders %}
+                    <div class="row g-2 mt-1">
+                        {% for sh in stakeholders %}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="d-flex align-items-center gap-2 p-2 rounded bg-white border" style="border-color: var(--light-gray);">
+                                <div class="stakeholder-badge-{{ sh.get('side', 'unknown') }}" style="width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:none;">
+                                    <i class="fas fa-user-tie small"></i>
+                                </div>
+                                <div class="flex-grow-1 overflow-hidden">
+                                    <div class="fw-semibold small text-truncate text-dark">{{ sh.get('name', '—') }}</div>
+                                    <div class="text-muted" style="font-size:.75rem;">{{ sh.get('role', '') }}</div>
+                                </div>
+                                {% set side = sh.get('side', 'unknown') %}
+                                <span class="badge rounded-pill small stakeholder-badge-{{ side }}" style="font-size:.68rem;">
+                                    {% if side == 'client' %}{{ _('Client') }}{% elif side == 'vendor' %}{{ _('Vendor') }}{% else %}{{ _('Unknown') }}{% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted small mb-0 mt-2">{{ _('No stakeholders identified in the transcript.') }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Two-column detail grid ─────────────────────────── -->
+        <div class="row g-4">
+            <div class="col-lg-6">
+
+                <!-- Top Concerns -->
+                <div class="card border-0 shadow-sm mb-4" style="border-radius:12px; background-color: #f8f9fb;">
+                    <div class="card-header border-0 bg-transparent py-3 px-4" data-bs-toggle="collapse" data-bs-target="#concernsCollapse" role="button" style="border-radius:12px 12px 0 0;cursor:pointer;">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="fw-bold mb-0 qbr-card-title text-dark">
+                                <i class="fas fa-exclamation-triangle me-2 qbr-icon-accent"></i>{{ _('Top Concerns') }}
+                                {% set concerns = ins.get('top_concerns', []) %}
+                                <span class="badge ms-1 small" style="background-color: var(--primary-red);">{{ concerns|length }}</span>
+                            </h6>
+                            <i class="fas fa-chevron-down text-muted small"></i>
+                        </div>
+                    </div>
+                    <div class="collapse show" id="concernsCollapse">
+                        <div class="card-body px-4 pb-4 pt-0">
+                            {% set concerns = ins.get('top_concerns', []) %}
+                            {% set concern_quotes = ins.get('top_concerns_quotes', []) %}
+                            {% if concerns %}
+                            <ul class="list-unstyled mb-0">
+                                {% for item in concerns %}
+                                <li class="py-2 border-bottom border-light">
+                                    <div class="d-flex align-items-start gap-2">
+                                        <i class="fas fa-circle-dot mt-1 small flex-shrink-0 qbr-icon-accent"></i>
+                                        <div class="flex-grow-1">
+                                            {# Support both old {text,quote} object format and current parallel-array format #}
+                                            {% if item is mapping %}
+                                            <span class="small text-dark">{{ item.get('text', '') }}</span>
+                                            {% set q = item.get('quote', '') %}
+                                            {% else %}
+                                            <span class="small text-dark">{{ item }}</span>
+                                            {% set q = concern_quotes[loop.index0] if loop.index0 < concern_quotes|length else '' %}
+                                            {% endif %}
+                                            {% if q %}
+                                            <div class="d-flex align-items-start justify-content-between gap-2 mt-1">
+                                                <div class="qbr-quote flex-grow-1">{{ q }}</div>
+                                                <button type="button" class="qbr-jump-btn flex-shrink-0"
+                                                        data-q="{{ q }}"
+                                                        onclick="jumpToQuote(this.dataset.q)"
+                                                        title="{{ _('Jump to source in transcript') }}">
+                                                    <i class="fas fa-arrow-up-right-from-square"></i>
+                                                </button>
+                                            </div>
+                                            {% elif qbr_session.transcript_content %}
+                                            <div class="mt-1">
+                                                <button type="button" class="qbr-jump-btn" onclick="openTranscript()">
+                                                    <i class="fas fa-scroll me-1"></i>{{ _('View transcript') }}
+                                                </button>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                            {% else %}
+                            <p class="text-muted small mb-0">{{ _('No concerns identified.') }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Positive Highlights -->
+                <div class="card border-0 shadow-sm mb-4" style="border-radius:12px; background-color: #f8f9fb;">
+                    <div class="card-header border-0 bg-transparent py-3 px-4" data-bs-toggle="collapse" data-bs-target="#highlightsCollapse" role="button" style="border-radius:12px 12px 0 0;cursor:pointer;">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="fw-bold mb-0 qbr-card-title text-dark">
+                                <i class="fas fa-star me-2 qbr-icon-neutral"></i>{{ _('Positive Highlights') }}
+                                {% set highlights = ins.get('positive_highlights', []) %}
+                                <span class="badge bg-secondary ms-1 small" style="background-color: var(--gray-dark) !important;">{{ highlights|length }}</span>
+                            </h6>
+                            <i class="fas fa-chevron-down text-muted small"></i>
+                        </div>
+                    </div>
+                    <div class="collapse show" id="highlightsCollapse">
+                        <div class="card-body px-4 pb-4 pt-0">
+                            {% set highlights = ins.get('positive_highlights', []) %}
+                            {% set highlight_quotes = ins.get('positive_highlights_quotes', []) %}
+                            {% if highlights %}
+                            <ul class="list-unstyled mb-0">
+                                {% for h in highlights %}
+                                {% set hq = highlight_quotes[loop.index0] if loop.index0 < highlight_quotes|length else '' %}
+                                <li class="py-2 border-bottom border-light">
+                                    <div class="d-flex align-items-start gap-2">
+                                        <i class="fas fa-check mt-1 small flex-shrink-0 qbr-icon-neutral"></i>
+                                        <div class="flex-grow-1">
+                                            <span class="small text-dark">{{ h }}</span>
+                                            {% if hq %}
+                                            <div class="d-flex align-items-start justify-content-between gap-2 mt-1">
+                                                <div class="qbr-quote flex-grow-1">{{ hq }}</div>
+                                                <button type="button" class="qbr-jump-btn flex-shrink-0"
+                                                        data-q="{{ hq }}"
+                                                        onclick="jumpToQuote(this.dataset.q)"
+                                                        title="{{ _('Jump to source in transcript') }}">
+                                                    <i class="fas fa-arrow-up-right-from-square"></i>
+                                                </button>
+                                            </div>
+                                            {% elif qbr_session.transcript_content %}
+                                            <div class="mt-1">
+                                                <button type="button" class="qbr-jump-btn" onclick="openTranscript()">
+                                                    <i class="fas fa-scroll me-1"></i>{{ _('View transcript') }}
+                                                </button>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                            {% else %}
+                            <p class="text-muted small mb-0">{{ _('No highlights identified.') }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Expansion Signals -->
+                <div class="card border-0 shadow-sm mb-4" style="border-radius:12px; background-color: #f8f9fb;">
+                    <div class="card-header border-0 bg-transparent py-3 px-4" data-bs-toggle="collapse" data-bs-target="#expansionCollapse" role="button" style="border-radius:12px 12px 0 0;cursor:pointer;">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="fw-bold mb-0 qbr-card-title text-dark">
+                                <i class="fas fa-chart-line me-2 qbr-icon-neutral"></i>{{ _('Expansion Signals') }}
+                                {% set signals = ins.get('expansion_signals', []) %}
+                                <span class="badge bg-secondary ms-1 small" style="background-color: var(--gray-dark) !important;">{{ signals|length }}</span>
+                            </h6>
+                            <i class="fas fa-chevron-down text-muted small"></i>
+                        </div>
+                    </div>
+                    <div class="collapse show" id="expansionCollapse">
+                        <div class="card-body px-4 pb-4 pt-0">
+                            {% set signals = ins.get('expansion_signals', []) %}
+                            {% if signals %}
+                            <ul class="list-unstyled mb-0">
+                                {% for s in signals %}
+                                <li class="d-flex align-items-start gap-2 py-2 border-bottom border-light">
+                                    <i class="fas fa-arrow-trend-up mt-1 small flex-shrink-0 qbr-icon-neutral"></i>
+                                    <span class="small text-dark">{{ s }}</span>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                            {% else %}
+                            <p class="text-muted small mb-0">{{ _('No expansion signals identified.') }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- /col-left -->
+
+            <div class="col-lg-6">
+
+                <!-- Action Items -->
+                <div class="card border-0 shadow-sm mb-4" style="border-radius:12px; background-color: #f8f9fb;">
+                    <div class="card-header border-0 bg-transparent py-3 px-4" data-bs-toggle="collapse" data-bs-target="#actionsCollapse" role="button" style="border-radius:12px 12px 0 0;cursor:pointer;">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="fw-bold mb-0 qbr-card-title text-dark">
+                                <i class="fas fa-tasks me-2 qbr-icon-neutral"></i>{{ _('Action Items & Commitments') }}
+                                {% set actions = ins.get('action_items', []) %}
+                                <span class="badge bg-secondary ms-1 small" style="background-color: var(--gray-dark) !important;">{{ actions|length }}</span>
+                            </h6>
+                            <i class="fas fa-chevron-down text-muted small"></i>
+                        </div>
+                    </div>
+                    <div class="collapse show" id="actionsCollapse">
+                        <div class="card-body px-4 pb-4 pt-0">
+                            {% set actions = ins.get('action_items', []) %}
+                            {% set action_quotes = ins.get('action_items_quotes', []) %}
+                            {% if actions %}
+                            <ol class="mb-0 ps-3">
+                                {% for item in actions %}
+                                <li class="py-2 border-bottom border-light text-dark">
+                                    {# Support both old {text,quote} object format and current parallel-array format #}
+                                    {% if item is mapping %}
+                                    <span class="small text-dark">{{ item.get('text', '') }}</span>
+                                    {% set q = item.get('quote', '') %}
+                                    {% else %}
+                                    <span class="small text-dark">{{ item }}</span>
+                                    {% set q = action_quotes[loop.index0] if loop.index0 < action_quotes|length else '' %}
+                                    {% endif %}
+                                    {% if q %}
+                                    <div class="d-flex align-items-start justify-content-between gap-2 mt-1">
+                                        <div class="qbr-quote flex-grow-1">{{ q }}</div>
+                                        <button type="button" class="qbr-jump-btn flex-shrink-0"
+                                                data-q="{{ q }}"
+                                                onclick="jumpToQuote(this.dataset.q)"
+                                                title="{{ _('Jump to source in transcript') }}">
+                                            <i class="fas fa-arrow-up-right-from-square"></i>
+                                        </button>
+                                    </div>
+                                    {% elif qbr_session.transcript_content %}
+                                    <div class="mt-1">
+                                        <button type="button" class="qbr-jump-btn" onclick="openTranscript()">
+                                            <i class="fas fa-scroll me-1"></i>{{ _('View transcript') }}
+                                        </button>
+                                    </div>
+                                    {% endif %}
+                                </li>
+                                {% endfor %}
+                            </ol>
+                            {% else %}
+                            <p class="text-muted small mb-0">{{ _('No action items identified.') }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Competitive Mentions -->
+                <div class="card border-0 shadow-sm mb-4" style="border-radius:12px; background-color: #f8f9fb;">
+                    <div class="card-header border-0 bg-transparent py-3 px-4" data-bs-toggle="collapse" data-bs-target="#competitiveCollapse" role="button" style="border-radius:12px 12px 0 0;cursor:pointer;">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="fw-bold mb-0 qbr-card-title text-dark">
+                                <i class="fas fa-shield-halved me-2 qbr-icon-neutral"></i>{{ _('Competitive Mentions') }}
+                                {% set comps = ins.get('competitive_mentions', []) %}
+                                <span class="badge bg-secondary ms-1 small" style="background-color: var(--gray-dark) !important;">{{ comps|length }}</span>
+                            </h6>
+                            <i class="fas fa-chevron-down text-muted small"></i>
+                        </div>
+                    </div>
+                    <div class="collapse show" id="competitiveCollapse">
+                        <div class="card-body px-4 pb-4 pt-0">
+                            {% set comps = ins.get('competitive_mentions', []) %}
+                            {% if comps %}
+                            {% for comp in comps %}
+                            <div class="d-flex align-items-start gap-3 py-2 border-bottom border-light">
+                                <div style="width:30px;height:30px;background:var(--light-gray);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                    <i class="fas fa-building small qbr-icon-neutral"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <strong class="small text-dark">{{ comp.get('name', 'Unknown') }}</strong>
+                                        {% set threat = comp.get('threat_level', 'low') %}
+                                        {% if threat == 'high' %}
+                                        <span class="badge small" style="background-color: var(--primary-red); color: white;">{{ _('High Threat') }}</span>
+                                        {% elif threat == 'medium' %}
+                                        <span class="badge small" style="background-color: var(--gray-dark); color: white;">{{ _('Medium Threat') }}</span>
+                                        {% else %}
+                                        <span class="badge small" style="background-color: var(--medium-gray); color: var(--neutral-dark);">{{ _('Low Threat') }}</span>
+                                        {% endif %}
+                                    </div>
+                                    <p class="small text-muted mb-0">{{ comp.get('context', '') }}</p>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            {% else %}
+                            <p class="text-muted small mb-0">{{ _('No competitive mentions identified.') }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- /col-right -->
+        </div>
+
+        <!-- ── Transcript Viewer ───────────────────────────────── -->
+        {% if qbr_session.transcript_content %}
+        <div class="card border-0 shadow-sm mb-4" style="border-radius:12px; background-color: #f8f9fb;">
+            <div class="card-header border-0 bg-transparent py-3 px-4" data-bs-toggle="collapse" data-bs-target="#transcriptCollapse" role="button" aria-expanded="false" style="border-radius:12px;cursor:pointer;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h6 class="fw-bold mb-0 qbr-card-title text-dark">
+                        <i class="fas fa-scroll me-2 qbr-icon-neutral"></i>{{ _('View Transcript') }}
+                        <span class="badge bg-secondary ms-1 small" style="background-color: var(--medium-gray) !important; color: var(--neutral-dark) !important;">{{ qbr_session.transcript_filename or 'transcript.txt' }}</span>
+                    </h6>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="small text-muted">{{ qbr_session.transcript_content|length }} {{ _('characters') }}</span>
+                        <i class="fas fa-chevron-down text-muted small"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="collapse" id="transcriptCollapse">
+                <div class="card-body px-4 pb-4 pt-3">
+                    <div class="transcript-viewer border" style="border-color: var(--light-gray);" id="transcriptViewer">{{ qbr_session.transcript_content }}</div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% endif %}{# end elif extracted_insights #}
+    </div>
+</div>
+
+<!-- Delete Modal — rendered at content root to avoid stacking context issues -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h6 class="modal-title fw-bold qbr-card-title"><i class="fas fa-trash-alt me-2 qbr-icon-accent"></i>{{ _('Delete QBR Session') }}</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body qbr-body-text">
+                <p class="mb-0 small">{{ _('Are you sure you want to delete this QBR session for') }} <strong>{{ qbr_session.company_name }} Q{{ qbr_session.quarter }} {{ qbr_session.year }}</strong>? {{ _('This action cannot be undone.') }}</p>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+                <button type="button" class="btn btn-sm btn-danger" style="background-color: var(--primary-red); border-color: var(--primary-red);" id="confirmDeleteBtn">{{ _('Delete') }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ── Bootstrap tooltip init ──────────────────────────────────────
+(function() {
+    function initTooltips() {
+        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(el) {
+            new bootstrap.Tooltip(el);
+        });
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initTooltips);
+    } else {
+        initTooltips();
+    }
+})();
+
+// ── Transcript jump-to-source ───────────────────────────────────
+(function() {
+    var viewer = document.getElementById('transcriptViewer');
+    if (viewer) { viewer._originalText = viewer.textContent; }
+})();
+
+function openTranscript() {
+    var collapseEl = document.getElementById('transcriptCollapse');
+    if (!collapseEl) return;
+    bootstrap.Collapse.getOrCreateInstance(collapseEl, {toggle: false}).show();
+    setTimeout(function() { collapseEl.scrollIntoView({behavior: 'smooth', block: 'start'}); }, 350);
+}
+
+function _findMatch(text, quote) {
+    // Strategy 1: exact match
+    var idx = text.indexOf(quote);
+    if (idx !== -1) return {start: idx, len: quote.length};
+
+    // Strategy 2: case-insensitive exact match
+    var lo = text.toLowerCase();
+    idx = lo.indexOf(quote.toLowerCase());
+    if (idx !== -1) return {start: idx, len: quote.length};
+
+    // Strategy 3: first N words (6 → 3) — handles AI minor paraphrase at end of quote
+    var words = quote.trim().split(/\s+/).filter(function(w) { return w.length > 0; });
+    for (var n = Math.min(7, words.length); n >= 3; n--) {
+        var phrase = words.slice(0, n).join(' ');
+        if (phrase.length < 12) continue;
+        idx = lo.indexOf(phrase.toLowerCase());
+        if (idx !== -1) return {start: idx, len: phrase.length};
+    }
+
+    // Strategy 4: any single distinctive word >=8 chars from the quote
+    for (var i = 0; i < words.length; i++) {
+        if (words[i].length >= 8) {
+            idx = lo.indexOf(words[i].toLowerCase());
+            if (idx !== -1) return {start: idx, len: words[i].length};
+        }
+    }
+
+    return null;
+}
+
+function jumpToQuote(rawQuote) {
+    var viewer = document.getElementById('transcriptViewer');
+    var collapseEl = document.getElementById('transcriptCollapse');
+    if (!viewer || !collapseEl) return;
+
+    // Open collapse
+    var bsCol = bootstrap.Collapse.getOrCreateInstance(collapseEl, {toggle: false});
+    bsCol.show();
+
+    // Always restore from the original plain text before applying new highlight
+    var rawText = viewer._originalText || viewer.textContent;
+    viewer._originalText = rawText;
+
+    var match = _findMatch(rawText, rawQuote);
+    if (!match) {
+        // No match at all — just scroll to the transcript section
+        setTimeout(function() { collapseEl.scrollIntoView({behavior: 'smooth', block: 'start'}); }, 350);
+        return;
+    }
+
+    // Rebuild innerHTML with <mark> using safe text-node escaping
+    function esc(str) {
+        var d = document.createElement('div');
+        d.appendChild(document.createTextNode(str));
+        return d.innerHTML;
+    }
+
+    var before = rawText.substring(0, match.start);
+    var matched = rawText.substring(match.start, match.start + match.len);
+    var after = rawText.substring(match.start + match.len);
+
+    viewer.innerHTML =
+        esc(before) +
+        '<mark class="qbr-highlight">' + esc(matched) + '</mark>' +
+        esc(after);
+
+    // Scroll to highlight after collapse animation (~350 ms)
+    setTimeout(function() {
+        var mark = viewer.querySelector('.qbr-highlight');
+        if (mark) mark.scrollIntoView({behavior: 'smooth', block: 'center'});
+    }, 420);
+}
+
+document.getElementById('openDeleteModalBtn').addEventListener('click', function() {
+    new bootstrap.Modal(document.getElementById('deleteModal')).show();
+});
+
+document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+    this.disabled = true;
+    this.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>{{ _("Deleting…") }}';
+    fetch('/api/qbr/sessions/{{ qbr_session.uuid }}', {
+        method: 'DELETE',
+        headers: { 'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').content }
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            window.location.href = '{{ url_for("qbr.qbr_dashboard") }}';
+        } else {
+            alert(data.error || '{{ _("Failed to delete session.") }}');
+            bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
+        }
+    })
+    .catch(() => {
+        alert('{{ _("An error occurred. Please try again.") }}');
+        bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
+    });
+});
+</script>
+{% endblock %}

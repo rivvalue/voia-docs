@@ -10860,3 +10860,416 @@ msgstr "Configuration introuvable."
 #: routes.py
 msgid "Campaign identifier is required."
 msgstr "L'identifiant de la campagne est requis."
+
+#: templates/qbr/qbr_dashboard.html templates/qbr/qbr_session_detail.html
+#: templates/qbr/qbr_company_history.html
+msgid "QBR Intelligence"
+msgstr "Intelligence QBR"
+
+#: templates/qbr/qbr_dashboard.html
+msgid "Quarterly Business Review transcript analysis and strategic briefs"
+msgstr "Analyse des transcriptions de Bilan d'Affaires Trimestriel et notes stratégiques"
+
+#: templates/qbr/qbr_dashboard.html templates/qbr/qbr_upload.html
+#: templates/qbr/qbr_company_history.html
+msgid "Upload Transcript"
+msgstr "Téléverser une transcription"
+
+#: templates/qbr/qbr_dashboard.html
+msgid "Filter by company name…"
+msgstr "Filtrer par nom d'entreprise…"
+
+#: templates/qbr/qbr_dashboard.html
+msgid "Quarter"
+msgstr "Trimestre"
+
+#: templates/qbr/qbr_dashboard.html
+msgid "All Quarters"
+msgstr "Tous les trimestres"
+
+#: templates/qbr/qbr_dashboard.html
+msgid "Filter"
+msgstr "Filtrer"
+
+#: templates/qbr/qbr_dashboard.html
+msgid "Period"
+msgstr "Période"
+
+#: templates/qbr/qbr_dashboard.html templates/qbr/qbr_session_detail.html
+msgid "Renewal Sentiment"
+msgstr "Sentiment de renouvellement"
+
+#: templates/qbr/qbr_dashboard.html templates/qbr/qbr_session_detail.html
+msgid "Uploaded"
+msgstr "Téléversé"
+
+#: templates/qbr/qbr_dashboard.html templates/qbr/qbr_session_detail.html
+#: templates/qbr/qbr_company_history.html
+msgid "Complete"
+msgstr "Terminé"
+
+#: templates/qbr/qbr_dashboard.html templates/qbr/qbr_session_detail.html
+#: templates/qbr/qbr_company_history.html
+msgid "Processing"
+msgstr "En cours"
+
+#: templates/qbr/qbr_dashboard.html templates/qbr/qbr_session_detail.html
+#: templates/qbr/qbr_company_history.html
+msgid "Positive"
+msgstr "Positif"
+
+#: templates/qbr/qbr_dashboard.html templates/qbr/qbr_session_detail.html
+#: templates/qbr/qbr_company_history.html
+msgid "At Risk"
+msgstr "À risque"
+
+#: templates/qbr/qbr_dashboard.html templates/qbr/qbr_session_detail.html
+#: templates/qbr/qbr_company_history.html
+msgid "View Brief"
+msgstr "Voir le rapport"
+
+#: templates/qbr/qbr_dashboard.html
+msgid "Delete session"
+msgstr "Supprimer la session"
+
+#: templates/qbr/qbr_dashboard.html
+msgid "No QBR Sessions Yet"
+msgstr "Aucune session QBR pour l'instant"
+
+#: templates/qbr/qbr_dashboard.html
+msgid "No sessions match the current filters."
+msgstr "Aucune session ne correspond aux filtres actuels."
+
+#: templates/qbr/qbr_dashboard.html
+msgid "Clear Filters"
+msgstr "Effacer les filtres"
+
+#: templates/qbr/qbr_dashboard.html
+msgid "Upload a QBR transcript to get started with AI-powered strategic briefs."
+msgstr "Téléversez une transcription QBR pour démarrer avec les notes stratégiques alimentées par l'IA."
+
+#: templates/qbr/qbr_dashboard.html templates/qbr/qbr_session_detail.html
+msgid "Delete QBR Session"
+msgstr "Supprimer la session QBR"
+
+#: templates/qbr/qbr_dashboard.html templates/qbr/qbr_session_detail.html
+msgid "Are you sure you want to delete the QBR session for"
+msgstr "Êtes-vous sûr de vouloir supprimer la session QBR pour"
+
+#: templates/qbr/qbr_dashboard.html templates/qbr/qbr_session_detail.html
+msgid "Are you sure you want to delete this QBR session for"
+msgstr "Êtes-vous sûr de vouloir supprimer cette session QBR pour"
+
+#: templates/qbr/qbr_dashboard.html templates/qbr/qbr_session_detail.html
+msgid "This action cannot be undone."
+msgstr "Cette action est irréversible."
+
+#: templates/qbr/qbr_dashboard.html templates/qbr/qbr_session_detail.html
+msgid "Deleting…"
+msgstr "Suppression…"
+
+#: templates/qbr/qbr_dashboard.html templates/qbr/qbr_session_detail.html
+msgid "Failed to delete session."
+msgstr "Échec de la suppression de la session."
+
+#: templates/qbr/qbr_dashboard.html templates/qbr/qbr_session_detail.html
+msgid "An error occurred. Please try again."
+msgstr "Une erreur s'est produite. Veuillez réessayer."
+
+#: templates/qbr/qbr_upload.html templates/qbr/qbr_session_detail.html
+#: templates/qbr/qbr_company_history.html
+msgid "Back to QBR Dashboard"
+msgstr "Retour au tableau de bord QBR"
+
+#: templates/qbr/qbr_upload.html templates/qbr/qbr_session_detail.html
+#: templates/qbr/qbr_company_history.html
+msgid "QBR Dashboard"
+msgstr "Tableau de bord QBR"
+
+#: templates/qbr/qbr_upload.html
+msgid "Upload QBR Transcript"
+msgstr "Téléverser une transcription QBR"
+
+#: templates/qbr/qbr_upload.html
+msgid "Upload a .txt transcript file to generate an AI-powered strategic brief"
+msgstr "Téléversez un fichier de transcription .txt pour générer un rapport stratégique alimenté par l'IA"
+
+#: templates/qbr/qbr_upload.html
+msgid "Client Company Name"
+msgstr "Nom de l'entreprise cliente"
+
+#: templates/qbr/qbr_upload.html
+msgid "Type to search client companies…"
+msgstr "Tapez pour rechercher des entreprises clientes…"
+
+#: templates/qbr/qbr_upload.html
+msgid "Select a company from the list. Only known client companies are accepted."
+msgstr "Sélectionnez une entreprise dans la liste. Seules les entreprises clientes connues sont acceptées."
+
+#: templates/qbr/qbr_upload.html
+msgid "No client companies found."
+msgstr "Aucune entreprise cliente trouvée."
+
+#: templates/qbr/qbr_upload.html
+msgid "Add participants with company names before uploading a QBR transcript."
+msgstr "Ajoutez des participants avec des noms d'entreprise avant de téléverser une transcription QBR."
+
+#: templates/qbr/qbr_upload.html
+msgid "Select quarter…"
+msgstr "Sélectionner un trimestre…"
+
+#: templates/qbr/qbr_upload.html
+msgid "Year"
+msgstr "Année"
+
+#: templates/qbr/qbr_upload.html
+msgid "Transcript File (.txt)"
+msgstr "Fichier de transcription (.txt)"
+
+#: templates/qbr/qbr_upload.html
+msgid "Only .txt files are accepted. Maximum size: 500 KB."
+msgstr "Seuls les fichiers .txt sont acceptés. Taille maximale : 500 Ko."
+
+#: templates/qbr/qbr_upload.html
+msgid "AI-powered analysis"
+msgstr "Analyse alimentée par l'IA"
+
+#: templates/qbr/qbr_upload.html
+msgid "After upload, VOÏA will extract renewal sentiment, relationship health, top concerns, action items, competitive mentions, and an executive summary. Analysis runs in the background — you'll be notified when it's ready."
+msgstr "Après le téléversement, VOÏA extraira le sentiment de renouvellement, la santé de la relation, les principales préoccupations, les éléments d'action, les mentions de concurrents et un résumé pour la direction. L'analyse s'exécute en arrière-plan — vous serez notifié lorsqu'elle sera prête."
+
+#: templates/qbr/qbr_upload.html
+msgid "Transcripts in French and other languages are automatically detected and analysed — the brief will be returned in the transcript's language."
+msgstr "Les transcriptions en français et dans d'autres langues sont automatiquement détectées et analysées — le rapport sera retourné dans la langue de la transcription."
+
+#: templates/qbr/qbr_upload.html
+msgid "Upload & Analyze"
+msgstr "Téléverser et analyser"
+
+#: templates/qbr/qbr_upload.html
+msgid "Add client companies (participants) before uploading"
+msgstr "Ajoutez des entreprises clientes (participants) avant de téléverser"
+
+#: templates/qbr/qbr_upload.html
+msgid "Uploading…"
+msgstr "Téléversement…"
+
+#: templates/qbr/qbr_session_detail.html
+msgid "QBR Brief"
+msgstr "Rapport QBR"
+
+#: templates/qbr/qbr_session_detail.html
+msgid "Analysis Complete"
+msgstr "Analyse terminée"
+
+#: templates/qbr/qbr_session_detail.html
+msgid "Processing…"
+msgstr "En cours…"
+
+#: templates/qbr/qbr_session_detail.html
+msgid "Analysis Failed"
+msgstr "Analyse échouée"
+
+#: templates/qbr/qbr_session_detail.html
+msgid "AI analysis is in progress…"
+msgstr "L'analyse IA est en cours…"
+
+#: templates/qbr/qbr_session_detail.html
+msgid "Refresh this page or check notifications when the brief is ready."
+msgstr "Actualisez cette page ou consultez les notifications lorsque le rapport est prêt."
+
+#: templates/qbr/qbr_session_detail.html
+msgid "Refresh"
+msgstr "Actualiser"
+
+#: templates/qbr/qbr_session_detail.html
+msgid "Analysis failed"
+msgstr "Analyse échouée"
+
+#: templates/qbr/qbr_session_detail.html
+msgid "The AI was unable to process this transcript. Please try re-uploading the file."
+msgstr "L'IA n'a pas pu traiter cette transcription. Veuillez essayer de retéléverser le fichier."
+
+#: templates/qbr/qbr_session_detail.html
+msgid "Confidence"
+msgstr "Confiance"
+
+#: templates/qbr/qbr_session_detail.html
+msgid "Relationship Health"
+msgstr "Santé de la relation"
+
+#: templates/qbr/qbr_session_detail.html
+msgid "Strong"
+msgstr "Solide"
+
+#: templates/qbr/qbr_session_detail.html
+msgid "Fragile"
+msgstr "Fragile"
+
+#: templates/qbr/qbr_session_detail.html
+msgid "Stable"
+msgstr "Stable"
+
+#: templates/qbr/qbr_session_detail.html
+msgid "Score"
+msgstr "Score"
+
+#: templates/qbr/qbr_session_detail.html
+msgid "Key Themes"
+msgstr "Thèmes clés"
+
+#: templates/qbr/qbr_session_detail.html
+msgid "No themes extracted."
+msgstr "Aucun thème extrait."
+
+#: templates/qbr/qbr_session_detail.html
+msgid "Executive Summary"
+msgstr "Résumé pour la direction"
+
+#: templates/qbr/qbr_session_detail.html
+msgid "Top Concerns"
+msgstr "Principales préoccupations"
+
+#: templates/qbr/qbr_session_detail.html
+msgid "No concerns identified."
+msgstr "Aucune préoccupation identifiée."
+
+#: templates/qbr/qbr_session_detail.html
+msgid "Positive Highlights"
+msgstr "Points positifs"
+
+#: templates/qbr/qbr_session_detail.html
+msgid "No highlights identified."
+msgstr "Aucun point positif identifié."
+
+#: templates/qbr/qbr_session_detail.html
+msgid "Expansion Signals"
+msgstr "Signaux d'expansion"
+
+#: templates/qbr/qbr_session_detail.html
+msgid "No expansion signals identified."
+msgstr "Aucun signal d'expansion identifié."
+
+#: templates/qbr/qbr_session_detail.html
+msgid "Action Items & Commitments"
+msgstr "Éléments d'action et engagements"
+
+#: templates/qbr/qbr_session_detail.html
+msgid "No action items identified."
+msgstr "Aucun élément d'action identifié."
+
+#: templates/qbr/qbr_session_detail.html
+msgid "Competitive Mentions"
+msgstr "Mentions concurrentielles"
+
+#: templates/qbr/qbr_session_detail.html
+msgid "High Threat"
+msgstr "Menace élevée"
+
+#: templates/qbr/qbr_session_detail.html
+msgid "Medium Threat"
+msgstr "Menace moyenne"
+
+#: templates/qbr/qbr_session_detail.html
+msgid "Low Threat"
+msgstr "Menace faible"
+
+#: templates/qbr/qbr_session_detail.html
+msgid "No competitive mentions identified."
+msgstr "Aucune mention concurrentielle identifiée."
+
+#: templates/qbr/qbr_session_detail.html
+msgid "Delete"
+msgstr "Supprimer"
+
+#: templates/qbr/qbr_company_history.html
+msgid "QBR History"
+msgstr "Historique QBR"
+
+#: templates/qbr/qbr_company_history.html
+msgid "QBR session"
+msgstr "session QBR"
+
+#: templates/qbr/qbr_company_history.html
+msgid "on record"
+msgstr "enregistrée"
+
+#: templates/qbr/qbr_company_history.html
+msgid "Upload New QBR"
+msgstr "Téléverser un nouveau QBR"
+
+#: templates/qbr/qbr_company_history.html
+msgid "Concerns"
+msgstr "Préoccupations"
+
+#: templates/qbr/qbr_company_history.html
+msgid "Action Items"
+msgstr "Éléments d'action"
+
+#: templates/qbr/qbr_company_history.html
+msgid "Expansion"
+msgstr "Expansion"
+
+#: templates/qbr/qbr_company_history.html
+msgid "and"
+msgstr "et"
+
+#: templates/qbr/qbr_company_history.html
+msgid "more"
+msgstr "de plus"
+
+#: templates/qbr/qbr_company_history.html
+msgid "No QBR sessions for"
+msgstr "Aucune session QBR pour"
+
+#: templates/qbr/qbr_company_history.html
+msgid "Upload the first transcript to begin tracking QBR history for this company."
+msgstr "Téléversez la première transcription pour commencer à suivre l'historique QBR de cette entreprise."
+
+#: templates/base.html
+msgid "QBR"
+msgstr "QBR"
+
+#: templates/qbr/qbr_session_detail.html
+msgid "Identified Stakeholders"
+msgstr "Parties prenantes identifiées"
+
+#: templates/qbr/qbr_session_detail.html
+msgid "Client"
+msgstr "Client"
+
+#: templates/qbr/qbr_session_detail.html
+msgid "Vendor"
+msgstr "Prestataire"
+
+#: templates/qbr/qbr_session_detail.html
+msgid "Unknown"
+msgstr "Inconnu"
+
+#: templates/qbr/qbr_session_detail.html
+msgid "No stakeholders identified in the transcript."
+msgstr "Aucune partie prenante identifiée dans la transcription."
+
+#: templates/qbr/qbr_session_detail.html
+msgid "Analysis Quality"
+msgstr "Qualité de l'analyse"
+
+#: templates/qbr/qbr_session_detail.html
+msgid "High confidence"
+msgstr "Confiance élevée"
+
+#: templates/qbr/qbr_session_detail.html
+msgid "Moderate confidence"
+msgstr "Confiance modérée"
+
+#: templates/qbr/qbr_session_detail.html
+msgid "Low confidence — transcript may be incomplete"
+msgstr "Confiance faible — la transcription est peut-être incomplète"
+
+#: templates/qbr/qbr_session_detail.html
+msgid "View Transcript"
+msgstr "Voir la transcription"
+
+#: templates/qbr/qbr_session_detail.html
+msgid "characters"
+msgstr "caractères"

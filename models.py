@@ -3388,6 +3388,49 @@ class SurveyTemplate(db.Model):
         }
 
 
+class QBRSession(db.Model):
+    """QBR (Quarterly Business Review) session model for transcript intelligence"""
+    __tablename__ = 'qbr_sessions'
+    __table_args__ = (
+        db.UniqueConstraint('business_account_id', 'transcript_hash', name='_qbr_business_hash_uc'),
+        db.Index('idx_qbr_session_business_account', 'business_account_id', db.text('created_at DESC')),
+        db.Index('idx_qbr_session_business_company', 'business_account_id', 'company_name'),
+    )
+
+    id = db.Column(db.Integer, primary_key=True)
+    uuid = db.Column(db.String(36), unique=True, nullable=False, index=True, server_default=db.text("gen_random_uuid()::text"))
+    business_account_id = db.Column(db.Integer, db.ForeignKey('business_accounts.id'), nullable=False, index=True)
+    company_name = db.Column(db.String(200), nullable=False, index=True)
+    quarter = db.Column(db.Integer, nullable=False)
+    year = db.Column(db.Integer, nullable=False)
+    transcript_content = db.Column(db.Text, nullable=False)
+    transcript_hash = db.Column(db.String(64), nullable=False, index=True)
+    transcript_filename = db.Column(db.String(255), nullable=True)
+    uploaded_by_user_id = db.Column(db.Integer, nullable=False)
+    extracted_insights = db.Column(db.JSON, nullable=True)
+    status = db.Column(db.String(20), nullable=False, default='pending', index=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+    business_account = db.relationship('BusinessAccount', backref=db.backref('qbr_sessions', lazy='dynamic'))
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'uuid': self.uuid,
+            'business_account_id': self.business_account_id,
+            'company_name': self.company_name,
+            'quarter': self.quarter,
+            'year': self.year,
+            'transcript_filename': self.transcript_filename,
+            'uploaded_by_user_id': self.uploaded_by_user_id,
+            'extracted_insights': self.extracted_insights,
+            'status': self.status,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+        }
+
+
 class ClassicSurveyConfig(db.Model):
     """Campaign-specific customization of a survey template. Created from template, editable per campaign."""
     __tablename__ = 'classic_survey_configs'

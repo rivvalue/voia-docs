@@ -127,6 +127,10 @@ class TaskQueue:
             campaign_id = task_data.get('campaign_id', 'unknown') if task_data else 'unknown'
             participant_name = task_data.get('participant_name', 'unknown') if task_data else 'unknown'
             logger.info(f"Added transcript analysis task for campaign {campaign_id}, participant {participant_name}")
+        elif task_type == 'qbr_analysis':
+            session_id = task_data.get('session_id', 'unknown') if task_data else 'unknown'
+            company_name = task_data.get('company_name', 'unknown') if task_data else 'unknown'
+            logger.info(f"Added QBR analysis task for session {session_id} ({company_name})")
         else:
             logger.info(f"Added task {task_type} for data_id {data_id}")
     
@@ -250,6 +254,16 @@ class TaskQueue:
                     logger.info(f"Worker {worker_id} completed bulk participant add for campaign {campaign_id} ({participant_count} participants)")
                 else:
                     logger.error(f"Worker {worker_id} failed bulk participant add task")
+
+            elif task_type == 'qbr_analysis':
+                # Process QBR transcript analysis task
+                success = self._process_qbr_analysis_task(task_data, worker_id)
+
+                if success:
+                    session_id = task_data.get('session_id', 'unknown')
+                    logger.info(f"Worker {worker_id} completed QBR analysis for session {session_id}")
+                else:
+                    logger.error(f"Worker {worker_id} failed QBR analysis task")
                         
         except Exception as e:
             logger.error(f"Error processing task {task}: {e}")
@@ -1731,7 +1745,253 @@ Respond with ONLY the JSON object, no other text:"""
         except Exception as e:
             logger.error(f"Error analyzing transcript with AI: {e}")
             return None
-    
+
+    def _analyze_qbr_transcript_with_ai(self, transcript_content, company_name, quarter, year):
+        """Use LLM gateway (or direct OpenAI fallback) to analyze QBR transcript and extract strategic insights"""
+        try:
+            quarter_label = f"Q{quarter} {year}"
+            prompt = f"""You are VOÏA, an AI specialized in analyzing Quarterly Business Review (QBR) transcripts. Analyze the following QBR transcript for {company_name} ({quarter_label}) and extract strategic intelligence.
+
+TRANSCRIPT:
+{transcript_content}
+
+STEP 1 — PARTICIPANT IDENTIFICATION (complete this before the JSON output):
+Read the entire transcript above and identify every person present. Participants appear as:
+  • Speaker-turn labels:  "Alice Chen:", "Alice:", "A.Chen:", "Alice Chen (VP):", "Alice [AcmeCorp]:"
+  • Attendee lists in the header: "Attendees: Alice Chen, Bob Smith, ..."
+  • Self-introductions: "Hi, I'm Alice Chen, VP of Product at Acme"
+  • Third-party mentions as active participants: "Bob Smith will handle this"
+If a person speaks even once, include them. If a name appears in the transcript without a clear role, use "Participant" as the role. If you cannot tell which organisation they belong to, use side = "unknown". You MUST NOT return an empty stakeholders array if any person can be identified.
+
+LANGUAGE DETECTION: First, detect the language of the transcript. All text fields in your response (top_concerns[].text, action_items[].text, positive_highlights, competitive_mentions[].context, expansion_signals, key_themes, executive_summary) must be written in the SAME language as the transcript. Enum values (renewal_sentiment, overall_relationship_health, threat_level, stakeholders[].side) must always remain in English.
+
+Respond with ONLY a valid JSON object (no markdown, no code fences) with these exact fields:
+
+{{
+  "detected_language": "en",
+  "meeting_date": "Not specified",
+  "meeting_time_range": "Not specified",
+  "analysis_confidence": 0.0,
+  "renewal_sentiment": "positive|neutral|at_risk",
+  "renewal_confidence_score": 0.0,
+  "overall_relationship_health": "strong|stable|fragile",
+  "relationship_health_score": 0.0,
+  "stakeholders": [{{"name": "Full Name", "role": "Job Title or Role", "side": "client|vendor|unknown"}}],
+  "top_concerns": ["concern description in transcript language"],
+  "top_concerns_quotes": ["verbatim excerpt ≤120 chars supporting each concern, same order"],
+  "positive_highlights": ["highlight in transcript language"],
+  "positive_highlights_quotes": ["verbatim excerpt ≤120 chars supporting each highlight, same order"],
+  "action_items": ["action/commitment description in transcript language"],
+  "action_items_quotes": ["verbatim excerpt ≤120 chars supporting each action item, same order"],
+  "competitive_mentions": [{{"name": "CompetitorName", "context": "brief context in transcript language", "threat_level": "low|medium|high"}}],
+  "expansion_signals": ["signal in transcript language"],
+  "key_themes": ["theme in transcript language"],
+  "executive_summary": "max 300 char summary in transcript language"
+}}
+
+Rules:
+- detected_language: ISO 639-1 code of the transcript language ("en", "fr", "es", "de", "pt", etc.)
+- meeting_date: the date of the conversation as explicitly stated in the transcript (e.g. "March 12, 2025"); use "Not specified" if no date is mentioned
+- meeting_time_range: the time range of the conversation as explicitly stated in the transcript (e.g. "10:00 AM – 11:30 AM"); use "Not specified" if no time is mentioned
+- analysis_confidence: 0.0 to 1.0 — overall confidence in analysis quality (based on transcript length, clarity, completeness); 1.0 = very complete and clear
+- renewal_sentiment: "positive" if client is happy/renewing, "neutral" if uncertain, "at_risk" if showing churn signals
+- renewal_confidence_score: 0.0 to 1.0 (1.0 = very confident in renewal sentiment)
+- overall_relationship_health: "strong" if excellent partnership, "stable" if adequate, "fragile" if at risk
+- relationship_health_score: 0.0 to 1.0 (1.0 = very strong relationship)
+- stakeholders: use the participant list you identified in STEP 1 above; max 10 entries; name = full name as written in transcript (or first name if only first name appears), or "Unknown Participant" only if truly no name exists; role = job title/function from transcript, or "Participant" if not stated; side = "client" (buying organisation), "vendor" (selling/CSM organisation), "unknown" if affiliation is not clear; NEVER return [] if any person is identifiable in the transcript
+- top_concerns: max 5 strings in transcript language describing the client's key concerns
+- top_concerns_quotes: parallel array to top_concerns (same length, same order); each entry is the shortest verbatim excerpt (≤120 chars) from the transcript that best supports the corresponding concern; use empty string "" if no clear source quote
+- positive_highlights: max 5 strings in transcript language describing positive feedback or wins
+- positive_highlights_quotes: parallel array to positive_highlights (same length, same order); each entry is the shortest verbatim excerpt (≤120 chars) from the transcript that best supports the corresponding highlight; use empty string "" if no clear source quote
+- action_items: max 10 strings in transcript language describing specific commitments or follow-up actions
+- action_items_quotes: parallel array to action_items (same length, same order); each entry is the shortest verbatim excerpt (≤120 chars) from the transcript supporting the corresponding action; use empty string "" if no clear source quote
+- competitive_mentions: array; name = competitor name; context in transcript language; threat_level always "low", "medium", or "high"
+- expansion_signals: max 5 strings in transcript language
+- key_themes: max 5 strings in transcript language
+- executive_summary: plain text in transcript language, max 300 characters"""
+
+            gateway = _get_transcript_gateway()
+            if gateway:
+                from llm_gateway import LLMRequest, LLMMessage
+                llm_request = LLMRequest(
+                    messages=[LLMMessage(role="user", content=prompt)],
+                    model=gateway.config.default_openai_model if hasattr(gateway, 'config') else "gpt-4o-mini",
+                    temperature=0.1,
+                    max_tokens=2000,
+                    json_mode=True
+                )
+                response = gateway.chat_completion(llm_request)
+                ai_response = response.content.strip() if response.content else ""
+                logger.debug("QBR analysis using LLM gateway")
+            else:
+                from openai import OpenAI
+                client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
+                response = client.chat.completions.create(
+                    model="gpt-4o-mini",
+                    messages=[{"role": "user", "content": prompt}],
+                    temperature=0.1,
+                    max_tokens=2000,
+                    response_format={"type": "json_object"}
+                )
+                ai_response = response.choices[0].message.content.strip()
+                logger.debug("QBR analysis using direct OpenAI")
+
+            if ai_response.startswith('```'):
+                lines = ai_response.split('\n')
+                if lines[0].startswith('```'):
+                    lines = lines[1:]
+                if lines and lines[-1].strip() == '```':
+                    lines = lines[:-1]
+                ai_response = '\n'.join(lines).strip()
+
+            try:
+                insights = json.loads(ai_response)
+            except json.JSONDecodeError as e:
+                logger.error(f"Invalid JSON response from LLM for QBR: {ai_response[:200]}... Error: {e}")
+                return None
+
+            return insights
+
+        except Exception as e:
+            logger.error(f"Error analyzing QBR transcript with AI: {e}")
+            return None
+
+    def _process_qbr_analysis_task(self, task_data, worker_id):
+        """Process a QBR analysis task"""
+        from models import QBRSession, AuditLog
+        from notification_utils import notify
+
+        session_id = task_data.get('session_id')
+        business_account_id = task_data.get('business_account_id')
+        uploaded_by_user_id = task_data.get('uploaded_by_user_id')
+
+        if not all([session_id, business_account_id]):
+            logger.error("QBR analysis task missing required data")
+            return False
+
+        try:
+            qbr_session = QBRSession.query.filter_by(
+                id=session_id,
+                business_account_id=business_account_id
+            ).first()
+
+            if not qbr_session:
+                logger.error(f"QBR session {session_id} not found or access denied")
+                return False
+
+            qbr_session.status = 'processing'
+            qbr_session.updated_at = datetime.utcnow()
+            db.session.commit()
+
+            insights = self._analyze_qbr_transcript_with_ai(
+                qbr_session.transcript_content,
+                qbr_session.company_name,
+                qbr_session.quarter,
+                qbr_session.year
+            )
+
+            if insights:
+                qbr_session.extracted_insights = insights
+                qbr_session.status = 'complete'
+                qbr_session.updated_at = datetime.utcnow()
+                db.session.commit()
+
+                quarter_label = f"Q{qbr_session.quarter} {qbr_session.year}"
+                notify(
+                    business_account_id=business_account_id,
+                    user_id=uploaded_by_user_id,
+                    category='success',
+                    message=f"QBR brief for {qbr_session.company_name} — {quarter_label} is ready"
+                )
+
+                try:
+                    audit = AuditLog.create_audit_entry(
+                        business_account_id=business_account_id,
+                        action_type='qbr_analysis_completed',
+                        action_description=f"QBR analysis completed for {qbr_session.company_name} {quarter_label}",
+                        resource_type='qbr_session',
+                        resource_id=str(session_id),
+                        resource_name=qbr_session.company_name,
+                        details={'quarter': qbr_session.quarter, 'year': qbr_session.year, 'uuid': qbr_session.uuid}
+                    )
+                    db.session.add(audit)
+                    db.session.commit()
+                except Exception as audit_err:
+                    logger.error(f"Failed to create audit log for QBR completion: {audit_err}")
+
+                logger.info(f"QBR analysis completed for session {session_id}")
+                return True
+            else:
+                qbr_session.status = 'failed'
+                qbr_session.updated_at = datetime.utcnow()
+                db.session.commit()
+
+                notify(
+                    business_account_id=business_account_id,
+                    user_id=uploaded_by_user_id,
+                    category='error',
+                    message=f"QBR analysis failed for transcript '{qbr_session.transcript_filename or 'unknown'}'"
+                )
+
+                try:
+                    audit = AuditLog.create_audit_entry(
+                        business_account_id=business_account_id,
+                        action_type='qbr_analysis_failed',
+                        action_description=f"QBR analysis failed for {qbr_session.company_name} Q{qbr_session.quarter} {qbr_session.year}",
+                        resource_type='qbr_session',
+                        resource_id=str(session_id),
+                        resource_name=qbr_session.company_name,
+                        details={'quarter': qbr_session.quarter, 'year': qbr_session.year, 'uuid': qbr_session.uuid}
+                    )
+                    db.session.add(audit)
+                    db.session.commit()
+                except Exception as audit_err:
+                    logger.error(f"Failed to create audit log for QBR failure: {audit_err}")
+
+                logger.error(f"QBR analysis failed for session {session_id}")
+                return False
+
+        except Exception as e:
+            logger.error(f"QBR analysis task error for session {session_id}: {e}")
+            db.session.rollback()
+            company_name_for_log = task_data.get('company_name', 'unknown')
+            transcript_filename_for_log = None
+            try:
+                qbr_session = QBRSession.query.filter_by(id=session_id, business_account_id=business_account_id).first()
+                if qbr_session:
+                    company_name_for_log = qbr_session.company_name
+                    transcript_filename_for_log = qbr_session.transcript_filename
+                    qbr_session.status = 'failed'
+                    qbr_session.updated_at = datetime.utcnow()
+                    db.session.commit()
+            except Exception:
+                pass
+            filename_label = f"transcript '{transcript_filename_for_log}'" if transcript_filename_for_log else f"QBR for {company_name_for_log}"
+            try:
+                notify(
+                    business_account_id=business_account_id,
+                    user_id=uploaded_by_user_id,
+                    category='error',
+                    message=f"QBR analysis failed for {filename_label}"
+                )
+            except Exception:
+                pass
+            try:
+                audit = AuditLog.create_audit_entry(
+                    business_account_id=business_account_id,
+                    action_type='qbr_analysis_failed',
+                    action_description=f"QBR analysis failed (exception) for session {session_id}",
+                    resource_type='qbr_session',
+                    resource_id=str(session_id),
+                    resource_name=company_name_for_log,
+                    details={'error': str(e)[:200]}
+                )
+                db.session.add(audit)
+                db.session.commit()
+            except Exception:
+                pass
+            return False
+
     def _scheduler(self):
         """Background scheduler for campaign lifecycle management with DB advisory lock"""
         logger.info("Campaign scheduler started")

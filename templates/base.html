@@ -95,6 +95,10 @@
                 <i class="fas fa-users"></i>
                 <span>{{ _('Participants') }}</span>
             </a>
+            <a href="{{ url_for('qbr.qbr_dashboard') }}" class="sidebar-nav-item" data-page="qbr">
+                <i class="fas fa-handshake"></i>
+                <span>QBR</span>
+            </a>
             <a href="{{ url_for('business_auth.admin_panel') }}" class="sidebar-nav-item" data-page="admin">
                 <i class="fas fa-cog"></i>
                 <span>{{ _('Settings') }}</span>
@@ -335,6 +339,8 @@
                     } else if (page === 'participants' && currentPath.includes('/business/participants')) {
                         item.classList.add('active');
                     } else if (page === 'admin' && currentPath.startsWith('/business/admin') && !currentPath.includes('/business-analytics-hub')) {
+                        item.classList.add('active');
+                    } else if (page === 'qbr' && currentPath.startsWith('/qbr')) {
                         item.classList.add('active');
                     }
                 });

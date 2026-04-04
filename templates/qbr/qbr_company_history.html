@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('QBR History') }} — {{ company_name }} — VOÏA{% endblock %}
+{% block page_class %}page-qbr-company-history{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+
+    <!-- Header -->
+    <div class="border-0 mb-0 px-4 py-4 d-flex justify-content-between align-items-center flex-wrap gap-3" style="background: #ffffff; border-bottom: 3px solid var(--primary-red, #E13A44);">
+        <div>
+            <h1 class="fw-bold mb-1" style="font-size: 1.6rem; color: var(--neutral-dark, #2B2B2B);">
+                <i class="fas fa-building me-2" style="color: #E13A44;"></i>
+                {{ company_name }}
+            </h1>
+            <p class="text-muted mb-0 small">{{ sessions|length }} {{ _('QBR session') }}{{ 's' if sessions|length != 1 else '' }} {{ _('on record') }}</p>
+        </div>
+        <a href="{{ url_for('qbr.qbr_upload') }}" class="btn btn-outline-danger btn-sm">
+            <i class="fas fa-upload me-1"></i> {{ _('Upload New QBR') }}
+        </a>
+    </div>
+
+    <!-- Breadcrumb -->
+    <div class="px-4 py-2" style="background: #f8f9fb; border-bottom: 1px solid #e9ecef;">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0 small">
+                <li class="breadcrumb-item">
+                    <a href="{{ url_for('qbr.qbr_dashboard') }}" class="text-decoration-none">
+                        <i class="fas fa-handshake me-1"></i>{{ _('QBR Intelligence') }}
+                    </a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">{{ company_name }}</li>
+            </ol>
+        </nav>
+    </div>
+
+    <div class="px-4 mt-3">
+        {% if sessions %}
+        <div class="d-flex flex-column gap-3">
+            {% for s in sessions %}
+            <div class="card border-0 shadow-sm" style="border-radius: 12px;">
+                <div class="card-body py-4 px-4">
+                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+                        <div class="flex-grow-1">
+                            <div class="d-flex align-items-center gap-3 mb-2 flex-wrap">
+                                <span class="badge bg-secondary-subtle text-secondary fw-bold px-3 py-2" style="font-size: 0.9rem;">
+                                    Q{{ s.quarter }} {{ s.year }}
+                                </span>
+                                {% if s.status == 'complete' %}
+                                <span class="badge bg-success-subtle text-success"><i class="fas fa-check-circle me-1"></i>{{ _('Complete') }}</span>
+                                {% elif s.status == 'processing' %}
+                                <span class="badge bg-info-subtle text-info"><i class="fas fa-spinner fa-spin me-1"></i>{{ _('Processing') }}</span>
+                                {% elif s.status == 'pending' %}
+                                <span class="badge bg-warning-subtle text-warning"><i class="fas fa-clock me-1"></i>{{ _('Pending') }}</span>
+                                {% else %}
+                                <span class="badge bg-danger-subtle text-danger"><i class="fas fa-exclamation-circle me-1"></i>{{ _('Failed') }}</span>
+                                {% endif %}
+
+                                {% if s.status == 'complete' and s.extracted_insights %}
+                                {% set sentiment = s.extracted_insights.get('renewal_sentiment', 'neutral') %}
+                                {% if sentiment == 'positive' %}
+                                <span class="badge rounded-pill" style="background: rgba(25,135,84,0.12); color: #198754; border: 1px solid #198754;"><i class="fas fa-thumbs-up me-1"></i>{{ _('Positive') }}</span>
+                                {% elif sentiment == 'at_risk' %}
+                                <span class="badge rounded-pill" style="background: rgba(220,53,69,0.12); color: #dc3545; border: 1px solid #dc3545;"><i class="fas fa-exclamation-triangle me-1"></i>{{ _('At Risk') }}</span>
+                                {% else %}
+                                <span class="badge rounded-pill" style="background: rgba(255,193,7,0.12); color: #856404; border: 1px solid #ffc107;"><i class="fas fa-minus me-1"></i>{{ _('Neutral') }}</span>
+                                {% endif %}
+
+                                {% if s.extracted_insights.get('detected_language') %}
+                                <span class="badge rounded-pill bg-light text-secondary border small" style="font-size: 0.7rem;">
+                                    <i class="fas fa-language me-1"></i>{{ s.extracted_insights.get('detected_language', 'en')|upper }}
+                                </span>
+                                {% endif %}
+                                {% endif %}
+                            </div>
+
+                            {% if s.status == 'complete' and s.extracted_insights %}
+                            {% set ins = s.extracted_insights %}
+                            {% if ins.get('executive_summary') %}
+                            <p class="text-muted small mb-3" style="line-height: 1.6;">{{ ins.get('executive_summary') }}</p>
+                            {% endif %}
+
+                            <div class="row g-2 mt-1">
+                                {% if ins.get('top_concerns') %}
+                                <div class="col-md-4">
+                                    <div class="small fw-semibold text-muted mb-1"><i class="fas fa-exclamation-triangle text-warning me-1"></i>{{ _('Concerns') }} ({{ ins.get('top_concerns')|length }})</div>
+                                    {% for c in ins.get('top_concerns', [])[:2] %}
+                                    <div class="small text-muted ps-2">• {{ c }}</div>
+                                    {% endfor %}
+                                    {% if ins.get('top_concerns')|length > 2 %}
+                                    <div class="small text-muted ps-2">…{{ _('and') }} {{ ins.get('top_concerns')|length - 2 }} {{ _('more') }}</div>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                                {% if ins.get('action_items') %}
+                                <div class="col-md-4">
+                                    <div class="small fw-semibold text-muted mb-1"><i class="fas fa-tasks text-danger me-1"></i>{{ _('Action Items') }} ({{ ins.get('action_items')|length }})</div>
+                                    {% for a in ins.get('action_items', [])[:2] %}
+                                    <div class="small text-muted ps-2">• {{ a }}</div>
+                                    {% endfor %}
+                                    {% if ins.get('action_items')|length > 2 %}
+                                    <div class="small text-muted ps-2">…{{ _('and') }} {{ ins.get('action_items')|length - 2 }} {{ _('more') }}</div>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                                {% if ins.get('expansion_signals') %}
+                                <div class="col-md-4">
+                                    <div class="small fw-semibold text-muted mb-1"><i class="fas fa-chart-line text-primary me-1"></i>{{ _('Expansion') }} ({{ ins.get('expansion_signals')|length }})</div>
+                                    {% for sig in ins.get('expansion_signals', [])[:2] %}
+                                    <div class="small text-muted ps-2">• {{ sig }}</div>
+                                    {% endfor %}
+                                    {% if ins.get('expansion_signals')|length > 2 %}
+                                    <div class="small text-muted ps-2">…{{ _('and') }} {{ ins.get('expansion_signals')|length - 2 }} {{ _('more') }}</div>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+
+                            <div class="mt-2 small text-muted">
+                                <i class="fas fa-calendar me-1"></i>{{ s.created_at.strftime('%B %d, %Y') if s.created_at else '—' }}
+                                {% if s.transcript_filename %}
+                                <span class="ms-2"><i class="fas fa-file-alt me-1"></i>{{ s.transcript_filename }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="d-flex flex-column gap-2 align-items-end">
+                            {% if s.status == 'complete' %}
+                            <a href="{{ url_for('qbr.qbr_session_detail', session_uuid=s.uuid) }}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-eye me-1"></i>{{ _('View Brief') }}
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% else %}
+        <div class="card border-0 shadow-sm text-center py-5">
+            <div class="card-body">
+                <i class="fas fa-building fa-3x text-muted mb-3"></i>
+                <h5 class="fw-semibold text-muted mb-2">{{ _('No QBR sessions for') }} {{ company_name }}</h5>
+                <p class="text-muted mb-3">{{ _('Upload the first transcript to begin tracking QBR history for this company.') }}</p>
+                <a href="{{ url_for('qbr.qbr_upload') }}" class="btn btn-danger">
+                    <i class="fas fa-upload me-1"></i> {{ _('Upload Transcript') }}
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
