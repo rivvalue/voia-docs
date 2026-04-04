@@ -685,8 +685,8 @@
         let suppressPollBadge = 0;
 
         window.markNotifRead = async function(notificationId, btnEl) {
+            suppressPollBadge++;
             try {
-                suppressPollBadge++;
                 btnEl.disabled = true;
                 btnEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
                 const resp = await fetch('/api/notifications/' + notificationId + '/read', {
@@ -698,13 +698,37 @@
                     item.classList.remove('unread');
                     item.classList.add('read');
                     btnEl.remove();
-                    updateBadgeCount(-1);
+                    try {
+                        const countResp = await fetch('/api/notifications/count?_=' + Date.now(), { cache: 'no-store' });
+                        if (!countResp.ok) throw new Error('Count fetch failed: ' + countResp.status);
+                        const countData = await countResp.json();
+                        const count = countData.unread_count || 0;
+                        if (count > 0) {
+                            notificationBadge.textContent = count;
+                            notificationBadge.style.display = 'inline-block';
+                            panelUnreadBadge.textContent = count;
+                            panelUnreadBadge.style.display = 'inline';
+                            markAllReadBtn.style.display = 'inline-block';
+                            markAllReadBtn.disabled = false;
+                            markAllReadBtn.innerHTML = '<i class="fas fa-check-double me-1"></i>{{ _("Mark all as read") }}';
+                        } else {
+                            notificationBadge.style.display = 'none';
+                            panelUnreadBadge.style.display = 'none';
+                            markAllReadBtn.style.display = 'none';
+                        }
+                        previousCount = count;
+                    } catch (countErr) {
+                        console.error('Notification count re-fetch error:', countErr);
+                    }
+                } else {
+                    btnEl.disabled = false;
+                    btnEl.innerHTML = '<i class="fas fa-check"></i>';
                 }
             } catch (err) {
                 btnEl.disabled = false;
                 btnEl.innerHTML = '<i class="fas fa-check"></i>';
             } finally {
-                suppressPollBadge--;
+                suppressPollBadge = Math.max(0, suppressPollBadge - 1);
             }
         };
         
