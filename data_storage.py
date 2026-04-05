@@ -266,7 +266,10 @@ def get_dashboard_data_cached(campaign_id=None, business_account_id=None):
 
     Cache guard: only cache when business_account_id is confirmed non-null to prevent
     stale/demo data being stored under the wrong key (original Nov 2025 bug).
-    Active campaigns use a 30-minute TTL; completed campaigns use the full 2-hour TTL.
+    Active campaigns use a 15-minute TTL; completed campaigns use the full 2-hour TTL.
+
+    NOTE: SimpleCache is in-process only — cached data is not shared between gunicorn workers.
+    Cache invalidation (bust_dashboard_cache) also only affects the calling worker process.
     """
     import time
     start_time = time.time()
@@ -311,7 +314,8 @@ def get_dashboard_data_cached(campaign_id=None, business_account_id=None):
     # --- CACHE STORE ---
     # Determine TTL based on campaign status:
     #   - Completed campaigns: 2-hour TTL (data is immutable)
-    #   - Active campaigns: 30-minute TTL (data changes as responses arrive)
+    #   - Active campaigns: 15-minute TTL (reduced from 30 min so live-monitoring admins
+    #     see reasonably fresh results without waiting up to 30 minutes)
     if use_cache and result is not None:
         try:
             campaign_status = None
@@ -323,8 +327,10 @@ def get_dashboard_data_cached(campaign_id=None, business_account_id=None):
             if campaign_status == 'completed':
                 ttl = cache_config.get_timeout()  # 2-hour TTL from cache_config
             else:
-                ttl = 1800  # 30-minute TTL for active campaigns
+                ttl = 900  # 15-minute TTL for active campaigns
 
+            # NOTE: SimpleCache is in-process only — this cache.set is not visible to other
+            # gunicorn workers. Each worker maintains its own independent in-memory cache.
             cache.set(cache_key, result, timeout=ttl)
             logger.info(f"💾 CACHE SET | Campaign: {campaign_id} | Status: {campaign_status} | TTL: {ttl}s | Tenant: {business_account_id}")
         except Exception as cache_err:
@@ -343,9 +349,14 @@ def bust_dashboard_cache(campaign_id, business_account_id, company_name=None):
     so the next load reflects fresh data.
     
     If company_name is provided, also busts the company detail cache for that company.
+
+    NOTE: SimpleCache is in-process only — this cache.delete only clears the cache in the
+    current gunicorn worker. Other workers maintain independent in-memory caches and will
+    continue serving stale data until their TTL expires or they are restarted.
     """
     cache_key = f"dashboard_data_campaign{campaign_id}_tenant{business_account_id}"
     try:
+        # NOTE: SimpleCache invalidation is in-process only; does not propagate to other gunicorn workers.
         cache.delete(cache_key)
         logger.info(f"🗑️ CACHE BUSTED | Campaign: {campaign_id} | Tenant: {business_account_id} | Key: {cache_key}")
     except Exception as e:
@@ -2518,6 +2529,8 @@ def get_company_detail_data(campaign_id, company_name, business_account_id=None)
             campaign_obj = Campaign.query.get(campaign_id)
             campaign_status = campaign_obj.status if campaign_obj else None
             ttl = cache_config.get_timeout() if campaign_status == 'completed' else 1800
+            # NOTE: SimpleCache is in-process only — this cache.set is not visible to other
+            # gunicorn workers. Each worker maintains its own independent in-memory cache.
             cache.set(cache_key, result, timeout=ttl)
             elapsed = (time.time() - start_time) * 1000
             logger.info(f"💾 COMPANY DETAIL CACHE SET | Campaign: {campaign_id} | Company: {company_name} | Status: {campaign_status} | TTL: {ttl}s | Time: {elapsed:.0f}ms")
@@ -2528,9 +2541,15 @@ def get_company_detail_data(campaign_id, company_name, business_account_id=None)
 
 
 def bust_company_detail_cache(campaign_id, company_name, business_account_id):
-    """Invalidate the company detail cache for a specific company/campaign/tenant."""
+    """Invalidate the company detail cache for a specific company/campaign/tenant.
+    
+    NOTE: SimpleCache is in-process only — this cache.delete only clears the cache in the
+    current gunicorn worker. Other workers maintain independent in-memory caches and will
+    continue serving stale data until their TTL expires or they are restarted.
+    """
     cache_key = f"company_detail_campaign{campaign_id}_company{company_name.upper()}_tenant{business_account_id}"
     try:
+        # NOTE: SimpleCache invalidation is in-process only; does not propagate to other gunicorn workers.
         cache.delete(cache_key)
         logger.info(f"🗑️ COMPANY DETAIL CACHE BUSTED | Campaign: {campaign_id} | Company: {company_name} | Tenant: {business_account_id}")
     except Exception as e:

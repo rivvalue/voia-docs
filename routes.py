@@ -428,6 +428,8 @@ def ensure_trial_participant(email, name, company_name, campaign_id):
     return participant, campaign_association
 
 @app.route('/')
+# NOTE: SimpleCache is in-process only — cached responses are not shared between gunicorn workers.
+# This is acceptable here: the landing page is static marketing content with no operational impact.
 @cache.cached(timeout=300, key_prefix=lambda: f"index_{session.get('language', 'en')}", unless=lambda: bool(session.get('auth_token')))
 def index():
     """Landing page with survey overview"""

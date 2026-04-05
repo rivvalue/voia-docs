@@ -795,19 +795,16 @@ class PromptTemplateService:
             if guidance:
                 return guidance
         
-        # Tier 3: Platform settings (cached for performance)
-        # Platform settings act as tenant-wide defaults when BA/campaign don't override
-        # Cache key based on singleton - only one platform settings row exists
+        # Tier 3: Platform settings (always queried fresh — single-row table, query is cheap)
+        # Platform settings act as tenant-wide defaults when BA/campaign don't override.
+        # The previous app-attribute cache (_platform_survey_settings_cache via setattr/getattr on
+        # current_app) had no expiry and was not cleared by the Flask-Caching calls that targeted
+        # the unrelated 'platform_survey_settings' Flask-Caching key, causing the AI engine to
+        # silently ignore new platform admin role prompt changes until server restart.
         try:
             from models import PlatformSurveySettings
-            from flask import current_app
             
-            # Use Flask's app context cache for platform settings (avoid repeated DB queries)
-            cache_key = '_platform_survey_settings_cache'
-            platform_settings = getattr(current_app, cache_key, None)
-            if platform_settings is None:
-                platform_settings = PlatformSurveySettings.query.first()
-                setattr(current_app, cache_key, platform_settings)
+            platform_settings = PlatformSurveySettings.query.first()
             
             if platform_settings and platform_settings.use_role_prompt_overrides and platform_settings.role_prompt_overrides:
                 platform_overrides = _parse_json_dict(platform_settings.role_prompt_overrides)

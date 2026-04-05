@@ -67,6 +67,8 @@ def _get_distinct_company_names(business_account_id):
     }
 
     companies = sorted(participant_companies | qbr_companies)
+    # NOTE: SimpleCache is in-process only — this cache.set is not visible to other
+    # gunicorn workers. Each worker maintains its own independent in-memory cache.
     cache.set(cache_key, companies, timeout=60)
     return companies
 
@@ -256,7 +258,8 @@ def qbr_upload():
             }
         )
 
-        # Invalidate company name cache
+        # Invalidate company name cache.
+        # NOTE: SimpleCache invalidation is in-process only; other gunicorn workers will not see this delete.
         cache.delete(f"qbr_companies_{business_account_id}")
 
         flash(
@@ -377,7 +380,8 @@ def qbr_session_delete(session_uuid):
             details={'quarter': quarter, 'year': year, 'deleted_by_user_id': user_id}
         )
 
-        # Invalidate company name cache
+        # Invalidate company name cache.
+        # NOTE: SimpleCache invalidation is in-process only; other gunicorn workers will not see this delete.
         cache.delete(f"qbr_companies_{business_account_id}")
 
         return jsonify({'success': True, 'message': 'QBR session deleted successfully'}), 200

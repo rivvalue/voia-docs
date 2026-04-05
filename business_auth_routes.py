@@ -3642,6 +3642,12 @@ def add_platform_email_domain():
         
         db.session.commit()
         
+        # Defensive cache invalidation — email_delivery_data caching is currently disabled,
+        # but this ensures the BA sees the new domain immediately if caching is ever re-introduced.
+        # NOTE: SimpleCache invalidation is in-process only; other gunicorn workers will not see this delete.
+        from app import cache as _cache
+        _cache.delete(f'email_delivery_data_{business_account_id}')
+        
         # Audit log
         queue_audit_log(
             business_account_id=business_account_id,
@@ -3715,6 +3721,12 @@ def edit_platform_email_domain(config_id):
         
         db.session.commit()
         
+        # Defensive cache invalidation — email_delivery_data caching is currently disabled,
+        # but this ensures the BA sees domain changes immediately if caching is ever re-introduced.
+        # NOTE: SimpleCache invalidation is in-process only; other gunicorn workers will not see this delete.
+        from app import cache as _cache
+        _cache.delete(f'email_delivery_data_{email_config.business_account_id}')
+        
         # Audit log
         queue_audit_log(
             business_account_id=email_config.business_account_id,
@@ -3775,6 +3787,12 @@ def delete_platform_email_domain(config_id):
         email_config.dkim_record_3_value = None
         
         db.session.commit()
+        
+        # Defensive cache invalidation — email_delivery_data caching is currently disabled,
+        # but this ensures the BA sees domain removal immediately if caching is ever re-introduced.
+        # NOTE: SimpleCache invalidation is in-process only; other gunicorn workers will not see this delete.
+        from app import cache as _cache
+        _cache.delete(f'email_delivery_data_{business_account_id}')
         
         # Audit log
         queue_audit_log(
@@ -4033,9 +4051,11 @@ def toggle_role_prompt_overrides():
         platform_settings.use_role_prompt_overrides = new_state
         db.session.commit()
         
-        # Clear any cached settings
-        from app import cache
-        cache.delete('platform_survey_settings')
+        # Note: the former cache.delete('platform_survey_settings') call has been removed.
+        # The Flask-Caching key 'platform_survey_settings' was never populated (no cache.set call
+        # existed for it), and the actual app-attribute cache (_platform_survey_settings_cache) has
+        # also been removed from prompt_template_service.py. PlatformSurveySettings is now always
+        # queried fresh from the DB.
         
         status = 'enabled' if new_state else 'disabled'
         flash(f'Role prompt override system {status}.', 'success')
@@ -4103,9 +4123,11 @@ def save_role_prompt_config():
         platform_settings.role_prompt_overrides = role_overrides
         db.session.commit()
         
-        # Clear cache
-        from app import cache
-        cache.delete('platform_survey_settings')
+        # Note: the former cache.delete('platform_survey_settings') call has been removed.
+        # The Flask-Caching key 'platform_survey_settings' was never populated (no cache.set call
+        # existed for it), and the actual app-attribute cache (_platform_survey_settings_cache) has
+        # also been removed from prompt_template_service.py. PlatformSurveySettings is now always
+        # queried fresh from the DB.
         
         # Audit log
         queue_audit_log(
@@ -4313,27 +4335,17 @@ def accept_role_prompts_defaults():
 # ==== EMAIL DELIVERY CONFIGURATION ROUTES (Business Account) ====
 
 def _get_email_delivery_data(business_account_id):
-    """Get email delivery configuration data (cached for 6 hours to avoid expensive SES API calls).
+    """Get email delivery configuration data (always queries DB fresh — not cached).
     
     Returns a dict with:
         - email_config: EmailConfiguration object or None
         - available_domains: List of verified domains for VOÏA-Managed mode
     
-    This function caches only the DATA, not the rendered HTML, to preserve CSRF tokens.
+    Caching was removed because the two DB queries here are lightweight and the
+    previous 6-hour cache prevented business account users from seeing newly
+    added or edited domains until the cache expired or the server restarted.
     """
-    from app import cache
     from models import EmailConfiguration, BusinessAccount
-    
-    cache_key = f'email_delivery_data_{business_account_id}'
-    
-    # Try to get from cache
-    cached_data = cache.get(cache_key)
-    if cached_data:
-        logger.debug(f"Serving email delivery data from cache: {cache_key}")
-        return cached_data
-    
-    # Cache miss - fetch from database
-    logger.debug(f"Cache miss for email delivery data: {cache_key}")
     
     business_account = BusinessAccount.query.get(business_account_id)
     if not business_account:
@@ -4349,24 +4361,18 @@ def _get_email_delivery_data(business_account_id):
         domain_verified=True
     ).all()
     
-    data = {
+    return {
         'email_config': email_config,
         'available_domains': available_domains
     }
-    
-    # Cache for 6 hours (21600 seconds)
-    cache.set(cache_key, data, timeout=21600)
-    logger.debug(f"Cached email delivery data: {cache_key}")
-    
-    return data
 
 @business_auth_bp.route('/admin/email-delivery-config')
 @require_business_auth
 def email_delivery_config():
     """Email delivery configuration page - dual-mode: VOÏA-Managed or Client-Managed (Business Admin)
     
-    Data is cached for 6 hours to avoid expensive SES API calls on every page load.
-    Template is rendered fresh on each request to preserve CSRF tokens.
+    Data is always queried fresh from the DB (no caching) so new platform-admin domains
+    are immediately visible to business account users without requiring a server restart.
     """
     try:
         current_account = get_current_business_account()
@@ -4375,7 +4381,6 @@ def email_delivery_config():
             flash(_('Business account context not found.'), 'error')
             return redirect(url_for('business_auth.admin_panel'))
         
-        # Get cached data (includes email_config and available_domains)
         data = _get_email_delivery_data(current_account.id)
         if not data:
             logger.error(f"Failed to retrieve email delivery data for account {current_account.id}")
@@ -4397,9 +4402,10 @@ def email_delivery_config():
 @business_auth_bp.route('/admin/email-delivery-config/save', methods=['POST'])
 @require_business_auth
 def save_email_delivery_config():
-    """Save email delivery configuration (dual-mode support)
+    """Save email delivery configuration (dual-mode support).
     
-    Invalidates cache after successful save to ensure fresh data on next load.
+    Data is always queried fresh from the DB (no caching). The cache.delete call below
+    is a defensive measure in case caching is ever re-introduced.
     """
     from app import cache
     
@@ -4539,7 +4545,9 @@ def save_email_delivery_config():
         # Save to database
         db.session.commit()
         
-        # Invalidate data cache to ensure fresh data on next load
+        # Defensive cache invalidation — email_delivery_data caching is currently disabled,
+        # but this is kept as a safety measure if caching is ever re-introduced.
+        # NOTE: SimpleCache invalidation is in-process only; other gunicorn workers will not see this delete.
         cache_key = f'email_delivery_data_{current_account.id}'
         cache.delete(cache_key)
         logger.debug(f"Invalidated email delivery data cache: {cache_key}")
