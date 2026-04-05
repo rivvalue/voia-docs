@@ -179,6 +179,24 @@
                                 </button>
                                 {% endif %}
                             </form>
+                            {% if user.last_login_at is none %}
+                            <form method="POST" 
+                                  action="{{ url_for('business_auth.delete_user', user_id=user.uuid) }}" 
+                                  style="display: inline;" 
+                                  id="deleteUserForm_{{ user.id }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                <button type="button" 
+                                        class="users-action-btn secondary" 
+                                        title={{ _('Delete User') }}
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteUserModal"
+                                        data-user-id="{{ user.id }}"
+                                        data-user-name="{{ user.get_full_name() }}"
+                                        aria-label="Delete {{ user.get_full_name() }}">
+                                    <i class="fas fa-trash" aria-hidden="true"></i>
+                                </button>
+                            </form>
+                            {% endif %}
                             {% endif %}
                             {% if user.id == current_user.id %}
                             <span class="text-muted small">{{ _('Current User') }}</span>
@@ -370,38 +388,51 @@ function editUser(userId, firstName, lastName, email, role) {
     editModal.show();
 }
 
-// Modal handlers
-document.getElementById('deactivateUserModal').addEventListener('show.bs.modal', function (event) {
-    const button = event.relatedTarget;
-    const userId = button.getAttribute('data-user-id');
-    const userName = button.getAttribute('data-user-name');
-    
-    document.getElementById('deactivateUserName').textContent = userName;
-    document.getElementById('confirmDeactivateUserBtn').onclick = function() {
-        document.getElementById('toggleStatusForm_' + userId).submit();
-    };
-});
+document.addEventListener('DOMContentLoaded', function () {
+    // Modal handlers
+    document.getElementById('deactivateUserModal').addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const userId = button.getAttribute('data-user-id');
+        const userName = button.getAttribute('data-user-name');
+        
+        document.getElementById('deactivateUserName').textContent = userName;
+        document.getElementById('confirmDeactivateUserBtn').onclick = function() {
+            document.getElementById('toggleStatusForm_' + userId).submit();
+        };
+    });
 
-document.getElementById('reactivateUserModal').addEventListener('show.bs.modal', function (event) {
-    const button = event.relatedTarget;
-    const userId = button.getAttribute('data-user-id');
-    const userName = button.getAttribute('data-user-name');
-    
-    document.getElementById('reactivateUserName').textContent = userName;
-    document.getElementById('confirmReactivateUserBtn').onclick = function() {
-        document.getElementById('toggleStatusForm_' + userId).submit();
-    };
-});
+    document.getElementById('reactivateUserModal').addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const userId = button.getAttribute('data-user-id');
+        const userName = button.getAttribute('data-user-name');
+        
+        document.getElementById('reactivateUserName').textContent = userName;
+        document.getElementById('confirmReactivateUserBtn').onclick = function() {
+            document.getElementById('toggleStatusForm_' + userId).submit();
+        };
+    });
 
-document.getElementById('resetPasswordModal').addEventListener('show.bs.modal', function (event) {
-    const button = event.relatedTarget;
-    const userId = button.getAttribute('data-user-id');
-    const userName = button.getAttribute('data-user-name');
-    
-    document.getElementById('resetPasswordUserName').textContent = userName;
-    document.getElementById('confirmResetPasswordBtn').onclick = function() {
-        document.getElementById('resetPasswordForm_' + userId).submit();
-    };
+    document.getElementById('resetPasswordModal').addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const userId = button.getAttribute('data-user-id');
+        const userName = button.getAttribute('data-user-name');
+        
+        document.getElementById('resetPasswordUserName').textContent = userName;
+        document.getElementById('confirmResetPasswordBtn').onclick = function() {
+            document.getElementById('resetPasswordForm_' + userId).submit();
+        };
+    });
+
+    document.getElementById('deleteUserModal').addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const userId = button.getAttribute('data-user-id');
+        const userName = button.getAttribute('data-user-name');
+
+        document.getElementById('deleteUserName').textContent = userName;
+        document.getElementById('confirmDeleteUserBtn').onclick = function() {
+            document.getElementById('deleteUserForm_' + userId).submit();
+        };
+    });
 });
 </script>
 
@@ -507,6 +538,41 @@ document.getElementById('resetPasswordModal').addEventListener('show.bs.modal', 
                 </button>
                 <button type="button" class="btn btn-primary" id="confirmResetPasswordBtn">
                     <i class="fas fa-key me-2"></i>{{ _('Yes, Reset Password') }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete User Modal -->
+<div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%); color: var(--primary-white);">
+                <h5 class="modal-title" id="deleteUserModalLabel">
+                    <i class="fas fa-trash me-2"></i>{{ _('Delete User') }}
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>{{ _('Are you sure you want to permanently delete') }} <span id="deleteUserName"></span>?</strong></p>
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>{{ _('Warning:') }}</strong> {{ _('This action cannot be undone. The user will be permanently removed.') }}
+                </div>
+                <p>{{ _('This action will:') }}</p>
+                <ul class="mb-0">
+                    <li>{{ _('Permanently remove the user account') }}</li>
+                    <li>{{ _('Delete all associated data') }}</li>
+                    <li>{{ _('This cannot be reversed') }}</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>{{ _('Cancel') }}
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteUserBtn">
+                    <i class="fas fa-trash me-2"></i>{{ _('Yes, Delete User') }}
                 </button>
             </div>
         </div>

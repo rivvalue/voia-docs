@@ -826,6 +826,55 @@ def reset_user_password(user_id):
         return redirect(url_for('business_auth.manage_users'))
 
 
+@business_auth_bp.route('/users/<string:user_id>/delete', methods=['POST'])
+@require_business_auth
+@require_permission('manage_users')
+def delete_user(user_id):
+    """Permanently delete a user who has never logged in"""
+    try:
+        current_user_id = session.get('business_user_id')
+        current_account_id = session.get('business_account_id')
+
+        if not current_user_id or not current_account_id:
+            logger.warning("Missing user or account session data")
+            flash('Authentication required.', 'error')
+            return redirect(url_for('business_auth.login'))
+
+        if not _is_valid_uuid(user_id):
+            abort(404)
+
+        user_to_delete = BusinessAccountUser.query.filter_by(
+            uuid=user_id,
+            business_account_id=current_account_id
+        ).first()
+
+        if not user_to_delete:
+            abort(404)
+
+        if user_to_delete.id == current_user_id:
+            flash('You cannot delete your own account.', 'error')
+            return redirect(url_for('business_auth.manage_users'))
+
+        if user_to_delete.last_login_at is not None:
+            flash('Cannot delete a user who has previously logged in. Use deactivation instead.', 'error')
+            return redirect(url_for('business_auth.manage_users'))
+
+        full_name = user_to_delete.get_full_name()
+        db.session.delete(user_to_delete)
+        db.session.commit()
+
+        logger.info(f"User {user_to_delete.id} ({user_to_delete.email}) permanently deleted by user {current_user_id}")
+        flash(f'User {full_name} has been permanently deleted.', 'success')
+
+        return redirect(url_for('business_auth.manage_users'))
+
+    except Exception as e:
+        logger.error(f"Error deleting user {user_id}: {e}")
+        db.session.rollback()
+        flash('Failed to delete user. Please try again.', 'error')
+        return redirect(url_for('business_auth.manage_users'))
+
+
 # ==== BUSINESS ACCOUNT ONBOARDING ROUTES (PHASE 1) ====
 
 @business_auth_bp.route('/admin/onboarding')
