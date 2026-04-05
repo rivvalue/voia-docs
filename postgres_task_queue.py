@@ -38,6 +38,27 @@ from email_service import email_service
 
 logger = logging.getLogger(__name__)
 
+# Audit log retry configuration — adjust via environment variables if needed
+AUDIT_LOG_RETRY_WARNING_THRESHOLD = int(os.environ.get("AUDIT_LOG_RETRY_WARNING_THRESHOLD", 10))
+AUDIT_LOG_MAX_BACKOFF_MINUTES = int(os.environ.get("AUDIT_LOG_MAX_BACKOFF_MINUTES", 30))
+
+# Per-task-type retry caps.
+# - audit_log: sentinel 9999 — compliance requirement, never permanently dropped
+# - AI tasks: 8 retries (~2h of backoff) — transient provider outages last longer than the old 7-min window
+# - All other types: 3 retries — short-lived transient failures; user or UI can recover
+TASK_MAX_RETRIES = {
+    'audit_log':          9999,
+    'ai_analysis':        8,
+    'transcript_analysis': 8,
+    'qbr_analysis':       8,
+    'send_email':         3,
+    'send_reminder_email': 3,
+    'executive_report':   3,
+    'export_campaign':    3,
+    'bulk_participant_add':    3,
+    'bulk_participant_remove': 3,
+}
+
 
 class PostgresTaskQueue:
     """PostgreSQL-backed persistent task queue with worker pool"""
@@ -123,6 +144,8 @@ class PostgresTaskQueue:
             campaign_id = task_payload.get('campaign_id')
             
             # Insert task into database - use CAST to avoid parameter style conflicts
+            # Retry cap is determined per task type; unknown types fall back to 3
+            effective_max_retries = TASK_MAX_RETRIES.get(task_type, 3)
             json_str = json.dumps(task_payload)
             result = db.session.execute(
                 text("""
@@ -133,7 +156,7 @@ class PostgresTaskQueue:
                     ) VALUES (
                         :task_type, CAST(:task_data AS jsonb), :priority, 'pending',
                         NOW(), :business_account_id, :campaign_id,
-                        NOW(), NOW(), 0, 3
+                        NOW(), NOW(), 0, :max_retries
                     ) RETURNING id
                 """),
                 {
@@ -141,7 +164,8 @@ class PostgresTaskQueue:
                     'task_data': json_str,
                     'priority': priority,
                     'business_account_id': business_account_id,
-                    'campaign_id': campaign_id
+                    'campaign_id': campaign_id,
+                    'max_retries': effective_max_retries
                 }
             )
             
@@ -302,9 +326,9 @@ class PostgresTaskQueue:
     def _mark_task_failed(self, task_id: int, error_message: str):
         """Mark a task as failed and handle retry logic"""
         try:
-            # Get current retry count
+            # Get current retry count and task type
             result = db.session.execute(
-                text("SELECT retry_count, max_retries FROM task_queue WHERE id = :task_id"),
+                text("SELECT retry_count, max_retries, task_type, task_data FROM task_queue WHERE id = :task_id"),
                 {"task_id": task_id}
             )
             row = result.fetchone()
@@ -315,8 +339,35 @@ class PostgresTaskQueue:
             
             retry_count = row[0]
             max_retries = row[1]
-            
-            if retry_count < max_retries:
+            task_type = row[2]
+            task_data = row[3]
+
+            if task_type == 'audit_log':
+                # audit_log tasks must never be permanently dropped — retry indefinitely
+                # Backoff capped at AUDIT_LOG_MAX_BACKOFF_MINUTES to prevent runaway delay growth
+                retry_delay_minutes = min(2 ** retry_count, AUDIT_LOG_MAX_BACKOFF_MINUTES)
+                db.session.execute(
+                    text("""
+                        UPDATE task_queue 
+                        SET status = 'pending',
+                            retry_count = retry_count + 1,
+                            scheduled_at = NOW() + :delay * INTERVAL '1 minute',
+                            error_message = :error,
+                            updated_at = NOW()
+                        WHERE id = :task_id
+                    """),
+                    {"task_id": task_id, "delay": retry_delay_minutes, "error": error_message}
+                )
+                if retry_count >= AUDIT_LOG_RETRY_WARNING_THRESHOLD:
+                    action_type = task_data.get('action_type', 'unknown') if isinstance(task_data, dict) else 'unknown'
+                    logger.error(
+                        f"AUDIT LOG TASK {task_id} HAS FAILED {retry_count + 1} TIMES — "
+                        f"action_type={action_type}, next retry in {retry_delay_minutes} min. "
+                        f"Error: {error_message}"
+                    )
+                else:
+                    logger.info(f"audit_log task {task_id} scheduled for retry {retry_count + 1} in {retry_delay_minutes} minutes")
+            elif retry_count < max_retries:
                 retry_delay_minutes = 2 ** retry_count  # 1, 2, 4 minutes
                 db.session.execute(
                     text("""
