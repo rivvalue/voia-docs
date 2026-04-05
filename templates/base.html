@@ -38,7 +38,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/modules/print.css') }}" media="print">
     {% else %}
     <!-- Legacy: Monolithic CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}?v=tab-nowrap-1800-1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}?v=sidebar-footer-v4">
     {% endif %}
     
     <!-- CSRF Token for AJAX requests -->
@@ -48,7 +48,7 @@
     {% block extra_head %}{% endblock %}
     
 </head>
-<body class="{% block page_class %}{% endblock %}" data-ui-version="{{ ui_version }}" data-user-id="{{ business_user_id }}" data-user-email="{{ business_user_email }}">
+<body class="{% block page_class %}{% endblock %}{% if ui_version == 'v2' and is_business_authenticated %} has-v2-sidebar{% endif %}" data-ui-version="{{ ui_version }}" data-user-id="{{ business_user_id }}" data-user-email="{{ business_user_email }}">
     
     <!-- Sidebar Navigation (v2 UI only) -->
     {% if ui_version == 'v2' and is_business_authenticated %}
@@ -105,10 +105,57 @@
             </a>
         </nav>
         <div class="sidebar-footer">
-            <a href="{{ url_for('business_auth.logout') }}" class="sidebar-nav-item">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>{{ _('Logout') }}</span>
+            <!-- Notification Bell — same look as other sidebar nav items -->
+            <a href="#" class="sidebar-nav-item sidebar-bell-item" id="sidebarNotificationBell" data-bs-toggle="offcanvas" data-bs-target="#notificationPanel" aria-controls="notificationPanel">
+                <i class="fas fa-bell"></i>
+                <span class="sidebar-item-label">{{ _('Notifications') }}</span>
+                <span class="sidebar-notif-badge" id="sidebarNotificationBadge" style="display: none;">0</span>
             </a>
+            <!-- User Dropdown (dropup) -->
+            <div class="user-dropdown sidebar-user-dropdown">
+                <div class="user-dropdown-trigger sidebar-user-dropdown-trigger sidebar-nav-item sidebar-user-trigger">
+                    <i class="fas fa-user-circle"></i>
+                    <span class="user-name">{{ business_user_name }}</span>
+                    <i class="fas fa-chevron-up sidebar-user-dropdown-arrow"></i>
+                </div>
+                <div class="user-dropdown-menu sidebar-user-dropdown-menu">
+                    <div class="user-dropdown-header">
+                        <div class="user-dropdown-name">{{ business_user_name }}</div>
+                        <div class="user-dropdown-email">{{ business_user_email }}</div>
+                    </div>
+                    <div class="user-dropdown-divider"></div>
+                    {% if current_user and current_user.role in ['admin', 'business_account_admin'] %}
+                    <a href="{{ url_for('business_auth.onboarding_progress') }}" class="user-dropdown-item">
+                        <i class="fas fa-tasks"></i>
+                        <div class="user-dropdown-item-content">
+                            <span class="user-dropdown-item-label">{{ _('Setup Progress') }}</span>
+                            <span class="user-dropdown-item-badge">{{ current_user.get_onboarding_progress_percentage()|int }}%</span>
+                        </div>
+                    </a>
+                    <div class="user-dropdown-divider"></div>
+                    {% endif %}
+                    <div class="user-dropdown-item-label px-3 py-2 text-muted small">{{ _('Language') }}</div>
+                    <a href="{{ url_for('language.set_language', lang='en') }}" class="user-dropdown-item">
+                        <i class="fas fa-globe"></i>
+                        <span>English</span>
+                        {% if session.get('language', 'en') == 'en' %}
+                        <i class="fas fa-check ms-auto text-success"></i>
+                        {% endif %}
+                    </a>
+                    <a href="{{ url_for('language.set_language', lang='fr') }}" class="user-dropdown-item">
+                        <i class="fas fa-globe"></i>
+                        <span>Français</span>
+                        {% if session.get('language', 'en') == 'fr' %}
+                        <i class="fas fa-check ms-auto text-success"></i>
+                        {% endif %}
+                    </a>
+                    <div class="user-dropdown-divider"></div>
+                    <a href="{{ url_for('business_auth.logout') }}" class="user-dropdown-item">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>{{ _('Logout') }}</span>
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
     
@@ -149,6 +196,8 @@
             <div class="navbar-right">
                 <div class="d-flex align-items-center gap-3">
                     {% if is_business_authenticated %}
+                    <!-- User Dropdown + Bell (hidden on desktop when V2 sidebar is shown) -->
+                    <div class="navbar-bell-user d-flex align-items-center gap-3">
                     <!-- User Dropdown Menu -->
                     <div class="user-dropdown">
                         <div class="user-dropdown-trigger">
@@ -205,6 +254,7 @@
                             <span class="notification-badge badge bg-danger position-absolute" id="notificationBadge" style="display: none; top: 4px; right: 4px; font-size: 0.65rem; padding: 0.25em 0.5em;">0</span>
                         </button>
                     </div>
+                    </div><!-- /.navbar-bell-user -->
                     {% endif %}
                     
                     {% if not is_business_authenticated %}
@@ -352,38 +402,43 @@
     <!-- User Dropdown Enhancement Script -->
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const userDropdown = document.querySelector('.user-dropdown');
-        const userDropdownTrigger = document.querySelector('.user-dropdown-trigger');
-        const userDropdownMenu = document.querySelector('.user-dropdown-menu');
+        // Handle all user-dropdown instances (navbar + sidebar)
+        document.querySelectorAll('.user-dropdown').forEach(function(userDropdown) {
+            const userDropdownTrigger = userDropdown.querySelector('.user-dropdown-trigger');
+            const userDropdownMenu = userDropdown.querySelector('.user-dropdown-menu');
+            
+            if (userDropdownTrigger && userDropdownMenu) {
+                // Toggle on click — derive state from class to stay in sync with outside-click handler
+                userDropdownTrigger.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const isOpen = userDropdown.classList.contains('user-dropdown-active');
+                    // Close all other open dropdowns first
+                    document.querySelectorAll('.user-dropdown.user-dropdown-active').forEach(function(other) {
+                        other.classList.remove('user-dropdown-active');
+                    });
+                    if (!isOpen) {
+                        userDropdown.classList.add('user-dropdown-active');
+                    }
+                });
+                
+                // Prevent dropdown from closing when clicking inside non-link content
+                userDropdownMenu.addEventListener('click', function(e) {
+                    if (e.target.tagName === 'A' || e.target.closest('a')) {
+                        return;
+                    }
+                    e.stopPropagation();
+                });
+            }
+        });
         
-        if (userDropdown && userDropdownTrigger && userDropdownMenu) {
-            let isOpen = false;
-            
-            // Toggle on click
-            userDropdownTrigger.addEventListener('click', function(e) {
-                e.stopPropagation();
-                isOpen = !isOpen;
-                userDropdown.classList.toggle('user-dropdown-active', isOpen);
-            });
-            
-            // Close when clicking outside
-            document.addEventListener('click', function(e) {
+        // Close all dropdowns when clicking outside
+        document.addEventListener('click', function(e) {
+            document.querySelectorAll('.user-dropdown.user-dropdown-active').forEach(function(userDropdown) {
                 if (!userDropdown.contains(e.target)) {
-                    isOpen = false;
                     userDropdown.classList.remove('user-dropdown-active');
                 }
             });
-            
-            // Prevent dropdown from closing when clicking inside
-            userDropdownMenu.addEventListener('click', function(e) {
-                // Allow links to navigate
-                if (e.target.tagName === 'A' || e.target.closest('a')) {
-                    // Link will navigate, no need to prevent default
-                    return;
-                }
-                e.stopPropagation();
-            });
-        }
+        });
     });
     </script>
     
@@ -837,6 +892,23 @@
         
         pollNotifications();
         setInterval(pollNotifications, 15000);
+    })();
+    </script>
+    
+    <!-- Sync sidebar notification badge with navbar badge -->
+    <script>
+    (function() {
+        const navBadge = document.getElementById('notificationBadge');
+        const sidebarBadge = document.getElementById('sidebarNotificationBadge');
+        if (navBadge && sidebarBadge) {
+            function syncSidebarBadge() {
+                sidebarBadge.textContent = navBadge.textContent;
+                sidebarBadge.style.display = (navBadge.style.display === 'none') ? 'none' : 'flex';
+            }
+            const observer = new MutationObserver(syncSidebarBadge);
+            observer.observe(navBadge, { childList: true, attributes: true, attributeFilter: ['style'] });
+            syncSidebarBadge();
+        }
     })();
     </script>
     {% endif %}
