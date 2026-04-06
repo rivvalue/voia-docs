@@ -2119,6 +2119,21 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
     display: none !important;
 }
 
+/* V2 sidebar: hide navbar bell & user on desktop (shown in sidebar footer instead) */
+@media (min-width: 992px) {
+    body[data-ui-version="v2"] .navbar-bell-user {
+        display: none !important;
+    }
+}
+
+/* V2 sidebar: hide sidebar bell & user on mobile (shown in navbar instead) */
+@media (max-width: 991.98px) {
+    body[data-ui-version="v2"] .sidebar-footer .sidebar-bell-item,
+    body[data-ui-version="v2"] .sidebar-footer .sidebar-user-dropdown {
+        display: none !important;
+    }
+}
+
 /* ============================================
    CONVERSATIONAL SURVEY - HERO SECTION
    ============================================ */
