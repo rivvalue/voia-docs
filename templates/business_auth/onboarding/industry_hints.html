@@ -6,11 +6,18 @@
 
 {% block content %}
 {# Breadcrumb Navigation #}
+{% if onboarding_mode %}
 {% set breadcrumb_items = [
     {'label': _('Settings'), 'url': url_for('business_auth.admin_panel')},
     {'label': _('Onboarding'), 'url': url_for('business_auth.onboarding_progress')},
     {'label': _('Industry Context'), 'current': true}
 ] %}
+{% else %}
+{% set breadcrumb_items = [
+    {'label': _('Settings'), 'url': url_for('business_auth.admin_panel')},
+    {'label': _('Industry Context'), 'current': true}
+] %}
+{% endif %}
 {% include 'components/breadcrumb.html' %}
 
 <div class="settings-hub-container">
@@ -24,6 +31,17 @@
             <p class="settings-hub-subtitle">{{ _('Review and customize how the AI understands your industry to ask more relevant questions') }}</p>
         </div>
     </div>
+
+    {% if not onboarding_mode %}
+    <!-- Warning Banner (settings context only) -->
+    <div class="alert alert-warning d-flex align-items-start mb-4" role="alert">
+        <i class="fas fa-exclamation-triangle fa-lg me-3 mt-1 flex-shrink-0"></i>
+        <div>
+            <strong>{{ _('Account-Wide Setting') }}</strong><br>
+            {{ _('Changes to industry context will affect all campaigns that inherit from this business account. Campaigns with campaign-level overrides will not be affected.') }}
+        </div>
+    </div>
+    {% endif %}
 
     <!-- Status Badge -->
     <div class="mb-4">
@@ -108,7 +126,8 @@
         {% endif %}
     </div>
 
-    <!-- Action Buttons -->
+    <!-- Action Buttons (Onboarding mode) -->
+    {% if onboarding_mode %}
     <div class="settings-card">
         <h3 class="settings-section-title mb-4">
             <i class="fas fa-check-circle me-2"></i>
@@ -124,7 +143,7 @@
                         <p class="text-muted">{{ _('Use the recommended industry hints shown above. You can customize them later if needed.') }}</p>
                         <form method="POST" action="{{ url_for('business_auth.accept_industry_hints_defaults') }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                            <input type="hidden" name="onboarding" value="{{ '1' if onboarding_mode else '0' }}"/>
+                            <input type="hidden" name="onboarding" value="1"/>
                             <button type="submit" class="btn btn-success btn-lg">
                                 <i class="fas fa-check me-2"></i>{{ _('Accept Defaults') }}
                             </button>
@@ -136,107 +155,100 @@
                 <div class="card h-100">
                     <div class="card-body text-center">
                         <i class="fas fa-edit fa-3x text-primary mb-3"></i>
-                        <h5>{{ _('Customize (Advanced)') }}</h5>
-                        <p class="text-muted">{{ _('Contact your administrator to set up custom industry hints for your specific needs.') }}</p>
-                        <button type="button" class="btn btn-outline-primary btn-lg" disabled>
-                            <i class="fas fa-cog me-2"></i>{{ _('Coming Soon') }}
-                        </button>
-                        <div class="mt-3">
-                            <button type="button" class="btn btn-link btn-sm p-0 json-hint-btn"
-                                    data-hint-target="ba-json-hint-content"
-                                    title="{{ _('View expected JSON format') }}">
-                                <i class="fas fa-info-circle me-1"></i>{{ _('View expected JSON format') }}
-                            </button>
-                        </div>
+                        <h5>{{ _('Customize Hints') }}</h5>
+                        <p class="text-muted">{{ _('Override the platform defaults with your own keywords for each survey topic. You can do this now or return to it later from Settings.') }}</p>
+                        <a href="{{ url_for('business_auth.account_industry_hints') }}" class="btn btn-outline-primary btn-lg">
+                            <i class="fas fa-cog me-2"></i>{{ _('Customize Now') }}
+                        </a>
                     </div>
                 </div>
             </div>
-
-            <!-- JSON hint example for BA level (hidden, used by popover) -->
-            <div id="ba-json-hint-content" class="d-none">
-                <p style="margin-bottom:0.5rem;font-size:0.8rem;">{{ _('Flat JSON: survey topic names as keys, comma-separated focus keywords as values.') }}</p>
-                <div class="d-flex justify-content-end mb-1">
-                    <button type="button" class="btn btn-sm btn-outline-secondary json-copy-btn"
-                            style="font-size:0.72rem;padding:2px 8px;">
-                        <i class="fas fa-copy me-1"></i>{{ _('Copy JSON') }}
-                    </button>
-                </div>
-                <pre style="margin:0;font-size:0.72rem;background:#f8f9fa;padding:0.6rem;border-radius:4px;white-space:pre-wrap;">{
-  "Product Quality": "defects, durability, feature completeness, reliability",
-  "Support Experience": "response time, technical expertise, issue resolution",
-  "Service Rating": "on-time delivery, account management quality",
-  "NPS Score": "recommendation likelihood, overall satisfaction",
-  "Pricing Value": "cost competitiveness, ROI, pricing transparency",
-  "User Experience": "interface usability, ease of onboarding",
-  "Satisfaction": "overall satisfaction, expectations met",
-  "Improvement Suggestions": "process improvements, communication, delivery"
-}</pre>
-                <p style="margin-top:0.5rem;margin-bottom:0;font-size:0.75rem;color:#6c757d;">{{ _('Prepare this file in an external editor. Contact your platform administrator to apply it.') }}</p>
-            </div>
         </div>
         
-        {% if onboarding_mode %}
         <hr class="my-4">
         <div class="text-center">
             <a href="{{ url_for('business_auth.onboarding_progress') }}" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-left me-2"></i>{{ _('Back to Onboarding') }}
             </a>
         </div>
-        {% endif %}
     </div>
+
+    {% else %}
+    <!-- Settings mode: Editable form -->
+    <div class="settings-card mb-4">
+        <h3 class="settings-section-title mb-4">
+            <i class="fas fa-edit me-2"></i>
+            {{ _('Customize Industry Hints') }}
+        </h3>
+        <p class="text-muted mb-4">{{ _('Override the platform default hints for each survey topic. Leave a field empty to inherit the platform default for that topic.') }}</p>
+
+        <form method="POST" action="{{ url_for('business_auth.save_industry_hints') }}" id="industryHintsForm">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+            {% if platform_hints %}
+            {% for topic, default_hints in platform_hints.items() %}
+            {% set topic_key = topic | replace(' ', '_') | lower %}
+            {% set current_value = account_overrides.get(topic, '') if account_overrides and not defaults_accepted else '' %}
+            <div class="mb-4">
+                <label class="form-label fw-semibold" for="hint_{{ topic_key }}">
+                    <i class="fas fa-tag me-1 text-primary"></i>{{ topic }}
+                </label>
+                <input type="text"
+                       class="form-control"
+                       id="hint_{{ topic_key }}"
+                       name="hint_{{ topic_key }}"
+                       data-topic="{{ topic }}"
+                       value="{{ current_value }}"
+                       placeholder="{{ _('Default: ') }}{{ default_hints }}"
+                       maxlength="500">
+                <div class="form-text text-muted">
+                    <i class="fas fa-info-circle me-1"></i>{{ _('Platform default: ') }}<em>{{ default_hints }}</em>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                {{ _('No platform defaults available. You can define custom hints for standard survey topics below.') }}
+            </div>
+            <!-- Fallback: standard topics -->
+            {% for topic in ['Product Quality', 'Support Experience', 'Service Rating', 'NPS Score', 'Pricing Value', 'User Experience', 'Satisfaction', 'Improvement Suggestions'] %}
+            {% set topic_key = topic | replace(' ', '_') | lower %}
+            {% set current_value = account_overrides.get(topic, '') if account_overrides and not defaults_accepted else '' %}
+            <div class="mb-4">
+                <label class="form-label fw-semibold" for="hint_{{ topic_key }}">
+                    <i class="fas fa-tag me-1 text-primary"></i>{{ topic }}
+                </label>
+                <input type="text"
+                       class="form-control"
+                       id="hint_{{ topic_key }}"
+                       name="hint_{{ topic_key }}"
+                       data-topic="{{ topic }}"
+                       value="{{ current_value }}"
+                       placeholder="{{ _('Enter comma-separated keywords...') }}"
+                       maxlength="500">
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            <div class="d-flex gap-3 mt-4">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-save me-2"></i>{{ _('Save Custom Hints') }}
+                </button>
+                <button type="button" class="btn btn-outline-success btn-lg" onclick="document.getElementById('resetIndustryHintsForm').submit()">
+                    <i class="fas fa-undo me-2"></i>{{ _('Reset to Platform Defaults') }}
+                </button>
+                <a href="{{ url_for('business_auth.admin_panel') }}" class="btn btn-outline-secondary btn-lg">
+                    <i class="fas fa-times me-2"></i>{{ _('Cancel') }}
+                </a>
+            </div>
+        </form>
+        <form id="resetIndustryHintsForm" method="POST" action="{{ url_for('business_auth.accept_industry_hints_defaults') }}" class="d-none">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <input type="hidden" name="onboarding" value="0"/>
+        </form>
+    </div>
+    {% endif %}
 </div>
 
-{% endblock %}
-
-{% block scripts %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.json-hint-btn').forEach(function(btn) {
-        var targetId = btn.getAttribute('data-hint-target');
-        var contentEl = document.getElementById(targetId);
-        new bootstrap.Popover(btn, {
-            html: true,
-            sanitize: false,
-            trigger: 'click',
-            placement: 'top',
-            title: '{{ _("Expected JSON Format") }}',
-            content: contentEl ? contentEl.innerHTML : '',
-            customClass: 'json-hint-popover'
-        });
-    });
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.json-hint-btn') && !e.target.closest('.popover')) {
-            document.querySelectorAll('.json-hint-btn').forEach(function(btn) {
-                var p = bootstrap.Popover.getInstance(btn);
-                if (p) p.hide();
-            });
-        }
-    });
-});
-
-// Copy JSON button (delegated — works inside cloned popover body)
-var _jsonCopySuccess = '<i class="fas fa-check me-1"></i>{{ _("Copied") }} \u2713';
-var _jsonCopyFailed = '{{ _("Failed") }}';
-document.addEventListener('click', function(e) {
-    var copyBtn = e.target.closest('.json-copy-btn');
-    if (!copyBtn) return;
-    var container = copyBtn.closest('.popover-body') ||
-                    copyBtn.parentElement.closest('[id$="-json-hint-content"]');
-    var pre = container ? container.querySelector('pre') : null;
-    if (!pre) return;
-    var origHtml = copyBtn.innerHTML;
-    function showFail() {
-        copyBtn.textContent = _jsonCopyFailed;
-        setTimeout(function() { copyBtn.innerHTML = origHtml; copyBtn.disabled = false; }, 1500);
-    }
-    try {
-        if (!navigator.clipboard || !navigator.clipboard.writeText) { showFail(); return; }
-        navigator.clipboard.writeText(pre.textContent).then(function() {
-            copyBtn.innerHTML = _jsonCopySuccess;
-            copyBtn.disabled = true;
-            setTimeout(function() { copyBtn.innerHTML = origHtml; copyBtn.disabled = false; }, 1500);
-        }).catch(showFail);
-    } catch (err) { showFail(); }
-});
-</script>
 {% endblock %}

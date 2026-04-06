@@ -6,11 +6,18 @@
 
 {% block content %}
 {# Breadcrumb Navigation #}
+{% if onboarding_mode %}
 {% set breadcrumb_items = [
     {'label': _('Settings'), 'url': url_for('business_auth.admin_panel')},
     {'label': _('Onboarding'), 'url': url_for('business_auth.onboarding_progress')},
     {'label': _('Persona Configuration'), 'current': true}
 ] %}
+{% else %}
+{% set breadcrumb_items = [
+    {'label': _('Settings'), 'url': url_for('business_auth.admin_panel')},
+    {'label': _('AI Personas'), 'current': true}
+] %}
+{% endif %}
 {% include 'components/breadcrumb.html' %}
 
 <div class="settings-hub-container">
@@ -24,6 +31,17 @@
             <p class="settings-hub-subtitle">{{ _('Review how the AI adapts its questioning style for different participant roles') }}</p>
         </div>
     </div>
+
+    {% if not onboarding_mode %}
+    <!-- Warning Banner (settings context only) -->
+    <div class="alert alert-warning d-flex align-items-start mb-4" role="alert">
+        <i class="fas fa-exclamation-triangle fa-lg me-3 mt-1 flex-shrink-0"></i>
+        <div>
+            <strong>{{ _('Account-Wide Setting') }}</strong><br>
+            {{ _('Changes to persona configuration will affect all campaigns that inherit from this business account. Campaigns with campaign-level persona overrides will not be affected.') }}
+        </div>
+    </div>
+    {% endif %}
 
     <!-- Status Badge -->
     <div class="mb-4">
@@ -104,7 +122,8 @@
         <p class="text-muted mt-2 mb-0">{{ _('The AI automatically adapts its language based on participant preference.') }}</p>
     </div>
 
-    <!-- Action Buttons -->
+    {% if onboarding_mode %}
+    <!-- Action Buttons (Onboarding mode) -->
     <div class="settings-card">
         <h3 class="settings-section-title mb-4">
             <i class="fas fa-check-circle me-2"></i>
@@ -120,7 +139,7 @@
                         <p class="text-muted">{{ _('Use the recommended persona configurations. They work well for most organizations.') }}</p>
                         <form method="POST" action="{{ url_for('business_auth.accept_role_prompts_defaults') }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                            <input type="hidden" name="onboarding" value="{{ '1' if onboarding_mode else '0' }}"/>
+                            <input type="hidden" name="onboarding" value="1"/>
                             <button type="submit" class="btn btn-success btn-lg">
                                 <i class="fas fa-check me-2"></i>{{ _('Accept Defaults') }}
                             </button>
@@ -132,24 +151,101 @@
                 <div class="card h-100">
                     <div class="card-body text-center">
                         <i class="fas fa-edit fa-3x text-primary mb-3"></i>
-                        <h5>{{ _('Customize (Advanced)') }}</h5>
-                        <p class="text-muted">{{ _('Contact your administrator to set up custom persona prompts for your organization.') }}</p>
-                        <button type="button" class="btn btn-outline-primary btn-lg" disabled>
-                            <i class="fas fa-cog me-2"></i>{{ _('Coming Soon') }}
-                        </button>
+                        <h5>{{ _('Customize Personas') }}</h5>
+                        <p class="text-muted">{{ _('Override the platform guidance for each participant tier with your own instructions. You can do this now or return to it later from Settings.') }}</p>
+                        <a href="{{ url_for('business_auth.account_role_prompts') }}" class="btn btn-outline-primary btn-lg">
+                            <i class="fas fa-cog me-2"></i>{{ _('Customize Now') }}
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
         
-        {% if onboarding_mode %}
         <hr class="my-4">
         <div class="text-center">
             <a href="{{ url_for('business_auth.onboarding_progress') }}" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-left me-2"></i>{{ _('Back to Onboarding') }}
             </a>
         </div>
-        {% endif %}
     </div>
+
+    {% else %}
+    <!-- Settings mode: Editable form per persona tier -->
+    <div class="settings-card mb-4">
+        <h3 class="settings-section-title mb-2">
+            <i class="fas fa-edit me-2"></i>
+            {{ _('Customize Persona Guidance') }}
+        </h3>
+        <div class="alert alert-info mb-4">
+            <p class="mb-2"><strong><i class="fas fa-layer-group me-2"></i>{{ _('4-Tier Hierarchy:') }}</strong></p>
+            <ul class="mb-0 small">
+                <li><strong>{{ _('Campaign') }}</strong> → <strong>{{ _('Business Account (This level)') }}</strong> → <strong>{{ _('Platform') }}</strong> → <strong>{{ _('ROLE_METADATA defaults') }}</strong></li>
+                <li>{{ _('Your overrides here will apply to all campaigns unless they define their own.') }}</li>
+                <li>{{ _('Leave a field empty to inherit the platform default for that persona.') }}</li>
+            </ul>
+        </div>
+
+        <form method="POST" action="{{ url_for('business_auth.save_role_prompts') }}" id="rolePromptsForm">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+            {% for role_key, role_data in roles.items() if role_key != 'default' %}
+            {% set role_overrides = account_overrides.get(role_key, {}) if account_overrides and not defaults_accepted else {} %}
+            <div class="mb-4 p-3 border rounded bg-light">
+                <h5 class="mb-3">
+                    <i class="fas fa-user-circle me-2 text-primary"></i>
+                    {{ role_data.label }}
+                    <small class="text-muted ms-2">(<code>{{ role_key }}</code>)</small>
+                </h5>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold" for="guidance_en_{{ role_key }}">
+                        {{ _('Guidance (English)') }}
+                    </label>
+                    <textarea class="form-control font-monospace"
+                              id="guidance_en_{{ role_key }}"
+                              name="guidance_en_{{ role_key }}"
+                              rows="5"
+                              maxlength="2000"
+                              placeholder="{{ _('Leave empty to use platform default') }}">{{ role_overrides.get('prompt_guidance', {}).get('en', '') }}</textarea>
+                    <div class="form-text text-muted">
+                        <i class="fas fa-info-circle me-1"></i>{{ _('Platform default: ') }}<em>{{ role_data.prompt_guidance.en[:120] }}{% if role_data.prompt_guidance.en|length > 120 %}...{% endif %}</em>
+                    </div>
+                </div>
+
+                <div class="mb-2">
+                    <label class="form-label fw-semibold" for="guidance_fr_{{ role_key }}">
+                        {{ _('Guidance (French)') }}
+                    </label>
+                    <textarea class="form-control font-monospace"
+                              id="guidance_fr_{{ role_key }}"
+                              name="guidance_fr_{{ role_key }}"
+                              rows="5"
+                              maxlength="2000"
+                              placeholder="{{ _('Leave empty to use platform default') }}">{{ role_overrides.get('prompt_guidance', {}).get('fr', '') }}</textarea>
+                    <div class="form-text text-muted">
+                        <i class="fas fa-info-circle me-1"></i>{{ _('Platform default: ') }}<em>{{ role_data.prompt_guidance.fr[:120] }}{% if role_data.prompt_guidance.fr|length > 120 %}...{% endif %}</em>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+            <div class="d-flex gap-3 mt-4">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-save me-2"></i>{{ _('Save Persona Overrides') }}
+                </button>
+                <button type="button" class="btn btn-outline-success btn-lg" onclick="document.getElementById('resetRolePromptsForm').submit()">
+                    <i class="fas fa-undo me-2"></i>{{ _('Reset to Platform Defaults') }}
+                </button>
+                <a href="{{ url_for('business_auth.admin_panel') }}" class="btn btn-outline-secondary btn-lg">
+                    <i class="fas fa-times me-2"></i>{{ _('Cancel') }}
+                </a>
+            </div>
+        </form>
+        <form id="resetRolePromptsForm" method="POST" action="{{ url_for('business_auth.accept_role_prompts_defaults') }}" class="d-none">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <input type="hidden" name="onboarding" value="0"/>
+        </form>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

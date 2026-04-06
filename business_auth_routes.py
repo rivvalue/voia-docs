@@ -4245,6 +4245,62 @@ def accept_industry_hints_defaults():
         return redirect(url_for('business_auth.account_industry_hints'))
 
 
+@business_auth_bp.route('/admin/account-industry-hints/save', methods=['POST'])
+@require_business_auth
+def save_industry_hints():
+    """Save custom industry hints from the settings context (non-onboarding)."""
+    try:
+        current_user = BusinessAccountUser.query.get(session.get('business_user_id'))
+        if not current_user:
+            return redirect(url_for('business_auth.login'))
+
+        business_account = BusinessAccount.query.get(current_user.business_account_id)
+        if not business_account:
+            flash(_('Business account not found.'), 'error')
+            return redirect(url_for('business_auth.admin_panel'))
+
+        import industry_topic_hints_config
+        platform_hints = industry_topic_hints_config.INDUSTRY_TOPIC_HINTS
+        account_industry = business_account.industry or 'General'
+        industry_hints = platform_hints.get(account_industry, platform_hints.get('General', {}))
+
+        new_overrides = {}
+        for topic in industry_hints.keys():
+            topic_key = topic.replace(' ', '_').lower()
+            field_name = f'hint_{topic_key}'
+            value = request.form.get(field_name, '').strip()
+            if value:
+                if len(value) > 500:
+                    value = value[:500]
+                new_overrides[topic] = value
+
+        if not new_overrides:
+            flash(_('No custom hints provided. Use "Reset to Platform Defaults" to accept defaults.'), 'warning')
+            return redirect(url_for('business_auth.account_industry_hints'))
+
+        new_overrides['_defaults_accepted'] = False
+        business_account.industry_topic_hints = new_overrides
+        db.session.commit()
+
+        topics_customized = [k for k in new_overrides.keys() if k != '_defaults_accepted']
+        queue_audit_log(
+            business_account_id=business_account.id,
+            action_type='industry_hints_customized',
+            resource_type='business_account',
+            resource_id=business_account.id,
+            user_name=current_user.get_full_name(),
+            details={'industry': account_industry, 'topics_customized': topics_customized}
+        )
+
+        flash(_('Industry hints saved successfully.'), 'success')
+        return redirect(url_for('business_auth.account_industry_hints'))
+
+    except Exception as e:
+        logger.error(f"Error saving industry hints: {e}")
+        flash(_('Failed to save industry hints.'), 'error')
+        return redirect(url_for('business_auth.account_industry_hints'))
+
+
 @business_auth_bp.route('/admin/account-role-prompts')
 @require_business_auth
 def account_role_prompts():
@@ -4329,6 +4385,67 @@ def accept_role_prompts_defaults():
     except Exception as e:
         logger.error(f"Error accepting role prompts defaults: {e}")
         flash(_('Failed to accept defaults.'), 'error')
+        return redirect(url_for('business_auth.account_role_prompts'))
+
+
+@business_auth_bp.route('/admin/account-role-prompts/save', methods=['POST'])
+@require_business_auth
+def save_role_prompts():
+    """Save custom role prompt overrides from the settings context (non-onboarding)."""
+    try:
+        current_user = BusinessAccountUser.query.get(session.get('business_user_id'))
+        if not current_user:
+            return redirect(url_for('business_auth.login'))
+
+        business_account = BusinessAccount.query.get(current_user.business_account_id)
+        if not business_account:
+            flash(_('Business account not found.'), 'error')
+            return redirect(url_for('business_auth.admin_panel'))
+
+        from ai_conversational_survey_v2 import ROLE_METADATA
+
+        new_overrides = {}
+        for role_key in ROLE_METADATA:
+            if role_key == 'default':
+                continue
+            guidance_en = request.form.get(f'guidance_en_{role_key}', '').strip()
+            guidance_fr = request.form.get(f'guidance_fr_{role_key}', '').strip()
+            if len(guidance_en) > 2000:
+                guidance_en = guidance_en[:2000]
+            if len(guidance_fr) > 2000:
+                guidance_fr = guidance_fr[:2000]
+            if guidance_en or guidance_fr:
+                new_overrides[role_key] = {
+                    'prompt_guidance': {}
+                }
+                if guidance_en:
+                    new_overrides[role_key]['prompt_guidance']['en'] = guidance_en
+                if guidance_fr:
+                    new_overrides[role_key]['prompt_guidance']['fr'] = guidance_fr
+
+        if not new_overrides:
+            flash(_('No custom persona overrides provided. Use "Reset to Platform Defaults" to accept defaults.'), 'warning')
+            return redirect(url_for('business_auth.account_role_prompts'))
+
+        new_overrides['_defaults_accepted'] = False
+        business_account.role_prompt_overrides = new_overrides
+        db.session.commit()
+
+        queue_audit_log(
+            business_account_id=business_account.id,
+            action_type='role_prompts_customized',
+            resource_type='business_account',
+            resource_id=business_account.id,
+            user_name=current_user.get_full_name(),
+            details={'roles_customized': [k for k in new_overrides.keys() if k != '_defaults_accepted']}
+        )
+
+        flash(_('Persona overrides saved successfully.'), 'success')
+        return redirect(url_for('business_auth.account_role_prompts'))
+
+    except Exception as e:
+        logger.error(f"Error saving role prompts: {e}")
+        flash(_('Failed to save persona overrides.'), 'error')
         return redirect(url_for('business_auth.account_role_prompts'))
 
 

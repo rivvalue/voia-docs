@@ -454,6 +454,16 @@
                                         <i class="fas fa-cog me-2 text-primary"></i>Survey Customization
                                     </a>
                                 </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('business_auth.account_industry_hints') }}" title="{{ _('Customize industry-specific AI topic hints') }}">
+                                        <i class="fas fa-industry me-2 text-primary"></i>Industry Context
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('business_auth.account_role_prompts') }}" title="{{ _('Customize AI persona questioning styles') }}">
+                                        <i class="fas fa-user-tie me-2 text-primary"></i>AI Personas
+                                    </a>
+                                </li>
                                 {% endif %}
                                 <li><hr class="dropdown-divider"></li>
                                 
