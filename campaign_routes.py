@@ -1992,7 +1992,13 @@ def save_classic_survey_config(campaign_id):
         classic_config.features = features
         
         db.session.commit()
-        
+
+        try:
+            from data_storage import bust_dashboard_cache
+            bust_dashboard_cache(campaign_id, current_account.id)
+        except Exception:
+            pass
+
         try:
             from audit_utils import queue_audit_log
             queue_audit_log(
