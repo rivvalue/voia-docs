@@ -834,8 +834,33 @@ body.modal-open {
                         </a>
                     </div>
 
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- AI & Survey Configuration Card -->
+        {% if current_user.has_permission('manage_users') %}
+        <div class="settings-card">
+            <div class="settings-card-header expanded"
+                 onclick="toggleCard('ai-survey-config')"
+                 role="button"
+                 tabindex="0"
+                 aria-expanded="true"
+                 aria-controls="ai-survey-config-content">
+                <div class="settings-card-title-wrapper">
+                    <div class="settings-card-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h2 class="settings-card-title">{{ _('AI & Survey Configuration') }}</h2>
+                </div>
+                <div class="settings-card-toggle">
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+            <div class="settings-card-content expanded" id="ai-survey-config-content">
+                <div class="settings-card-body">
                     <!-- {{ _('Survey Defaults') }} -->
-                    {% if business_account.account_type in ['customer', 'demo', 'platform_owner'] %}
                     <div class="settings-item">
                         <div class="settings-item-header">
                             <div class="settings-item-icon">
@@ -850,7 +875,6 @@ body.modal-open {
                             <i class="fas fa-sliders-h me-1"></i>Configure
                         </a>
                     </div>
-                    {% endif %}
 
                     <!-- {{ _('Industry Context') }} -->
                     <div class="settings-item">

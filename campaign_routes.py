@@ -1538,7 +1538,9 @@ def survey_config(campaign_id):
                 'product_description': current_account.product_description or '',
                 'target_clients_description': current_account.target_clients_description or ''
             },
-            'role_overrides': current_account.role_prompt_overrides or {}
+            'role_overrides': current_account.role_prompt_overrides or {},
+            'conversation_tone': current_account.conversation_tone or '',
+            'industry': current_account.industry or ''
         }
         
         # Role options for role prompt overrides (full data with defaults)
