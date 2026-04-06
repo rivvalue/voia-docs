@@ -370,7 +370,6 @@
         </h5>
         <ul style="margin: var(--spacing-sm) 0 0 var(--spacing-lg); color: var(--gray-dark);">
             <li><strong>Campaign Managers:</strong> {{ _('Can create surveys, manage participants, and view analytics') }}</li>
-            <li><strong>Viewers:</strong> {{ _('Can view survey results and analytics but cannot create campaigns') }}</li>
             <li><strong>Admins:</strong> {{ _('Full access to all features and settings') }}</li>
         </ul>
     </div>
@@ -410,7 +409,6 @@
                 <select class="form-control" id="role" name="role" required>
                     <option value="manager">Campaign Manager</option>
                     <option value="admin">Administrator</option>
-                    <option value="viewer">Viewer</option>
                 </select>
                 <div class="form-text">{{ _('Campaign Manager is recommended for most team members') }}</div>
             </div>

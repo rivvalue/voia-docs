@@ -762,7 +762,8 @@ body.modal-open {
 
     <!-- 4-Card Grid -->
     <div class="settings-grid">
-        <!-- Card 1: {{ _('Account Settings') }} -->
+        <!-- Card 1: {{ _('Account Settings') }} (Admin only) -->
+        {% if current_user.has_permission('manage_users') %}
         <div class="settings-card">
             <div class="settings-card-header" 
                  onclick="toggleCard('account-settings')" 
@@ -885,6 +886,7 @@ body.modal-open {
                 </div>
             </div>
         </div>
+        {% endif %}
 
         <!-- Card 2: {{ _('User Management') }} -->
         <div class="settings-card">
@@ -983,7 +985,8 @@ body.modal-open {
                         </button>
                     </div>
 
-                    <!-- {{ _('Audit Logs') }} -->
+                    <!-- {{ _('Audit Logs') }} (Admin only) -->
+                    {% if current_user.has_permission('manage_users') %}
                     <div class="settings-item">
                         <div class="settings-item-header">
                             <div class="settings-item-icon">
@@ -998,11 +1001,13 @@ body.modal-open {
                             <i class="fas fa-history me-1"></i>View Logs
                         </a>
                     </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
 
-        <!-- Card 4: {{ _('System Settings') }} -->
+        <!-- Card 4: {{ _('System Settings') }} (Admin only) -->
+        {% if current_user.has_permission('manage_users') %}
         <div class="settings-card">
             <div class="settings-card-header" 
                  onclick="toggleCard('system-settings')" 
@@ -1134,6 +1139,7 @@ body.modal-open {
                 </div>
             </div>
         </div>
+        {% endif %}
 
         <!-- Card 5: {{ _('Platform Administration') }} (Platform Admin Only) -->
         {% if current_user.role == 'platform_admin' or current_user.is_platform_admin() %}

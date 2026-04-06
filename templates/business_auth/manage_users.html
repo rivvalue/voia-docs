@@ -275,7 +275,6 @@
                         <label for="role" class="form-label">{{ _('Role') }}</label>
                         <select class="form-select" id="role" name="role" aria-describedby="role_help">
                             <option value="manager">Manager - Can manage campaigns and participants</option>
-                            <option value="viewer">Viewer - Can only view data and reports</option>
                             <option value="admin">Admin - Full access including user management</option>
                             {% if business_account.account_type == 'platform_owner' and current_user.is_platform_admin() %}
                             <option value="platform_admin">Platform Admin - Cross-tenant platform management</option>
@@ -355,7 +354,6 @@
                         <label for="edit_role" class="form-label">{{ _('Role') }}</label>
                         <select class="form-select" id="edit_role" name="role" aria-describedby="edit_role_help">
                             <option value="manager">Manager - Can manage campaigns and participants</option>
-                            <option value="viewer">Viewer - Can only view data and reports</option>
                             <option value="admin">Admin - Full access including user management</option>
                             {% if business_account.account_type == 'platform_owner' and current_user.is_platform_admin() %}
                             <option value="platform_admin">Platform Admin - Cross-tenant platform management</option>

@@ -544,7 +544,7 @@ def add_user():
         current_user = BusinessAccountUser.query.get(current_user_id)
         
         # Validate role based on account type and user permissions
-        allowed_roles = ['admin', 'manager', 'viewer']  # Simplified roles
+        allowed_roles = ['admin', 'manager']
         
         # Allow platform_admin role only for platform_owner accounts by platform admins
         if (current_account.account_type == 'platform_owner' and 
@@ -687,7 +687,12 @@ def edit_user(user_id):
             flash('A user with this email address already exists.', 'error')
             return redirect(url_for('business_auth.manage_users'))
         
-        allowed_roles = ['business_account_admin', 'admin', 'manager', 'viewer']
+        current_account = get_current_business_account()
+        current_user = BusinessAccountUser.query.get(current_user_id)
+        allowed_roles = ['business_account_admin', 'admin', 'manager']
+        if (current_account and current_account.account_type == 'platform_owner' and
+                current_user and current_user.is_platform_admin()):
+            allowed_roles.append('platform_admin')
         if role not in allowed_roles:
             flash('Invalid role selected.', 'error')
             return redirect(url_for('business_auth.manage_users'))
@@ -2728,6 +2733,7 @@ def scheduler_status():
 
 @business_auth_bp.route('/admin/audit-logs')
 @require_business_auth
+@require_permission('manage_users')
 def audit_logs():
     """Audit logs viewing page"""
     try:
@@ -2892,6 +2898,7 @@ def audit_logs():
 
 @business_auth_bp.route('/admin/email-config')
 @require_business_auth
+@require_permission('manage_users')
 def email_config():
     """Email configuration management page"""
     try:
@@ -2916,6 +2923,7 @@ def email_config():
 
 @business_auth_bp.route('/admin/email-config/save', methods=['POST'])
 @require_business_auth
+@require_permission('manage_users')
 def save_email_config():
     """Save email configuration"""
     try:
@@ -3046,6 +3054,7 @@ def save_email_config():
 
 @business_auth_bp.route('/admin/email-config/test', methods=['POST'])
 @require_business_auth
+@require_permission('manage_users')
 @rate_limit(limit=10)  # 10 tests per minute per IP to prevent abuse
 def test_email_config():
     """Test email configuration"""
@@ -3093,6 +3102,7 @@ def test_email_config():
 
 @business_auth_bp.route('/admin/email-config/send-test', methods=['POST'])
 @require_business_auth
+@require_permission('manage_users')
 @rate_limit(limit=5)  # 5 test emails per minute per IP to prevent spam
 def send_test_email():
     """Send test email"""
@@ -3199,6 +3209,7 @@ VOÏA System
 
 @business_auth_bp.route('/admin/email-config/preview', methods=['POST'])
 @require_business_auth
+@require_permission('manage_users')
 def preview_email_content():
     """Preview email content with custom or default templates"""
     try:
@@ -4834,6 +4845,7 @@ This is an automated test message from VOÏA - Voice Of Client"""
 
 @business_auth_bp.route('/admin/brand-config')
 @require_business_auth
+@require_permission('manage_users')
 def brand_config():
     """Branding configuration management page"""
     try:
@@ -4859,6 +4871,7 @@ def brand_config():
 
 @business_auth_bp.route('/admin/brand-config/save', methods=['POST'])
 @require_business_auth
+@require_permission('manage_users')
 def save_brand_config():
     """Save branding configuration with secure logo upload and image processing"""
     try:
@@ -4966,6 +4979,7 @@ def save_brand_config():
 
 @business_auth_bp.route('/admin/license-info')
 @require_business_auth
+@require_permission('manage_users')
 def license_info():
     """Display comprehensive license information for the business account"""
     try:
@@ -5156,6 +5170,7 @@ def _process_logo_upload(logo_file, business_account_id, old_logo_filename=None)
 
 @business_auth_bp.route('/admin/survey-config')
 @require_business_auth
+@require_permission('manage_users')
 def survey_config():
     """Survey customization configuration management page"""
     try:
@@ -5213,6 +5228,7 @@ def survey_config():
 
 @business_auth_bp.route('/admin/survey-config/save', methods=['POST'])
 @require_business_auth
+@require_permission('manage_users')
 def save_survey_config():
     """Save survey customization configuration"""
     try:
