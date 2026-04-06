@@ -57,6 +57,7 @@ TASK_MAX_RETRIES = {
     'export_campaign':    3,
     'bulk_participant_add':    3,
     'bulk_participant_remove': 3,
+    'csv_participant_import':  3,
 }
 
 
@@ -491,6 +492,13 @@ class PostgresTaskQueue:
                 from task_queue import TaskQueue
                 temp_queue = TaskQueue()
                 success = temp_queue._process_bulk_participant_remove_task(task_data, worker_name)
+                return success
+            
+            elif task_type == 'csv_participant_import':
+                # Process CSV participant import task
+                from task_queue import TaskQueue
+                temp_queue = TaskQueue()
+                success = temp_queue._process_csv_participant_import_task(task_data, worker_name)
                 return success
             
             elif task_type == 'qbr_analysis':

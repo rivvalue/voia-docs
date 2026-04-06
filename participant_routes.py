@@ -234,6 +234,14 @@ def list_participants():
         # Prepare participant data
         participant_data = [p.to_dict() for p in participants]
         
+        # Check for pending or processing CSV import jobs
+        from models import BulkOperationJob
+        active_import_job = BulkOperationJob.query.filter(
+            BulkOperationJob.business_account_id == current_account.id,
+            BulkOperationJob.operation_type == 'csv_participant_import',
+            BulkOperationJob.status.in_(['pending', 'processing'])
+        ).order_by(BulkOperationJob.created_at.desc()).first()
+
         return render_template('participants/list.html',
                              participants=participant_data,
                              campaigns=[c.to_dict() for c in campaigns],
@@ -241,6 +249,7 @@ def list_participants():
                              search_query='',  # Initial state has no search
                              kpi_stats=kpi_stats,
                              filter_options=filter_options,
+                             active_import_job=active_import_job,
                              pagination={
                                  'page': 1,
                                  'per_page': per_page,
@@ -808,9 +817,6 @@ def upload_participants():
                         flash(_('... and %(count)d more rows.', count=len(rejected_rows) - 15), 'error')
                     return redirect(url_for('participants.upload_participants'))
         
-        errors = []
-        error_count = 0
-
         # Pre-validate commercial_value consistency across same companies
         company_commercial_values = {}
         for row_num, row in enumerate(participant_rows, start=2):
@@ -821,8 +827,8 @@ def upload_participants():
                 try:
                     commercial_value = float(commercial_value_str)
                     if commercial_value < 0:
-                        errors.append(f"Row {row_num}: Commercial value must be positive")
-                        continue
+                        flash(f'Row {row_num}: Commercial value must be positive', 'error')
+                        return redirect(url_for('participants.upload_participants'))
                     
                     company_key = company_name.upper()
                     if company_key in company_commercial_values:
@@ -833,146 +839,91 @@ def upload_participants():
                     else:
                         company_commercial_values[company_key] = commercial_value
                 except ValueError:
-                    errors.append(f"Row {row_num}: Invalid commercial value '{commercial_value_str}' - must be a number")
-        
-        created_count = 0
-        
-        for row_num, row in enumerate(participant_rows, start=2):  # Start at 2 for header row
-            try:
-                email = row.get('email', '').strip().lower()
-                name = row.get('name', '').strip()
-                company_name = row.get('company_name', '').strip()
-                
-                if not email or not name or not company_name:
-                    errors.append(f"Row {row_num}: Email, name, and company name are required")
-                    error_count += 1
-                    continue
-                
-                # Optional segmentation attributes (backward compatible)
-                role = row.get('role', '').strip() or None
-                region = row.get('region', '').strip() or None
-                customer_tier = row.get('customer_tier', '').strip() or None
-                language = row.get('language', '').strip() or 'en'
-                client_industry = row.get('client_industry', '').strip() or None
-                
-                # Validate client_industry if provided
-                if client_industry:
-                    from industry_topic_hints_config import INDUSTRY_TOPIC_HINTS
-                    valid_industries = list(INDUSTRY_TOPIC_HINTS.keys())
-                    if client_industry not in valid_industries:
-                        errors.append(f"Row {row_num}: Invalid client industry '{client_industry}'. Must be one of: {', '.join(valid_industries)}")
-                        error_count += 1
-                        continue
-                
-                # Parse commercial_value (optional, company-level)
-                commercial_value = None
-                commercial_value_str = row.get('commercial_value', '').strip()
-                if commercial_value_str:
-                    try:
-                        commercial_value = float(commercial_value_str)
-                        if commercial_value < 0:
-                            errors.append(f"Row {row_num}: Commercial value must be positive")
-                            error_count += 1
-                            continue
-                    except ValueError:
-                        errors.append(f"Row {row_num}: Invalid commercial value '{commercial_value_str}'")
-                        error_count += 1
-                        continue
-                
-                # Parse tenure_years (optional)
-                tenure_years = None
-                tenure_years_str = row.get('tenure_years', '').strip()
-                if tenure_years_str:
-                    try:
-                        tenure_years = float(tenure_years_str)
-                        if tenure_years < 0:
-                            errors.append(f"Row {row_num}: Tenure must be positive")
-                            error_count += 1
-                            continue
-                    except ValueError:
-                        errors.append(f"Row {row_num}: Invalid tenure value '{tenure_years_str}'")
-                        error_count += 1
-                        continue
-                
-                # Check for duplicate participant (email within business account)
-                existing = Participant.query.filter_by(
-                    business_account_id=current_account.id,
-                    email=email
-                ).first()
-                
-                if existing:
-                    errors.append(f"Row {row_num}: Participant {email} already exists in your account")
-                    error_count += 1
-                    continue
-                
-                # Create participant with origin tracking and unified token system
-                participant = Participant()
-                participant.business_account_id = current_account.id
-                participant.email = email
-                participant.name = name
-                participant.company_name = company_name if company_name else None
-                participant.role = role
-                participant.region = region
-                participant.customer_tier = customer_tier
-                participant.language = language
-                participant.client_industry = client_industry
-                participant.company_commercial_value = commercial_value
-                participant.tenure_years = tenure_years
-                participant.source = 'admin_bulk'  # Track that this was admin-created via bulk upload
-                
-                # Generate unified token for seamless UX
-                participant.generate_token()
-                
-                # Set appropriate status for business context
-                participant.set_appropriate_status_for_context(is_trial=False)
-                db.session.add(participant)
-                created_count += 1
-                
-            except Exception as e:
-                errors.append(f"Row {row_num}: {str(e)}")
-                error_count += 1
-        
+                    flash(f'Row {row_num}: Invalid commercial value \'{commercial_value_str}\' - must be a number', 'error')
+                    return redirect(url_for('participants.upload_participants'))
+
+        # Validate client_industry values upfront
+        from industry_topic_hints_config import INDUSTRY_TOPIC_HINTS
+        valid_industries = set(INDUSTRY_TOPIC_HINTS.keys())
+        for row_num, row in enumerate(participant_rows, start=2):
+            client_industry = row.get('client_industry', '').strip()
+            if client_industry and client_industry not in valid_industries:
+                flash(f'Row {row_num}: Invalid client industry \'{client_industry}\'. Must be one of: {", ".join(sorted(valid_industries))}', 'error')
+                return redirect(url_for('participants.upload_participants'))
+
+        # Serialize validated rows for background task
+        serialized_rows = []
+        for row_num, row in enumerate(participant_rows, start=2):
+            commercial_value_str = row.get('commercial_value', '').strip()
+            tenure_years_str = row.get('tenure_years', '').strip()
+
+            commercial_value_parsed = None
+            if commercial_value_str:
+                try:
+                    commercial_value_parsed = float(commercial_value_str)
+                except ValueError:
+                    flash(f'Row {row_num}: Invalid commercial value \'{commercial_value_str}\' - must be a number', 'error')
+                    return redirect(url_for('participants.upload_participants'))
+
+            tenure_years_parsed = None
+            if tenure_years_str:
+                try:
+                    tenure_years_parsed = float(tenure_years_str)
+                    if tenure_years_parsed < 0:
+                        flash(f'Row {row_num}: Tenure must be positive', 'error')
+                        return redirect(url_for('participants.upload_participants'))
+                except ValueError:
+                    flash(f'Row {row_num}: Invalid tenure value \'{tenure_years_str}\' - must be a number', 'error')
+                    return redirect(url_for('participants.upload_participants'))
+
+            serialized_rows.append({
+                'row_num': row_num,
+                'email': row.get('email', '').strip().lower(),
+                'name': row.get('name', '').strip(),
+                'company_name': row.get('company_name', '').strip(),
+                'role': row.get('role', '').strip() or None,
+                'region': row.get('region', '').strip() or None,
+                'customer_tier': row.get('customer_tier', '').strip() or None,
+                'language': row.get('language', '').strip() or 'en',
+                'client_industry': row.get('client_industry', '').strip() or None,
+                'commercial_value': commercial_value_parsed,
+                'tenure_years': tenure_years_parsed,
+            })
+
+        # Create BulkOperationJob and enqueue background task
+        from models import BulkOperationJob
+        from task_queue import task_queue
+
+        job = BulkOperationJob(
+            job_id=str(uuid.uuid4()),
+            business_account_id=current_account.id,
+            user_id=session.get('business_user_id'),
+            operation_type='csv_participant_import',
+            operation_data=json.dumps({
+                'participant_count': participant_count,
+                'filename': file.filename
+            }),
+            status='pending',
+            progress=0
+        )
+        db.session.add(job)
+        db.session.flush()
+
+        task_queue.add_task(
+            task_type='csv_participant_import',
+            priority=1,
+            task_data={
+                'job_id': job.id,
+                'business_account_id': current_account.id,
+                'user_id': session.get('business_user_id'),
+                'rows': serialized_rows
+            }
+        )
         db.session.commit()
-        
-        # Sync commercial_value to all existing participants from the same companies
-        if company_commercial_values:
-            from sqlalchemy import func
-            for company_key, commercial_value in company_commercial_values.items():
-                # Update all participants with matching company (case-insensitive)
-                Participant.query.filter(
-                    func.upper(Participant.company_name) == company_key,
-                    Participant.business_account_id == current_account.id
-                ).update({'company_commercial_value': commercial_value}, synchronize_session=False)
-            
-            db.session.commit()
-        
-        # Audit logging for bulk participant upload
-        if created_count > 0:
-            try:
-                queue_audit_log(
-                    business_account_id=current_account.id,
-                    action_type='participants_uploaded',
-                    resource_type='participant',
-                    details={
-                        'count': created_count,
-                        'errors': error_count,
-                        'source': 'admin_bulk'
-                    }
-                )
-            except Exception as audit_error:
-                logger.error(f"Failed to log bulk participant upload audit: {audit_error}")
-        
-        # Show results
-        if created_count > 0:
-            flash(f'Successfully created {created_count} participants. You can now assign them to campaigns.', 'success')
-        
-        if error_count > 0:
-            flash(f'{error_count} errors occurred during upload. Check the details below.', 'warning')
-            for error in errors[:10]:  # Show first 10 errors
-                flash(error, 'error')
-        
+
         account_name = current_account.name if current_account and hasattr(current_account, 'name') else 'Unknown'
-        logger.info(f"CSV upload completed: {created_count} created, {error_count} errors (Business Account: {account_name})")
+        logger.info(f"CSV upload queued: {participant_count} rows, job {job.job_id} (Business Account: {account_name})")
+        flash('Your file is being processed — you\'ll be notified when it\'s done.', 'info')
         return redirect(url_for('participants.list_participants'))
         
     except Exception as e:

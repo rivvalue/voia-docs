@@ -255,6 +255,16 @@ class TaskQueue:
                 else:
                     logger.error(f"Worker {worker_id} failed bulk participant add task")
 
+            elif task_type == 'csv_participant_import':
+                # Process CSV participant import task
+                success = self._process_csv_participant_import_task(task_data, worker_id)
+
+                if success:
+                    row_count = len(task_data.get('rows', []))
+                    logger.info(f"Worker {worker_id} completed CSV participant import ({row_count} rows)")
+                else:
+                    logger.error(f"Worker {worker_id} failed CSV participant import task")
+
             elif task_type == 'qbr_analysis':
                 # Process QBR transcript analysis task
                 success = self._process_qbr_analysis_task(task_data, worker_id)
@@ -891,6 +901,197 @@ class TaskQueue:
             
             return False
     
+    def _process_csv_participant_import_task(self, task_data, worker_id):
+        """Process CSV participant import task with batching and progress tracking"""
+        from models import BulkOperationJob
+        from notification_utils import notify
+        from license_service import LicenseService
+
+        job_id = task_data.get('job_id')
+        business_account_id = task_data.get('business_account_id')
+        user_id = task_data.get('user_id')
+        rows = task_data.get('rows', [])
+
+        if not all([job_id, business_account_id, rows is not None]):
+            logger.error("CSV participant import task missing required data")
+            return False
+
+        try:
+            # Get the job record
+            job = BulkOperationJob.query.get(job_id)
+            if not job:
+                logger.error(f"BulkOperationJob {job_id} not found")
+                return False
+
+            # Update job status to processing
+            job.status = 'processing'
+            job.started_at = datetime.utcnow()
+            db.session.commit()
+
+            BATCH_SIZE = 100
+            total_count = len(rows)
+            created_count = 0
+            error_count = 0
+            row_errors = []
+
+            for i in range(0, total_count, BATCH_SIZE):
+                batch = rows[i:i + BATCH_SIZE]
+
+                # Bulk email lookup for this batch to avoid N+1 queries
+                batch_emails = [r.get('email', '').strip().lower() for r in batch if r.get('email')]
+                existing_emails = set()
+                if batch_emails:
+                    from sqlalchemy import func as sqlfunc
+                    existing_records = Participant.query.filter(
+                        Participant.business_account_id == business_account_id,
+                        sqlfunc.lower(Participant.email).in_(batch_emails)
+                    ).with_entities(Participant.email).all()
+                    existing_emails = {e.lower() for (e,) in existing_records}
+
+                for row in batch:
+                    row_num = row.get('row_num', '?')
+                    try:
+                        email = row.get('email', '').strip().lower()
+                        name = row.get('name', '').strip()
+                        company_name = row.get('company_name', '').strip()
+
+                        if not email or not name or not company_name:
+                            row_errors.append(f"Row {row_num}: Email, name, and company name are required")
+                            error_count += 1
+                            continue
+
+                        if email in existing_emails:
+                            row_errors.append(f"Row {row_num}: Participant {email} already exists in your account")
+                            error_count += 1
+                            continue
+
+                        role = row.get('role') or None
+                        region = row.get('region') or None
+                        customer_tier = row.get('customer_tier') or None
+                        language = row.get('language') or 'en'
+                        client_industry = row.get('client_industry') or None
+                        commercial_value = row.get('commercial_value')
+                        tenure_years = row.get('tenure_years')
+
+                        participant = Participant()
+                        participant.business_account_id = business_account_id
+                        participant.email = email
+                        participant.name = name
+                        participant.company_name = company_name
+                        participant.role = role
+                        participant.region = region
+                        participant.customer_tier = customer_tier
+                        participant.language = language
+                        participant.client_industry = client_industry
+                        participant.company_commercial_value = float(commercial_value) if commercial_value is not None else None
+                        participant.tenure_years = float(tenure_years) if tenure_years is not None else None
+                        participant.source = 'admin_bulk'
+                        participant.generate_token()
+                        participant.set_appropriate_status_for_context(is_trial=False)
+
+                        db.session.add(participant)
+                        existing_emails.add(email)
+                        created_count += 1
+
+                    except Exception as e:
+                        logger.error(f"CSV import row {row_num} error: {e}")
+                        row_errors.append(f"Row {row_num}: {str(e)}")
+                        error_count += 1
+
+                # Commit batch
+                db.session.commit()
+
+                # Update job progress
+                processed = min(i + BATCH_SIZE, total_count)
+                job.progress = int((processed / total_count) * 100)
+                db.session.commit()
+
+                logger.info(f"CSV import batch processed: {processed}/{total_count} rows")
+
+            # Sync commercial values to all existing participants from same companies
+            company_commercial_values = {}
+            for row in rows:
+                company_name = row.get('company_name', '').strip()
+                commercial_value = row.get('commercial_value')
+                if company_name and commercial_value is not None:
+                    company_commercial_values[company_name.upper()] = float(commercial_value)
+
+            if company_commercial_values:
+                from sqlalchemy import func as sqlfunc2
+                for company_key, cv in company_commercial_values.items():
+                    Participant.query.filter(
+                        sqlfunc2.upper(Participant.company_name) == company_key,
+                        Participant.business_account_id == business_account_id
+                    ).update({'company_commercial_value': cv}, synchronize_session=False)
+                db.session.commit()
+
+            # Mark job as completed
+            job.status = 'completed'
+            job.completed_at = datetime.utcnow()
+            job.result = json.dumps({
+                'total': total_count,
+                'created': created_count,
+                'failed': error_count,
+                'errors': row_errors[:50]
+            })
+            db.session.commit()
+
+            # Audit logging
+            try:
+                from audit_utils import queue_audit_log
+                queue_audit_log(
+                    business_account_id=business_account_id,
+                    action_type='participants_uploaded',
+                    resource_type='participant',
+                    details={
+                        'job_id': job.job_id,
+                        'total': total_count,
+                        'created': created_count,
+                        'failed': error_count,
+                        'method': 'background_task'
+                    }
+                )
+            except Exception as audit_error:
+                logger.error(f"Failed to log CSV participant import audit: {audit_error}")
+
+            # Send notification
+            message = f"CSV import complete: {created_count} participant(s) created"
+            if error_count > 0:
+                message += f", {error_count} row(s) had errors"
+
+            notify(
+                business_account_id=business_account_id,
+                user_id=user_id,
+                category='success' if error_count == 0 else 'warning',
+                message=message
+            )
+
+            logger.info(f"CSV participant import completed: {created_count} created, {error_count} failed")
+            return True
+
+        except Exception as e:
+            logger.error(f"CSV participant import task error: {e}")
+            db.session.rollback()
+
+            try:
+                job = BulkOperationJob.query.get(job_id)
+                if job:
+                    job.status = 'failed'
+                    job.completed_at = datetime.utcnow()
+                    job.result = json.dumps({'error': str(e)})
+                    db.session.commit()
+
+                notify(
+                    business_account_id=business_account_id,
+                    user_id=user_id,
+                    category='error',
+                    message=f"CSV participant import failed: {str(e)}"
+                )
+            except Exception as notify_error:
+                logger.error(f"Failed to send CSV import error notification: {notify_error}")
+
+            return False
+
     def _create_email_delivery_record(self, task_data):
         """Create EmailDelivery record for tracking"""
         try:
