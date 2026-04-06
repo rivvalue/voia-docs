@@ -30,15 +30,15 @@
     <!-- Custom CSS -->
     {% if use_refactored_frontend %}
     <!-- Phase 2: Modular CSS - Load order: base → utilities → components → pages → responsive → print -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/modules/base.css') }}?v=campaign-ux-fix-1">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/modules/utilities.css') }}?v=campaign-ux-fix-1">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/modules/components.css') }}?v=campaign-ux-fix-1">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/modules/pages.css') }}?v=campaign-ux-fix-1">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/modules/responsive.css') }}?v=campaign-ux-fix-1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modules/base.css') }}?v=header-harmonize-3">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modules/utilities.css') }}?v=header-harmonize-3">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modules/components.css') }}?v=header-harmonize-3">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modules/pages.css') }}?v=header-harmonize-3">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modules/responsive.css') }}?v=header-harmonize-3">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/modules/print.css') }}" media="print">
     {% else %}
     <!-- Legacy: Monolithic CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}?v=sidebar-footer-v4">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}?v=header-harmonize-3">
     {% endif %}
     
     <!-- CSRF Token for AJAX requests -->

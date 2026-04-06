@@ -8,14 +8,16 @@
 .modal { z-index: 10010 !important; }
 .modal-backdrop { z-index: 10005 !important; }
 </style>
+{% set breadcrumb_items = [
+    {'label': 'QBR Intelligence', 'current': true}
+] %}
+{% include 'components/breadcrumb.html' %}
 <div class="container-fluid px-0">
     <!-- Header -->
-    <div class="border-0 mb-0 px-4 py-4 d-flex justify-content-between align-items-center flex-wrap gap-3" style="background: #ffffff; border-bottom: 3px solid var(--primary-red, #E13A44);">
+    <div class="page-header-band px-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
         <div>
-            <h1 class="mb-1 fw-bold" style="font-size: 1.75rem; color: var(--neutral-dark, #2B2B2B);">
-                <i class="fas fa-handshake me-2" style="color: #E13A44;"></i>{{ _('QBR Intelligence') }}
-            </h1>
-            <p class="text-muted mb-0" style="font-size: 0.9rem;">{{ _('Quarterly Business Review transcript analysis and strategic briefs') }}</p>
+            <h1 class="h2 mb-2"><i class="fas fa-handshake me-2" style="color: var(--primary-red);"></i>{{ _('QBR Intelligence') }}</h1>
+            <p class="text-muted mb-0">{{ _('Quarterly Business Review transcript analysis and strategic briefs') }}</p>
         </div>
         <div class="d-flex align-items-center gap-2">
             <button type="button" id="manualRefreshBtn" class="btn btn-outline-secondary btn-sm" onclick="manualRefresh()" title="{{ _('Refresh') }}">
@@ -25,17 +27,6 @@
                 <i class="fas fa-upload me-1"></i> {{ _('Upload Transcript') }}
             </a>
         </div>
-    </div>
-
-    <!-- Breadcrumb -->
-    <div class="px-4 py-2 mb-3" style="background: #f8f9fb; border-bottom: 1px solid #e9ecef;">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb mb-0 small">
-                <li class="breadcrumb-item active" aria-current="page">
-                    <i class="fas fa-handshake me-1"></i>{{ _('QBR Intelligence') }}
-                </li>
-            </ol>
-        </nav>
     </div>
 
     <div class="px-4">

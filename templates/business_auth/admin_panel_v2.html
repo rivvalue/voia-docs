@@ -12,16 +12,11 @@
 .settings-hub-container {
     max-width: 1400px;
     margin: 0 auto;
-    padding: var(--spacing-xl);
+    padding: 0 var(--spacing-xl) var(--spacing-xl);
 }
 
-/* Header Section */
+/* Header Section — base spacing/background comes from .page-header-band */
 .settings-hub-header {
-    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
-    padding: var(--spacing-2xl);
-    margin: calc(-1 * var(--spacing-xl)) calc(-1 * var(--spacing-xl)) var(--spacing-2xl);
-    border-radius: 0;
-    color: var(--primary-white);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -36,18 +31,17 @@
 
 .settings-hub-title {
     font-family: var(--font-family-headings);
-    font-size: var(--font-size-3xl);
+    font-size: var(--font-size-2xl);
     font-weight: 700;
     margin: 0 0 var(--spacing-sm) 0;
-    color: var(--primary-white);
+    color: var(--primary-black);
 }
 
 .settings-hub-subtitle {
     font-family: var(--font-family-base);
     font-size: var(--font-size-base);
     margin: 0;
-    opacity: 0.9;
-    color: var(--primary-white);
+    color: var(--gray-dark);
 }
 
 /* Header Actions */
@@ -59,9 +53,9 @@
 
 .settings-action-btn {
     padding: var(--spacing-sm) var(--spacing-lg);
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--primary-white);
+    border: 2px solid rgba(0, 0, 0, 0.15);
+    background: rgba(0, 0, 0, 0.04);
+    color: var(--primary-black);
     border-radius: var(--radius-lg);
     font-size: var(--font-size-sm);
     font-weight: 600;
@@ -73,8 +67,8 @@
 }
 
 .settings-action-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-    border-color: rgba(255, 255, 255, 0.5);
+    background: rgba(0, 0, 0, 0.08);
+    border-color: rgba(0, 0, 0, 0.25);
     transform: translateY(-2px);
 }
 
@@ -298,12 +292,7 @@
 /* Mobile: Full-width cards */
 @media (max-width: 767px) {
     .settings-hub-container {
-        padding: var(--spacing-md);
-    }
-    
-    .settings-hub-header {
-        margin: calc(-1 * var(--spacing-md)) calc(-1 * var(--spacing-md)) var(--spacing-lg);
-        padding: var(--spacing-xl);
+        padding: 0 var(--spacing-md) var(--spacing-md);
     }
     
     .settings-grid {
@@ -725,14 +714,19 @@ body.modal-open {
 }
 </style>
 
+{% set breadcrumb_items = [
+    {'label': 'Settings', 'current': true}
+] %}
+{% include 'components/breadcrumb.html' %}
+
 <div class="settings-hub-container">
     <!-- Header -->
-    <div class="settings-hub-header">
+    <div class="page-header-band settings-hub-header">
         <div class="settings-hub-header-content">
-            <h1 class="settings-hub-title">
-                <i class="fas fa-cog me-2"></i>Settings Hub
+            <h1 class="h2 mb-2">
+                <i class="fas fa-cog me-2" style="color: var(--primary-red);"></i>Settings Hub
             </h1>
-            <p class="settings-hub-subtitle">
+            <p class="text-muted mb-0">
                 {{ _('Manage your account, team, data, and system settings') }}
             </p>
         </div>

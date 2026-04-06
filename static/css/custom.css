@@ -6980,16 +6980,11 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
 .settings-hub-container {
     max-width: 1400px;
     margin: 0 auto;
-    padding: var(--spacing-xl);
+    padding: 0 var(--spacing-xl) var(--spacing-xl);
 }
 
-/* Header Section - Red Gradient (Settings Hub v2 Pattern) */
+/* Header Section - Settings Hub v2 (white-band pattern, see .page-header-band) */
 .settings-hub-header {
-    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
-    padding: var(--spacing-2xl);
-    margin: calc(-1 * var(--spacing-xl)) calc(-1 * var(--spacing-xl)) var(--spacing-2xl);
-    border-radius: 0;
-    color: var(--primary-white);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -7004,18 +6999,17 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
 
 .settings-hub-title {
     font-family: var(--font-family-headings);
-    font-size: var(--font-size-3xl);
+    font-size: var(--font-size-2xl);
     font-weight: 700;
     margin: 0 0 var(--spacing-sm) 0;
-    color: var(--primary-white);
+    color: var(--primary-black);
 }
 
 .settings-hub-subtitle {
     font-family: var(--font-family-base);
     font-size: var(--font-size-base);
     margin: 0;
-    opacity: 0.9;
-    color: var(--primary-white);
+    color: var(--gray-dark);
 }
 
 /* Sections and Cards */
@@ -7358,12 +7352,7 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
 
 @media (max-width: 576px) {
     .settings-hub-container {
-        padding: var(--spacing-md);
-    }
-    
-    .settings-hub-header {
-        margin: calc(-1 * var(--spacing-md)) calc(-1 * var(--spacing-md)) var(--spacing-lg);
-        padding: var(--spacing-lg);
+        padding: 0 var(--spacing-md) var(--spacing-md);
     }
     
     .settings-hub-title {
