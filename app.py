@@ -232,6 +232,23 @@ if error_monitor.enabled or cloudwatch_logger.enabled:
         cloudwatch_logger.capture_exception(error, context={'error_code': 500})
         return "Internal Server Error", 500
 
+# Global exception handler: captures unhandled exceptions that may bypass the 500 handler
+# (e.g. exceptions in before-request hooks or edge Flask routing cases).
+# Skips HTTPExceptions (including InternalServerError from abort(500)) to avoid duplicates
+# with handle_500_shared and to avoid capturing 4xx errors.
+# Only registered when CloudWatch is enabled, matching the existing conditional pattern.
+# Calls both monitoring backends to preserve the shared behavior of handle_500_shared.
+if cloudwatch_logger.enabled:
+    from werkzeug.exceptions import HTTPException
+
+    @app.errorhandler(Exception)
+    def handle_global_exception(exc):
+        if isinstance(exc, HTTPException):
+            return exc
+        error_monitor.capture_exception(exc, context={'error_code': 500})
+        cloudwatch_logger.capture_exception(exc, context={'error_code': 500})
+        return "Internal Server Error", 500
+
 # Stage 1 Optimization: Performance Monitoring and Compression
 # Feature flag controlled optimizations
 try:
