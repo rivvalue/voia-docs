@@ -808,6 +808,9 @@ def upload_participants():
                         flash(_('... and %(count)d more rows.', count=len(rejected_rows) - 15), 'error')
                     return redirect(url_for('participants.upload_participants'))
         
+        errors = []
+        error_count = 0
+
         # Pre-validate commercial_value consistency across same companies
         company_commercial_values = {}
         for row_num, row in enumerate(participant_rows, start=2):
@@ -833,9 +836,6 @@ def upload_participants():
                     errors.append(f"Row {row_num}: Invalid commercial value '{commercial_value_str}' - must be a number")
         
         created_count = 0
-        error_count = 0
-        if not errors:
-            errors = []
         
         for row_num, row in enumerate(participant_rows, start=2):  # Start at 2 for header row
             try:
