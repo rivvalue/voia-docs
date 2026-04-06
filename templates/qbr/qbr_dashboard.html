@@ -17,9 +17,14 @@
             </h1>
             <p class="text-muted mb-0" style="font-size: 0.9rem;">{{ _('Quarterly Business Review transcript analysis and strategic briefs') }}</p>
         </div>
-        <a href="{{ url_for('qbr.qbr_upload') }}" class="btn btn-danger">
-            <i class="fas fa-upload me-1"></i> {{ _('Upload Transcript') }}
-        </a>
+        <div class="d-flex align-items-center gap-2">
+            <button type="button" id="manualRefreshBtn" class="btn btn-outline-secondary btn-sm" onclick="manualRefresh()" title="{{ _('Refresh') }}">
+                <i class="fas fa-sync-alt"></i>
+            </button>
+            <a href="{{ url_for('qbr.qbr_upload') }}" class="btn btn-danger">
+                <i class="fas fa-upload me-1"></i> {{ _('Upload Transcript') }}
+            </a>
+        </div>
     </div>
 
     <!-- Breadcrumb -->
@@ -82,7 +87,7 @@
                     </thead>
                     <tbody>
                         {% for s in sessions %}
-                        <tr>
+                        <tr data-session-uuid="{{ s.uuid }}" data-session-status="{{ s.status }}">
                             <td class="px-4 py-3">
                                 <a href="{{ url_for('qbr.qbr_company_history', company_name=s.company_name) }}" class="fw-semibold text-decoration-none" style="color: #1a1a1a;">
                                     {{ s.company_name }}
@@ -91,7 +96,7 @@
                             <td class="py-3">
                                 <span class="badge bg-secondary-subtle text-secondary fw-semibold">Q{{ s.quarter }} {{ s.year }}</span>
                             </td>
-                            <td class="py-3">
+                            <td class="py-3" data-qbr-status>
                                 {% if s.status == 'complete' %}
                                 <span class="badge bg-success-subtle text-success"><i class="fas fa-check-circle me-1"></i>{{ _('Complete') }}</span>
                                 {% elif s.status == 'processing' %}
@@ -102,7 +107,7 @@
                                 <span class="badge bg-danger-subtle text-danger"><i class="fas fa-exclamation-circle me-1"></i>{{ _('Failed') }}</span>
                                 {% endif %}
                             </td>
-                            <td class="py-3">
+                            <td class="py-3" data-qbr-sentiment>
                                 {% if s.status == 'complete' and s.extracted_insights %}
                                     {% set sentiment = s.extracted_insights.get('renewal_sentiment', 'neutral') %}
                                     {% if sentiment == 'positive' %}
@@ -119,7 +124,10 @@
                             <td class="py-3">
                                 <span class="text-muted small">{{ s.created_at.strftime('%b %d, %Y') if s.created_at else '—' }}</span>
                             </td>
-                            <td class="py-3 text-end pe-4">
+                            <td class="py-3 text-end pe-4"
+                                data-qbr-actions
+                                data-view-brief-url="{{ url_for('qbr.qbr_session_detail', session_uuid=s.uuid) }}"
+                                data-delete-html="<button class=&quot;btn btn-sm btn-outline-danger&quot; onclick=&quot;deleteQBRSession('{{ s.uuid }}', '{{ s.company_name|e }}', 'Q{{ s.quarter }} {{ s.year }}')&quot; title=&quot;{{ _('Delete session') }}&quot;><i class=&quot;fas fa-trash-alt&quot;></i></button>">
                                 {% if s.status == 'complete' %}
                                 <a href="{{ url_for('qbr.qbr_session_detail', session_uuid=s.uuid) }}" class="btn btn-sm btn-outline-primary me-1">
                                     <i class="fas fa-eye me-1"></i>{{ _('View Brief') }}
@@ -248,5 +256,88 @@ document.getElementById('confirmDeleteBtn').addEventListener('click', function()
         bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
     });
 });
+
+// ── QBR Status Polling ──────────────────────────────────────────────────────
+(function() {
+    const POLL_INTERVAL = 5000;
+    const activePollers = {};
+
+    function sentimentBadgeHtml(sentiment) {
+        if (sentiment === 'positive') {
+            return '<span class="badge" style="background:rgba(25,135,84,0.12);color:#198754;border:1px solid #198754;"><i class="fas fa-thumbs-up me-1"></i>{{ _("Positive") }}</span>';
+        } else if (sentiment === 'at_risk') {
+            return '<span class="badge" style="background:rgba(220,53,69,0.12);color:#dc3545;border:1px solid #dc3545;"><i class="fas fa-exclamation-triangle me-1"></i>{{ _("At Risk") }}</span>';
+        }
+        return '<span class="badge" style="background:rgba(255,193,7,0.12);color:#856404;border:1px solid #ffc107;"><i class="fas fa-minus me-1"></i>{{ _("Neutral") }}</span>';
+    }
+
+    function applyCompletedState(row, data) {
+        const statusCell = row.querySelector('[data-qbr-status]');
+        if (statusCell) {
+            statusCell.innerHTML = '<span class="badge bg-success-subtle text-success"><i class="fas fa-check-circle me-1"></i>{{ _("Complete") }}</span>';
+        }
+        const sentimentCell = row.querySelector('[data-qbr-sentiment]');
+        if (sentimentCell) {
+            sentimentCell.innerHTML = data.renewal_sentiment ? sentimentBadgeHtml(data.renewal_sentiment) : '<span class="text-muted small">—</span>';
+        }
+        const actionsCell = row.querySelector('[data-qbr-actions]');
+        if (actionsCell) {
+            const uuid = data.uuid;
+            const viewBriefUrl = actionsCell.dataset.viewBriefUrl;
+            const deleteHtml = actionsCell.dataset.deleteHtml;
+            actionsCell.innerHTML =
+                '<a href="' + viewBriefUrl + '" class="btn btn-sm btn-outline-primary me-1"><i class="fas fa-eye me-1"></i>{{ _("View Brief") }}</a>' +
+                deleteHtml;
+        }
+        row.dataset.sessionStatus = 'complete';
+    }
+
+    function pollSession(uuid, row) {
+        if (activePollers[uuid]) return;
+
+        activePollers[uuid] = setInterval(function() {
+            fetch('/api/qbr/sessions/' + uuid + '/status', {credentials: 'same-origin'})
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.status === 'complete') {
+                        clearInterval(activePollers[uuid]);
+                        delete activePollers[uuid];
+                        applyCompletedState(row, data);
+                    } else if (data.status === 'failed') {
+                        clearInterval(activePollers[uuid]);
+                        delete activePollers[uuid];
+                        const statusCell = row.querySelector('[data-qbr-status]');
+                        if (statusCell) {
+                            statusCell.innerHTML = '<span class="badge bg-danger-subtle text-danger"><i class="fas fa-exclamation-circle me-1"></i>{{ _("Failed") }}</span>';
+                        }
+                        row.dataset.sessionStatus = 'failed';
+                    }
+                })
+                .catch(function() {});
+        }, POLL_INTERVAL);
+    }
+
+    function startPollingForPendingSessions() {
+        document.querySelectorAll('tr[data-session-uuid]').forEach(function(row) {
+            const status = row.dataset.sessionStatus;
+            if (status === 'pending' || status === 'processing') {
+                pollSession(row.dataset.sessionUuid, row);
+            }
+        });
+    }
+
+    function manualRefresh() {
+        const btn = document.getElementById('manualRefreshBtn');
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>{{ _("Refreshing…") }}';
+        }
+        window.location.reload();
+    }
+
+    window.manualRefresh = manualRefresh;
+
+    document.addEventListener('DOMContentLoaded', startPollingForPendingSessions);
+})();
 </script>
 {% endblock %}

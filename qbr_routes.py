@@ -339,6 +339,37 @@ def qbr_company_history(company_name):
         return redirect(url_for('qbr.qbr_dashboard'))
 
 
+@qbr_api_bp.route('/sessions/<session_uuid>/status', methods=['GET'])
+@require_business_auth
+def qbr_session_status(session_uuid):
+    """Lightweight status endpoint for polling a single QBR session. GET /api/qbr/sessions/<uuid>/status"""
+    try:
+        business_account_id = _get_business_account_id()
+
+        from models import QBRSession
+        qbr_session = QBRSession.query.filter_by(
+            uuid=session_uuid,
+            business_account_id=business_account_id
+        ).first()
+
+        if not qbr_session:
+            return jsonify({'error': 'Session not found'}), 404
+
+        renewal_sentiment = None
+        if qbr_session.status == 'complete' and qbr_session.extracted_insights:
+            renewal_sentiment = qbr_session.extracted_insights.get('renewal_sentiment', 'neutral')
+
+        return jsonify({
+            'uuid': qbr_session.uuid,
+            'status': qbr_session.status,
+            'renewal_sentiment': renewal_sentiment,
+        }), 200
+
+    except Exception as e:
+        logger.error(f"QBR session status error: {e}")
+        return jsonify({'error': 'Failed to get session status'}), 500
+
+
 @qbr_api_bp.route('/sessions/<session_uuid>', methods=['DELETE'])
 @require_business_auth
 def qbr_session_delete(session_uuid):

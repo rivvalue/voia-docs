@@ -165,11 +165,86 @@
     </div>
 
     {% if active_import_job %}
-    <div class="alert alert-info alert-dismissible fade show mx-0 mb-3" role="alert">
-        <i class="fas fa-spinner fa-spin me-2"></i>
-        <strong>Import in progress</strong> &mdash; Your CSV file is being processed in the background. You'll receive a notification when it's done.
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <div class="alert alert-info fade show mx-0 mb-3" role="alert" id="importJobBanner">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <div>
+                <i class="fas fa-spinner fa-spin me-2" id="importJobSpinnerIcon"></i>
+                <strong id="importJobBannerTitle">Import in progress</strong> &mdash; <span id="importJobBannerText">Your CSV file is being processed in the background.</span>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-light border-info" onclick="manualParticipantRefresh()" id="importRefreshBtn" title="Refresh">
+                <i class="fas fa-sync-alt"></i>
+            </button>
+        </div>
     </div>
+    <script>
+    (function() {
+        const jobId = '{{ active_import_job.job_id }}';
+        const POLL_INTERVAL = 5000;
+        let pollTimer = null;
+
+        function stopPolling() {
+            if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+        }
+
+        function refreshParticipantData() {
+            fetch('{{ url_for("participants.api_filter_participants") }}', {credentials: 'same-origin'})
+                .then(function(r) { return r.ok ? r.json() : null; })
+                .then(function(data) {
+                    if (!data || !data.success) return;
+                    if (typeof updateParticipantTable === 'function') {
+                        updateParticipantTable(data.participants, data.pagination);
+                    }
+                    if (typeof updateKPICards === 'function') {
+                        updateKPICards(data.kpi_stats);
+                    }
+                })
+                .catch(function() {});
+        }
+
+        function pollJobStatus() {
+            fetch('/business/participants/api/bulk-jobs/' + jobId + '/status', {credentials: 'same-origin'})
+                .then(function(r) { return r.ok ? r.json() : null; })
+                .then(function(data) {
+                    if (!data) return;
+                    if (data.status === 'completed') {
+                        stopPolling();
+                        var banner = document.getElementById('importJobBanner');
+                        var icon = document.getElementById('importJobSpinnerIcon');
+                        var title = document.getElementById('importJobBannerTitle');
+                        var text = document.getElementById('importJobBannerText');
+                        if (banner) { banner.classList.remove('alert-info'); banner.classList.add('alert-success'); }
+                        if (icon) { icon.className = 'fas fa-check-circle me-2'; }
+                        if (title) { title.textContent = 'Import complete'; }
+                        if (text) { text.textContent = 'Your CSV import finished successfully.'; }
+                        refreshParticipantData();
+                    } else if (data.status === 'failed') {
+                        stopPolling();
+                        var banner = document.getElementById('importJobBanner');
+                        var icon = document.getElementById('importJobSpinnerIcon');
+                        var title = document.getElementById('importJobBannerTitle');
+                        var text = document.getElementById('importJobBannerText');
+                        if (banner) { banner.classList.remove('alert-info'); banner.classList.add('alert-danger'); }
+                        if (icon) { icon.className = 'fas fa-exclamation-circle me-2'; }
+                        if (title) { title.textContent = 'Import failed'; }
+                        if (text) { text.textContent = data.error || 'An error occurred during import.'; }
+                    }
+                })
+                .catch(function() {});
+        }
+
+        function manualParticipantRefresh() {
+            var btn = document.getElementById('importRefreshBtn');
+            if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Refreshing…'; }
+            window.location.reload();
+        }
+        window.manualParticipantRefresh = manualParticipantRefresh;
+
+        pollJobStatus();
+        pollTimer = setInterval(pollJobStatus, POLL_INTERVAL);
+
+        window.addEventListener('beforeunload', stopPolling);
+    })();
+    </script>
     {% endif %}
 
     <!-- Summary Cards -->

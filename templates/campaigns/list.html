@@ -20,7 +20,10 @@
                 <h1 class="h2 mb-2">{{ _('Campaign Management') }}</h1>
                 <p class="text-muted mb-0">{{ _('Manage survey campaigns for %(name)s', name=business_account.name) }}</p>
             </div>
-            <div class="col-12 col-md-4 text-center text-md-end">
+            <div class="col-12 col-md-4 text-center text-md-end d-flex align-items-center justify-content-center justify-content-md-end gap-2">
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.location.reload()" title="{{ _('Refresh') }}">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
                 <a href="{{ url_for('campaigns.create_campaign') }}" class="create-campaign-btn">
                     <i class="fas fa-plus me-2"></i>{{ _('Create Campaign') }}
                 </a>
@@ -58,7 +61,7 @@
                     class="btn btn-outline-primary btn-sm" 
                     onclick="downloadExecutiveReport('{{ campaign.uuid }}', '{{ campaign.name|e }}')"
                     title="{{ _('Executive Report') }}">
-                <i class="fas fa-file-pdf me-1"></i><span class="btn-label">{{ _('Report') }}</span>
+                <i class="fas fa-file-pdf me-1"></i><span class="btn-label" id="execReportText_{{ campaign.uuid }}">{{ _('Report') }}</span>
             </button>
             {% endif %}
         </div>
@@ -661,6 +664,44 @@ function regenerateExecutiveReport(campaignId, campaignName) {
     showRegenerateReportModal(campaignId, campaignName);
 }
 
+const _execReportPollers = {};
+
+function startExecReportPolling(campaignId) {
+    if (_execReportPollers[campaignId]) return;
+    _execReportPollers[campaignId] = setInterval(function() {
+        checkReport{{ _('Status') }}AndStop(campaignId);
+    }, 5000);
+}
+
+function stopExecReportPolling(campaignId) {
+    if (_execReportPollers[campaignId]) {
+        clearInterval(_execReportPollers[campaignId]);
+        delete _execReportPollers[campaignId];
+    }
+}
+
+function checkReport{{ _('Status') }}AndStop(campaignId) {
+    fetch(`/business/api/campaigns/${campaignId}/executive-reports`, {
+        method: 'GET',
+        headers: {'Content-Type': 'application/json'},
+        credentials: 'same-origin'
+    })
+    .then(response => response.ok ? response.json() : null)
+    .then(data => {
+        if (!data || !data.executive_reports || data.executive_reports.length === 0) return;
+        const report = data.executive_reports[0];
+        if (report.status === 'completed') {
+            stopExecReportPolling(campaignId);
+            updateReportButtonText(campaignId, true);
+        } else if (report.status === 'failed') {
+            stopExecReportPolling(campaignId);
+            const textElement = document.getElementById(`execReportText_${campaignId}`);
+            if (textElement) textElement.textContent = '{{ _('Report') }}';
+        }
+    })
+    .catch(() => {});
+}
+
 function confirmRegenerateReport(campaignId, campaignName) {
     // Get CSRF token
     const csrfToken = document.querySelector('meta[name=csrf-token]');
@@ -674,6 +715,10 @@ function confirmRegenerateReport(campaignId, campaignName) {
     if (textElement) {
         textElement.textContent = 'Regenerating...';
     }
+
+    // Hide regenerate link while regenerating
+    const regenerateLink = document.getElementById(`regenerateLink_${campaignId}`);
+    if (regenerateLink) regenerateLink.classList.add('d-none');
     
     fetch(`/business/api/campaigns/${campaignId}/executive-reports/regenerate`, {
         method: 'POST',
@@ -692,11 +737,12 @@ function confirmRegenerateReport(campaignId, campaignName) {
     })
     .then(result => {
         if (result.success) {
-            setTimeout(() => checkReport{{ _('Status') }}(campaignId), 5000);
+            startExecReportPolling(campaignId);
         } else {
             if (textElement) {
                 textElement.textContent = '{{ _('Executive Report') }} Available';
             }
+            if (regenerateLink) regenerateLink.classList.remove('d-none');
             alert('Failed to start executive report regeneration: ' + (result.data.error || 'Unknown error'));
         }
     })
@@ -705,6 +751,7 @@ function confirmRegenerateReport(campaignId, campaignName) {
         if (textElement) {
             textElement.textContent = '{{ _('Executive Report') }} Available';
         }
+        if (regenerateLink) regenerateLink.classList.remove('d-none');
         console.error('Error regenerating executive report:', error);
         alert('Failed to start executive report regeneration: ' + error.message);
     });
