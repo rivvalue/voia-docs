@@ -5730,7 +5730,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 let companyResponsesState = {
     companyName: null,
-    campaignId: null,
+    campaignUuid: null,
     campaignName: null,
     page: 1,
     search: '',
@@ -5745,10 +5745,10 @@ function openCompanyResponsesModal(companyName, campaignId, campaignName) {
 }
 
 // Legacy modal function kept for compatibility
-function openCompanyResponsesModalLegacy(companyName, campaignId, campaignName) {
+function openCompanyResponsesModalLegacy(companyName, campaignUuid, campaignName) {
     // Store state
     companyResponsesState.companyName = companyName;
-    companyResponsesState.campaignId = campaignId;
+    companyResponsesState.campaignUuid = campaignUuid;
     companyResponsesState.campaignName = campaignName;
     companyResponsesState.page = 1;
     companyResponsesState.search = '';
@@ -5770,7 +5770,7 @@ function openCompanyResponsesModalLegacy(companyName, campaignId, campaignName) 
 }
 
 async function loadCompanyResponses() {
-    const { companyName, campaignId, page, search, sortBy, sortOrder } = companyResponsesState;
+    const { companyName, campaignUuid, page, search, sortBy, sortOrder } = companyResponsesState;
     
     // Show loading state
     document.getElementById('companyResponsesLoading').style.display = 'block';
@@ -5790,7 +5790,7 @@ async function loadCompanyResponses() {
             params.append('search', search);
         }
         
-        const url = `/api/campaigns/${campaignId}/companies/${encodeURIComponent(companyName)}/responses?${params}`;
+        const url = `/api/campaigns/${campaignUuid}/companies/${encodeURIComponent(companyName)}/responses?${params}`;
         const response = await fetch(url);
         
         if (!response.ok) {

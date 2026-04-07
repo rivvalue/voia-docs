@@ -10,6 +10,7 @@ import uuid
 import json
 from datetime import datetime, timedelta
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session, send_file
+from werkzeug.exceptions import HTTPException
 from sqlalchemy import desc
 from sqlalchemy.orm import joinedload
 
@@ -163,6 +164,8 @@ def list_campaigns():
                              campaigns=campaign_data,
                              business_account=current_account.to_dict())
         
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Campaign list error: {e}")
         flash(_('Error loading campaigns.'), 'error')
@@ -327,6 +330,8 @@ def create_campaign():
         
         return redirect(url_for('campaigns.list_campaigns'))
         
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Campaign creation error: {e}")
         db.session.rollback()
@@ -336,9 +341,9 @@ def create_campaign():
                              business_account=current_account.to_dict() if current_account else {})
 
 
-@campaign_bp.route('/<int:campaign_id>/preview_survey')
+@campaign_bp.route('/<campaign_uuid>/preview_survey')
 @require_business_auth
-def preview_classic_survey(campaign_id):
+def preview_classic_survey(campaign_uuid):
     """Preview classic survey questionnaire without requiring activation or participant token"""
     try:
         current_account = get_current_business_account()
@@ -347,9 +352,9 @@ def preview_classic_survey(campaign_id):
             return redirect(url_for('business_auth.login'))
 
         campaign = Campaign.query.filter_by(
-            id=campaign_id,
+            uuid=campaign_uuid,
             business_account_id=current_account.id
-        ).first()
+        ).first_or_404()
 
         if not campaign:
             flash('Campaign not found.', 'error')
@@ -357,7 +362,7 @@ def preview_classic_survey(campaign_id):
 
         if campaign.survey_type != 'classic':
             flash('Preview is only available for classic surveys.', 'warning')
-            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+            return redirect(url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid))
 
         classic_config = ClassicSurveyConfig.query.filter_by(campaign_id=campaign.id).first()
 
@@ -403,10 +408,12 @@ def preview_classic_survey(campaign_id):
             else:
                 session.pop('language', None)
 
+    except HTTPException:
+        raise
     except Exception as e:
         logging.error(f"Error in classic survey preview: {e}")
         flash('Unable to load survey preview.', 'error')
-        return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        return redirect(url_for('campaigns.list_campaigns'))
 
 
 @campaign_bp.route('/<uuid:campaign_uuid>/acknowledge_preview', methods=['POST'])
@@ -431,7 +438,7 @@ def acknowledge_preview(campaign_uuid):
 
         if campaign.survey_type != 'classic':
             flash('Preview acknowledgment is only for classic surveys.', 'warning')
-            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign.id))
+            return redirect(url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid))
 
         campaign.simulation_completed_at = datetime.utcnow()
         db.session.commit()
@@ -450,8 +457,10 @@ def acknowledge_preview(campaign_uuid):
             logger.error(f"Failed to audit preview acknowledgment: {audit_err}")
 
         flash('Preview acknowledged. Campaign marked as previewed.', 'success')
-        return redirect(url_for('campaigns.view_campaign', campaign_id=campaign.id))
+        return redirect(url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid))
 
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error acknowledging preview: {e}")
         db.session.rollback()
@@ -459,7 +468,7 @@ def acknowledge_preview(campaign_uuid):
         try:
             campaign = Campaign.query.filter_by(uuid=str(campaign_uuid), business_account_id=get_current_business_account().id).first()
             if campaign:
-                return redirect(url_for('campaigns.view_campaign', campaign_id=campaign.id))
+                return redirect(url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid))
         except Exception:
             pass
         return redirect(url_for('campaigns.list_campaigns'))
@@ -521,8 +530,10 @@ def validate_campaign(campaign_uuid):
             logger.error(f"Failed to audit campaign validation: {audit_err}")
 
         flash('Campaign validated successfully.', 'success')
-        return redirect(url_for('campaigns.view_campaign', campaign_id=campaign.id))
+        return redirect(url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid))
 
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error validating campaign: {e}")
         db.session.rollback()
@@ -530,15 +541,15 @@ def validate_campaign(campaign_uuid):
         try:
             campaign = Campaign.query.filter_by(uuid=str(campaign_uuid), business_account_id=get_current_business_account().id).first()
             if campaign:
-                return redirect(url_for('campaigns.view_campaign', campaign_id=campaign.id))
+                return redirect(url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid))
         except Exception:
             pass
         return redirect(url_for('campaigns.list_campaigns'))
 
 
-@campaign_bp.route('/<int:campaign_id>')
+@campaign_bp.route('/<campaign_uuid>')
 @require_business_auth
-def view_campaign(campaign_id):
+def view_campaign(campaign_uuid):
     """View campaign details (read-only access for all authenticated users)"""
     try:
         current_account = get_current_business_account()
@@ -548,9 +559,9 @@ def view_campaign(campaign_id):
         
         # Get campaign (scoped to current business account)
         campaign = Campaign.query.filter_by(
-            id=campaign_id,
+            uuid=campaign_uuid,
             business_account_id=current_account.id
-        ).first()
+        ).first_or_404()
         
         if not campaign:
             flash(_('Campaign not found.'), 'error')
@@ -566,7 +577,7 @@ def view_campaign(campaign_id):
             func.count(case((CampaignParticipant.status == 'invited', 1))).label('invited'),
             func.count(case((CampaignParticipant.status == 'pending', 1))).label('pending')
         ).filter(
-            CampaignParticipant.campaign_id == campaign_id,
+            CampaignParticipant.campaign_id == campaign.id,
             CampaignParticipant.business_account_id == current_account.id
         ).first()
         
@@ -632,16 +643,18 @@ def view_campaign(campaign_id):
                              business_account=current_account.to_dict(),
                              campaign_config=campaign_config)
         
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Campaign view error: {e}")
         flash(_('Error loading campaign details.'), 'error')
         return redirect(url_for('campaigns.list_campaigns'))
 
 
-@campaign_bp.route('/<int:campaign_id>/edit', methods=['GET', 'POST'])
+@campaign_bp.route('/<campaign_uuid>/edit', methods=['GET', 'POST'])
 @require_business_auth
 @require_permission('manage_participants')
-def edit_draft_campaign(campaign_id):
+def edit_draft_campaign(campaign_uuid):
     """Edit draft campaign details (name, dates, description)"""
     try:
         current_account = get_current_business_account()
@@ -651,9 +664,9 @@ def edit_draft_campaign(campaign_id):
         
         # Get campaign (scoped to current business account)
         campaign = Campaign.query.filter_by(
-            id=campaign_id,
+            uuid=campaign_uuid,
             business_account_id=current_account.id
-        ).first()
+        ).first_or_404()
         
         if not campaign:
             flash(_('Campaign not found.'), 'error')
@@ -662,7 +675,7 @@ def edit_draft_campaign(campaign_id):
         # Validate: Only draft campaigns can be edited
         if campaign.status != 'draft':
             flash(f'Only draft campaigns can be edited. This campaign is {campaign.status}.', 'error')
-            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+            return redirect(url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid))
         
         if request.method == 'GET':
             # Show edit form
@@ -709,7 +722,7 @@ def edit_draft_campaign(campaign_id):
         
         if dates_changed:
             invited_count = CampaignParticipant.query.filter_by(
-                campaign_id=campaign_id,
+                campaign_id=campaign.id,
                 business_account_id=current_account.id,
                 status='invited'
             ).count()
@@ -810,7 +823,7 @@ def edit_draft_campaign(campaign_id):
             db.session.rollback()
             for error in content_errors:
                 flash(error, 'error')
-            return redirect(url_for('campaigns.edit_draft_campaign', campaign_id=campaign_id))
+            return redirect(url_for('campaigns.edit_draft_campaign', campaign_uuid=campaign.uuid))
         
         db.session.commit()
         
@@ -832,22 +845,24 @@ def edit_draft_campaign(campaign_id):
             except Exception as audit_error:
                 logger.error(f"Failed to audit campaign edit: {audit_error}")
         
-        logger.info(f"Campaign '{campaign.name}' (ID: {campaign_id}) edited by business account {current_account.id}")
+        logger.info(f"Campaign '{campaign.name}' (ID: {campaign.id}) edited by business account {current_account.id}")
         flash(f'Campaign "{campaign.name}" updated successfully!', 'success')
         
-        return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        return redirect(url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid))
         
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Campaign edit error: {e}")
         db.session.rollback()
         flash(_('Failed to update campaign. Please try again.'), 'error')
-        return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        return redirect(url_for('campaigns.list_campaigns'))
 
 
-@campaign_bp.route('/<int:campaign_id>/delete', methods=['POST'])
+@campaign_bp.route('/<campaign_uuid>/delete', methods=['POST'])
 @require_business_auth
 @require_permission('manage_participants')
-def delete_draft_campaign(campaign_id):
+def delete_draft_campaign(campaign_uuid):
     """Delete draft campaign and cascade associations"""
     try:
         current_account = get_current_business_account()
@@ -857,9 +872,9 @@ def delete_draft_campaign(campaign_id):
         
         # Get campaign (scoped to current business account)
         campaign = Campaign.query.filter_by(
-            id=campaign_id,
+            uuid=campaign_uuid,
             business_account_id=current_account.id
-        ).first()
+        ).first_or_404()
         
         if not campaign:
             flash(_('Campaign not found.'), 'error')
@@ -868,16 +883,16 @@ def delete_draft_campaign(campaign_id):
         # Validate: Only draft campaigns can be deleted
         if campaign.status != 'draft':
             flash(f'Only draft campaigns can be deleted. This campaign is {campaign.status}.', 'error')
-            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+            return redirect(url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid))
         
         # Get counts for audit trail
         participant_count = CampaignParticipant.query.filter_by(
-            campaign_id=campaign_id,
+            campaign_id=campaign.id,
             business_account_id=current_account.id
         ).count()
         
         response_count = SurveyResponse.query.filter_by(
-            campaign_id=campaign_id
+            campaign_id=campaign.id
         ).count()
         
         # Store campaign info for audit log (before deletion)
@@ -887,9 +902,12 @@ def delete_draft_campaign(campaign_id):
         
         # Delete cascade: Remove campaign_participants associations first
         CampaignParticipant.query.filter_by(
-            campaign_id=campaign_id,
+            campaign_id=campaign.id,
             business_account_id=current_account.id
         ).delete()
+        
+        # Store campaign_id before deletion for audit log
+        campaign_id_for_audit = campaign.id
         
         # Delete the campaign
         db.session.delete(campaign)
@@ -902,7 +920,7 @@ def delete_draft_campaign(campaign_id):
                 business_account_id=current_account.id,
                 action_type='campaign_deleted',
                 resource_type='campaign',
-                resource_id=campaign_id,
+                resource_id=campaign_id_for_audit,
                 resource_name=campaign_name,
                 details={
                     'campaign_name': campaign_name,
@@ -916,22 +934,24 @@ def delete_draft_campaign(campaign_id):
         except Exception as audit_error:
             logger.error(f"Failed to audit campaign deletion: {audit_error}")
         
-        logger.info(f"Campaign '{campaign_name}' (ID: {campaign_id}) deleted by business account {current_account.id}")
+        logger.info(f"Campaign '{campaign_name}' deleted by business account {current_account.id}")
         flash(f'Campaign "{campaign_name}" has been deleted.', 'success')
         
         return redirect(url_for('campaigns.list_campaigns'))
         
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Campaign deletion error: {e}")
         db.session.rollback()
         flash(_('Failed to delete campaign. Please try again.'), 'error')
-        return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        return redirect(url_for('campaigns.list_campaigns'))
 
 
-@campaign_bp.route('/<int:campaign_id>/mark-ready', methods=['POST'])
+@campaign_bp.route('/<campaign_uuid>/mark-ready', methods=['POST'])
 @require_business_auth
 @require_permission('manage_participants')
-def mark_ready(campaign_id):
+def mark_ready(campaign_uuid):
     """Mark campaign as ready for activation"""
     try:
         current_account = get_current_business_account()
@@ -941,9 +961,9 @@ def mark_ready(campaign_id):
         
         # Get campaign (scoped to current business account)
         campaign = Campaign.query.filter_by(
-            id=campaign_id,
+            uuid=campaign_uuid,
             business_account_id=current_account.id
-        ).first()
+        ).first_or_404()
         
         if not campaign:
             flash(_('Campaign not found.'), 'error')
@@ -952,43 +972,45 @@ def mark_ready(campaign_id):
         # Validate campaign can be marked ready
         if campaign.status != 'draft':
             flash(f'Campaign must be in draft status to mark as ready. Current status: {campaign.status}', 'error')
-            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+            return redirect(url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid))
         
         # Check if campaign has basic requirements
         if not campaign.name or not campaign.description:
             flash(_('The campaign must have a name and description to be marked as ready.'), 'error')
-            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+            return redirect(url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid))
         
         # Check if campaign has participants
         participant_count = CampaignParticipant.query.filter_by(
-            campaign_id=campaign_id,
+            campaign_id=campaign.id,
             business_account_id=current_account.id
         ).count()
         
         if participant_count == 0:
             flash(_('The campaign must have at least one participant to be marked as ready.'), 'error')
-            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+            return redirect(url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid))
         
         # Mark as ready
         campaign.status = 'ready'
         db.session.commit()
         
-        logger.info(f"Campaign '{campaign.name}' (ID: {campaign_id}) marked as ready by business account {current_account.id}")
+        logger.info(f"Campaign '{campaign.name}' (ID: {campaign.id}) marked as ready by business account {current_account.id}")
         flash(f'Campaign "{campaign.name}" is now ready for activation!', 'success')
         
-        return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        return redirect(url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid))
         
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error marking campaign as ready: {e}")
         db.session.rollback()
         flash(_('Failed to mark campaign as ready. Please try again.'), 'error')
-        return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        return redirect(url_for('campaigns.list_campaigns'))
 
 
-@campaign_bp.route('/<int:campaign_id>/activate', methods=['POST'])
+@campaign_bp.route('/<campaign_uuid>/activate', methods=['POST'])
 @require_business_auth
 @require_permission('manage_participants')
-def activate_campaign(campaign_id):
+def activate_campaign(campaign_uuid):
     """Activate campaign (enforce single active campaign constraint)"""
     try:
         current_account = get_current_business_account()
@@ -998,9 +1020,9 @@ def activate_campaign(campaign_id):
         
         # Get campaign (scoped to current business account)
         campaign = Campaign.query.filter_by(
-            id=campaign_id,
+            uuid=campaign_uuid,
             business_account_id=current_account.id
-        ).first()
+        ).first_or_404()
         
         if not campaign:
             flash(_('Campaign not found.'), 'error')
@@ -1008,11 +1030,11 @@ def activate_campaign(campaign_id):
         
         if campaign.status == 'active':
             flash(f'Campaign "{campaign.name}" is already active.', 'info')
-            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+            return redirect(url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid))
         
         if campaign.status != 'ready':
             flash(f'Campaign must be ready to activate. Current status: {campaign.status}', 'error')
-            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+            return redirect(url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid))
         
         # Enforce single active campaign constraint (unless parallel campaigns enabled)
         if not current_account.allow_parallel_campaigns:
@@ -1023,17 +1045,17 @@ def activate_campaign(campaign_id):
             
             if existing_active:
                 flash(f'Cannot activate campaign. Another campaign "{existing_active.name}" is already active. Only one campaign can be active at a time.', 'error')
-                return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+                return redirect(url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid))
         
         # Check date constraints using consistent date handling
         today = datetime.now().date()
         if campaign.start_date > today:
             flash(f'Cannot activate campaign before start date ({campaign.start_date}). Please wait until the start date.', 'error')
-            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+            return redirect(url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid))
         
         if campaign.end_date < today:
             flash(f'Cannot activate campaign past end date ({campaign.end_date}). Please update the campaign dates.', 'error')
-            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+            return redirect(url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid))
         
         # Check license limits before activation using new LicenseService
         from license_service import LicenseService
@@ -1046,11 +1068,11 @@ def activate_campaign(campaign_id):
                 except Exception as info_error:
                     logger.error(f"Failed to get license info for error message: {info_error}")
                     flash('Cannot activate campaign. License limit reached. Please contact support to upgrade your license.', 'error')
-                return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+                return redirect(url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid))
         except Exception as license_error:
             logger.error(f"License check failed during campaign activation: {license_error}")
             flash('Cannot activate campaign due to a license system error. Please contact support for assistance.', 'error')
-            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+            return redirect(url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid))
         
         # Activate campaign
         campaign.status = 'active'
@@ -1063,7 +1085,7 @@ def activate_campaign(campaign_id):
         
         # Get all campaign-participant associations for token generation
         campaign_participants = CampaignParticipant.query.filter_by(
-            campaign_id=campaign_id,
+            campaign_id=campaign.id,
             business_account_id=current_account.id
         ).all()
         
@@ -1110,7 +1132,7 @@ def activate_campaign(campaign_id):
                 continue
         
         # Log activation summary with token generation results
-        logger.info(f"Campaign '{campaign.name}' (ID: {campaign_id}) activated by business account {current_account.id}")
+        logger.info(f"Campaign '{campaign.name}' (ID: {campaign.id}) activated by business account {current_account.id}")
         logger.info(f"Token generation results: {token_success_count} successful, {token_error_count} failed")
         
         # Audit log campaign activation (includes vetting_status for traceability)
@@ -1140,19 +1162,21 @@ def activate_campaign(campaign_id):
         else:
             flash(f'Campaign "{campaign.name}" is active but token generation failed for all {token_error_count} participants. Check logs and retry.', 'error')
         
-        return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        return redirect(url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid))
         
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error activating campaign: {e}")
         db.session.rollback()
         flash(_('Failed to activate campaign. Please try again.'), 'error')
-        return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        return redirect(url_for('campaigns.list_campaigns'))
 
 
-@campaign_bp.route('/<int:campaign_id>/complete', methods=['POST'])
+@campaign_bp.route('/<campaign_uuid>/complete', methods=['POST'])
 @require_business_auth
 @require_permission('manage_participants')
-def complete_campaign(campaign_id):
+def complete_campaign(campaign_uuid):
     """Complete campaign"""
     try:
         current_account = get_current_business_account()
@@ -1162,9 +1186,9 @@ def complete_campaign(campaign_id):
         
         # Get campaign (scoped to current business account)
         campaign = Campaign.query.filter_by(
-            id=campaign_id,
+            uuid=campaign_uuid,
             business_account_id=current_account.id
-        ).first()
+        ).first_or_404()
         
         if not campaign:
             flash(_('Campaign not found.'), 'error')
@@ -1173,7 +1197,7 @@ def complete_campaign(campaign_id):
         # Validate campaign can be completed
         if campaign.status not in ['active']:
             flash(f'Only active campaigns can be completed. Current status: {campaign.status}', 'error')
-            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+            return redirect(url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid))
         
         # Complete campaign and generate KPI snapshot
         campaign.close_campaign()
@@ -1197,26 +1221,28 @@ def complete_campaign(campaign_id):
         except Exception as audit_error:
             logger.error(f"Failed to audit campaign completion: {audit_error}")
         
-        logger.info(f"Campaign '{campaign.name}' (ID: {campaign_id}) completed by business account {current_account.id}")
+        logger.info(f"Campaign '{campaign.name}' (ID: {campaign.id}) completed by business account {current_account.id}")
         flash(f'Campaign "{campaign.name}" has been completed!', 'success')
         
-        return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        return redirect(url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid))
         
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error completing campaign: {e}")
         db.session.rollback()
         flash(_('Failed to complete campaign. Please try again.'), 'error')
-        return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        return redirect(url_for('campaigns.list_campaigns'))
 
 
 # ==============================================================================
 # PARTICIPANT INVITATION ROUTES
 # ==============================================================================
 
-@campaign_bp.route('/<int:campaign_id>/send-invitations', methods=['POST'])
+@campaign_bp.route('/<campaign_uuid>/send-invitations', methods=['POST'])
 @require_business_auth
 @require_permission('manage_participants')
-def send_bulk_invitations(campaign_id):
+def send_bulk_invitations(campaign_uuid):
     """Send bulk email invitations to all campaign participants"""
     try:
         current_account = get_current_business_account()
@@ -1226,9 +1252,9 @@ def send_bulk_invitations(campaign_id):
         
         # Get campaign (scoped to current business account)
         campaign = Campaign.query.filter_by(
-            id=campaign_id,
+            uuid=campaign_uuid,
             business_account_id=current_account.id
-        ).first()
+        ).first_or_404()
         
         if not campaign:
             flash(_('Campaign not found.'), 'error')
@@ -1237,22 +1263,22 @@ def send_bulk_invitations(campaign_id):
         # Validate campaign status - only send invitations for active campaigns
         if campaign.status != 'active':
             flash(f'Cannot send invitations for {campaign.status} campaign. Campaign must be active.', 'error')
-            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+            return redirect(url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid))
         
         # Check if email service is configured for this business account
         if not email_service.is_configured(current_account.id):
             flash(_('The email service is not configured. Please configure your SMTP settings first.'), 'error')
-            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+            return redirect(url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid))
         
         # Get all campaign participants that haven't been invited yet
         campaign_participants = CampaignParticipant.query.filter_by(
-            campaign_id=campaign_id,
+            campaign_id=campaign.id,
             business_account_id=current_account.id
         ).all()
         
         if not campaign_participants:
             flash(_('No participants found for this campaign.'), 'warning')
-            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+            return redirect(url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid))
         
         # Filter participants - only send to those who haven't been invited or failed previous attempts
         invitable_participants = []
@@ -1270,7 +1296,7 @@ def send_bulk_invitations(campaign_id):
         
         if not invitable_participants:
             flash(_('All participants have already been successfully invited.'), 'info')
-            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+            return redirect(url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid))
         
         # Create email delivery records and add to task queue
         successful_queued = 0
@@ -1281,7 +1307,7 @@ def send_bulk_invitations(campaign_id):
                 # Create EmailDelivery record for tracking
                 email_delivery = EmailDelivery()
                 email_delivery.business_account_id = current_account.id
-                email_delivery.campaign_id = campaign_id
+                email_delivery.campaign_id = campaign.id
                 email_delivery.participant_id = cp.participant_id
                 email_delivery.campaign_participant_id = cp.id
                 email_delivery.email_type = 'participant_invitation'
@@ -1329,21 +1355,23 @@ def send_bulk_invitations(campaign_id):
         if failed_queued > 0:
             flash(f'{failed_queued} invitation(s) failed to queue. Please check logs and try again.', 'error')
         
-        logger.info(f"Bulk invitations queued for campaign '{campaign.name}' (ID: {campaign_id}): {successful_queued} successful, {failed_queued} failed")
+        logger.info(f"Bulk invitations queued for campaign '{campaign.name}' (ID: {campaign.id}): {successful_queued} successful, {failed_queued} failed")
         
-        return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        return redirect(url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid))
         
+    except HTTPException:
+        raise
     except Exception as e:
-        logger.error(f"Error sending bulk invitations for campaign {campaign_id}: {e}")
+        logger.error(f"Error sending bulk invitations: {e}")
         db.session.rollback()
         flash(_('Failed to send invitations. Please try again.'), 'error')
-        return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        return redirect(url_for('campaigns.list_campaigns'))
 
 
-@campaign_bp.route('/<int:campaign_id>/invitation-status')
+@campaign_bp.route('/<campaign_uuid>/invitation-status')
 @require_business_auth
 @require_permission('manage_participants')
-def invitation_status(campaign_id):
+def invitation_status(campaign_uuid):
     """Get invitation status for campaign participants"""
     try:
         current_account = get_current_business_account()
@@ -1352,23 +1380,23 @@ def invitation_status(campaign_id):
         
         # Get campaign (scoped to current business account)
         campaign = Campaign.query.filter_by(
-            id=campaign_id,
+            uuid=campaign_uuid,
             business_account_id=current_account.id
-        ).first()
+        ).first_or_404()
         
         if not campaign:
             return jsonify({'error': 'Campaign not found'}), 404
         
         # Get all email deliveries for this campaign
         email_deliveries = EmailDelivery.query.filter_by(
-            campaign_id=campaign_id,
+            campaign_id=campaign.id,
             business_account_id=current_account.id,
             email_type='participant_invitation'
         ).all()
         
         # Get campaign participants with eager loading to prevent N+1 queries
         campaign_participants = CampaignParticipant.query.filter_by(
-            campaign_id=campaign_id,
+            campaign_id=campaign.id,
             business_account_id=current_account.id
         ).options(joinedload(CampaignParticipant.participant)).all()
         
@@ -1397,7 +1425,7 @@ def invitation_status(campaign_id):
                 participant_status.append(status_info)
         
         return jsonify({
-            'campaign_id': campaign_id,
+            'campaign_id': campaign.id,
             'campaign_name': campaign.name,
             'participants': participant_status,
             'summary': {
@@ -1408,15 +1436,17 @@ def invitation_status(campaign_id):
             }
         })
         
+    except HTTPException:
+        raise
     except Exception as e:
-        logger.error(f"Error getting invitation status for campaign {campaign_id}: {e}")
+        logger.error(f"Error getting invitation status: {e}")
         return jsonify({'error': 'Failed to get invitation status'}), 500
 
 
-@campaign_bp.route('/<int:campaign_id>/resend-failed-invitations', methods=['POST'])
+@campaign_bp.route('/<campaign_uuid>/resend-failed-invitations', methods=['POST'])
 @require_business_auth
 @require_permission('manage_participants')
-def resend_failed_invitations(campaign_id):
+def resend_failed_invitations(campaign_uuid):
     """Resend invitations for participants with failed email deliveries"""
     try:
         current_account = get_current_business_account()
@@ -1426,9 +1456,9 @@ def resend_failed_invitations(campaign_id):
         
         # Get campaign (scoped to current business account)
         campaign = Campaign.query.filter_by(
-            id=campaign_id,
+            uuid=campaign_uuid,
             business_account_id=current_account.id
-        ).first()
+        ).first_or_404()
         
         if not campaign:
             flash(_('Campaign not found.'), 'error')
@@ -1437,11 +1467,11 @@ def resend_failed_invitations(campaign_id):
         # Check if email service is configured for this business account
         if not email_service.is_configured(current_account.id):
             flash(_('The email service is not configured. Please configure your SMTP settings first.'), 'error')
-            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+            return redirect(url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid))
         
         # Find failed email deliveries that can be retried
         failed_deliveries = EmailDelivery.query.filter_by(
-            campaign_id=campaign_id,
+            campaign_id=campaign.id,
             business_account_id=current_account.id,
             email_type='participant_invitation',
             status='failed'
@@ -1451,7 +1481,7 @@ def resend_failed_invitations(campaign_id):
         
         if not failed_deliveries:
             flash(_('No failed invitations can be resent.'), 'info')
-            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+            return redirect(url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid))
         
         # Resend failed invitations
         resent_count = 0
@@ -1487,21 +1517,23 @@ def resend_failed_invitations(campaign_id):
         else:
             flash(_('No invitations were queued for resend.'), 'warning')
         
-        logger.info(f"Resent {resent_count} failed invitations for campaign '{campaign.name}' (ID: {campaign_id})")
+        logger.info(f"Resent {resent_count} failed invitations for campaign '{campaign.name}' (ID: {campaign.id})")
         
-        return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        return redirect(url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid))
         
+    except HTTPException:
+        raise
     except Exception as e:
-        logger.error(f"Error resending failed invitations for campaign {campaign_id}: {e}")
+        logger.error(f"Error resending failed invitations: {e}")
         db.session.rollback()
         flash(_('Failed to resend invitations. Please try again.'), 'error')
-        return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        return redirect(url_for('campaigns.list_campaigns'))
 
 
-@campaign_bp.route('/<int:campaign_id>/survey-config')
+@campaign_bp.route('/<campaign_uuid>/survey-config')
 @require_business_auth
 @require_permission('manage_participants')
-def survey_config(campaign_id):
+def survey_config(campaign_uuid):
     """Display campaign survey configuration form"""
     try:
         current_account = get_current_business_account()
@@ -1511,9 +1543,9 @@ def survey_config(campaign_id):
         
         # Get campaign (scoped to current business account)
         campaign = Campaign.query.filter_by(
-            id=campaign_id,
+            uuid=campaign_uuid,
             business_account_id=current_account.id
-        ).first()
+        ).first_or_404()
         
         if not campaign:
             flash(_('Campaign not found.'), 'error')
@@ -1572,16 +1604,18 @@ def survey_config(campaign_id):
                              topic_options=topic_options,
                              ENABLE_PROMPT_PREVIEW=os.getenv('ENABLE_PROMPT_PREVIEW') == 'true')
         
+    except HTTPException:
+        raise
     except Exception as e:
-        logger.error(f"Survey config display error for campaign {campaign_id}: {e}")
+        logger.error(f"Survey config display error: {e}")
         flash(_('Error loading survey configuration.'), 'error')
-        return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        return redirect(url_for('campaigns.list_campaigns'))
 
 
-@campaign_bp.route('/<int:campaign_id>/survey-config/save', methods=['POST'])
+@campaign_bp.route('/<campaign_uuid>/survey-config/save', methods=['POST'])
 @require_business_auth
 @require_permission('manage_participants')
-def save_survey_config(campaign_id):
+def save_survey_config(campaign_uuid):
     """Save campaign survey configuration"""
     try:
         current_account = get_current_business_account()
@@ -1591,9 +1625,9 @@ def save_survey_config(campaign_id):
         
         # Get campaign (scoped to current business account)
         campaign = Campaign.query.filter_by(
-            id=campaign_id,
+            uuid=campaign_uuid,
             business_account_id=current_account.id
-        ).first()
+        ).first_or_404()
         
         if not campaign:
             flash(_('Campaign not found.'), 'error')
@@ -1602,7 +1636,7 @@ def save_survey_config(campaign_id):
         # Check if campaign can be modified
         if campaign.status in ['active', 'completed']:
             flash(f'Survey configuration cannot be modified for {campaign.status} campaigns.', 'error')
-            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+            return redirect(url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid))
         
         # Process inheritance flags (convert form values to boolean)
         campaign.use_business_product_focus = request.form.get('use_business_product_focus') == 'true'
@@ -1634,24 +1668,24 @@ def save_survey_config(campaign_id):
                 max_questions = int(request.form.get('max_questions', 8))
                 if not (3 <= max_questions <= 15):
                     flash(_('The maximum number of questions must be between 3 and 15.'), 'error')
-                    return redirect(url_for('campaigns.survey_config', campaign_id=campaign_id))
+                    return redirect(url_for('campaigns.survey_config', campaign_uuid=campaign.uuid))
                 campaign.max_questions = max_questions
                 
                 max_duration = int(request.form.get('max_duration_seconds', 120))
                 if not (60 <= max_duration <= 300):
                     flash(_('The maximum duration must be between 60 and 300 seconds.'), 'error')
-                    return redirect(url_for('campaigns.survey_config', campaign_id=campaign_id))
+                    return redirect(url_for('campaigns.survey_config', campaign_uuid=campaign.uuid))
                 campaign.max_duration_seconds = max_duration
                 
                 max_follow_ups = int(request.form.get('max_follow_ups_per_topic', 2))
                 if not (1 <= max_follow_ups <= 3):
                     flash(_('The maximum number of follow-ups per topic must be between 1 and 3.'), 'error')
-                    return redirect(url_for('campaigns.survey_config', campaign_id=campaign_id))
+                    return redirect(url_for('campaigns.survey_config', campaign_uuid=campaign.uuid))
                 campaign.max_follow_ups_per_topic = max_follow_ups
                 
             except ValueError:
                 flash(_('Invalid numeric values in survey controls.'), 'error')
-                return redirect(url_for('campaigns.survey_config', campaign_id=campaign_id))
+                return redirect(url_for('campaigns.survey_config', campaign_uuid=campaign.uuid))
         
         # Topic Prioritization section - only save if not inheriting
         if campaign.use_business_topics:
@@ -1741,22 +1775,24 @@ def save_survey_config(campaign_id):
         except Exception as audit_error:
             logger.error(f"Failed to audit survey config update: {audit_error}")
         
-        logger.info(f"Survey configuration updated for campaign '{campaign.name}' (ID: {campaign_id}) by business account {current_account.id}")
+        logger.info(f"Survey configuration updated for campaign '{campaign.name}' (ID: {campaign.id}) by business account {current_account.id}")
         flash(_('Survey configuration saved successfully!'), 'success')
         
-        return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        return redirect(url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid))
         
+    except HTTPException:
+        raise
     except Exception as e:
-        logger.error(f"Error saving survey config for campaign {campaign_id}: {e}")
+        logger.error(f"Error saving survey config: {e}")
         db.session.rollback()
         flash(_('Failed to save survey configuration. Please try again.'), 'error')
-        return redirect(url_for('campaigns.survey_config', campaign_id=campaign_id))
+        return redirect(url_for('campaigns.list_campaigns'))
 
 
-@campaign_bp.route('/<int:campaign_id>/classic-survey-config')
+@campaign_bp.route('/<campaign_uuid>/classic-survey-config')
 @require_business_auth
 @require_permission('manage_participants')
-def classic_survey_config(campaign_id):
+def classic_survey_config(campaign_uuid):
     """Display classic survey configuration editor"""
     try:
         current_account = get_current_business_account()
@@ -1765,9 +1801,9 @@ def classic_survey_config(campaign_id):
             return redirect(url_for('business_auth.login'))
         
         campaign = Campaign.query.filter_by(
-            id=campaign_id,
+            uuid=campaign_uuid,
             business_account_id=current_account.id
-        ).first()
+        ).first_or_404()
         
         if not campaign:
             flash(_('Campaign not found.'), 'error')
@@ -1775,12 +1811,12 @@ def classic_survey_config(campaign_id):
         
         if campaign.survey_type != 'classic':
             flash('This configuration is only available for classic surveys.', 'warning')
-            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+            return redirect(url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid))
         
         classic_config = ClassicSurveyConfig.query.filter_by(campaign_id=campaign.id).first()
         if classic_config and classic_config.is_frozen():
             flash(_('The survey configuration is locked because the campaign has been activated. No further changes are possible.'), 'warning')
-            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+            return redirect(url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid))
         
         if not classic_config:
             template = seed_default_survey_template()
@@ -1811,16 +1847,18 @@ def classic_survey_config(campaign_id):
                              is_frozen=False,
                              has_responses=has_responses)
         
+    except HTTPException:
+        raise
     except Exception as e:
-        logger.error(f"Classic survey config display error for campaign {campaign_id}: {e}")
+        logger.error(f"Classic survey config display error: {e}")
         flash(_('Error loading configuration.'), 'error')
-        return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        return redirect(url_for('campaigns.list_campaigns'))
 
 
-@campaign_bp.route('/<int:campaign_id>/classic-survey-config/save', methods=['POST'])
+@campaign_bp.route('/<campaign_uuid>/classic-survey-config/save', methods=['POST'])
 @require_business_auth
 @require_permission('manage_participants')
-def save_classic_survey_config(campaign_id):
+def save_classic_survey_config(campaign_uuid):
     """Save classic survey configuration"""
     try:
         current_account = get_current_business_account()
@@ -1829,9 +1867,9 @@ def save_classic_survey_config(campaign_id):
             return redirect(url_for('business_auth.login'))
         
         campaign = Campaign.query.filter_by(
-            id=campaign_id,
+            uuid=campaign_uuid,
             business_account_id=current_account.id
-        ).first()
+        ).first_or_404()
         
         if not campaign:
             flash(_('Campaign not found.'), 'error')
@@ -1839,16 +1877,16 @@ def save_classic_survey_config(campaign_id):
         
         if campaign.survey_type != 'classic':
             flash('This configuration is only available for classic surveys.', 'warning')
-            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+            return redirect(url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid))
         
         classic_config = ClassicSurveyConfig.query.filter_by(campaign_id=campaign.id).first()
         if not classic_config:
             flash(_('Configuration not found.'), 'error')
-            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+            return redirect(url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid))
         
         if classic_config.is_frozen():
             flash(_('The configuration is locked because the campaign has been activated.'), 'error')
-            return redirect(url_for('campaigns.classic_survey_config', campaign_id=campaign_id))
+            return redirect(url_for('campaigns.classic_survey_config', campaign_uuid=campaign.uuid))
         
         has_responses = SurveyResponse.query.filter_by(campaign_id=campaign.id).count() > 0
         
@@ -1987,7 +2025,7 @@ def save_classic_survey_config(campaign_id):
         if validation_errors:
             for err in validation_errors:
                 flash(err, 'error')
-            return redirect(url_for('campaigns.classic_survey_config', campaign_id=campaign_id))
+            return redirect(url_for('campaigns.classic_survey_config', campaign_uuid=campaign.uuid))
         
         classic_config.feature_count = len(features)
         classic_config.driver_labels = driver_labels
@@ -1997,7 +2035,7 @@ def save_classic_survey_config(campaign_id):
 
         try:
             from data_storage import bust_dashboard_cache
-            bust_dashboard_cache(campaign_id, current_account.id)
+            bust_dashboard_cache(campaign.id, current_account.id)
         except Exception:
             pass
 
@@ -2018,22 +2056,24 @@ def save_classic_survey_config(campaign_id):
         except Exception as audit_error:
             logger.error(f"Failed to audit classic survey config update: {audit_error}")
         
-        logger.info(f"Classic survey config updated for campaign '{campaign.name}' (ID: {campaign_id}) by business account {current_account.id}")
+        logger.info(f"Classic survey config updated for campaign '{campaign.name}' (ID: {campaign.id}) by business account {current_account.id}")
         flash(_('Classic survey configuration saved successfully!'), 'success')
         
-        return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        return redirect(url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid))
         
+    except HTTPException:
+        raise
     except Exception as e:
-        logger.error(f"Error saving classic survey config for campaign {campaign_id}: {e}")
+        logger.error(f"Error saving classic survey config: {e}")
         db.session.rollback()
         flash(_('Failed to save configuration. Please try again.'), 'error')
-        return redirect(url_for('campaigns.classic_survey_config', campaign_id=campaign_id))
+        return redirect(url_for('campaigns.list_campaigns'))
 
 
-@campaign_bp.route('/<int:campaign_id>/email-preview')
+@campaign_bp.route('/<campaign_uuid>/email-preview')
 @require_business_auth
 @require_permission('manage_participants')
-def email_preview(campaign_id):
+def email_preview(campaign_uuid):
     """Preview campaign email without sending"""
     try:
         current_account = get_current_business_account()
@@ -2042,9 +2082,9 @@ def email_preview(campaign_id):
         
         # Get campaign (scoped to current business account)
         campaign = Campaign.query.filter_by(
-            id=campaign_id,
+            uuid=campaign_uuid,
             business_account_id=current_account.id
-        ).first()
+        ).first_or_404()
         
         if not campaign:
             return jsonify({'error': 'Campaign not found'}), 404
@@ -2067,15 +2107,17 @@ def email_preview(campaign_id):
         # Return HTML preview
         return result['html_body'], 200, {'Content-Type': 'text/html; charset=utf-8'}
         
+    except HTTPException:
+        raise
     except Exception as e:
-        logger.error(f"Error generating email preview for campaign {campaign_id}: {e}")
+        logger.error(f"Error generating email preview: {e}")
         return jsonify({'error': 'Failed to generate email preview'}), 500
 
 
-@campaign_bp.route('/<int:campaign_id>/responses')
+@campaign_bp.route('/<campaign_uuid>/responses')
 @require_business_auth
 # @require_permission('manage_participants')  # Temporarily disabled for testing
-def campaign_responses(campaign_id):
+def campaign_responses(campaign_uuid):
     """List all participant responses within a specific campaign"""
     try:
         current_account = get_current_business_account()
@@ -2087,9 +2129,9 @@ def campaign_responses(campaign_id):
         
         # Get campaign (scoped to current business account)
         campaign = Campaign.query.filter_by(
-            id=campaign_id,
+            uuid=campaign_uuid,
             business_account_id=current_account.id
-        ).first()
+        ).first_or_404()
         
         if not campaign:
             if request.is_json:
@@ -2111,7 +2153,7 @@ def campaign_responses(campaign_id):
         ).join(
             Participant, CampaignParticipant.participant_id == Participant.id
         ).filter(
-            SurveyResponse.campaign_id == campaign_id,
+            SurveyResponse.campaign_id == campaign.id,
             CampaignParticipant.business_account_id == current_account.id
         )
         
@@ -2179,18 +2221,20 @@ def campaign_responses(campaign_id):
                              business_account=current_account.to_dict(),
                              is_classic=is_classic)
         
+    except HTTPException:
+        raise
     except Exception as e:
-        logger.error(f"Error loading campaign responses for campaign {campaign_id}: {e}")
+        logger.error(f"Error loading campaign responses: {e}")
         if request.is_json:
             return jsonify({'error': 'Failed to load campaign responses'}), 500
         flash(_('Error loading campaign responses.'), 'error')
-        return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        return redirect(url_for('campaigns.list_campaigns'))
 
 
-@campaign_bp.route('/<int:campaign_id>/responses/<int:participant_id>')
+@campaign_bp.route('/<campaign_uuid>/responses/<int:participant_id>')
 @require_business_auth
 @require_permission('manage_participants')
-def individual_response(campaign_id, participant_id):
+def individual_response(campaign_uuid, participant_id):
     """View individual participant response with full conversational transcript"""
     try:
         current_account = get_current_business_account()
@@ -2202,9 +2246,9 @@ def individual_response(campaign_id, participant_id):
         
         # Get campaign (scoped to current business account)
         campaign = Campaign.query.filter_by(
-            id=campaign_id,
+            uuid=campaign_uuid,
             business_account_id=current_account.id
-        ).first()
+        ).first_or_404()
         
         if not campaign:
             if request.is_json:
@@ -2218,7 +2262,7 @@ def individual_response(campaign_id, participant_id):
         ).join(
             Participant, CampaignParticipant.participant_id == Participant.id
         ).filter(
-            SurveyResponse.campaign_id == campaign_id,
+            SurveyResponse.campaign_id == campaign.id,
             CampaignParticipant.participant_id == participant_id,
             CampaignParticipant.business_account_id == current_account.id
         ).first()
@@ -2227,12 +2271,12 @@ def individual_response(campaign_id, participant_id):
             if request.is_json:
                 return jsonify({'error': 'Survey response not found for this participant'}), 404
             flash(_('Survey response not found for this participant.'), 'error')
-            return redirect(url_for('campaigns.campaign_responses', campaign_id=campaign_id))
+            return redirect(url_for('campaigns.campaign_responses', campaign_uuid=campaign.uuid))
         
         # Get participant through the campaign_participants relationship  
         campaign_participant = CampaignParticipant.query.filter_by(
             participant_id=participant_id,
-            campaign_id=campaign_id,
+            campaign_id=campaign.id,
             business_account_id=current_account.id
         ).first()
         
@@ -2240,7 +2284,7 @@ def individual_response(campaign_id, participant_id):
             if request.is_json:
                 return jsonify({'error': 'Participant not found in this campaign'}), 404
             flash(_('Participant not found in this campaign.'), 'error')
-            return redirect(url_for('campaigns.campaign_responses', campaign_id=campaign_id))
+            return redirect(url_for('campaigns.campaign_responses', campaign_uuid=campaign.uuid))
         
         participant = campaign_participant.participant
         
@@ -2270,7 +2314,7 @@ def individual_response(campaign_id, participant_id):
                 except (json_mod.JSONDecodeError, TypeError):
                     feature_evaluations = []
             
-            classic_config = ClassicSurveyConfig.query.filter_by(campaign_id=campaign_id).first()
+            classic_config = ClassicSurveyConfig.query.filter_by(campaign_id=campaign.id).first()
             if classic_config and survey_response.loyalty_drivers:
                 normalized_drivers = _normalize_driver_labels(classic_config.driver_labels)
                 driver_key_map = {d['key']: d for d in normalized_drivers}
@@ -2329,18 +2373,20 @@ def individual_response(campaign_id, participant_id):
                              feature_evaluations=feature_evaluations,
                              loyalty_driver_labels=loyalty_driver_labels)
         
+    except HTTPException:
+        raise
     except Exception as e:
-        logger.error(f"Error loading individual response for participant {participant_id} in campaign {campaign_id}: {e}")
+        logger.error(f"Error loading individual response for participant {participant_id}: {e}")
         if request.is_json:
             return jsonify({'error': 'Failed to load individual response'}), 500
         flash(_('Error loading individual response.'), 'error')
-        return redirect(url_for('campaigns.campaign_responses', campaign_id=campaign_id))
+        return redirect(url_for('campaigns.list_campaigns'))
 
 
-@campaign_bp.route('/api/campaigns/<int:campaign_id>/export', methods=['POST'])
+@campaign_bp.route('/api/campaigns/<campaign_uuid>/export', methods=['POST'])
 @require_business_auth
 @require_permission('export_data')
-def export_campaign_async(campaign_id):
+def export_campaign_async(campaign_uuid):
     """Queue async campaign export job (unified pattern with bulk operations)"""
     try:
         from models import BulkOperationJob
@@ -2353,12 +2399,12 @@ def export_campaign_async(campaign_id):
         
         # CRITICAL: Verify campaign ownership BEFORE queueing job (tenant isolation)
         campaign = Campaign.query.filter_by(
-            id=campaign_id,
+            uuid=campaign_uuid,
             business_account_id=current_account.id
         ).first()
         
         if not campaign:
-            logger.warning(f"Export attempt denied: Campaign {campaign_id} not found for account {current_account.id}")
+            logger.warning(f"Export attempt denied: Campaign {campaign_uuid} not found for account {current_account.id}")
             return jsonify({'error': 'Campaign not found'}), 404
         
         # Create BulkOperationJob for export (set fields after instantiation)
@@ -2368,7 +2414,7 @@ def export_campaign_async(campaign_id):
         job.user_id = session.get('business_user_id')
         job.operation_type = 'export_campaign'
         job.operation_data = json.dumps({
-            'campaign_id': campaign_id,
+            'campaign_id': campaign.id,
             'campaign_name': campaign.name
         })
         job.status = 'pending'
@@ -2380,13 +2426,13 @@ def export_campaign_async(campaign_id):
         # Queue export task
         task_data = {
             'job_id': job.job_id,
-            'campaign_id': campaign_id,
+            'campaign_id': campaign.id,
             'business_account_id': current_account.id,
             'user_id': session.get('business_user_id')
         }
         task_queue.add_task('export_campaign', priority=1, task_data=task_data)
         
-        logger.info(f"Queued async campaign export for campaign {campaign_id} (job_id: {job.job_id}) - Owner: {current_account.id}")
+        logger.info(f"Queued async campaign export for campaign {campaign.id} (job_id: {job.job_id}) - Owner: {current_account.id}")
         
         return jsonify({
             'job_id': job.job_id,
@@ -2394,16 +2440,18 @@ def export_campaign_async(campaign_id):
             'message': 'Export job queued successfully'
         }), 202
         
+    except HTTPException:
+        raise
     except Exception as e:
-        logger.error(f"Error queuing campaign export for {campaign_id}: {e}")
+        logger.error(f"Error queuing campaign export: {e}")
         db.session.rollback()
         return jsonify({'error': 'Failed to queue export job'}), 500
 
 
-@campaign_bp.route('/api/campaigns/<int:campaign_id>/export/download/<job_id>', methods=['GET'])
+@campaign_bp.route('/api/campaigns/<campaign_uuid>/export/download/<job_id>', methods=['GET'])
 @require_business_auth
 @require_permission('export_data')
-def download_campaign_export(campaign_id, job_id):
+def download_campaign_export(campaign_uuid, job_id):
     """Download completed campaign export file with strict path validation"""
     try:
         from models import BulkOperationJob
@@ -2459,15 +2507,15 @@ def download_campaign_export(campaign_id, job_id):
         
         # Verify campaign access (double-check ownership)
         campaign = Campaign.query.filter_by(
-            id=campaign_id,
+            uuid=campaign_uuid,
             business_account_id=current_account.id
         ).first()
         
         if not campaign:
-            logger.warning(f"Export download denied: Campaign {campaign_id} not found for account {current_account.id}")
+            logger.warning(f"Export download denied: Campaign {campaign_uuid} not found for account {current_account.id}")
             return jsonify({'error': 'Campaign not found'}), 404
         
-        logger.info(f"Export download authorized: job={job_id}, campaign={campaign_id}, account={current_account.id}, file={requested_file}")
+        logger.info(f"Export download authorized: job={job_id}, campaign={campaign.id}, account={current_account.id}, file={requested_file}")
         
         return send_file(
             requested_file,
@@ -2476,22 +2524,24 @@ def download_campaign_export(campaign_id, job_id):
             download_name=f"{campaign.name}_export.json"
         )
         
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error downloading campaign export {job_id}: {e}")
         return jsonify({'error': 'Failed to download export'}), 500
 
 
-@campaign_bp.route('/api/campaigns/<int:campaign_id>/export/legacy', methods=['GET'])
+@campaign_bp.route('/api/campaigns/<campaign_uuid>/export/legacy', methods=['GET'])
 @require_business_auth
 @require_permission('export_data')
-def export_campaign_responses_legacy(campaign_id):
+def export_campaign_responses_legacy(campaign_uuid):
     """
     DEPRECATED: Legacy synchronous export endpoint.
-    Use POST /api/campaigns/<id>/export for async exports with progress tracking.
+    Use POST /api/campaigns/<uuid>/export for async exports with progress tracking.
     This endpoint is kept for backwards compatibility only.
     """
     try:
-        logger.warning(f"DEPRECATED: Legacy synchronous export endpoint used for campaign {campaign_id}. Migrate to async export.")
+        logger.warning(f"DEPRECATED: Legacy synchronous export endpoint used for campaign {campaign_uuid}. Migrate to async export.")
         
         current_account = get_current_business_account()
         if not current_account:
@@ -2499,21 +2549,21 @@ def export_campaign_responses_legacy(campaign_id):
         
         # Get campaign and verify access
         campaign = Campaign.query.filter_by(
-            id=campaign_id,
+            uuid=campaign_uuid,
             business_account_id=current_account.id
         ).first()
         
         if not campaign:
             return jsonify({'error': 'Campaign not found'}), 404
         
-        logger.info(f"Campaign export initiated for campaign {campaign_id} ({campaign.name}) by business account {current_account.id}")
+        logger.info(f"Campaign export initiated for campaign {campaign.id} ({campaign.name}) by business account {current_account.id}")
         
         # Query responses for this specific campaign
         responses = SurveyResponse.query.filter_by(
-            campaign_id=campaign_id
+            campaign_id=campaign.id
         ).all()
         
-        logger.info(f"Export query returned {len(responses)} responses for campaign {campaign_id}")
+        logger.info(f"Export query returned {len(responses)} responses for campaign {campaign.id}")
         
         # Convert responses to dictionaries
         data = []
@@ -2524,7 +2574,7 @@ def export_campaign_responses_legacy(campaign_id):
         
         export_info = {
             'total_responses': len(responses),
-            'campaign_id': campaign_id,
+            'campaign_id': campaign.id,
             'campaign_name': campaign.name,
             'business_account': current_account.name,
             'exported_at': datetime.utcnow().isoformat(),
@@ -2536,14 +2586,16 @@ def export_campaign_responses_legacy(campaign_id):
             'export_info': export_info
         })
         
+    except HTTPException:
+        raise
     except Exception as e:
-        logger.error(f"Error exporting campaign {campaign_id}: {e}")
+        logger.error(f"Error exporting campaign: {e}")
         return jsonify({'error': 'Failed to export campaign data'}), 500
 
 
-@campaign_bp.route('/<int:campaign_id>/simulate')
+@campaign_bp.route('/<campaign_uuid>/simulate')
 @require_business_auth
-def simulate_campaign(campaign_id):
+def simulate_campaign(campaign_uuid):
     """
     Simulation entry route: run a full VOÏA conversation against real campaign settings
     without writing any data to survey_responses. Bypasses campaign status check so
@@ -2561,7 +2613,7 @@ def simulate_campaign(campaign_id):
             return redirect(url_for('business_auth.login'))
 
         campaign = Campaign.query.filter_by(
-            id=campaign_id,
+            uuid=campaign_uuid,
             business_account_id=current_account.id
         ).first()
 
@@ -2580,7 +2632,7 @@ def simulate_campaign(campaign_id):
         session['is_simulation'] = True
         session['auth_token'] = synthetic_token
         session['auth_email'] = synthetic_email
-        session['campaign_id'] = campaign_id
+        session['campaign_id'] = campaign.id
         session['business_account_id'] = current_account.id
         session['language'] = language_code
         session['participant_name'] = f'Simulation ({role_label})'
@@ -2588,7 +2640,7 @@ def simulate_campaign(campaign_id):
         session['participant_company'] = current_account.name
         session['participant_id'] = None
         session['association_id'] = None
-        session['simulation_campaign_id'] = campaign_id
+        session['simulation_campaign_id'] = campaign.id
         session['participant_data'] = {
             'participant_name': f'Simulation ({role_label})',
             'participant_company': current_account.name,
@@ -2607,7 +2659,7 @@ def simulate_campaign(campaign_id):
         campaign_description = campaign.description
 
         logger.info(
-            f"Simulation started: campaign={campaign_id}, role={role}, "
+            f"Simulation started: campaign={campaign.id}, role={role}, "
             f"lang={language_code}, account={current_account.id}"
         )
 
@@ -2627,17 +2679,19 @@ def simulate_campaign(campaign_id):
             branding_context=branding_context,
             is_business_authenticated=True,
             is_simulation=True,
-            simulation_campaign_id=campaign_id,
+            simulation_campaign_id=campaign.id,
             simulation_role=role,
             simulation_role_label=role_label,
             simulation_language=language_code,
             campaign=campaign
         )
 
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Simulation route error: {e}")
         flash('Failed to start simulation.', 'error')
-        return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        return redirect(url_for('campaigns.list_campaigns'))
 
 
 @campaign_bp.route('/api/timeline-data')
@@ -2712,6 +2766,8 @@ def get_timeline_data():
             'campaigns': timeline_data
         })
         
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error getting timeline data: {e}")
         return jsonify({'error': 'Failed to load timeline data'}), 500

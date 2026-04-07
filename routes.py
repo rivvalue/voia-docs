@@ -2169,9 +2169,9 @@ def queue_status():
         return jsonify({'error': 'Failed to get queue status'}), 500
 
 # Campaign Export API Routes
-@app.route('/api/campaigns/<int:campaign_id>/export', methods=['POST'])
+@app.route('/api/campaigns/<campaign_uuid>/export', methods=['POST'])
 @require_business_auth
-def start_campaign_export(campaign_id):
+def start_campaign_export(campaign_uuid):
     """Start asynchronous export for a campaign - Business users can export their own campaign data"""
     try:
         # Get current business account
@@ -2181,7 +2181,7 @@ def start_campaign_export(campaign_id):
         
         # Verify campaign belongs to this business account
         campaign = Campaign.query.filter_by(
-            id=campaign_id,
+            uuid=campaign_uuid,
             business_account_id=current_account.id
         ).first()
         
@@ -2189,9 +2189,9 @@ def start_campaign_export(campaign_id):
             return jsonify({'error': 'Campaign not found'}), 404
         
         # Queue export task
-        job_id = add_export_task(campaign_id, current_account.id)
+        job_id = add_export_task(campaign.id, current_account.id)
         
-        logger.info(f"Export started for campaign {campaign_id} by business account {current_account.id} (job_id: {job_id})")
+        logger.info(f"Export started for campaign {campaign.id} by business account {current_account.id} (job_id: {job_id})")
         
         # Add audit log for export initiation
         try:
@@ -2200,7 +2200,7 @@ def start_campaign_export(campaign_id):
                 business_account_id=current_account.id,
                 action_type='campaign_export_started',
                 resource_type='campaign',
-                resource_id=campaign_id,
+                resource_id=campaign.id,
                 resource_name=campaign.name,
                 details={
                     'job_id': job_id,
@@ -4296,7 +4296,7 @@ def get_company_responses(campaign_uuid, company_name):
         
         # Build base query for responses
         query = SurveyResponse.query.filter_by(
-            campaign_id=campaign_id,
+            campaign_id=campaign.id,
             company_name=company_name
         )
         

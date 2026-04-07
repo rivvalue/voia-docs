@@ -9,7 +9,7 @@
 {# Breadcrumb Navigation #}
 {% set breadcrumb_items = [
     {'label': _('Campaigns'), 'url': url_for('campaigns.list_campaigns')},
-    {'label': campaign.name, 'url': url_for('campaigns.view_campaign', campaign_id=campaign.id)},
+    {'label': campaign.name, 'url': url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid)},
     {'label': _('Classic Survey Configuration'), 'current': true}
 ] %}
 {% include 'components/breadcrumb.html' %}
@@ -261,7 +261,7 @@
         </div>
         {% endif %}
 
-        <form method="POST" action="{{ url_for('campaigns.save_classic_survey_config', campaign_id=campaign.id) }}" id="classicSurveyForm">
+        <form method="POST" action="{{ url_for('campaigns.save_classic_survey_config', campaign_uuid=campaign.uuid) }}" id="classicSurveyForm">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
             <div class="form-section">
@@ -396,11 +396,11 @@
                     <button type="submit" class="btn btn-primary" {% if is_frozen %}disabled{% endif %}>
                         <i class="fas fa-save me-1"></i>{{ _('Save Configuration') }}
                     </button>
-                    <a href="{{ url_for('campaigns.preview_classic_survey', campaign_id=campaign.id) }}"
+                    <a href="{{ url_for('campaigns.preview_classic_survey', campaign_uuid=campaign.uuid) }}"
                        class="btn btn-outline-secondary" target="_blank">
                         <i class="fas fa-eye me-1"></i>{{ _('Preview Survey') }}
                     </a>
-                    <a href="{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}"
+                    <a href="{{ url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid) }}"
                        class="btn btn-outline-secondary">
                         <i class="fas fa-arrow-left me-1"></i>{{ _('Cancel') }}
                     </a>

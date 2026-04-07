@@ -8,7 +8,7 @@
 {# Breadcrumb Navigation #}
 {% set breadcrumb_items = [
     {'label': 'Campaigns', 'url': url_for('campaigns.list_campaigns')},
-    {'label': campaign.name, 'url': url_for('campaigns.view_campaign', campaign_id=campaign.id)},
+    {'label': campaign.name, 'url': url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid)},
     {'label': 'Responses', 'current': true}
 ] %}
 {% include 'components/breadcrumb.html' %}
@@ -116,10 +116,10 @@
                     <p class="mb-0 opacity-75">{{ _('Review and analyze individual participant responses') }}</p>
                 </div>
                 <div class="col-md-4 text-end">
-                    <button onclick="exportCampaignResponses({{ campaign.id }})" class="btn btn-light me-2" title="{{ _('Export campaign responses') }}">
+                    <button onclick="exportCampaignResponses('{{ campaign.uuid }}')" class="btn btn-light me-2" title="{{ _('Export campaign responses') }}">
                         <i class="fas fa-download me-2"></i>Export
                     </button>
-                    <a href="{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}" class="btn btn-outline-light">
+                    <a href="{{ url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid) }}" class="btn btn-outline-light">
                         <i class="fas fa-arrow-left me-2"></i>Back to Campaign
                     </a>
                 </div>
@@ -129,7 +129,7 @@
 
     <!-- Search Container -->
     <div class="search-container">
-        <form method="GET" action="{{ url_for('campaigns.campaign_responses', campaign_id=campaign.id) }}" class="row g-3">
+        <form method="GET" action="{{ url_for('campaigns.campaign_responses', campaign_uuid=campaign.uuid) }}" class="row g-3">
             <div class="col-md-8">
                 <div class="input-group">
                     <span class="input-group-text">
@@ -149,7 +149,7 @@
                         <i class="fas fa-search me-2"></i>Search
                     </button>
                     {% if search_query %}
-                    <a href="{{ url_for('campaigns.campaign_responses', campaign_id=campaign.id) }}" class="btn btn-outline-secondary">
+                    <a href="{{ url_for('campaigns.campaign_responses', campaign_uuid=campaign.uuid) }}" class="btn btn-outline-secondary">
                         <i class="fas fa-times me-2"></i>Clear
                     </a>
                     {% endif %}
@@ -238,7 +238,7 @@
                         <td class="text-end">
                             {% if response.participant_id %}
                             <a href="{{ url_for('campaigns.individual_response', 
-                                              campaign_id=campaign.id, 
+                                              campaign_uuid=campaign.uuid, 
                                               participant_id=response.participant_id) }}{% if search_query %}?search={{ search_query }}{% endif %}" 
                                class="btn btn-sm btn-outline-danger">
                                 <i class="fas fa-eye me-1"></i>{{ _('View Details') }}
@@ -262,7 +262,7 @@
                 {% endif %}
             </p>
             {% if search_query %}
-            <a href="{{ url_for('campaigns.campaign_responses', campaign_id=campaign.id) }}" class="btn btn-outline-danger">
+            <a href="{{ url_for('campaigns.campaign_responses', campaign_uuid=campaign.uuid) }}" class="btn btn-outline-danger">
                 <i class="fas fa-times me-2"></i>Clear Search
             </a>
             {% endif %}
@@ -278,7 +278,7 @@
                 <!-- Previous Page -->
                 <li class="page-item {{ 'disabled' if not pagination.has_prev else '' }}">
                     {% if pagination.has_prev %}
-                    <a class="page-link" href="{{ url_for('campaigns.campaign_responses', campaign_id=campaign.id, page=pagination.prev_num, search=search_query) }}">
+                    <a class="page-link" href="{{ url_for('campaigns.campaign_responses', campaign_uuid=campaign.uuid, page=pagination.prev_num, search=search_query) }}">
                         <i class="fas fa-chevron-left"></i>
                     </a>
                     {% else %}
@@ -291,7 +291,7 @@
                     {% if page_num %}
                         {% if page_num != pagination.page %}
                         <li class="page-item">
-                            <a class="page-link" href="{{ url_for('campaigns.campaign_responses', campaign_id=campaign.id, page=page_num, search=search_query) }}">
+                            <a class="page-link" href="{{ url_for('campaigns.campaign_responses', campaign_uuid=campaign.uuid, page=page_num, search=search_query) }}">
                                 {{ page_num }}
                             </a>
                         </li>
@@ -310,7 +310,7 @@
                 <!-- Next Page -->
                 <li class="page-item {{ 'disabled' if not pagination.has_next else '' }}">
                     {% if pagination.has_next %}
-                    <a class="page-link" href="{{ url_for('campaigns.campaign_responses', campaign_id=campaign.id, page=pagination.next_num, search=search_query) }}">
+                    <a class="page-link" href="{{ url_for('campaigns.campaign_responses', campaign_uuid=campaign.uuid, page=pagination.next_num, search=search_query) }}">
                         <i class="fas fa-chevron-right"></i>
                     </a>
                     {% else %}
@@ -333,12 +333,16 @@ document.querySelector('input[name="search"]').addEventListener('keypress', func
 });
 
 // {{ _('Export campaign responses') }}
-function exportCampaignResponses(campaignId) {
-    console.log('Exporting campaign responses for campaign:', campaignId);
+function exportCampaignResponses(campaignUuid) {
+    console.log('Exporting campaign responses for campaign:', campaignUuid);
     
-    fetch(`/business/campaigns/api/campaigns/${campaignId}/export`, {
-        method: 'GET',
-        credentials: 'include'
+    fetch(`/business/campaigns/api/campaigns/${campaignUuid}/export`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('meta[name="csrf-token"]') ? document.querySelector('meta[name="csrf-token"]').content : ''
+        }
     })
     .then(response => {
         if (response.status === 403 || response.status === 401) {

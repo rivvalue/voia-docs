@@ -8,8 +8,8 @@
 {# Breadcrumb Navigation #}
 {% set breadcrumb_items = [
     {'label': 'Campaigns', 'url': url_for('campaigns.list_campaigns')},
-    {'label': campaign.name, 'url': url_for('campaigns.view_campaign', campaign_id=campaign.id)},
-    {'label': 'Responses', 'url': url_for('campaigns.campaign_responses', campaign_id=campaign.id)},
+    {'label': campaign.name, 'url': url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid)},
+    {'label': 'Responses', 'url': url_for('campaigns.campaign_responses', campaign_uuid=campaign.uuid)},
     {'label': participant.name, 'current': true}
 ] %}
 {% include 'components/breadcrumb.html' %}
@@ -333,7 +333,7 @@
                     <p class="mb-0 opacity-75">{{ participant.email or 'No email' }} | {{ campaign.name }}</p>
                 </div>
                 <div class="col-md-4 text-end">
-                    <a href="{{ url_for('campaigns.campaign_responses', campaign_id=campaign.id) }}{% if search_query %}?search={{ search_query }}{% endif %}" class="btn btn-outline-light">
+                    <a href="{{ url_for('campaigns.campaign_responses', campaign_uuid=campaign.uuid) }}{% if search_query %}?search={{ search_query }}{% endif %}" class="btn btn-outline-light">
                         <i class="fas fa-arrow-left me-2"></i>Back to Responses
                     </a>
                 </div>
@@ -349,7 +349,7 @@
                 <i class="fas fa-search text-muted me-2"></i>
                 <span class="text-muted">{{ _('Search results highlighted for:') }} <strong>"{{ search_query }}"</strong></span>
             </div>
-            <a href="{{ url_for('campaigns.individual_response', campaign_id=campaign.id, participant_id=participant.id) }}" class="btn btn-sm btn-outline-secondary">
+            <a href="{{ url_for('campaigns.individual_response', campaign_uuid=campaign.uuid, participant_id=participant.id) }}" class="btn btn-sm btn-outline-secondary">
                 <i class="fas fa-times me-1"></i>Clear Search
             </a>
         </div>

@@ -35,7 +35,7 @@ window.CampaignFormI18n = {
 {# Breadcrumb Navigation #}
 {% set breadcrumb_items = [
     {'label': 'Campaigns', 'url': url_for('campaigns.list_campaigns')},
-    {'label': campaign.name, 'url': url_for('campaigns.view_campaign', campaign_id=campaign.id)},
+    {'label': campaign.name, 'url': url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid)},
     {'label': 'Edit', 'current': true}
 ] %}
 {% include 'components/breadcrumb.html' %}
@@ -328,13 +328,13 @@ Thank you for your time and valuable insights!">{{ campaign.custom_closing_messa
                 </p>
                 
                 <div class="d-flex gap-2 flex-wrap">
-                    <button type="button" class="btn btn-outline-primary" onclick="previewEmail('invitation', {{ campaign.id }})">
+                    <button type="button" class="btn btn-outline-primary" onclick="previewEmail('invitation', '{{ campaign.uuid }}')">
                         <i class="fas fa-envelope me-2"></i>{{ _('Preview Invitation') }}
                     </button>
-                    <button type="button" class="btn btn-outline-danger" onclick="previewEmail('reminder_primary', {{ campaign.id }})">
+                    <button type="button" class="btn btn-outline-danger" onclick="previewEmail('reminder_primary', '{{ campaign.uuid }}')">
                         <i class="fas fa-bell me-2"></i>{{ _('Preview Last Chance Reminder') }}
                     </button>
-                    <button type="button" class="btn btn-outline-warning" onclick="previewEmail('reminder_midpoint', {{ campaign.id }})">
+                    <button type="button" class="btn btn-outline-warning" onclick="previewEmail('reminder_midpoint', '{{ campaign.uuid }}')">
                         <i class="fas fa-clock me-2"></i>{{ _('Preview Midpoint Reminder') }}
                     </button>
                 </div>
@@ -349,7 +349,7 @@ Thank you for your time and valuable insights!">{{ campaign.custom_closing_messa
 
             <!-- Form Actions -->
             <div class="d-flex justify-content-between">
-                <a href="{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}" class="btn btn-outline-secondary">
+                <a href="{{ url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid) }}" class="btn btn-outline-secondary">
                     <i class="fas fa-arrow-left me-2"></i>Cancel
                 </a>
                 <button type="submit" class="btn btn-primary">
@@ -394,9 +394,9 @@ Thank you for your time and valuable insights!">{{ campaign.custom_closing_messa
 <!-- Phase 1: Frontend Refactoring - External JavaScript -->
 <script src="{{ url_for('static', filename='js/forms/campaign-form.js') }}"></script>
 <script>
-// Make previewEmail function available globally with campaign ID
+// Make previewEmail function available globally with campaign UUID
 window.previewEmail = function(emailType) {
-    previewEmail(emailType, {{ campaign.id }});
+    previewEmail(emailType, '{{ campaign.uuid }}');
 };
 </script>
 {% else %}
@@ -553,8 +553,8 @@ updateMidpointReminderDisplay();
 
 // Email Preview Function
 function previewEmail(emailType) {
-    const campaignId = {{ campaign.id }};
-    const previewUrl = `/business/campaigns/${campaignId}/email-preview?email_type=${emailType}`;
+    const campaignUuid = '{{ campaign.uuid }}';
+    const previewUrl = `/business/campaigns/${campaignUuid}/email-preview?email_type=${emailType}`;
     
     // Show modal
     const modal = new bootstrap.Modal(document.getElementById('emailPreviewModal'));

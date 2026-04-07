@@ -35,7 +35,7 @@
     {% macro campaign_actions(campaign, view_type='table') %}
         {% set action_class = 'table-actions' if view_type == 'table' else 'campaign-card-actions' %}
         <div class="{{ action_class }}" {% if view_type == 'card' %}onclick="event.stopPropagation();"{% endif %}>
-            <a href="{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}" 
+            <a href="{{ url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid) }}" 
                class="btn btn-outline-primary btn-sm" title="{{ _('View Details') }}">
                 <i class="fas fa-eye me-1"></i><span class="btn-label">{{ _('View') }}</span>
             </a>
@@ -51,7 +51,7 @@
             </a>
             {% if campaign.status in ['active', 'completed'] %}
             <button type="button" class="btn btn-outline-info btn-sm" 
-                    onclick="startCampaignExport({{ campaign.id }}, '{{ campaign.name|e }}')"
+                    onclick="startCampaignExport('{{ campaign.uuid }}', '{{ campaign.name|e }}')"
                     title="{{ _('Export Data') }}">
                 <i class="fas fa-download me-1"></i><span class="btn-label">{{ _('Export') }}</span>
             </button>
@@ -77,7 +77,7 @@
 
     {# Campaign Card for Grid View #}
     {% macro campaign_card(campaign) %}
-    <div class="campaign-card" onclick="location.href='{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}'">
+    <div class="campaign-card" onclick="location.href='{{ url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid) }}'">
         <div class="campaign-card-header">
             <div class="d-flex justify-content-between align-items-start">
                 <h5 class="mb-0 campaign-card-title">{{ campaign.name }}</h5>
@@ -384,7 +384,7 @@
 let currentExportJob = null;
 let exportCheckInterval = null;
 
-function startCampaignExport(campaignId, campaignName) {
+function startCampaignExport(campaignUuid, campaignName) {
     // Show modal and reset state
     const modal = new bootstrap.Modal(document.getElementById('exportProgressModal'));
     document.getElementById('exportCampaignName').textContent = campaignName;
@@ -402,7 +402,7 @@ function startCampaignExport(campaignId, campaignName) {
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
     
     // {{ _('Start') }} export
-    fetch(`/api/campaigns/${campaignId}/export`, {
+    fetch(`/api/campaigns/${campaignUuid}/export`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

@@ -229,10 +229,10 @@ function updateMidpointReminderDisplay() {
  * Email Preview Function
  * Opens a modal with email preview for different email types
  * @param {string} emailType - Type of email to preview (invitation, reminder_primary, reminder_midpoint)
- * @param {number} campaignId - Campaign ID for the preview
+ * @param {string} campaignUuid - Campaign UUID for the preview
  */
-function previewEmail(emailType, campaignId) {
-    const previewUrl = `/business/campaigns/${campaignId}/email-preview?email_type=${emailType}`;
+function previewEmail(emailType, campaignUuid) {
+    const previewUrl = `/business/campaigns/${campaignUuid}/email-preview?email_type=${emailType}`;
     
     const modalElement = document.getElementById('emailPreviewModal');
     const contentDiv = document.getElementById('emailPreviewContent');

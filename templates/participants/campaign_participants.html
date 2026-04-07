@@ -6,7 +6,7 @@
 {# Breadcrumb Navigation #}
 {% set breadcrumb_items = [
     {'label': 'Campaigns', 'url': url_for('campaigns.list_campaigns')},
-    {'label': campaign.name, 'url': url_for('campaigns.view_campaign', campaign_id=campaign.id)},
+    {'label': campaign.name, 'url': url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid)},
     {'label': 'Manage Participants', 'current': true}
 ] %}
 {% include 'components/breadcrumb.html' %}

@@ -10,7 +10,7 @@
 {# Breadcrumb Navigation #}
 {% set breadcrumb_items = [
     {'label': 'Campaigns', 'url': url_for('campaigns.list_campaigns')},
-    {'label': campaign.name, 'url': url_for('campaigns.view_campaign', campaign_id=campaign.id)},
+    {'label': campaign.name, 'url': url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid)},
     {'label': 'Survey Configuration', 'current': true}
 ] %}
 {% include 'components/breadcrumb.html' %}
@@ -392,7 +392,7 @@
         <div class="mb-4"></div>
         {% endif %}
         
-        <form method="POST" action="{{ url_for('campaigns.save_survey_config', campaign_id=campaign.id) }}">
+        <form method="POST" action="{{ url_for('campaigns.save_survey_config', campaign_uuid=campaign.uuid) }}">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="use_business_product_focus" id="use_business_product_focus_hidden" value="{{ 'true' if campaign.get('use_business_product_focus', True) else 'false' }}">
             <input type="hidden" name="use_business_controls" id="use_business_controls_hidden" value="{{ 'true' if campaign.get('use_business_controls', True) else 'false' }}">
@@ -1036,7 +1036,7 @@
 
             <!-- Form Actions -->
             <div class="d-flex justify-content-between">
-                <a href="{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}" class="btn btn-outline-secondary">
+                <a href="{{ url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid) }}" class="btn btn-outline-secondary">
                     <i class="fas fa-arrow-left me-2"></i>Back to Campaign
                 </a>
                 
