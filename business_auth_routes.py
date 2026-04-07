@@ -68,15 +68,18 @@ def get_branding_context(business_account_id=None):
     return branding_context
 
 
-@business_auth_bp.route('/logo/<int:business_account_id>')
-def serve_logo(business_account_id):
+@business_auth_bp.route('/logo/<uuid>')
+def serve_logo(uuid):
     """Serve tenant logo from database. Public endpoint (no auth required for survey pages)."""
-    from models import BrandingConfig
+    from models import BrandingConfig, BusinessAccount
     from flask import make_response, abort
-    from io import BytesIO
+
+    business_account = BusinessAccount.query.filter_by(uuid=uuid).first()
+    if not business_account:
+        abort(404)
 
     branding_config = BrandingConfig.query.filter_by(
-        business_account_id=business_account_id
+        business_account_id=business_account.id
     ).first()
 
     if not branding_config or not branding_config.logo_data:

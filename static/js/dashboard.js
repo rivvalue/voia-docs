@@ -4356,7 +4356,7 @@ function loadSurveyResponses(page = 1, searchQuery = '', npsFilter = '') {
                 
                 const canView = response.can_view !== undefined ? response.can_view : false;
                 const detailsButton = canView ? 
-                    `<a href="/survey-response/${response.id}" class="btn btn-outline-primary btn-sm" title="${translations.viewDetails}">
+                    `<a href="/survey-response/${response.uuid}" class="btn btn-outline-primary btn-sm" title="${translations.viewDetails}">
                         <i class="fas fa-eye"></i>
                     </a>` :
                     `<span class="text-muted" title="${translations.authenticationRequired}">
@@ -5892,7 +5892,7 @@ function renderCompanyResponsesTable(responses) {
         if (canView) {
             // User can view this response
             const link = document.createElement('a');
-            link.href = `/survey-response/${encodeURIComponent(response.id)}`;
+            link.href = `/survey-response/${encodeURIComponent(response.uuid)}`;
             link.className = 'btn btn-sm btn-outline-primary';
             link.title = translations.viewFullResponse || '';
             const icon = document.createElement('i');

@@ -3146,9 +3146,11 @@ class BrandingConfig(db.Model):
         ]
     
     def get_logo_url(self):
-        """Get logo URL path — serves from database via /business/logo/<id> route"""
+        """Get logo URL path — serves from database via /business/logo/<uuid> route"""
         if self.logo_data and self.business_account_id:
-            return f'/business/logo/{self.business_account_id}'
+            business_account = BusinessAccount.query.get(self.business_account_id)
+            if business_account and business_account.uuid:
+                return f'/business/logo/{business_account.uuid}'
         return None
     
     def has_logo(self):
@@ -3296,6 +3298,7 @@ class Notification(db.Model):
     def to_dict(self):
         return {
             'id': self.id,
+            'uuid': self.uuid,
             'business_account_id': self.business_account_id,
             'user_id': self.user_id,
             'message': self.message,

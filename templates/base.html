@@ -698,7 +698,7 @@
                 html += '<div class="notif-time">' + formatTimeAgo(n.created_at) + '</div>';
                 html += '</div>';
                 if (n.unread) {
-                    html += '<button class="btn btn-sm btn-outline-primary notif-mark-btn" onclick="markNotifRead(' + n.id + ', this)" title="{{ _("Mark as read") }}"><i class="fas fa-check"></i></button>';
+                    html += '<button class="btn btn-sm btn-outline-primary notif-mark-btn" data-notif-uuid="' + n.uuid + '" onclick="markNotifRead(this.dataset.notifUuid, this)" title="{{ _("Mark as read") }}"><i class="fas fa-check"></i></button>';
                 }
                 html += '</div>';
             });

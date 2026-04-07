@@ -1685,15 +1685,16 @@ def submit_survey_overwrite():
         logger.error(f"Error submitting survey: {e}")
         return jsonify({'error': 'Failed to submit survey'}), 500
 
-@app.route('/survey-response/<int:response_id>')
-def public_survey_response(response_id):
+@app.route('/survey-response/<uuid>')
+def public_survey_response(uuid):
     """Public route for viewing trial survey response details"""
+    from werkzeug.exceptions import HTTPException
+    from models import SurveyResponse
+
+    # 404 check must happen before the broad try/except so HTTPException propagates
+    response = SurveyResponse.query.filter_by(uuid=uuid).first_or_404()
+
     try:
-        # Import models to avoid circular imports
-        from models import SurveyResponse
-        
-        # Get the survey response by ID
-        response = SurveyResponse.query.get_or_404(response_id)
         
         # Security check: Check if user is authenticated as business user first
         current_business_user = get_current_business_user()
@@ -1701,7 +1702,7 @@ def public_survey_response(response_id):
             # Business user trying to access a business response - verify ownership
             if response.campaign and response.campaign.business_account_id == current_business_user.business_account_id:
                 # Business user owns this campaign - grant access
-                logger.info(f"Business user {current_business_user.email} granted access to response {response_id}")
+                logger.info(f"Business user {current_business_user.email} granted access to response {uuid}")
                 response_data = response.to_dict()
                 
                 # DEBUG: Log what fields are in response_data
@@ -1737,19 +1738,19 @@ def public_survey_response(response_id):
                                      campaign_name=campaign_name)
             else:
                 # Business user doesn't own this campaign
-                logger.warning(f"Business user {current_business_user.email} denied access to response {response_id} - not their campaign")
+                logger.warning(f"Business user {current_business_user.email} denied access to response {uuid} - not their campaign")
                 flash(_('You do not have permission to view this survey response.'), 'error')
                 return redirect(url_for('business_auth.business_analytics'))
         
         # Check if this is a trial response (public access allowed)
         if response.campaign_participant_id is not None:
             # This is a business response and user is not authenticated - redirect to login
-            logger.warning(f"Access denied to business response {response_id} - redirecting to login")
+            logger.warning(f"Access denied to business response {uuid} - redirecting to login")
             flash(_('This survey response requires authentication. Please log in to view it.'), 'info')
             return redirect(url_for('business_auth.login'))
         
         # This is a trial response - allow public access
-        logger.info(f"Public access granted to trial response {response_id}")
+        logger.info(f"Public access granted to trial response {uuid}")
         
         # Convert response to dict for template
         response_data = response.to_dict()
@@ -1785,8 +1786,10 @@ def public_survey_response(response_id):
                              bi_label=bi_label,
                              campaign_name=campaign_name)
     
+    except HTTPException:
+        raise
     except Exception as e:
-        logger.error(f"Error accessing survey response {response_id}: {e}")
+        logger.error(f"Error accessing survey response {uuid}: {e}")
         flash(_('Survey response not found or unavailable.'), 'error')
         return redirect(url_for('dashboard'))
 
@@ -4252,8 +4255,8 @@ def get_campaign_comparison():
         logger.error(f"Error getting campaign comparison: {e}")
         return jsonify({'error': 'Failed to load comparison data'}), 500
 
-@app.route('/api/campaigns/<int:campaign_id>/companies/<company_name>/responses')
-def get_company_responses(campaign_id, company_name):
+@app.route('/api/campaigns/<campaign_uuid>/companies/<company_name>/responses')
+def get_company_responses(campaign_uuid, company_name):
     """Get all responses for a specific company in a campaign with pagination and filtering"""
     try:
         from models import Campaign, SurveyResponse
@@ -4276,18 +4279,20 @@ def get_company_responses(campaign_id, company_name):
         if current_business_user:
             # Business user - verify campaign belongs to their account
             business_account_id = current_business_user.business_account_id
-            campaign = Campaign.query.filter_by(id=campaign_id, business_account_id=business_account_id).first()
+            campaign = Campaign.query.filter_by(uuid=campaign_uuid, business_account_id=business_account_id).first()
         else:
             # Public/participant user - only allow demo account campaigns
             from models import BusinessAccount
             demo_account = BusinessAccount.query.filter_by(name='Archelo Group inc').first()
             if demo_account:
-                campaign = Campaign.query.filter_by(id=campaign_id, business_account_id=demo_account.id).first()
+                campaign = Campaign.query.filter_by(uuid=campaign_uuid, business_account_id=demo_account.id).first()
             else:
                 return jsonify({'error': 'Demo account not available'}), 404
         
         if not campaign:
             return jsonify({'error': 'Campaign not found or not accessible'}), 404
+        
+        campaign_id = campaign.id
         
         # Build base query for responses
         query = SurveyResponse.query.filter_by(
@@ -4345,6 +4350,7 @@ def get_company_responses(campaign_id, company_name):
             
             response_list.append({
                 'id': response.id,
+                'uuid': response.uuid,
                 'respondent_name': response_data['respondent_name'],
                 'nps_score': response.nps_score,
                 'satisfaction_rating': response.satisfaction_rating,
@@ -4468,7 +4474,7 @@ def company_responses_page(company_name):
         return render_template('company_responses.html',
                              company_name=company_name,
                              campaign=campaign,
-                             campaign_id=campaign_id,
+                             campaign_uuid=campaign.uuid,
                              branding_context=branding_context,
                              is_business_authenticated=is_business_authenticated,
                              bi_url=last_bi_page,
@@ -4674,18 +4680,18 @@ def get_notifications():
         return jsonify({'error': 'Failed to get notifications'}), 500
 
 
-@app.route('/api/notifications/<int:notification_id>/read', methods=['POST'])
+@app.route('/api/notifications/<notification_uuid>/read', methods=['POST'])
 @require_business_auth
-def mark_notification_read(notification_id):
+def mark_notification_read(notification_uuid):
     """Mark a notification as read"""
     try:
-        from notification_utils import mark_as_read
+        from notification_utils import mark_notification_as_read_by_uuid
         
         current_account = get_current_business_account()
         if not current_account:
             return jsonify({'error': 'Business account not found'}), 401
         
-        success = mark_as_read(notification_id, current_account.id)
+        success = mark_notification_as_read_by_uuid(notification_uuid, current_account.id)
         
         if success:
             return jsonify({'success': True})
