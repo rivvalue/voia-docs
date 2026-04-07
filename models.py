@@ -1788,6 +1788,7 @@ class Participant(db.Model):
     def to_dict(self):
         return {
             'id': self.id,
+            'uuid': self.uuid,
             'business_account_id': self.business_account_id,
             'email': self.email,
             'name': self.name,

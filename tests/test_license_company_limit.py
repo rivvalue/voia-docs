@@ -564,7 +564,7 @@ class TestCampaignAssignmentSoftWarning:
         with patch('license_service.LicenseService.can_add_participants',
                    return_value=False):
             response = client.post(
-                f'/business/participants/campaigns/{campaign.id}/participants',
+                f'/business/participants/campaigns/{campaign.uuid}/participants',
                 data={'participant_ids': [str(participant.id)]},
                 follow_redirects=True,
             )

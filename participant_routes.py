@@ -524,12 +524,12 @@ def create_participant():
         return redirect(url_for('participants.create_participant'))
 
 
-@participant_bp.route('/<int:participant_id>/edit', methods=['GET', 'POST'])
+@participant_bp.route('/<uuid:participant_uuid>/edit', methods=['GET', 'POST'])
 @require_business_auth
 @require_permission('manage_participants')
-def edit_participant(participant_id):
+def edit_participant(participant_uuid):
     """Edit existing participant with conditional email locking"""
-    
+    participant_uuid = str(participant_uuid)
     try:
         current_account = get_current_business_account()
         if not current_account or not current_account.id:
@@ -538,7 +538,7 @@ def edit_participant(participant_id):
         
         # Get participant (scoped to current business account)
         participant = Participant.query.filter_by(
-            id=participant_id,
+            uuid=participant_uuid,
             business_account_id=current_account.id
         ).first()
         
@@ -578,7 +578,7 @@ def edit_participant(participant_id):
             valid_industries = list(INDUSTRY_TOPIC_HINTS.keys())
             if client_industry not in valid_industries:
                 flash(f'Invalid client industry. Must be one of: {", ".join(valid_industries)}', 'error')
-                return redirect(url_for('participants.edit_participant', participant_id=participant_id))
+                return redirect(url_for('participants.edit_participant', participant_uuid=participant.uuid))
         
         # Parse commercial_value (optional, company-level)
         commercial_value = None
@@ -588,10 +588,10 @@ def edit_participant(participant_id):
                 commercial_value = float(commercial_value_str)
                 if commercial_value < 0:
                     flash('Commercial value must be a positive number.', 'error')
-                    return redirect(url_for('participants.edit_participant', participant_id=participant_id))
+                    return redirect(url_for('participants.edit_participant', participant_uuid=participant.uuid))
             except ValueError:
                 flash('Invalid commercial value. Please enter a valid number.', 'error')
-                return redirect(url_for('participants.edit_participant', participant_id=participant_id))
+                return redirect(url_for('participants.edit_participant', participant_uuid=participant.uuid))
         
         # Parse tenure_years (optional)
         tenure_years = None
@@ -601,20 +601,20 @@ def edit_participant(participant_id):
                 tenure_years = float(tenure_years_str)
                 if tenure_years < 0:
                     flash('Tenure must be a positive number.', 'error')
-                    return redirect(url_for('participants.edit_participant', participant_id=participant_id))
+                    return redirect(url_for('participants.edit_participant', participant_uuid=participant.uuid))
             except ValueError:
                 flash('Invalid tenure value. Please enter a valid number.', 'error')
-                return redirect(url_for('participants.edit_participant', participant_id=participant_id))
+                return redirect(url_for('participants.edit_participant', participant_uuid=participant.uuid))
         
         # Validate required fields
         if not email or not name or not company_name:
             flash('Email, name, and company name are required.', 'error')
-            return redirect(url_for('participants.edit_participant', participant_id=participant_id))
+            return redirect(url_for('participants.edit_participant', participant_uuid=participant.uuid))
         
         # CRITICAL: Block email changes if participant has survey history
         if has_history and email != participant.email:
             flash('Email cannot be changed - this participant has survey history (responses, campaigns, or email deliveries).', 'error')
-            return redirect(url_for('participants.edit_participant', participant_id=participant_id))
+            return redirect(url_for('participants.edit_participant', participant_uuid=participant.uuid))
         
         # If email changed and no survey history, check for duplicates
         if email != participant.email:
@@ -625,7 +625,7 @@ def edit_participant(participant_id):
             
             if existing:
                 flash(f'Participant with email {email} already exists in your account.', 'error')
-                return redirect(url_for('participants.edit_participant', participant_id=participant_id))
+                return redirect(url_for('participants.edit_participant', participant_uuid=participant.uuid))
         
         # Track changes for audit logging
         changes = {}
@@ -933,12 +933,12 @@ def upload_participants():
         return redirect(url_for('participants.upload_participants'))
 
 
-@participant_bp.route('/<int:participant_id>/delete', methods=['POST'])
+@participant_bp.route('/<uuid:participant_uuid>/delete', methods=['POST'])
 @require_business_auth
 @require_permission('manage_participants')
-def delete_participant(participant_id):
+def delete_participant(participant_uuid):
     """Delete participant"""
-    
+    participant_uuid = str(participant_uuid)
     try:
         current_account = get_current_business_account()
         if not current_account or not current_account.id:
@@ -947,7 +947,7 @@ def delete_participant(participant_id):
         
         # Get participant (scoped to current business account)
         participant = Participant.query.filter_by(
-            id=participant_id,
+            uuid=participant_uuid,
             business_account_id=current_account.id
         ).first()
         
@@ -971,7 +971,7 @@ def delete_participant(participant_id):
                 business_account_id=current_account.id,
                 action_type='participant_deleted',
                 resource_type='participant',
-                resource_id=participant_id,
+                resource_id=participant_uuid,
                 resource_name=participant_name,
                 details={
                     'email': participant_email
@@ -981,23 +981,23 @@ def delete_participant(participant_id):
             logger.error(f"Failed to log participant deletion audit: {audit_error}")
         
         account_name = current_account.name if current_account and hasattr(current_account, 'name') else 'Unknown'
-        logger.info(f"Deleted participant {participant_name} (ID: {participant_id}, Business Account: {account_name})")
+        logger.info(f"Deleted participant {participant_name} (UUID: {participant_uuid}, Business Account: {account_name})")
         flash(f'Participant {participant_name} deleted successfully.', 'success')
         
     except Exception as e:
         db.session.rollback()
-        logger.error(f"Error deleting participant {participant_id}: {e}")
+        logger.error(f"Error deleting participant {participant_uuid}: {e}")
         flash('Error deleting participant.', 'error')
     
     return redirect(url_for('participants.list_participants'))
 
 
-@participant_bp.route('/<int:participant_id>/regenerate-token', methods=['POST'])
+@participant_bp.route('/<uuid:participant_uuid>/regenerate-token', methods=['POST'])
 @require_business_auth
 @require_permission('manage_participants')
-def regenerate_token(participant_id):
+def regenerate_token(participant_uuid):
     """Regenerate participant token"""
-    
+    participant_uuid = str(participant_uuid)
     try:
         current_account = get_current_business_account()
         if not current_account or not current_account.id:
@@ -1006,7 +1006,7 @@ def regenerate_token(participant_id):
         
         # Get participant (scoped to current business account)
         participant = Participant.query.filter_by(
-            id=participant_id,
+            uuid=participant_uuid,
             business_account_id=current_account.id
         ).first()
         
@@ -1025,7 +1025,7 @@ def regenerate_token(participant_id):
                 business_account_id=current_account.id,
                 action_type='participant_token_regenerated',
                 resource_type='participant',
-                resource_id=participant_id,
+                resource_id=participant_uuid,
                 resource_name=participant.name,
                 details={
                     'email': participant.email
@@ -1036,12 +1036,12 @@ def regenerate_token(participant_id):
         
         account_name = current_account.name if current_account and hasattr(current_account, 'name') else 'Unknown'
         participant_name = participant.name if participant and hasattr(participant, 'name') else 'Unknown'
-        logger.info(f"Regenerated token for participant {participant_name} (ID: {participant_id}, Business Account: {account_name})")
+        logger.info(f"Regenerated token for participant {participant_name} (UUID: {participant_uuid}, Business Account: {account_name})")
         flash(f'New token generated for {participant_name}.', 'success')
         
     except Exception as e:
         db.session.rollback()
-        logger.error(f"Error regenerating token for participant {participant_id}: {e}")
+        logger.error(f"Error regenerating token for participant {participant_uuid}: {e}")
         flash('Error regenerating token.', 'error')
     
     return redirect(url_for('participants.list_participants'))
@@ -1249,12 +1249,13 @@ def bulk_edit_participants():
 # CAMPAIGN-PARTICIPANT ASSOCIATION MANAGEMENT ROUTES
 # ==============================================================================
 
-@participant_bp.route('/campaigns/<int:campaign_id>/participants', methods=['GET', 'POST'])
+@participant_bp.route('/campaigns/<uuid:campaign_uuid>/participants', methods=['GET', 'POST'])
 @require_business_auth
 @require_permission('manage_participants')
-def manage_campaign_participants(campaign_id: int):
+def manage_campaign_participants(campaign_uuid):
     """Manage participants for a specific campaign"""
-    
+    campaign_uuid = str(campaign_uuid)
+    campaign_id = None
     try:
         current_account = get_current_business_account()
         if not current_account or not current_account.id:
@@ -1263,9 +1264,10 @@ def manage_campaign_participants(campaign_id: int):
         
         # Get campaign (scoped to current business account)
         campaign = Campaign.query.filter_by(
-            id=campaign_id,
+            uuid=campaign_uuid,
             business_account_id=current_account.id
         ).first()
+        campaign_id = campaign.id if campaign else None
         
         if not campaign:
             flash(_('Campaign not found.'), 'error')
@@ -1488,6 +1490,7 @@ def manage_campaign_participants(campaign_id: int):
                 participant_data = cp.participant.to_dict() if cp.participant else {}
                 participant_data.update({
                     'association_id': cp.id,
+                    'association_uuid': cp.uuid,
                     'token': cp.token,  # Use campaign-participant token, not participant token
                     'status': cp.status,
                     'invited_at': cp.invited_at.isoformat() if cp.invited_at else None,
@@ -1519,12 +1522,12 @@ def manage_campaign_participants(campaign_id: int):
             # Validate campaign status - can only add participants if campaign is draft or ready
             if campaign.status not in ['draft', 'ready']:
                 flash(f'Cannot add participants to {campaign.status} campaign. Campaign must be draft or ready.', 'error')
-                return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
+                return redirect(url_for('participants.manage_campaign_participants', campaign_uuid=campaign_uuid))
             
             participant_ids = request.form.getlist('participant_ids')
             if not participant_ids:
                 flash('No participants selected.', 'error')
-                return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
+                return redirect(url_for('participants.manage_campaign_participants', campaign_uuid=campaign_uuid))
             
             # License soft-check: Warn if adding these participants would exceed invitation guideline
             if not LicenseService.can_add_participants(
@@ -1563,7 +1566,7 @@ def manage_campaign_participants(campaign_id: int):
                 if campaign_locked.has_active_bulk_job:
                     db.session.rollback()
                     flash(f'A bulk operation is already in progress for this campaign ({campaign_locked.active_bulk_operation}). Please wait for it to complete.', 'warning')
-                    return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
+                    return redirect(url_for('participants.manage_campaign_participants', campaign_uuid=campaign_uuid))
                 
                 # Create job record
                 job = BulkOperationJob(
@@ -1605,7 +1608,7 @@ def manage_campaign_participants(campaign_id: int):
                 
                 flash(f'Adding {participant_count} participants in the background. You will be notified when complete.', 'info')
                 logger.info(f"Queued bulk participant add job {job.job_id} for campaign {campaign_id} ({participant_count} participants)")
-                return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
+                return redirect(url_for('participants.manage_campaign_participants', campaign_uuid=campaign_uuid))
             
             else:
                 # Process synchronously for small operations (< 100 participants)
@@ -1666,21 +1669,22 @@ def manage_campaign_participants(campaign_id: int):
                 else:
                     flash('No new participants were added.', 'warning')
                 
-                return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
+                return redirect(url_for('participants.manage_campaign_participants', campaign_uuid=campaign_uuid))
             
     except Exception as e:
         db.session.rollback()
         logger.error(f"Error managing campaign participants for campaign {campaign_id}: {e}")
         flash('Error managing campaign participants.', 'error')
-        return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
+        return redirect(url_for('participants.manage_campaign_participants', campaign_uuid=campaign_uuid))
 
 
-@participant_bp.route('/campaigns/<int:campaign_id>/participants/<int:association_id>/remove', methods=['POST'])
+@participant_bp.route('/campaigns/<uuid:campaign_uuid>/participants/<uuid:association_uuid>/remove', methods=['POST'])
 @require_business_auth
 @require_permission('manage_participants')
-def remove_campaign_participant(campaign_id, association_id):
+def remove_campaign_participant(campaign_uuid, association_uuid):
     """Remove participant from campaign"""
-    
+    campaign_uuid = str(campaign_uuid)
+    association_uuid = str(association_uuid)
     try:
         current_account = get_current_business_account()
         if not current_account or not current_account.id:
@@ -1689,7 +1693,7 @@ def remove_campaign_participant(campaign_id, association_id):
         
         # Get campaign (scoped to current business account)
         campaign = Campaign.query.filter_by(
-            id=campaign_id,
+            uuid=campaign_uuid,
             business_account_id=current_account.id
         ).first()
         
@@ -1701,18 +1705,18 @@ def remove_campaign_participant(campaign_id, association_id):
         if campaign.status in ['active', 'completed']:
             status_msg = 'active and collecting responses' if campaign.status == 'active' else 'completed'
             flash(f'Cannot remove participants from {status_msg} campaign. Participants can only be modified when campaign is in draft or ready status.', 'error')
-            return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
+            return redirect(url_for('participants.manage_campaign_participants', campaign_uuid=campaign_uuid))
         
         # Get association (scoped to current business account)
         association = CampaignParticipant.query.filter_by(
-            id=association_id,
-            campaign_id=campaign_id,
+            uuid=association_uuid,
+            campaign_id=campaign.id,
             business_account_id=current_account.id
         ).first()
         
         if not association:
             flash('Participant association not found.', 'error')
-            return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
+            return redirect(url_for('participants.manage_campaign_participants', campaign_uuid=campaign_uuid))
         
         participant_name = association.participant.name if association.participant else 'Unknown'
         participant_email = association.participant.email if association.participant else 'Unknown'
@@ -1725,7 +1729,7 @@ def remove_campaign_participant(campaign_id, association_id):
                 business_account_id=current_account.id,
                 action_type='participants_removed',
                 resource_type='campaign',
-                resource_id=campaign_id,
+                resource_id=campaign_uuid,
                 resource_name=campaign.name,
                 details={
                     'participant_name': participant_name,
@@ -1735,31 +1739,31 @@ def remove_campaign_participant(campaign_id, association_id):
         except Exception as audit_error:
             logger.error(f"Failed to log participant removal from campaign audit: {audit_error}")
         
-        logger.info(f"Removed participant {participant_name} from campaign {campaign.name} (ID: {campaign_id})")
+        logger.info(f"Removed participant {participant_name} from campaign {campaign.name} (UUID: {campaign_uuid})")
         flash(f'Removed {participant_name} from campaign {campaign.name}.', 'success')
         
     except Exception as e:
         db.session.rollback()
-        logger.error(f"Error removing participant from campaign {campaign_id}: {e}")
+        logger.error(f"Error removing participant from campaign {campaign_uuid}: {e}")
         flash('Error removing participant from campaign.', 'error')
     
-    return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
+    return redirect(url_for('participants.manage_campaign_participants', campaign_uuid=campaign_uuid))
 
 
-@participant_bp.route('/campaigns/<int:campaign_id>/participants/bulk-remove', methods=['POST'])
+@participant_bp.route('/campaigns/<uuid:campaign_uuid>/participants/bulk-remove', methods=['POST'])
 @require_business_auth
 @require_permission('manage_participants')
-def bulk_remove_campaign_participants(campaign_id):
+def bulk_remove_campaign_participants(campaign_uuid):
     """
     Bulk remove participants from campaign
     Only allowed for campaigns in draft or ready status
     Uses background jobs for large batches (>100)
     """
-    
+    campaign_uuid = str(campaign_uuid)
     SYNC_BATCH_SIZE = 100
     
     try:
-        logger.info(f"Bulk remove request received for campaign {campaign_id}")
+        logger.info(f"Bulk remove request received for campaign {campaign_uuid}")
         current_account = get_current_business_account()
         if not current_account or not current_account.id:
             logger.error("Bulk remove: Business account context not found")
@@ -1767,6 +1771,15 @@ def bulk_remove_campaign_participants(campaign_id):
                 'success': False,
                 'error': 'Business account context not found'
             }), 401
+        
+        # Resolve campaign UUID to integer PK
+        campaign_obj = Campaign.query.filter_by(
+            uuid=campaign_uuid,
+            business_account_id=current_account.id
+        ).first()
+        if not campaign_obj:
+            return jsonify({'success': False, 'error': 'Campaign not found'}), 404
+        campaign_id = campaign_obj.id
         
         # Parse request data
         data = request.get_json()
@@ -1869,9 +1882,9 @@ def bulk_remove_campaign_participants(campaign_id):
         # Generate unique bulk operation ID for audit trail correlation
         bulk_operation_id = str(uuid.uuid4())
         
-        # Fetch associations (scoped to current business account and campaign)
+        # Fetch associations by UUID (scoped to current business account and campaign)
         associations = CampaignParticipant.query.filter(
-            CampaignParticipant.id.in_(association_ids),
+            CampaignParticipant.uuid.in_(association_ids),
             CampaignParticipant.campaign_id == campaign_id,
             CampaignParticipant.business_account_id == current_account.id
         ).all()
@@ -2004,11 +2017,12 @@ def get_bulk_job_status(job_id):
 # INDIVIDUAL PARTICIPANT INVITATION ROUTES
 # ==============================================================================
 
-@participant_bp.route('/<int:participant_id>/send-invitation', methods=['POST'])
+@participant_bp.route('/<uuid:participant_uuid>/send-invitation', methods=['POST'])
 @require_business_auth
 @require_permission('manage_participants')
-def send_individual_invitation(participant_id):
+def send_individual_invitation(participant_uuid):
     """Send email invitation to individual participant for all their active campaigns"""
+    participant_uuid = str(participant_uuid)
     try:
         current_account = get_current_business_account()
         if not current_account:
@@ -2017,7 +2031,7 @@ def send_individual_invitation(participant_id):
         
         # Get participant (scoped to current business account)
         participant = Participant.query.filter_by(
-            id=participant_id,
+            uuid=participant_uuid,
             business_account_id=current_account.id
         ).first()
         
@@ -2032,7 +2046,7 @@ def send_individual_invitation(participant_id):
         
         # Get active campaigns for this participant
         active_campaign_participants = CampaignParticipant.query.filter_by(
-            participant_id=participant_id,
+            participant_id=participant.id,
             business_account_id=current_account.id
         ).join(Campaign).filter(
             Campaign.status == 'active'  # type: ignore
@@ -2062,7 +2076,7 @@ def send_individual_invitation(participant_id):
                 email_delivery = EmailDelivery()
                 email_delivery.business_account_id = current_account.id
                 email_delivery.campaign_id = cp.campaign_id
-                email_delivery.participant_id = participant_id
+                email_delivery.participant_id = participant.id
                 email_delivery.campaign_participant_id = cp.id
                 email_delivery.email_type = 'participant_invitation'
                 email_delivery.recipient_email = participant.email
@@ -2108,31 +2122,33 @@ def send_individual_invitation(participant_id):
         if sent_count == 0 and failed_count == 0:
             flash(f'All invitations for {participant.name} have already been sent successfully.', 'info')
         
-        logger.info(f"Individual invitations queued for participant {participant.name} (ID: {participant_id}): {sent_count} successful, {failed_count} failed")
+        logger.info(f"Individual invitations queued for participant {participant.name} (UUID: {participant_uuid}): {sent_count} successful, {failed_count} failed")
         
         return redirect(url_for('participants.list_participants'))
         
     except Exception as e:
-        logger.error(f"Error sending individual invitation for participant {participant_id}: {e}")
+        logger.error(f"Error sending individual invitation for participant {participant_uuid}: {e}")
         db.session.rollback()
         flash('Failed to send invitation. Please try again.', 'error')
         return redirect(url_for('participants.list_participants'))
 
 
-@participant_bp.route('/campaigns/<int:campaign_id>/participants/<int:participant_id>/send-invitation', methods=['POST'])
+@participant_bp.route('/campaigns/<uuid:campaign_uuid>/participants/<uuid:participant_uuid>/send-invitation', methods=['POST'])
 @require_business_auth
 @require_permission('manage_participants')
-def send_campaign_participant_invitation(campaign_id, participant_id):
+def send_campaign_participant_invitation(campaign_uuid, participant_uuid):
     """Send email invitation to specific participant for specific campaign"""
+    campaign_uuid = str(campaign_uuid)
+    participant_uuid = str(participant_uuid)
     try:
         current_account = get_current_business_account()
         if not current_account:
             flash(_('Business account context not found.'), 'error')
-            return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
+            return redirect(url_for('participants.manage_campaign_participants', campaign_uuid=campaign_uuid))
         
         # Get campaign (scoped to current business account)
         campaign = Campaign.query.filter_by(
-            id=campaign_id,
+            uuid=campaign_uuid,
             business_account_id=current_account.id
         ).first()
         
@@ -2140,26 +2156,36 @@ def send_campaign_participant_invitation(campaign_id, participant_id):
             flash(_('Campaign not found.'), 'error')
             return redirect(url_for('participants.list_participants'))
         
+        # Get participant (scoped to current business account)
+        participant_obj = Participant.query.filter_by(
+            uuid=participant_uuid,
+            business_account_id=current_account.id
+        ).first()
+        
+        if not participant_obj:
+            flash('Participant not found.', 'error')
+            return redirect(url_for('participants.manage_campaign_participants', campaign_uuid=campaign_uuid))
+        
         # Get campaign-participant association
         cp = CampaignParticipant.query.filter_by(
-            campaign_id=campaign_id,
-            participant_id=participant_id,
+            campaign_id=campaign.id,
+            participant_id=participant_obj.id,
             business_account_id=current_account.id
         ).first()
         
         if not cp or not cp.participant:
             flash('Participant association not found.', 'error')
-            return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
+            return redirect(url_for('participants.manage_campaign_participants', campaign_uuid=campaign_uuid))
         
         # Validate campaign status
         if campaign.status != 'active':
             flash(f'Cannot send invitations for {campaign.status} campaign. Campaign must be active.', 'error')
-            return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
+            return redirect(url_for('participants.manage_campaign_participants', campaign_uuid=campaign_uuid))
         
         # Check if email service is configured for this business account
         if not email_service.is_configured(current_account.id):
             flash(_('The email service is not configured. Please configure your SMTP settings first.'), 'error')
-            return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
+            return redirect(url_for('participants.manage_campaign_participants', campaign_uuid=campaign_uuid))
         
         # Check if there's already a successful delivery
         existing_delivery = EmailDelivery.query.filter_by(
@@ -2170,14 +2196,14 @@ def send_campaign_participant_invitation(campaign_id, participant_id):
         
         if existing_delivery:
             flash(f'Invitation for {cp.participant.name} has already been sent successfully.', 'info')
-            return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
+            return redirect(url_for('participants.manage_campaign_participants', campaign_uuid=campaign_uuid))
         
         try:
             # Create EmailDelivery record for tracking
             email_delivery = EmailDelivery()
             email_delivery.business_account_id = current_account.id
-            email_delivery.campaign_id = campaign_id
-            email_delivery.participant_id = participant_id
+            email_delivery.campaign_id = campaign.id
+            email_delivery.participant_id = participant_obj.id
             email_delivery.campaign_participant_id = cp.id
             email_delivery.email_type = 'participant_invitation'
             email_delivery.recipient_email = cp.participant.email
@@ -2197,7 +2223,7 @@ def send_campaign_participant_invitation(campaign_id, participant_id):
                 'business_account_name': current_account.name,
                 'business_account_id': current_account.id,  # Critical for tenant-specific email config
                 'campaign_id': campaign.id,
-                'participant_id': participant_id,
+                'participant_id': participant_obj.id,
                 'campaign_participant_id': cp.id,
                 'email_delivery_id': email_delivery.id
             }
@@ -2212,26 +2238,27 @@ def send_campaign_participant_invitation(campaign_id, participant_id):
             db.session.commit()
             
             flash(f'Successfully queued invitation for {cp.participant.name}. Email will be sent in the background.', 'success')
-            logger.info(f"Individual campaign invitation queued for participant {cp.participant.name} (ID: {participant_id}) in campaign {campaign.name} (ID: {campaign_id})")
+            logger.info(f"Individual campaign invitation queued for participant {cp.participant.name} (UUID: {participant_uuid}) in campaign {campaign.name} (UUID: {campaign_uuid})")
             
         except Exception as e:
             logger.error(f"Failed to queue invitation for participant {cp.participant.email} in campaign {campaign.name}: {e}")
             flash(f'Failed to queue invitation for {cp.participant.name}. Please try again.', 'error')
         
-        return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
+        return redirect(url_for('participants.manage_campaign_participants', campaign_uuid=campaign_uuid))
         
     except Exception as e:
-        logger.error(f"Error sending campaign participant invitation for participant {participant_id} in campaign {campaign_id}: {e}")
+        logger.error(f"Error sending campaign participant invitation for participant {participant_uuid} in campaign {campaign_uuid}: {e}")
         db.session.rollback()
         flash('Failed to send invitation. Please try again.', 'error')
-        return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
+        return redirect(url_for('participants.manage_campaign_participants', campaign_uuid=campaign_uuid))
 
 
-@participant_bp.route('/<int:participant_id>/invitation-history')
+@participant_bp.route('/<uuid:participant_uuid>/invitation-history')
 @require_business_auth
 @require_permission('manage_participants')
-def participant_invitation_history(participant_id):
+def participant_invitation_history(participant_uuid):
     """Get invitation history for a specific participant"""
+    participant_uuid = str(participant_uuid)
     try:
         current_account = get_current_business_account()
         if not current_account:
@@ -2239,7 +2266,7 @@ def participant_invitation_history(participant_id):
         
         # Get participant (scoped to current business account)
         participant = Participant.query.filter_by(
-            id=participant_id,
+            uuid=participant_uuid,
             business_account_id=current_account.id
         ).first()
         
@@ -2248,7 +2275,7 @@ def participant_invitation_history(participant_id):
         
         # Get all email deliveries for this participant
         email_deliveries = EmailDelivery.query.filter_by(
-            participant_id=participant_id,
+            participant_id=participant.id,
             business_account_id=current_account.id,
             email_type='participant_invitation'
         ).order_by(EmailDelivery.created_at.desc()).all()
@@ -2270,7 +2297,7 @@ def participant_invitation_history(participant_id):
             invitation_history.append(history_item)
         
         return jsonify({
-            'participant_id': participant_id,
+            'participant_uuid': participant.uuid,
             'participant_name': participant.name,
             'participant_email': participant.email,
             'invitation_history': invitation_history,
@@ -2283,5 +2310,5 @@ def participant_invitation_history(participant_id):
         })
         
     except Exception as e:
-        logger.error(f"Error getting invitation history for participant {participant_id}: {e}")
+        logger.error(f"Error getting invitation history for participant {participant_uuid}: {e}")
         return jsonify({'error': 'Failed to get invitation history'}), 500

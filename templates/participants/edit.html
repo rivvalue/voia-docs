@@ -39,7 +39,7 @@
     {% endif %}
 
     <!-- Configuration Form -->
-    <form method="POST" action="{{ url_for('participants.edit_participant', participant_id=participant.id) }}" id="participantEditForm">
+    <form method="POST" action="{{ url_for('participants.edit_participant', participant_uuid=participant.uuid) }}" id="participantEditForm">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         {% if has_survey_history %}
         {# Hidden field to submit email when visible field is disabled #}

@@ -554,7 +554,7 @@
                                     </td>
                                     <td data-label="Actions" class="text-end">
                                         <div class="btn-group btn-group-sm" role="group" aria-label="Participant actions">
-                                            <a href="{{ url_for('participants.edit_participant', participant_id=participant.id) }}" 
+                                            <a href="{{ url_for('participants.edit_participant', participant_uuid=participant.uuid) }}" 
                                                class="btn btn-outline-primary"
                                                title={{ _('Edit participant') }}
                                                aria-label="Edit {{ participant.name }}">
@@ -562,7 +562,7 @@
                                             </a>
                                             <button type="button" 
                                                     class="btn btn-outline-danger delete-participant-btn"
-                                                    data-participant-id="{{ participant.id }}"
+                                                    data-participant-uuid="{{ participant.uuid }}"
                                                     data-participant-name="{{ participant.name }}"
                                                     title={{ _('Delete participant') }}
                                                     aria-label="Delete {{ participant.name }}">
@@ -915,7 +915,7 @@ function updateParticipantTable(participants, pagination) {
                 </td>
                 <td data-label="Actions" class="text-end">
                     <div class="btn-group btn-group-sm" role="group" aria-label="Participant actions">
-                        <a href="/business/participants/${p.id}/edit" 
+                        <a href="/business/participants/${p.uuid}/edit" 
                            class="btn btn-outline-primary"
                            title={{ _('Edit participant') }}
                            aria-label="Edit ${p.name}">
@@ -923,7 +923,7 @@ function updateParticipantTable(participants, pagination) {
                         </a>
                         <button type="button" 
                                 class="btn btn-outline-danger delete-participant-btn"
-                                data-participant-id="${p.id}"
+                                data-participant-uuid="${p.uuid}"
                                 data-participant-name="${p.name}"
                                 title={{ _('Delete participant') }}
                                 aria-label="Delete ${p.name}">
@@ -1020,18 +1020,18 @@ function attachDeleteListeners() {
     deleteButtons.forEach(button => {
         button.addEventListener('click', function(e) {
             e.preventDefault();
-            const participantId = this.getAttribute('data-participant-id');
+            const participantUuid = this.getAttribute('data-participant-uuid');
             const participantNom = this.getAttribute('data-participant-name');
             
-            showDeleteParticipantModal(participantId, participantNom);
+            showDeleteParticipantModal(participantUuid, participantNom);
         });
     });
 }
 
-function confirmDeleteParticipant(participantId) {
+function confirmDeleteParticipant(participantUuid) {
     const form = document.createElement('form');
     form.method = 'POST';
-    form.action = `/business/participants/${participantId}/delete`;
+    form.action = `/business/participants/${participantUuid}/delete`;
     
     const csrfToken = document.querySelector('meta[name="csrf-token"]');
     if (csrfToken) {
@@ -1046,11 +1046,11 @@ function confirmDeleteParticipant(participantId) {
     form.submit();
 }
 
-function showDeleteParticipantModal(participantId, participantName) {
+function showDeleteParticipantModal(participantUuid, participantName) {
     document.getElementById('deleteParticipantName').textContent = participantName;
     document.getElementById('confirmDeleteParticipantBtn').onclick = function() {
         bootstrap.Modal.getInstance(document.getElementById('deleteParticipantModal')).hide();
-        confirmDeleteParticipant(participantId);
+        confirmDeleteParticipant(participantUuid);
     };
     new bootstrap.Modal(document.getElementById('deleteParticipantModal')).show();
 }

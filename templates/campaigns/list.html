@@ -45,7 +45,7 @@
                 <i class="fas fa-chart-bar me-1"></i><span class="btn-label">{{ _('Insights') }}</span>
             </a>
             {% endif %}
-            <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" 
+            <a href="{{ url_for('participants.manage_campaign_participants', campaign_uuid=campaign.uuid) }}" 
                class="btn btn-outline-secondary btn-sm" title="{{ _('Manage Participants') }}">
                 <i class="fas fa-users me-1"></i><span class="btn-label">{{ _('Participants') }}</span>
             </a>

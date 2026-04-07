@@ -85,7 +85,7 @@ class TestParticipantEdit:
         participant = sample_data.create_participant(db_session, account)
         db_session.commit()
         
-        response = client.post(f'/business/participants/{participant.id}/edit', data={
+        response = client.post(f'/business/participants/{participant.uuid}/edit', data={
             'name': 'Updated Name',
             'email': participant.email,
             'company_name': 'Updated Company',
@@ -105,7 +105,7 @@ class TestParticipantEdit:
         other_participant = sample_data.create_participant(db_session, other_account)
         db_session.commit()
         
-        response = client.post(f'/business/participants/{other_participant.id}/edit', data={
+        response = client.post(f'/business/participants/{other_participant.uuid}/edit', data={
             'name': 'Hacked Name'
         })
         
@@ -121,7 +121,7 @@ class TestParticipantDeletion:
         participant = sample_data.create_participant(db_session, account)
         db_session.commit()
         
-        response = client.post(f'/business/participants/{participant.id}/delete')
+        response = client.post(f'/business/participants/{participant.uuid}/delete')
         assert response.status_code in [200, 302]
 
 
@@ -155,7 +155,7 @@ class TestTokenManagement:
         old_token = participant.token
         db_session.commit()
         
-        response = client.post(f'/business/participants/{participant.id}/regenerate-token')
+        response = client.post(f'/business/participants/{participant.uuid}/regenerate-token')
         
         assert response.status_code in [200, 302]
     
@@ -179,6 +179,6 @@ class TestParticipantInvitations:
         participant = sample_data.create_participant(db_session, account)
         db_session.commit()
         
-        response = client.post(f'/business/participants/{participant.id}/send-invitation')
+        response = client.post(f'/business/participants/{participant.uuid}/send-invitation')
         
         assert response.status_code in [200, 302, 400]

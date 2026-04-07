@@ -792,9 +792,9 @@ class TaskQueue:
                 # Process batch
                 for association_id in batch:
                     try:
-                        # Find and delete the association
+                        # Find and delete the association (association_id is a UUID string)
                         association = CampaignParticipant.query.filter_by(
-                            id=association_id,
+                            uuid=association_id,
                             campaign_id=campaign_id,
                             business_account_id=business_account_id
                         ).first()
