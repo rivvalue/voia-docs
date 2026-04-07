@@ -3352,6 +3352,7 @@ def save_platform_email_settings():
         smtp_password = request.form.get('smtp_password', '').strip()
         use_tls = request.form.get('use_tls') == 'on'
         use_ssl = request.form.get('use_ssl') == 'on'
+        ses_rate_limit_per_second = request.form.get('ses_rate_limit_per_second', '14.0')
         
         # Validate required fields
         if not all([aws_region, smtp_server, smtp_username]):
@@ -3365,6 +3366,15 @@ def save_platform_email_settings():
                 raise ValueError("Port must be between 1 and 65535")
         except ValueError:
             flash('Invalid SMTP port. Please enter a number between 1 and 65535.', 'error')
+            return redirect(url_for('business_auth.platform_email_settings'))
+
+        # Validate rate limit
+        try:
+            ses_rate_limit_per_second = float(ses_rate_limit_per_second)
+            if ses_rate_limit_per_second <= 0:
+                raise ValueError("Rate must be greater than 0")
+        except ValueError:
+            flash('Invalid send rate limit. Please enter a positive number.', 'error')
             return redirect(url_for('business_auth.platform_email_settings'))
         
         # Get or create platform email settings (singleton)
@@ -3382,6 +3392,7 @@ def save_platform_email_settings():
         platform_settings.smtp_username = smtp_username
         platform_settings.use_tls = use_tls
         platform_settings.use_ssl = use_ssl
+        platform_settings.ses_rate_limit_per_second = ses_rate_limit_per_second
         platform_settings.configured_by_user_id = current_user.id
         platform_settings.updated_at = datetime.utcnow()
         
@@ -3393,6 +3404,13 @@ def save_platform_email_settings():
         platform_settings.is_verified = False
         
         db.session.commit()
+        
+        # Propagate new rate to the running rate limiter singleton immediately
+        try:
+            from ses_rate_limiter import get_ses_rate_limiter
+            get_ses_rate_limiter().set_rate(ses_rate_limit_per_second)
+        except Exception as _rl_exc:
+            logger.warning(f"Could not update SES rate limiter singleton: {_rl_exc}")
         
         # Queue audit log
         queue_audit_log(
@@ -3407,7 +3425,8 @@ def save_platform_email_settings():
                 'smtp_port': smtp_port,
                 'smtp_username': smtp_username,
                 'use_tls': use_tls,
-                'use_ssl': use_ssl
+                'use_ssl': use_ssl,
+                'ses_rate_limit_per_second': ses_rate_limit_per_second
             }
         )
         

@@ -594,6 +594,15 @@ with app.app_context():
         )
 
     try:
+        from migrations.add_ses_rate_limit import run as _migrate_ses_rate_limit
+        _migrate_ses_rate_limit(db)
+    except Exception as e:
+        logger.error(
+            f"CRITICAL: Startup migration add_ses_rate_limit FAILED: {e}. "
+            "SES rate limiting will use hardcoded default until ses_rate_limit_per_second column is added."
+        )
+
+    try:
         from sqlalchemy import text as sa_text, inspect as sa_inspect
         inspector = sa_inspect(db.engine)
         available_tables = inspector.get_table_names()

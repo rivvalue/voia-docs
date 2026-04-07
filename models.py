@@ -1563,6 +1563,9 @@ class PlatformEmailSettings(db.Model):
     use_tls = db.Column(db.Boolean, nullable=False, default=True)
     use_ssl = db.Column(db.Boolean, nullable=False, default=False)
     
+    # Send rate limiting
+    ses_rate_limit_per_second = db.Column(db.Float, nullable=False, default=14.0)
+
     # Configuration status
     is_verified = db.Column(db.Boolean, nullable=False, default=False)
     last_test_at = db.Column(db.DateTime, nullable=True)

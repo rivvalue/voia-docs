@@ -214,6 +214,12 @@ class PostgresTaskQueue:
                         
                         logger.debug(f"Worker {worker_name} processing task: {task['task_type']} (id={task['id']})")
                         
+                        # Enforce SES send-rate limit for VOÏA-managed email tasks only
+                        if task['task_type'] in ('send_email', 'send_reminder_email'):
+                            if self._is_voia_managed_email(task['task_data'], task):
+                                from ses_rate_limiter import get_ses_rate_limiter
+                                get_ses_rate_limiter().acquire()
+                        
                         # Process the task
                         success = self._process_task(task, worker_name)
                         
@@ -305,6 +311,37 @@ class PostgresTaskQueue:
             db.session.rollback()
             return None
     
+    def _is_voia_managed_email(self, task_data: Dict, task: Optional[Dict] = None) -> bool:
+        """Return True only when the email task will use VOÏA-managed AWS SES.
+
+        Checks the business account's EmailConfiguration.  Returns False for
+        client-managed SMTP paths and for tasks without a business_account_id,
+        so those are never rate-limited.
+
+        business_account_id is resolved from task_data payload first, then
+        falls back to the top-level task row metadata (already present in the
+        claimed task dict) so a producer that omits it from payload still works.
+        """
+        business_account_id = (
+            task_data.get('business_account_id')
+            or (task.get('business_account_id') if task else None)
+        )
+        if not business_account_id:
+            return False
+        try:
+            from models import EmailConfiguration
+            email_config = EmailConfiguration.get_for_business_account(business_account_id)
+            return bool(email_config and email_config.use_platform_email)
+        except Exception as exc:
+            # Fail-safe: apply rate limiting when we cannot determine the email
+            # delivery mode so that SES is never accidentally over-driven.
+            logger.warning(
+                f"_is_voia_managed_email: could not determine email mode for "
+                f"business_account_id={business_account_id} — {exc}; "
+                f"applying rate limit as a safety measure"
+            )
+            return True
+
     def _mark_task_completed(self, task_id: int):
         """Mark a task as completed"""
         try:
