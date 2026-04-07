@@ -818,9 +818,64 @@ def reset_user_password(user_id):
         
         logger.info(f"Password reset token generated for user {user_to_reset.id} ({user_to_reset.email}) by admin {current_user_id}")
         
-        # TODO: Send password reset email (implement with email service)
-        # For now, show the token to the admin
-        flash(f'Password reset initiated for {user_to_reset.get_full_name()}. Reset token: {reset_token[:8]}... (expires in 24 hours)', 'success')
+        # Send password reset email via email service
+        try:
+            from email_service import EmailService
+            from audit_utils import queue_audit_log
+            email_service = EmailService()
+            email_result = email_service.send_password_reset_email(
+                user_email=user_to_reset.email,
+                user_first_name=user_to_reset.first_name,
+                user_last_name=user_to_reset.last_name,
+                reset_token=reset_token,
+                business_account_id=current_account_id
+            )
+            
+            if email_result.get('success'):
+                flash(f'Password reset email sent to {user_to_reset.get_full_name()} ({user_to_reset.email}). The link expires in 24 hours.', 'success')
+                logger.info(f"Password reset email sent successfully to {user_to_reset.email} by admin {current_user_id}")
+                
+                # Audit log the password reset initiation
+                try:
+                    queue_audit_log(
+                        business_account_id=current_account_id,
+                        action_type='password_reset_initiated',
+                        resource_type='business_account_user',
+                        resource_id=user_to_reset.id,
+                        resource_name=user_to_reset.get_full_name(),
+                        details={
+                            'user_email': user_to_reset.email,
+                            'user_name': user_to_reset.get_full_name(),
+                            'initiated_by_user_id': current_user_id
+                        }
+                    )
+                except Exception as audit_error:
+                    logger.error(f"Failed to create audit log for password reset: {audit_error}")
+            else:
+                error_msg = email_result.get('error', 'Unknown error')
+                logger.error(f"Failed to send password reset email to {user_to_reset.email}: {error_msg}")
+                try:
+                    from app import error_monitor
+                    error_monitor.capture_message(
+                        f"Admin password reset email failed for user {user_to_reset.id}: {error_msg}",
+                        level='error',
+                        context={'user_id': user_to_reset.id, 'admin_user_id': current_user_id, 'business_account_id': current_account_id}
+                    )
+                except Exception:
+                    pass
+                flash(f'Password reset token generated for {user_to_reset.get_full_name()}, but the email failed to send. Please check the email configuration.', 'warning')
+        
+        except Exception as email_error:
+            logger.error(f"Exception sending password reset email to {user_to_reset.email}: {email_error}")
+            try:
+                from app import error_monitor
+                error_monitor.capture_exception(
+                    email_error,
+                    context={'action': 'admin_password_reset_email', 'user_id': user_to_reset.id, 'admin_user_id': current_user_id, 'business_account_id': current_account_id}
+                )
+            except Exception:
+                pass
+            flash(f'Password reset token generated for {user_to_reset.get_full_name()}, but the email failed to send. Please check the email configuration.', 'warning')
         
         return redirect(url_for('business_auth.manage_users'))
     

@@ -37,6 +37,7 @@ ACTION_DESCRIPTIONS = {
     'industry_hints_update': 'Industry topic hints updated',
     'user_added': 'New user added to account',
     'user_removed': 'User removed from account',
+    'password_reset_initiated': 'Admin-initiated password reset',
     'scheduler_run': 'Campaign scheduler executed',
     'executive_report_downloaded': 'Executive report downloaded',
     'campaign_simulation_completed': 'Campaign simulation completed',
