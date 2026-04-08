@@ -4703,6 +4703,67 @@ def mark_notification_read(notification_uuid):
         return jsonify({'error': 'Failed to mark notification as read'}), 500
 
 
+@app.route('/feedback/submit', methods=['POST'])
+@require_business_auth
+def feedback_submit():
+    """Receive in-app feedback and create a YouTrack issue."""
+    from youtrack_bugtracker import create_issue
+    from flask_babel import gettext as _t
+
+    issue_type_raw = request.form.get('feedback_type', '').strip()
+    title = request.form.get('feedback_title', '').strip()
+    description_text = request.form.get('feedback_description', '').strip()
+    blocking = request.form.get('feedback_blocking', '').strip()
+    steps = request.form.get('feedback_steps', '').strip()
+    page_url = request.form.get('feedback_page_url', '').strip()
+
+    if not title:
+        return jsonify({'error': _t('Title is required.')}), 400
+    if not description_text:
+        return jsonify({'error': _t('Description is required.')}), 400
+    if issue_type_raw not in ('bug', 'feature'):
+        return jsonify({'error': _t('Invalid feedback type.')}), 400
+
+    yt_type = 'Bug' if issue_type_raw == 'bug' else 'Feature'
+
+    if issue_type_raw == 'bug':
+        yt_priority = 'High' if blocking == '1' else 'Normal'
+    else:
+        yt_priority = None
+
+    user_email = session.get('business_user_email', '')
+    account_name = session.get('business_account_name', '')
+
+    env_block_lines = [
+        '',
+        '---',
+        '**Environment**',
+        f'- **User:** {user_email}',
+        f'- **Tenant:** {account_name}',
+        f'- **Page:** {page_url}',
+    ]
+
+    full_description = description_text
+
+    if issue_type_raw == 'bug' and steps:
+        full_description += '\n\n**Steps to reproduce:**\n' + steps
+
+    full_description += '\n'.join(env_block_lines)
+
+    try:
+        result = create_issue(
+            title=title,
+            description=full_description,
+            issue_type=yt_type,
+            priority=yt_priority,
+        )
+        logger.info(f"Feedback submitted by {user_email}: {result['id']}")
+        return jsonify({'success': True, 'issue_id': result['id'], 'issue_url': result['url']})
+    except RuntimeError as exc:
+        logger.error(f"Feedback submission failed: {exc}")
+        return jsonify({'error': str(exc)}), 502
+
+
 @app.route('/api/notifications/mark-all-read', methods=['POST'])
 @require_business_auth
 def mark_all_notifications_read():

@@ -11365,3 +11365,58 @@ msgstr "créneaux entreprises restants"
 #: templates/business_auth/license_info.html
 msgid "Approaching client company limit"
 msgstr "Limite d'entreprises clientes presque atteinte"
+
+#: templates/base.html (feedback widget)
+msgid "Give Feedback"
+msgstr "Donner un avis"
+
+msgid "Bug Report"
+msgstr "Signaler un bug"
+
+msgid "Feature Request"
+msgstr "Demande de fonctionnalité"
+
+msgid "Short summary"
+msgstr "Résumé court"
+
+msgid "Describe the issue or feature in detail"
+msgstr "Décrivez le problème ou la fonctionnalité en détail"
+
+msgid "This issue is blocking my work"
+msgstr "Ce problème bloque mon travail"
+
+msgid "Severity"
+msgstr "Sévérité"
+
+msgid "Steps to reproduce"
+msgstr "Étapes pour reproduire"
+
+msgid "Auto-captured context:"
+msgstr "Contexte capturé automatiquement :"
+
+msgid "Page URL"
+msgstr "URL de la page"
+
+msgid "your email"
+msgstr "votre e-mail"
+
+msgid "tenant"
+msgstr "organisation"
+
+msgid "Thank you! Your feedback has been submitted."
+msgstr "Merci ! Votre retour a bien été soumis."
+
+msgid "Submission failed. Please try again."
+msgstr "Échec de la soumission. Veuillez réessayer."
+
+msgid "Network error. Please try again."
+msgstr "Erreur réseau. Veuillez réessayer."
+
+msgid "Submitting..."
+msgstr "Envoi en cours…"
+
+msgid "Title is required."
+msgstr "Le titre est requis."
+
+msgid "Description is required."
+msgstr "La description est requise."

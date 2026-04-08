@@ -105,6 +105,11 @@
             </a>
         </nav>
         <div class="sidebar-footer">
+            <!-- Give Feedback — same look as other sidebar footer items -->
+            <a href="#" class="sidebar-nav-item sidebar-feedback-item" id="sidebarFeedbackBtn" data-bs-toggle="modal" data-bs-target="#feedbackModal">
+                <i class="fas fa-comment-dots"></i>
+                <span class="sidebar-item-label">{{ _('Give Feedback') }}</span>
+            </a>
             <!-- Notification Bell — same look as other sidebar nav items -->
             <a href="#" class="sidebar-nav-item sidebar-bell-item" id="sidebarNotificationBell" data-bs-toggle="offcanvas" data-bs-target="#notificationPanel" aria-controls="notificationPanel">
                 <i class="fas fa-bell"></i>
@@ -198,6 +203,10 @@
                     {% if is_business_authenticated %}
                     <!-- User Dropdown + Bell (hidden on desktop when V2 sidebar is shown) -->
                     <div class="navbar-bell-user d-flex align-items-center gap-3">
+                    <!-- Give Feedback Button (legacy navbar) -->
+                    <button type="button" class="btn btn-sm btn-outline-secondary navbar-feedback-btn" id="navbarFeedbackBtn" data-bs-toggle="modal" data-bs-target="#feedbackModal" title="{{ _('Give Feedback') }}">
+                        <i class="fas fa-comment-dots me-1"></i>{{ _('Give Feedback') }}
+                    </button>
                     <!-- User Dropdown Menu -->
                     <div class="user-dropdown">
                         <div class="user-dropdown-trigger">
@@ -442,6 +451,162 @@
     });
     </script>
     
+    <!-- Feedback Modal -->
+    {% if is_business_authenticated %}
+    <div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header" style="background: #E13A44; color: #fff;">
+                    <h5 class="modal-title" id="feedbackModalLabel">
+                        <i class="fas fa-comment-dots me-2"></i>{{ _('Give Feedback') }}
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="feedbackFormAlert" class="alert d-none mb-3" role="alert"></div>
+                    <form id="feedbackForm" novalidate>
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="feedback_page_url" id="feedbackPageUrl">
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">{{ _('Type') }}</label>
+                            <div class="d-flex gap-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="feedback_type" id="feedbackTypeBug" value="bug" checked>
+                                    <label class="form-check-label" for="feedbackTypeBug">
+                                        <i class="fas fa-bug me-1" style="color: #E13A44;"></i>{{ _('Bug Report') }}
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="feedback_type" id="feedbackTypeFeature" value="feature">
+                                    <label class="form-check-label" for="feedbackTypeFeature">
+                                        <i class="fas fa-lightbulb me-1" style="color: #6c757d;"></i>{{ _('Feature Request') }}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="feedbackTitle" class="form-label fw-semibold">{{ _('Title') }} <span style="color: #E13A44;">*</span></label>
+                            <input type="text" class="form-control" id="feedbackTitle" name="feedback_title" maxlength="200" placeholder="{{ _('Short summary') }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="feedbackDescription" class="form-label fw-semibold">{{ _('Description') }} <span style="color: #E13A44;">*</span></label>
+                            <textarea class="form-control" id="feedbackDescription" name="feedback_description" rows="4" placeholder="{{ _('Describe the issue or feature in detail') }}" required></textarea>
+                        </div>
+
+                        <div id="feedbackBugFields">
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="feedbackBlocking" name="feedback_blocking" value="1">
+                                    <label class="form-check-label" for="feedbackBlocking">
+                                        {{ _('This issue is blocking my work') }}
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="feedbackSteps" class="form-label fw-semibold">{{ _('Steps to reproduce') }}</label>
+                                <textarea class="form-control" id="feedbackSteps" name="feedback_steps" rows="3" placeholder="{{ _('1. Go to ...\n2. Click on ...\n3. See error') }}"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Read-only context strip -->
+                        <div class="rounded p-2 mb-1" style="background: #f8f9fa; font-size: 0.78rem; color: #6c757d; border: 1px solid #dee2e6;">
+                            <i class="fas fa-info-circle me-1"></i>
+                            <strong>{{ _('Auto-captured context:') }}</strong>
+                            {{ _('Page URL') }}, {{ _('your email') }} ({{ business_user_email }}), {{ _('tenant') }} ({{ business_account_name or '' }})
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+                    <button type="button" class="btn btn-danger" id="feedbackSubmitBtn" style="background: #E13A44; border-color: #E13A44;">
+                        <i class="fas fa-paper-plane me-1"></i>{{ _('Submit') }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    (function () {
+        const feedbackModal = document.getElementById('feedbackModal');
+        if (!feedbackModal) return;
+
+        const form = document.getElementById('feedbackForm');
+        const submitBtn = document.getElementById('feedbackSubmitBtn');
+        const alertBox = document.getElementById('feedbackFormAlert');
+        const bugFields = document.getElementById('feedbackBugFields');
+        const pageUrlInput = document.getElementById('feedbackPageUrl');
+        const typeRadios = form.querySelectorAll('input[name="feedback_type"]');
+
+        function showAlert(msg, type) {
+            alertBox.className = 'alert alert-' + type + ' mb-3';
+            alertBox.textContent = msg;
+            alertBox.classList.remove('d-none');
+        }
+        function hideAlert() { alertBox.classList.add('d-none'); }
+
+        function toggleBugFields() {
+            const selected = form.querySelector('input[name="feedback_type"]:checked');
+            if (selected && selected.value === 'bug') {
+                bugFields.style.display = '';
+            } else {
+                bugFields.style.display = 'none';
+            }
+        }
+
+        typeRadios.forEach(function (r) { r.addEventListener('change', toggleBugFields); });
+        toggleBugFields();
+
+        feedbackModal.addEventListener('show.bs.modal', function () {
+            pageUrlInput.value = window.location.href;
+            hideAlert();
+            form.reset();
+            toggleBugFields();
+        });
+
+        submitBtn.addEventListener('click', async function () {
+            hideAlert();
+            const title = document.getElementById('feedbackTitle').value.trim();
+            const desc = document.getElementById('feedbackDescription').value.trim();
+            if (!title) { showAlert('{{ _("Title is required.") }}', 'warning'); return; }
+            if (!desc)  { showAlert('{{ _("Description is required.") }}', 'warning'); return; }
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>{{ _("Submitting...") }}';
+
+            const data = new FormData(form);
+
+            try {
+                const resp = await fetch('{{ url_for("feedback_submit") }}', {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').getAttribute('content') },
+                    body: data
+                });
+                const json = await resp.json();
+                if (resp.ok && json.success) {
+                    showAlert('{{ _("Thank you! Your feedback has been submitted.") }}' + (json.issue_id ? ' (' + json.issue_id + ')' : ''), 'success');
+                    form.reset();
+                    toggleBugFields();
+                    setTimeout(function () {
+                        bootstrap.Modal.getInstance(feedbackModal).hide();
+                    }, 2500);
+                } else {
+                    showAlert(json.error || '{{ _("Submission failed. Please try again.") }}', 'danger');
+                }
+            } catch (e) {
+                showAlert('{{ _("Network error. Please try again.") }}', 'danger');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane me-1"></i>{{ _("Submit") }}';
+            }
+        });
+    })();
+    </script>
+    {% endif %}
+
     <!-- Notification Offcanvas Panel -->
     {% if is_business_authenticated %}
     <div class="offcanvas offcanvas-end" tabindex="-1" id="notificationPanel" aria-labelledby="notificationPanelLabel" data-bs-backdrop="false" data-bs-scroll="true">
