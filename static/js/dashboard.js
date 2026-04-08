@@ -31,6 +31,13 @@ let availableCampaigns = [];
 let selectedCampaignId = null;
 let kpiOverviewData = null;
 
+// Helper: get the integer campaign ID from the selected campaignFilter option
+function getSelectedCampaignNumericId() {
+    const select = document.getElementById('campaignFilter');
+    const option = select && select.selectedOptions[0];
+    return option ? option.getAttribute('data-id') : null;
+}
+
 // Initialize global translations object and load dashboard translations
 window.translations = window.translations || {};
 
@@ -390,8 +397,9 @@ function populateCampaignFilterDropdown() {
     let defaultCampaign = null;
     
     if (urlCampaignId) {
-        // If URL has campaign_id, use that
-        defaultCampaign = availableCampaigns.find(c => c.id === parseInt(urlCampaignId));
+        // If URL has campaign_id, use that (may be UUID or integer for backwards compatibility)
+        defaultCampaign = availableCampaigns.find(c => c.uuid === urlCampaignId) ||
+                          availableCampaigns.find(c => c.id === parseInt(urlCampaignId));
         console.log('📌 Using campaign from URL parameter:', urlCampaignId, defaultCampaign);
     }
     
@@ -399,7 +407,8 @@ function populateCampaignFilterDropdown() {
     if (!defaultCampaign) {
         const storedCampaignId = sessionStorage.getItem('selectedCampaignId');
         if (storedCampaignId) {
-            defaultCampaign = availableCampaigns.find(c => c.id === parseInt(storedCampaignId));
+            defaultCampaign = availableCampaigns.find(c => c.uuid === storedCampaignId) ||
+                              availableCampaigns.find(c => c.id === parseInt(storedCampaignId));
             if (defaultCampaign) {
                 console.log('🔄 Restored campaign from session storage:', storedCampaignId);
             }
@@ -440,7 +449,8 @@ function populateCampaignFilterDropdown() {
     // Add campaign options
     availableCampaigns.forEach(campaign => {
         const option = document.createElement('option');
-        option.value = campaign.id;
+        option.value = campaign.uuid;
+        option.setAttribute('data-id', campaign.id);
         
         // Normalize status to lowercase for consistent logic
         const rawStatus = (campaign.status || '').toLowerCase();
@@ -459,7 +469,7 @@ function populateCampaignFilterDropdown() {
         // Set as selected if this is the default campaign
         if (defaultCampaign && campaign.id === defaultCampaign.id) {
             option.selected = true;
-            selectedCampaignId = campaign.id;
+            selectedCampaignId = campaign.uuid;
         }
         
         select.appendChild(option);
@@ -472,8 +482,8 @@ function populateCampaignFilterDropdown() {
     
     // Re-apply selected value after cloneNode (cloneNode may not preserve programmatic .selected property)
     if (defaultCampaign) {
-        newSelect.value = String(defaultCampaign.id);
-        selectedCampaignId = defaultCampaign.id;
+        newSelect.value = String(defaultCampaign.uuid);
+        selectedCampaignId = defaultCampaign.uuid;
     }
     
     // Attach the event listener
@@ -494,7 +504,7 @@ function populateCampaignFilterDropdown() {
 // Apply campaign filter to analytics
 async function applyCampaignFilter() {
     const select = document.getElementById('campaignFilter');
-    selectedCampaignId = select.value ? parseInt(select.value) : null;
+    selectedCampaignId = select.value || null;
     
     console.log('🎯 Campaign filter applied:', selectedCampaignId);
     
@@ -620,7 +630,7 @@ function restoreCampaignSelection() {
     
     if (campaignId && select) {
         select.value = campaignId;
-        selectedCampaignId = parseInt(campaignId);
+        selectedCampaignId = campaignId;
         console.log('🔄 Restored campaign selection:', campaignId);
         return true;
     }
@@ -1362,8 +1372,8 @@ function loadCompanyNpsDataDirect() {
     }
 
     // Build URL with campaign_id if available
-    const campaignSelect = document.getElementById('campaignFilter');
-    const campaignParam = (campaignSelect && campaignSelect.value) ? `?campaign=${campaignSelect.value}` : '';
+    const numericCampaignId = getSelectedCampaignNumericId();
+    const campaignParam = numericCampaignId ? `?campaign=${numericCampaignId}` : '';
 
     fetch('/api/company_nps' + campaignParam)
         .then(response => response.json())
@@ -1509,7 +1519,12 @@ function loadDashboardData() {
     const urlParams = new URLSearchParams();
     
     if (selectedCampaignId) {
-        urlParams.append('campaign_id', selectedCampaignId);
+        const select = document.getElementById('campaignFilter');
+        const selectedOption = select && select.selectedOptions[0];
+        const numericId = selectedOption ? selectedOption.getAttribute('data-id') : null;
+        if (numericId) {
+            urlParams.append('campaign_id', numericId);
+        }
     }
     
     // Add cache-busting timestamp
@@ -3381,7 +3396,7 @@ function populateAccountIntelligence() {
                 <div class="card-body p-3">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="mb-0">
-                            <a href="#" onclick="openCompanyResponsesModal('${escapeHtml(account.company_name).replace(/'/g, "\\'")}', ${campaignId}, '${escapeHtml(campaignName).replace(/'/g, "\\'")}'); return false;" 
+                            <a href="#" onclick="openCompanyResponsesModal('${escapeHtml(account.company_name).replace(/'/g, "\\'")}', '${campaignId}', '${escapeHtml(campaignName).replace(/'/g, "\\'")}'); return false;" 
                                style="color: #2E5090; text-decoration: none; cursor: pointer;"
                                onmouseover="this.style.textDecoration='underline';"
                                onmouseout="this.style.textDecoration='none';"
@@ -3475,9 +3490,9 @@ function loadAccountIntelligence(page = 1) {
     if (hasRisks) params.append('has_risks', hasRisks);
     
     // Get current campaign if set
-    const campaignSelect = document.getElementById('campaignFilter');
-    if (campaignSelect && campaignSelect.value) {
-        params.append('campaign', campaignSelect.value);
+    const numericCampaignIdAI = getSelectedCampaignNumericId();
+    if (numericCampaignIdAI) {
+        params.append('campaign', numericCampaignIdAI);
     }
     
     // Show loading
@@ -3620,7 +3635,7 @@ function renderAccountIntelligence(accountData, pagination) {
                 <div class="card-body p-3">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="mb-0">
-                            <a href="#" onclick="openCompanyResponsesModal('${escapeHtml(account.company_name).replace(/'/g, "\\'")}', ${campaignId}, '${escapeHtml(campaignName).replace(/'/g, "\\'")}'); return false;" 
+                            <a href="#" onclick="openCompanyResponsesModal('${escapeHtml(account.company_name).replace(/'/g, "\\'")}', '${campaignId}', '${escapeHtml(campaignName).replace(/'/g, "\\'")}'); return false;" 
                                style="color: #2E5090; text-decoration: none; cursor: pointer;"
                                onmouseover="this.style.textDecoration='underline';"
                                onmouseout="this.style.textDecoration='none';"
@@ -3988,7 +4003,7 @@ function siFilterHighRisk() {
             <tr class="${riskBorderClass}" data-si-click="company" data-company-name="${escapeHtml(company.company_name)}">
                 <td>
                     <a href="#"
-                       onclick="event.stopPropagation(); openCompanyResponsesModal('${escapeHtml(company.company_name).replace(/'/g, "\\'")}', ${campaignIdHR}, ''); return false;"
+                       onclick="event.stopPropagation(); openCompanyResponsesModal('${escapeHtml(company.company_name).replace(/'/g, "\\'")}', '${campaignIdHR}', ''); return false;"
                        style="color: #2E5090; text-decoration: none; cursor: pointer; font-weight: 600;"
                        onmouseover="this.style.textDecoration='underline';"
                        onmouseout="this.style.textDecoration='none';"
@@ -4306,9 +4321,9 @@ function loadSurveyResponses(page = 1, searchQuery = '', npsFilter = '') {
     let url = `/api/survey_responses?page=${page}&per_page=${responsesPerPage}`;
     
     // CRITICAL: Get campaign filter (NPS must be campaign-specific)
-    const campaignSelect = document.getElementById('campaignFilter');
-    if (campaignSelect && campaignSelect.value) {
-        url += `&campaign=${campaignSelect.value}`;
+    const numericIdSR = getSelectedCampaignNumericId();
+    if (numericIdSR) {
+        url += `&campaign=${numericIdSR}`;
     }
     
     if (searchQuery.trim()) {
@@ -4638,9 +4653,9 @@ function loadTenureNpsData(page = 1) {
     let url = `/api/tenure_nps?page=${page}&per_page=${tenureGroupsPerPage}`;
     
     // CRITICAL: Get campaign filter (NPS must be campaign-specific)
-    const campaignSelect = document.getElementById('campaignFilter');
-    if (campaignSelect && campaignSelect.value) {
-        url += `&campaign=${campaignSelect.value}`;
+    const numericIdTN = getSelectedCampaignNumericId();
+    if (numericIdTN) {
+        url += `&campaign=${numericIdTN}`;
     }
     
     fetch(url)
@@ -4748,9 +4763,9 @@ function loadCompanyNpsData(page = 1, searchQuery = '', npsFilter = '') {
     let url = `/api/company_nps?page=${page}&per_page=${companiesPerPage}`;
     
     // CRITICAL: Get campaign filter (NPS must be campaign-specific)
-    const campaignSelect = document.getElementById('campaignFilter');
-    if (campaignSelect && campaignSelect.value) {
-        url += `&campaign=${campaignSelect.value}`;
+    const numericIdCN = getSelectedCampaignNumericId();
+    if (numericIdCN) {
+        url += `&campaign=${numericIdCN}`;
     }
     
     if (searchQuery.trim()) {
@@ -4849,7 +4864,7 @@ function populateCompanyNpsTable(companyData) {
             <tr class="${riskBorderClass}" data-si-click="company" data-company-name="${escapeHtml(company.company_name)}">
                 <td>
                     <a href="#"
-                       onclick="event.stopPropagation(); openCompanyResponsesModal('${escapeHtml(company.company_name).replace(/'/g, "\\'")}', ${campaignIdCN}, ''); return false;"
+                       onclick="event.stopPropagation(); openCompanyResponsesModal('${escapeHtml(company.company_name).replace(/'/g, "\\'")}', '${campaignIdCN}', ''); return false;"
                        style="color: #2E5090; text-decoration: none; cursor: pointer; font-weight: 600;"
                        onmouseover="this.style.textDecoration='underline';"
                        onmouseout="this.style.textDecoration='none';"

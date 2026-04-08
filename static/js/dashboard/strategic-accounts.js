@@ -262,7 +262,7 @@
                     <div class="d-flex justify-content-between align-items-start mb-2">
                         <div>
                             <h5 class="mb-1">
-                                <a href="#" onclick="openCompanyResponsesModal('${companyNameEscaped.replace(/'/g, "\\'")}', ${campaignId || 'null'}, '${campaignNameEscaped.replace(/'/g, "\\'")}'); return false;"
+                                <a href="#" onclick="openCompanyResponsesModal('${companyNameEscaped.replace(/'/g, "\\'")}', '${campaignId || ''}', '${campaignNameEscaped.replace(/'/g, "\\'")}'); return false;"
                                    style="color:#2E5090; text-decoration:none; cursor:pointer;"
                                    onmouseover="this.style.textDecoration='underline';"
                                    onmouseout="this.style.textDecoration='none';">
@@ -340,9 +340,11 @@
         const campaignName = campaignSelect && campaignId
             ? campaignSelect.options[campaignSelect.selectedIndex].text
             : 'Current Campaign';
+        const numericCampaignId = campaignSelect && campaignSelect.selectedOptions[0]
+            ? campaignSelect.selectedOptions[0].getAttribute('data-id') : null;
 
         const params = new URLSearchParams();
-        if (campaignId) params.append('campaign_id', campaignId);
+        if (numericCampaignId) params.append('campaign_id', numericCampaignId);
         params.append('_t', Date.now());
 
         fetch(`/api/strategic_accounts?${params}`)

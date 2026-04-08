@@ -3885,6 +3885,7 @@ def get_campaign_filter_options():
             'campaigns': [
                 {
                     'id': campaign.id,
+                    'uuid': campaign.uuid,
                     'name': campaign.name,
                     'start_date': campaign.start_date.isoformat(),
                     'end_date': campaign.end_date.isoformat(),
@@ -4412,9 +4413,9 @@ def company_responses_page(company_name):
     try:
         from models import Campaign
         
-        # Get campaign ID from query parameter
-        campaign_id = request.args.get('campaign', type=int)
-        if not campaign_id:
+        # Get campaign UUID from query parameter
+        campaign_uuid = request.args.get('campaign', type=str)
+        if not campaign_uuid:
             flash(_('Campaign identifier is required.'), 'error')
             # Redirect based on auth status
             current_user_check = get_current_business_user()
@@ -4426,13 +4427,13 @@ def company_responses_page(company_name):
         if current_business_user:
             # Business user - verify campaign belongs to their account
             business_account_id = current_business_user.business_account_id
-            campaign = Campaign.query.filter_by(id=campaign_id, business_account_id=business_account_id).first()
+            campaign = Campaign.query.filter_by(uuid=campaign_uuid, business_account_id=business_account_id).first()
         else:
             # Public user - only allow demo account campaigns
             from models import BusinessAccount
             demo_account = BusinessAccount.query.filter_by(name='Archelo Group inc').first()
             if demo_account:
-                campaign = Campaign.query.filter_by(id=campaign_id, business_account_id=demo_account.id).first()
+                campaign = Campaign.query.filter_by(uuid=campaign_uuid, business_account_id=demo_account.id).first()
             else:
                 flash(_('Demo account not available.'), 'error')
                 return redirect(url_for('dashboard'))  # Public users only reach here
@@ -4469,7 +4470,7 @@ def company_responses_page(company_name):
         
         from data_storage import get_company_detail_data
         detail_ba_id = current_business_user.business_account_id if current_business_user else 1
-        account_insights = get_company_detail_data(campaign_id, company_name, business_account_id=detail_ba_id)
+        account_insights = get_company_detail_data(campaign.id, company_name, business_account_id=detail_ba_id)
 
         return render_template('company_responses.html',
                              company_name=company_name,

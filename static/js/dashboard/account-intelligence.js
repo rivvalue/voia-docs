@@ -41,7 +41,7 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <h6 class="mb-1">
-                            <a href="#" onclick="openCompanyResponsesModal('${escapeHtml(account.company_name).replace(/'/g, "\\'")}', ${campaignId ? campaignId : 'null'}, '${escapeHtml(campaignName).replace(/'/g, "\\'")}'); return false;" 
+                            <a href="#" onclick="openCompanyResponsesModal('${escapeHtml(account.company_name).replace(/'/g, "\\'")}', '${campaignId || ''}', '${escapeHtml(campaignName).replace(/'/g, "\\'")}'); return false;" 
                                style="color: #2E5090; text-decoration: none; cursor: pointer;"
                                onmouseover="this.style.textDecoration='underline';"
                                onmouseout="this.style.textDecoration='none';"
@@ -410,7 +410,7 @@
                         <div class="d-flex justify-content-between align-items-start mb-2">
                             <div>
                                 <h5 class="mb-1">
-                                    <a href="#" onclick="openCompanyResponsesModal('${escapeHtml(account.company_name).replace(/'/g, "\\'")}', ${campaignId}, '${escapeHtml(campaignName).replace(/'/g, "\\'")}'); return false;" 
+                                    <a href="#" onclick="openCompanyResponsesModal('${escapeHtml(account.company_name).replace(/'/g, "\\'")}', '${campaignId}', '${escapeHtml(campaignName).replace(/'/g, "\\'")}'); return false;" 
                                        style="color: #2E5090; text-decoration: none; cursor: pointer;"
                                        onmouseover="this.style.textDecoration='underline';"
                                        onmouseout="this.style.textDecoration='none';"
@@ -525,10 +525,10 @@
         if (hasOpp) params.append('has_opportunities', hasOpp);
         if (hasRisks) params.append('has_risks', hasRisks);
         
-        // Get current campaign if set
-        const campaignSelect = document.getElementById('campaignFilter');
-        if (campaignSelect && campaignSelect.value) {
-            params.append('campaign', campaignSelect.value);
+        // Get current campaign if set (use numeric ID for API calls)
+        const numericIdAI2 = typeof getSelectedCampaignNumericId === 'function' ? getSelectedCampaignNumericId() : null;
+        if (numericIdAI2) {
+            params.append('campaign', numericIdAI2);
         }
         
         // Show loading
@@ -718,7 +718,7 @@
                         <div class="d-flex justify-content-between align-items-start mb-2">
                             <div>
                                 <h5 class="mb-1">
-                                    <a href="#" onclick="openCompanyResponsesModal('${escapeHtml(account.company_name).replace(/'/g, "\\'")}', ${campaignId}, '${escapeHtml(campaignName).replace(/'/g, "\\'")}'); return false;" 
+                                    <a href="#" onclick="openCompanyResponsesModal('${escapeHtml(account.company_name).replace(/'/g, "\\'")}', '${campaignId}', '${escapeHtml(campaignName).replace(/'/g, "\\'")}'); return false;" 
                                        style="color: #2E5090; text-decoration: none; cursor: pointer;"
                                        onmouseover="this.style.textDecoration='underline';"
                                        onmouseout="this.style.textDecoration='none';"
