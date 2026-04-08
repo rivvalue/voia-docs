@@ -5715,32 +5715,59 @@ def business_license_overview():
 def admin_licenses():
     """List all business accounts with current license status (Platform Admin Only)"""
     try:
-        # Get filter parameter
+        # Get filter and search parameters
         filter_type = request.args.get('filter', 'all').lower()
-        
+        search_query = request.args.get('search', '').strip()
+
         # Use bulk optimization method to fetch all license data efficiently
         bulk_license_data = LicenseService.get_bulk_license_data()
-        
+
+        if not bulk_license_data:
+            return render_template('business_auth/admin_licenses.html',
+                                 licenses_data=[],
+                                 total_accounts=0,
+                                 filter_type=filter_type,
+                                 search_query=search_query,
+                                 page_title="All Business Accounts")
+
+        all_account_ids = list(bulk_license_data.keys())
+
+        # Bulk query: unactivated admins for all accounts at once
+        from models import Campaign
+        unactivated_admins_query = BusinessAccountUser.query.filter(
+            BusinessAccountUser.business_account_id.in_(all_account_ids),
+            BusinessAccountUser.role.in_(['admin', 'business_account_admin']),
+            BusinessAccountUser.email_verified == False
+        ).all()
+        unactivated_admins_map = {}
+        for u in unactivated_admins_query:
+            if u.business_account_id not in unactivated_admins_map:
+                unactivated_admins_map[u.business_account_id] = u
+
+        # Bulk query: active campaign counts for all accounts at once
+        from sqlalchemy import func as _func
+        active_campaign_counts_query = db.session.query(
+            Campaign.business_account_id,
+            _func.count(Campaign.id).label('cnt')
+        ).filter(
+            Campaign.business_account_id.in_(all_account_ids),
+            Campaign.status == 'active'
+        ).group_by(Campaign.business_account_id).all()
+        active_campaigns_map = {row.business_account_id: row.cnt for row in active_campaign_counts_query}
+
+        # Bulk query: unique company domain counts for all accounts at once
+        company_counts_map = LicenseService.get_bulk_company_domain_counts(all_account_ids)
+
         # Transform bulk data to match original format
         licenses_data = []
         for account_id, data in bulk_license_data.items():
             account = data['account']
             license_info = data['license_info']
-            
-            # Check if there's an unactivated admin user (check both 'admin' and legacy 'business_account_admin')
-            unactivated_admin = BusinessAccountUser.query.filter(
-                BusinessAccountUser.business_account_id == account.id,
-                BusinessAccountUser.role.in_(['admin', 'business_account_admin']),
-                BusinessAccountUser.email_verified == False
-            ).first()
-            
-            # Get active campaign count for parallel campaigns toggle validation
-            from models import Campaign
-            active_campaigns_count = Campaign.query.filter_by(
-                business_account_id=account.id,
-                status='active'
-            ).count()
-            
+
+            unactivated_admin = unactivated_admins_map.get(account.id)
+            active_campaigns_count = active_campaigns_map.get(account.id, 0)
+            company_count = company_counts_map.get(account.id, 0)
+
             account_data = {
                 'id': account.id,
                 'uuid': account.uuid,
@@ -5766,15 +5793,26 @@ def admin_licenses():
                 'unactivated_admin_email': unactivated_admin.email if unactivated_admin else None,
                 'allow_parallel_campaigns': getattr(account, 'allow_parallel_campaigns', False),
                 'active_campaigns_count': active_campaigns_count,
-                'company_count': LicenseService.get_unique_company_domain_count(account.id),
+                'company_count': company_count,
                 'company_limit': license_info.get('current_license').max_client_companies if license_info.get('current_license') else None,
             }
             licenses_data.append(account_data)
-        
-        # Apply filtering based on filter_type
+
+        total_accounts = len(licenses_data)
+
+        # Apply server-side search filter (name or ID)
+        if search_query:
+            search_lower = search_query.lower()
+            licenses_data = [
+                data for data in licenses_data
+                if search_lower in (data.get('name') or '').lower()
+                or search_lower in str(data.get('id', ''))
+            ]
+
+        # Apply filter buttons
         filtered_data = licenses_data
         page_title = "All Business Accounts"
-        
+
         if filter_type == 'expiring':
             filtered_data = [data for data in licenses_data if data.get('expires_soon', False)]
             page_title = "Expiring Licenses"
@@ -5782,18 +5820,18 @@ def admin_licenses():
             filtered_data = [data for data in licenses_data if data.get('license_type') == 'trial']
             page_title = "Trial Accounts"
         elif filter_type == 'usage':
-            # Show accounts with high usage (>80% of limits)
-            filtered_data = [data for data in licenses_data 
+            filtered_data = [data for data in licenses_data
                            if (data.get('campaigns_used', 0) / max(data.get('campaigns_limit', 1), 1) > 0.8) or
                               (data.get('users_count', 0) / max(data.get('users_limit', 1), 1) > 0.8)]
             page_title = "High Usage Accounts"
-        
+
         return render_template('business_auth/admin_licenses.html',
                              licenses_data=filtered_data,
-                             total_accounts=len(licenses_data),
+                             total_accounts=total_accounts,
                              filter_type=filter_type,
+                             search_query=search_query,
                              page_title=page_title)
-        
+
     except Exception as e:
         logger.error(f"Error loading admin licenses page: {e}")
         flash('Failed to load license information. Please try again.', 'error')

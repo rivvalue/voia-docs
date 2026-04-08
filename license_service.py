@@ -403,6 +403,44 @@ class LicenseService:
             return 0
 
     @staticmethod
+    def get_bulk_company_domain_counts(account_ids: List[int]) -> Dict[int, int]:
+        """
+        Count distinct client company email domains for multiple business accounts in one query.
+
+        Returns a dict mapping business_account_id -> domain count (consumer domains excluded).
+
+        Args:
+            account_ids: List of business account IDs to count for
+
+        Returns:
+            dict: {business_account_id: int} — missing keys mean 0
+        """
+        try:
+            from models import Participant
+            if not account_ids:
+                return {}
+
+            rows = db.session.query(
+                Participant.business_account_id,
+                Participant.email
+            ).filter(
+                Participant.business_account_id.in_(account_ids),
+                Participant.email.isnot(None)
+            ).all()
+
+            counts: Dict[int, set] = {}
+            for business_account_id, email in rows:
+                if email and '@' in email:
+                    domain = email.split('@', 1)[1].lower().strip()
+                    if domain and domain not in LicenseService.CONSUMER_EMAIL_DOMAINS:
+                        counts.setdefault(business_account_id, set()).add(domain)
+
+            return {aid: len(domains) for aid, domains in counts.items()}
+        except Exception as e:
+            logger.error(f"Failed to bulk count unique company domains: {e}")
+            return {}
+
+    @staticmethod
     def can_add_participant_from_domain(business_account_id: int, email: str) -> bool:
         """
         Check if a participant with the given email can be added based on client company limits.

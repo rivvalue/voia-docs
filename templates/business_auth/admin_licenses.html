@@ -32,23 +32,39 @@
 
     <!-- Filter Navigation -->
     <div class="admin-section">
-        <div class="license-filters">
-            <a href="{{ url_for('business_auth.admin_licenses', filter='all') }}" 
-               class="filter-btn {% if filter_type == 'all' %}active{% endif %}">
-                <i class="fas fa-list"></i> All Accounts
-            </a>
-            <a href="{{ url_for('business_auth.admin_licenses', filter='expiring') }}" 
-               class="filter-btn {% if filter_type == 'expiring' %}active{% endif %}">
-                <i class="fas fa-exclamation-triangle"></i> Expiring Soon
-            </a>
-            <a href="{{ url_for('business_auth.admin_licenses', filter='trial') }}" 
-               class="filter-btn {% if filter_type == 'trial' %}active{% endif %}">
-                <i class="fas fa-flask"></i> Trial Accounts
-            </a>
-            <a href="{{ url_for('business_auth.admin_licenses', filter='usage') }}" 
-               class="filter-btn {% if filter_type == 'usage' %}active{% endif %}">
-                <i class="fas fa-chart-bar"></i> High Usage
-            </a>
+        <div class="license-filters-bar">
+            <div class="license-filters">
+                <a href="{{ url_for('business_auth.admin_licenses', filter='all', search=search_query) }}" 
+                   class="filter-btn {% if filter_type == 'all' %}active{% endif %}">
+                    <i class="fas fa-list"></i> All Accounts
+                </a>
+                <a href="{{ url_for('business_auth.admin_licenses', filter='expiring', search=search_query) }}" 
+                   class="filter-btn {% if filter_type == 'expiring' %}active{% endif %}">
+                    <i class="fas fa-exclamation-triangle"></i> Expiring Soon
+                </a>
+                <a href="{{ url_for('business_auth.admin_licenses', filter='trial', search=search_query) }}" 
+                   class="filter-btn {% if filter_type == 'trial' %}active{% endif %}">
+                    <i class="fas fa-flask"></i> Trial Accounts
+                </a>
+                <a href="{{ url_for('business_auth.admin_licenses', filter='usage', search=search_query) }}" 
+                   class="filter-btn {% if filter_type == 'usage' %}active{% endif %}">
+                    <i class="fas fa-chart-bar"></i> High Usage
+                </a>
+            </div>
+            <form class="license-search-form" method="GET" action="{{ url_for('business_auth.admin_licenses') }}">
+                <input type="hidden" name="filter" value="{{ filter_type }}">
+                <div class="search-input-group">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="licenseSearchInput" name="search" value="{{ search_query }}"
+                           placeholder="Search by name or ID…" class="license-search-input"
+                           autocomplete="off">
+                    {% if search_query %}
+                    <a href="{{ url_for('business_auth.admin_licenses', filter=filter_type) }}" class="search-clear" title="Clear search">
+                        <i class="fas fa-times"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </form>
         </div>
     </div>
 
@@ -63,7 +79,7 @@
         
         {% if licenses_data %}
         <div class="table-responsive">
-            <table class="table table-custom-theme table-striped">
+            <table class="table table-custom-theme table-striped" id="licensesTable">
                 <thead>
                     <tr>
                         <th>{{ _('Business Account') }}</th>
@@ -81,7 +97,7 @@
                 </thead>
                 <tbody>
                     {% for account in licenses_data %}
-                    <tr>
+                    <tr data-search="{{ (account.get('name', '') ~ ' ' ~ account.get('id', '')|string)|lower }}">
                         <td>
                             <div class="account-info">
                                 <strong>{{ account.get('name', 'Unknown') }}</strong>
@@ -223,8 +239,16 @@
         {% else %}
         <div class="empty-state">
             <i class="fas fa-search fa-3x text-muted mb-3"></i>
+            {% if search_query %}
+            <h4>{{ _('No results for') }} "{{ search_query }}"</h4>
+            <p class="text-muted">{{ _('No business accounts match your search. Try a different name or ID.') }}</p>
+            <a href="{{ url_for('business_auth.admin_licenses', filter=filter_type) }}" class="btn btn-outline-primary mt-2">
+                <i class="fas fa-times me-2"></i>{{ _('Clear search') }}
+            </a>
+            {% else %}
             <h4>{{ _('No accounts found') }}</h4>
             <p class="text-muted">{{ _('No business accounts match the current filter criteria.') }}</p>
+            {% endif %}
         </div>
         {% endif %}
     </div>
@@ -272,11 +296,70 @@
     background-color: rgba(225, 58, 68, 0.05);
 }
 
+.license-filters-bar {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
 .license-filters {
     display: flex;
     gap: 10px;
-    margin-bottom: 20px;
     flex-wrap: wrap;
+    flex: 1;
+}
+
+.license-search-form {
+    flex-shrink: 0;
+}
+
+.search-input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-icon {
+    position: absolute;
+    left: 12px;
+    color: var(--gray-dark);
+    font-size: 0.85rem;
+    pointer-events: none;
+}
+
+.license-search-input {
+    padding: 8px 36px 8px 34px;
+    border: 1px solid var(--light-gray);
+    border-radius: var(--radius-lg);
+    background: var(--primary-white);
+    color: var(--primary-black);
+    font-size: var(--font-size-sm);
+    box-shadow: var(--shadow-sm);
+    width: 240px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.license-search-input:focus {
+    outline: none;
+    border-color: var(--primary-red);
+    box-shadow: 0 0 0 3px rgba(225, 58, 68, 0.1);
+}
+
+.search-clear {
+    position: absolute;
+    right: 10px;
+    color: var(--gray-dark);
+    font-size: 0.8rem;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s ease;
+}
+
+.search-clear:hover {
+    color: var(--primary-red);
 }
 
 .filter-btn {
@@ -501,4 +584,36 @@
     color: #22c55e;
 }
 </style>
+
+<script>
+(function () {
+    var input = document.getElementById('licenseSearchInput');
+    if (!input) return;
+
+    var form = input.closest('form');
+    var table = document.getElementById('licensesTable');
+
+    var debounceTimer;
+
+    input.addEventListener('input', function () {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(function () {
+            var term = input.value.trim().toLowerCase();
+            if (!table) return;
+            var rows = table.querySelectorAll('tbody tr');
+            rows.forEach(function (row) {
+                var haystack = row.getAttribute('data-search') || '';
+                row.style.display = (!term || haystack.indexOf(term) !== -1) ? '' : 'none';
+            });
+        }, 150);
+    });
+
+    input.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+            clearTimeout(debounceTimer);
+            form.submit();
+        }
+    });
+}());
+</script>
 {% endblock %}
