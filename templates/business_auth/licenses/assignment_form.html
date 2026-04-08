@@ -313,6 +313,33 @@
             </div>
         </div>
 
+        <!-- License Period -->
+        <div class="admin-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <i class="fas fa-calendar-alt"></i>
+                    {{ _('License Period') }}
+                </h3>
+                <p class="text-muted">{{ _('Set the start and end dates for this license. The end date defaults to 12 months after the start date.') }}</p>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="start_date" class="form-label">{{ _('Start Date') }} <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" id="start_date" name="start_date" required>
+                            <div class="form-text">{{ _('License becomes active on this date.') }}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="end_date" class="form-label">{{ _('End Date') }} <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" id="end_date" name="end_date" required>
+                            <div class="form-text">{{ _('License expires at the end of this date.') }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Assignment Notes -->
         <div class="admin-section">
             <div class="section-header">
@@ -637,6 +664,41 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize
     onLicenseTypeChange();
+
+    // License period date pickers
+    const startDateInput = document.getElementById('start_date');
+    const endDateInput = document.getElementById('end_date');
+
+    function formatDate(d) {
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    function addMonths(date, months) {
+        const result = new Date(date);
+        result.setMonth(result.getMonth() + months);
+        return result;
+    }
+
+    function initDateDefaults() {
+        const today = new Date();
+        startDateInput.value = formatDate(today);
+        endDateInput.value = formatDate(addMonths(today, 12));
+        endDateInput.min = formatDate(new Date(today.getTime() + 86400000));
+    }
+
+    startDateInput.addEventListener('change', function() {
+        if (!this.value) return;
+        const start = new Date(this.value + 'T00:00:00');
+        const defaultEnd = addMonths(start, 12);
+        endDateInput.value = formatDate(defaultEnd);
+        const nextDay = new Date(start.getTime() + 86400000);
+        endDateInput.min = formatDate(nextDay);
+    });
+
+    initDateDefaults();
 });
 </script>
 

@@ -6028,6 +6028,30 @@ def process_license_assignment():
                 flash('Custom limit values must be valid positive numbers.', 'error')
                 return redirect(url_for('business_auth.license_assignment_form', business_id=business_account.uuid))
         
+        # Parse and validate start/end dates
+        start_date_str = request.form.get('start_date', '').strip()
+        end_date_str = request.form.get('end_date', '').strip()
+
+        if not start_date_str or not end_date_str:
+            flash('Start date and end date are required.', 'error')
+            return redirect(url_for('business_auth.license_assignment_form', business_id=business_account.uuid))
+
+        try:
+            license_start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+            license_end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
+        except ValueError:
+            flash('Invalid date format. Please use the date picker.', 'error')
+            return redirect(url_for('business_auth.license_assignment_form', business_id=business_account.uuid))
+
+        if license_end_date <= license_start_date:
+            flash('End date must be after start date.', 'error')
+            return redirect(url_for('business_auth.license_assignment_form', business_id=business_account.uuid))
+
+        # Compute duration_months from the chosen dates
+        delta_months = (license_end_date.year - license_start_date.year) * 12 + (license_end_date.month - license_start_date.month)
+        if delta_months < 1:
+            delta_months = 1
+
         fresh_business_account = BusinessAccount.query.get(business_id)
         if not fresh_business_account or fresh_business_account.name != business_account.name:
             logger.error(f"Business account validation failed during license assignment for business_id {business_id}")
@@ -6047,6 +6071,8 @@ def process_license_assignment():
             license_type=license_type,
             custom_config=custom_config,
             created_by=created_by,
+            start_date=license_start_date,
+            duration_months=delta_months,
             transcript_addon_config=transcript_addon_config
         )
         
