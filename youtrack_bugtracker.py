@@ -98,8 +98,8 @@ def create_issue(title: str, description: str, issue_type: str, priority: str = 
 
     if fields_data:
         type_candidates = (
-            ["Bug"] if issue_type.lower() == "bug"
-            else ["Feature", "Feature Request", "Task", "Story", "Improvement"]
+            ["Incident", "Bug"] if issue_type.lower() == "bug"
+            else ["Question", "Feature", "Feature Request", "Task", "Story", "Improvement"]
         )
         resolved_type = _find_enum_value(fields_data, "type", type_candidates)
         if resolved_type is None:
