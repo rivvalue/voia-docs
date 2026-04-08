@@ -349,31 +349,31 @@ Un **participant** est un contact individuel. Une **entreprise cliente** est l'o
 
 ## Tableau comparatif des licences
 
-> **Core vs Plus :** Core et Plus incluent le même ensemble complet de fonctionnalités, à l'exception de l'accès API, disponible uniquement sur Plus et Pro. Les autres différences entre ces niveaux concernent uniquement les limites d'utilisation (utilisateurs, entreprises clientes, campagnes).
+> **Core vs Plus :** Core et Plus incluent le même ensemble complet de fonctionnalités. Les différences entre ces niveaux concernent uniquement les limites d'utilisation (utilisateurs, entreprises clientes, campagnes). L'accès API est disponible uniquement sur Pro.
 
-| Fonctionnalité | Core | Plus | Pro | Trial |
-|----------------|------|------|-----|-------|
-| Campagnes/an | 4 | 4 | 12+ (personnalisable) | 1 |
-| Utilisateurs | 5 | 10 | 25+ (personnalisable) | 2 |
-| **Entreprises clientes** | **20** | **100** | **Illimitées (configurables)** | **Illimitées** |
-| Durée | 12 mois | 12 mois | 12+ mois (personnalisable) | 1 mois |
-| Sondages classiques | ✓ | ✓ | ✓ | ✓ |
-| Sondages conversationnels | ✓ | ✓ | ✓ | ✓ |
-| Suivi NPS | ✓ | ✓ | ✓ | ✓ |
-| Envoi par email | ✓ | ✓ | ✓ | ✓ |
-| Analyse de sentiment | ✓ | ✓ | ✓ | ✗ |
-| Analyse des thèmes clés | ✓ | ✓ | ✓ | ✗ |
-| Analytiques avancés | ✓ | ✓ | ✓ | ✗ |
-| Génération de rapports exécutifs | ✓ | ✓ | ✓ | ✗ |
-| Export de données (CSV / Excel) | ✓ | ✓ | ✓ | ✗ |
-| Modèles de sondage personnalisés | ✓ | ✓ | ✓ | ✗ |
-| Intelligence QBR | ✓ | ✓ | ✓ | ✗ |
-| Service d'assistance (help desk) | ✓ | ✓ | ✓ | ✗ |
-| Accès API | ✗ | ✓ | ✓ | ✗ |
-| Branding white-label | ✗ | ✗ | ✓ | ✗ |
-| Intégrations personnalisées | ✗ | ✗ | ✓ | ✗ |
-| Garantie SLA (99,9 %) | ✗ | ✗ | ✓ | ✗ |
-| Support prioritaire (24/7) | ✗ | ✗ | ✓ | ✗ |
+| Fonctionnalité | Core | Plus | Pro |
+|----------------|------|------|-----|
+| Campagnes/an | 4 | 4 | 12+ (personnalisable) |
+| Utilisateurs | 5 | 10 | 25+ (personnalisable) |
+| **Entreprises clientes** | **20** | **100** | **Illimitées (configurables)** |
+| Durée | 12 mois | 12 mois | 12+ mois (personnalisable) |
+| Sondages classiques | ✓ | ✓ | ✓ |
+| Sondages conversationnels | ✓ | ✓ | ✓ |
+| Suivi NPS | ✓ | ✓ | ✓ |
+| Envoi par email | ✓ | ✓ | ✓ |
+| Analyse de sentiment | ✓ | ✓ | ✓ |
+| Analyse des thèmes clés | ✓ | ✓ | ✓ |
+| Analytiques avancés | ✓ | ✓ | ✓ |
+| Génération de rapports exécutifs | ✓ | ✓ | ✓ |
+| Export de données (CSV / Excel) | ✓ | ✓ | ✓ |
+| Modèles de sondage personnalisés | ✓ | ✓ | ✓ |
+| Intelligence QBR | ✓ | ✓ | ✓ |
+| Service d'assistance (help desk) | ✓ | ✓ | ✓ |
+| Accès API | ✗ | ✗ | ✓ |
+| Branding white-label | ✗ | ✗ | ✓ |
+| Intégrations personnalisées | ✗ | ✗ | ✓ |
+| Garantie SLA (99,9 %) | ✗ | ✗ | ✓ |
+| Support prioritaire (24/7) | ✗ | ✗ | ✓ |
 
 ---
 

@@ -393,31 +393,31 @@ Yes, anyone with access to your VOÏA account counts as a user.
 
 ## License Comparison Table
 
-> **Core vs Plus:** Core and Plus include the same full feature set except API access, which is available on Plus and Pro only. All other differences between these tiers are usage limits only (users, client companies, campaigns).
+> **Core vs Plus:** Core and Plus include the same full feature set. All differences between these tiers are usage limits only (users, client companies, campaigns). API access is available on Pro only.
 
-| Feature | Core | Plus | Pro | Trial |
-|---------|------|------|-----|-------|
-| Campaigns/year | 4 | 4 | 12+ (custom) | 1 |
-| Users | 5 | 10 | 25+ (custom) | 2 |
-| **Client companies** | **20** | **100** | **Unlimited (configurable)** | **Unlimited** |
-| Duration | 12 months | 12 months | 12+ months (custom) | 1 month |
-| Classic surveys | ✓ | ✓ | ✓ | ✓ |
-| Conversational surveys | ✓ | ✓ | ✓ | ✓ |
-| NPS tracking | ✓ | ✓ | ✓ | ✓ |
-| Email delivery | ✓ | ✓ | ✓ | ✓ |
-| Sentiment analysis | ✓ | ✓ | ✓ | ✗ |
-| Key themes analysis | ✓ | ✓ | ✓ | ✗ |
-| Advanced analytics | ✓ | ✓ | ✓ | ✗ |
-| Executive report generation | ✓ | ✓ | ✓ | ✗ |
-| Data export (CSV / Excel) | ✓ | ✓ | ✓ | ✗ |
-| Custom survey templates | ✓ | ✓ | ✓ | ✗ |
-| QBR Intelligence | ✓ | ✓ | ✓ | ✗ |
-| Help desk | ✓ | ✓ | ✓ | ✗ |
-| API access | ✗ | ✓ | ✓ | ✗ |
-| White-label branding | ✗ | ✗ | ✓ | ✗ |
-| Custom integrations | ✗ | ✗ | ✓ | ✗ |
-| SLA guarantee (99.9%) | ✗ | ✗ | ✓ | ✗ |
-| Priority support (24/7) | ✗ | ✗ | ✓ | ✗ |
+| Feature | Core | Plus | Pro |
+|---------|------|------|-----|
+| Campaigns/year | 4 | 4 | 12+ (custom) |
+| Users | 5 | 10 | 25+ (custom) |
+| **Client companies** | **20** | **100** | **Unlimited (configurable)** |
+| Duration | 12 months | 12 months | 12+ months (custom) |
+| Classic surveys | ✓ | ✓ | ✓ |
+| Conversational surveys | ✓ | ✓ | ✓ |
+| NPS tracking | ✓ | ✓ | ✓ |
+| Email delivery | ✓ | ✓ | ✓ |
+| Sentiment analysis | ✓ | ✓ | ✓ |
+| Key themes analysis | ✓ | ✓ | ✓ |
+| Advanced analytics | ✓ | ✓ | ✓ |
+| Executive report generation | ✓ | ✓ | ✓ |
+| Data export (CSV / Excel) | ✓ | ✓ | ✓ |
+| Custom survey templates | ✓ | ✓ | ✓ |
+| QBR Intelligence | ✓ | ✓ | ✓ |
+| Help desk | ✓ | ✓ | ✓ |
+| API access | ✗ | ✗ | ✓ |
+| White-label branding | ✗ | ✗ | ✓ |
+| Custom integrations | ✗ | ✗ | ✓ |
+| SLA guarantee (99.9%) | ✗ | ✗ | ✓ |
+| Priority support (24/7) | ✗ | ✗ | ✓ |
 
 ---
 
