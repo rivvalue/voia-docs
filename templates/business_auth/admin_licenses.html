@@ -221,6 +221,12 @@
                                    class="btn btn-sm btn-outline-info" title={{ _('View History') }}>
                                     <i class="fas fa-history"></i>
                                 </a>
+                                {% if account.get('current_license') %}
+                                <a href="{{ url_for('business_auth.edit_campaign_slots', business_id=account.get('uuid', '')) }}"
+                                   class="btn btn-sm btn-outline-success" title="Edit Campaign Slots">
+                                    <i class="fas fa-sliders-h"></i>
+                                </a>
+                                {% endif %}
                                 {% if account.get('has_unactivated_admin') %}
                                 <form method="POST" action="{{ url_for('business_auth.resend_business_account_invitation', user_id=account.get('unactivated_admin_uuid')) }}" style="display: inline;">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
@@ -502,6 +508,17 @@
 .btn-outline-info:hover {
     background-color: #17a2b8;
     border-color: #17a2b8;
+    color: var(--primary-white);
+}
+
+.btn-outline-success {
+    border-color: #28a745;
+    color: #28a745;
+}
+
+.btn-outline-success:hover {
+    background-color: #28a745;
+    border-color: #28a745;
     color: var(--primary-white);
 }
 

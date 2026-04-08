@@ -1,0 +1,110 @@
+{% extends "business_auth/base.html" %}
+
+{% block title %}Edit Campaign Slots — {{ business_account.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h5 class="mb-0">
+                        <i class="fas fa-sliders-h me-2"></i>Edit Campaign Slots
+                    </h5>
+                    <a href="{{ url_for('business_auth.license_assignment_form', business_id=business_account.uuid) }}"
+                       class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Back
+                    </a>
+                </div>
+                <div class="card-body">
+
+                    <div class="mb-4">
+                        <p class="text-muted mb-1">Account</p>
+                        <strong>{{ business_account.name }}</strong>
+                        <span class="badge bg-secondary ms-2">{{ current_license.license_type | title }}</span>
+                    </div>
+
+                    <div class="row mb-4 text-center">
+                        <div class="col-4">
+                            <div class="stat-box">
+                                <div class="stat-value">{{ current_license.max_campaigns_per_year }}</div>
+                                <div class="stat-label">Current Limit</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-box">
+                                <div class="stat-value">{{ campaigns_used }}</div>
+                                <div class="stat-label">Used This Period</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-box">
+                                <div class="stat-value">{{ [current_license.max_campaigns_per_year - campaigns_used, 0] | max }}</div>
+                                <div class="stat-label">Remaining</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endwith %}
+
+                    <form method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+                        <div class="mb-3">
+                            <label for="new_limit" class="form-label fw-semibold">New Campaign Limit</label>
+                            <input type="number" class="form-control" id="new_limit" name="new_limit"
+                                   min="{{ campaigns_used | default(1) }}" step="1"
+                                   value="{{ current_license.max_campaigns_per_year }}" required>
+                            <div class="form-text">
+                                Minimum value is {{ campaigns_used }} (campaigns already used this period).
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="notes" class="form-label fw-semibold">Notes <span class="text-muted fw-normal">(optional)</span></label>
+                            <textarea class="form-control" id="notes" name="notes" rows="2"
+                                      placeholder="Reason for change, contract reference, etc."></textarea>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-check me-2"></i>Save Changes
+                            </button>
+                            <a href="{{ url_for('business_auth.license_assignment_form', business_id=business_account.uuid) }}"
+                               class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+.stat-box {
+    background: var(--light-gray, #f5f5f5);
+    border-radius: 8px;
+    padding: 16px 8px;
+}
+.stat-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--primary-red, #e13a44);
+}
+.stat-label {
+    font-size: 0.78rem;
+    color: var(--gray-medium, #777);
+    margin-top: 2px;
+}
+</style>
+{% endblock %}

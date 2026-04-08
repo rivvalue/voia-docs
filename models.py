@@ -3061,6 +3061,7 @@ class LicenseHistory(db.Model):
         return license_record
 
 
+
 class BrandingConfig(db.Model):
     """Branding Configuration model for business account-specific branding settings"""
     __tablename__ = 'branding_configs'

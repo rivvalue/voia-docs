@@ -6269,6 +6269,87 @@ def license_history(business_id):
         return redirect(url_for('business_auth.admin_licenses'))
 
 
+@business_auth_bp.route('/admin/licenses/campaign-slots/<string:business_id>', methods=['GET', 'POST'])
+@require_platform_admin
+def edit_campaign_slots(business_id):
+    """Allow platform admin to adjust the campaign slot limit on the active license (Platform Admin Only)"""
+    try:
+        is_valid, business_account, message = validate_business_account_access(business_id, allow_platform_admin=True)
+        if not is_valid:
+            if business_account is None and 'not found' in message:
+                from flask import abort
+                abort(404)
+            flash('Access denied.', 'error')
+            return redirect(url_for('business_auth.admin_licenses'))
+
+        current_license = LicenseService.get_current_license(business_account.id)
+        if not current_license:
+            flash('No active license found for this account. Please assign a license first.', 'error')
+            return redirect(url_for('business_auth.license_assignment_form', business_id=business_account.uuid))
+
+        campaigns_used = LicenseService.get_campaigns_used_in_current_period(business_account.id)
+        current_user = BusinessAccountUser.query.get(session.get('business_user_id'))
+
+        if request.method == 'POST':
+            new_limit_str = request.form.get('new_limit', '').strip()
+            notes = request.form.get('notes', '').strip() or None
+
+            try:
+                new_limit = int(new_limit_str)
+                if new_limit < 1:
+                    raise ValueError('Must be at least 1')
+                if new_limit < campaigns_used:
+                    flash(f'Cannot set limit below the {campaigns_used} campaigns already used this period.', 'error')
+                    return redirect(url_for('business_auth.edit_campaign_slots', business_id=business_account.uuid))
+            except (ValueError, TypeError):
+                flash('Please enter a valid positive number.', 'error')
+                return redirect(url_for('business_auth.edit_campaign_slots', business_id=business_account.uuid))
+
+            old_limit = current_license.max_campaigns_per_year
+            current_license.max_campaigns_per_year = new_limit
+            db.session.commit()
+
+            logger.info(
+                f"Platform admin {current_user.email if current_user else 'unknown'} updated campaign limit "
+                f"for {business_account.name} (id={business_account.id}): {old_limit} → {new_limit}"
+            )
+
+            try:
+                queue_audit_log(
+                    business_account_id=business_account.id,
+                    action_type='campaign_limit_updated',
+                    resource_type='license_history',
+                    resource_id=current_license.id,
+                    resource_name=business_account.name,
+                    user_email=current_user.email if current_user else 'unknown',
+                    user_name=current_user.get_full_name() if current_user else 'unknown',
+                    details={
+                        'old_limit': old_limit,
+                        'new_limit': new_limit,
+                        'license_type': current_license.license_type,
+                        'notes': notes,
+                    }
+                )
+            except Exception as audit_error:
+                logger.error(f"Failed to audit campaign limit update: {audit_error}")
+
+            flash(f'Campaign limit updated to {new_limit} for {business_account.name}.', 'success')
+            return redirect(url_for('business_auth.license_assignment_form', business_id=business_account.uuid))
+
+        return render_template(
+            'business_auth/licenses/edit_campaign_slots.html',
+            business_account=business_account,
+            current_license=current_license,
+            campaigns_used=campaigns_used,
+        )
+
+    except Exception as e:
+        logger.error(f"Error editing campaign slots for business_id {business_id}: {e}")
+        db.session.rollback()
+        flash('Failed to update campaign limit. Please try again.', 'error')
+        return redirect(url_for('business_auth.admin_licenses'))
+
+
 @business_auth_bp.route('/admin/licenses/dashboard')
 @require_platform_admin
 def license_dashboard():

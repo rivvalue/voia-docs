@@ -156,7 +156,7 @@ class LicenseService:
             return None, None
     
     # ==== CAMPAIGN LIMIT ENFORCEMENT ====
-    
+
     @staticmethod
     def can_activate_campaign(business_account_id: int) -> bool:
         """
@@ -196,7 +196,7 @@ class LicenseService:
             # Get current license to check limits
             current_license = LicenseService.get_current_license(business_account_id)
             max_campaigns = current_license.max_campaigns_per_year if current_license else 4
-            
+
             # If no valid license period, fall back to calendar year (trial behavior)
             if not period_start or not period_end:
                 logger.info(f"No valid license period for business_account_id {business_account_id}, using calendar year fallback")
@@ -657,19 +657,21 @@ class LicenseService:
                     })
                     
                     # Calculate days remaining for legacy license
-                    from datetime import date
+                    from datetime import date, datetime
                     today = date.today()
-                    if period_end > today:
-                        license_info['days_remaining'] = (period_end - today).days
+                    period_end_date = period_end.date() if isinstance(period_end, datetime) else period_end
+                    if period_end_date > today:
+                        license_info['days_remaining'] = (period_end_date - today).days
                         license_info['expires_soon'] = license_info['days_remaining'] <= 30
                     else:
-                        license_info['days_since_expired'] = (today - period_end).days
+                        license_info['days_since_expired'] = (today - period_end_date).days
             
             # Calculate campaign usage
             campaigns_used = LicenseService.get_campaigns_used_in_current_period(business_account_id)
+            campaigns_limit = license_info['campaigns_limit']
             license_info.update({
                 'campaigns_used': campaigns_used,
-                'campaigns_remaining': max(0, license_info['campaigns_limit'] - campaigns_used)
+                'campaigns_remaining': max(0, campaigns_limit - campaigns_used)
             })
             
             # Update capability checks
