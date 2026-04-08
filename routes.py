@@ -4731,14 +4731,18 @@ def feedback_submit():
     else:
         yt_priority = None
 
-    user_email = session.get('business_user_email', '')
-    account_name = session.get('business_account_name', '')
+    _biz_user = get_current_business_user()
+    _biz_account = get_current_business_account()
+    user_email = _biz_user.email if _biz_user else ''
+    user_name = _biz_user.get_full_name() if _biz_user else ''
+    account_name = _biz_account.name if _biz_account else ''
 
+    user_display = f'{user_name} <{user_email}>' if user_name else user_email
     env_block_lines = [
         '',
         '---',
         '**Environment**',
-        f'- **User:** {user_email}',
+        f'- **User:** {user_display}',
         f'- **Tenant:** {account_name}',
         f'- **Page:** {page_url}',
     ]
