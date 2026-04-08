@@ -188,14 +188,16 @@ def create_campaign():
             return render_template('campaigns/create.html',
                                  business_account=current_account.to_dict())
         
-        # Check license limits before creation
-        from license_service import LicenseService
-        if not LicenseService.can_activate_campaign(current_account.id):
-            license_info = LicenseService.get_license_info(current_account.id)
-            flash(f'Cannot create campaign. Your {license_info["license_type"]} license allows {license_info["campaigns_limit"]} campaigns per year and you have already used {license_info["campaigns_used"]} campaigns. Please contact support to upgrade your license.', 'error')
+        # Check pre-activation campaign cap (max 10 draft or ready campaigns)
+        pre_activation_count = Campaign.query.filter(
+            Campaign.business_account_id == current_account.id,
+            Campaign.status.in_(['draft', 'ready'])
+        ).count()
+        if pre_activation_count >= 10:
+            flash('You have reached the limit of 10 draft or ready campaigns. Please delete or activate an existing campaign before creating a new one.', 'error')
             return render_template('campaigns/create.html',
                                  business_account=current_account.to_dict())
-        
+
         # Handle form submission
         name = request.form.get('name', '').strip()
         description = request.form.get('description', '').strip()
@@ -880,9 +882,9 @@ def delete_draft_campaign(campaign_uuid):
             flash(_('Campaign not found.'), 'error')
             return redirect(url_for('campaigns.list_campaigns'))
         
-        # Validate: Only draft campaigns can be deleted
-        if campaign.status != 'draft':
-            flash(f'Only draft campaigns can be deleted. This campaign is {campaign.status}.', 'error')
+        # Validate: Only draft or ready campaigns can be deleted
+        if campaign.status not in ['draft', 'ready']:
+            flash(f'Only draft or ready campaigns can be deleted. This campaign is {campaign.status}.', 'error')
             return redirect(url_for('campaigns.view_campaign', campaign_uuid=campaign.uuid))
         
         # Get counts for audit trail
