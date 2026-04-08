@@ -28,6 +28,14 @@ By default, only one campaign can be active at a time per account. Attempting to
 
 ---
 
+## Draft Campaign Cap
+
+A maximum of **10 campaigns** may exist in a pre-activation state (Draft or Ready) at any one time per account. Attempting to create an eleventh campaign while 10 are already in Draft or Ready status will be blocked until the count falls below the cap.
+
+**Freeing up space:** Ready campaigns can be deleted to reduce the pre-activation count and allow new campaigns to be created. Deleting a Ready campaign is permanent and cannot be undone.
+
+---
+
 ## Creating a Campaign
 
 **Step 1: Basic Information**

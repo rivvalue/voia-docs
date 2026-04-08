@@ -15,6 +15,15 @@ Step-by-step video walkthroughs
 
 ---
 
+## In-App Feedback
+
+Authenticated users can submit bug reports or feature requests directly from the platform without leaving the application.
+
+**How to access:**  
+Click the **Give Feedback** button in the user menu, located at the bottom of the sidebar on desktop. From there you can describe your issue or suggestion and submit it directly to the VOÏA team.
+
+---
+
 ## Contact Support
 
 Reach out to your account administrator or contact:

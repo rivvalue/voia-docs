@@ -25,8 +25,8 @@ Votre licence VOÏA détermine :
 **Pour :** petites équipes débutant avec la collecte de feedback
 
 **Limites :**
-- 4 campagnes / an
-- 5 utilisateurs maximum
+- 4 campagnes / an (limites personnalisées disponibles — voir ci-dessous)
+- 5 utilisateurs maximum (limites personnalisées disponibles — voir ci-dessous)
 - **20 entreprises clientes** (toutes campagnes confondues, cumulatif)
 - Durée : 12 mois
 
@@ -44,8 +44,8 @@ Votre licence VOÏA détermine :
 **Pour :** entreprises en croissance
 
 **Limites :**
-- 4 campagnes / an
-- 10 utilisateurs maximum
+- 4 campagnes / an (limites personnalisées disponibles — voir ci-dessous)
+- 10 utilisateurs maximum (limites personnalisées disponibles — voir ci-dessous)
 - **100 entreprises clientes** (toutes campagnes confondues, cumulatif)
 - Durée : 12 mois
 
@@ -56,6 +56,12 @@ Votre licence VOÏA détermine :
 - ✓ Modèles personnalisés
 - ✓ Accès API
 - ✓ Rapports PDF executive
+
+---
+
+### Limites personnalisées pour Core et Plus
+
+Les administrateurs de plateforme peuvent configurer des limites d'utilisateurs et de campagnes personnalisées pour les licences Core et Plus — par exemple, augmenter le quota de campagnes ou le nombre d'utilisateurs autorisés au-delà des valeurs standard. Ces limites personnalisées sont accordées par un administrateur de plateforme et ne nécessitent pas de passage à Pro. Contactez votre administrateur de compte ou les ventes VOÏA pour en faire la demande.
 
 ---
 
@@ -131,6 +137,10 @@ Les licences fonctionnent sur un cycle annuel basé sur la **date d'activation**
 
 **Important :** Le quota de campagnes se réinitialise à la date anniversaire. Le comptage d'entreprises clientes **ne se réinitialise jamais** — il est cumulatif sur toute la durée du compte.
 
+### Dates de début et de fin personnalisées
+
+Les administrateurs de plateforme peuvent configurer une **date de début et une date de fin personnalisées** lors de l'attribution d'une licence — par exemple, pour antidater une licence afin de l'aligner sur la date de début d'un contrat, ou pour définir une expiration précise correspondant à un cycle de facturation. Contactez votre administrateur de compte si vous avez besoin d'une période de licence différente de la durée standard de 12 mois.
+
 ---
 
 ## Expiration de la licence
@@ -191,6 +201,19 @@ Accédez à **Paramètres → Informations sur la licence** pour consulter :
 ---
 
 ## Mise à niveau ou rétrogradation
+
+### Pack supplémentaire de campagnes
+
+Si vous avez besoin de campagnes supplémentaires au-delà de votre quota en cours d'année, un **pack supplémentaire de campagnes** est disponible. Chaque pack ajoute **4 campagnes supplémentaires** à votre période de licence en cours, sans nécessiter de passage à une licence supérieure.
+
+**Détails :**
+- Disponible dans la période de licence en cours (non reporté à l'année suivante)
+- Accordé par un administrateur de plateforme — aucun achat en libre-service dans l'application
+- **Tarification :** Core — 8 500 $ / Plus — 15 000 $
+
+Pour demander un pack supplémentaire de campagnes, contactez votre administrateur de compte ou les ventes VOÏA.
+
+---
 
 ### Quand mettre à niveau ?
 

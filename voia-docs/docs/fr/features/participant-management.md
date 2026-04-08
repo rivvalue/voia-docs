@@ -25,7 +25,9 @@ Base de données centralisée de tous vos clients :
 1. Télécharger le modèle CSV
 2. Remplir les données des participants
 3. Téléverser le fichier
-4. VOÏA valide et importe automatiquement
+4. VOÏA valide et lance l'import
+
+**Traitement en arrière-plan :** Les imports CSV volumineux sont traités en arrière-plan. Le téléversement retourne immédiatement avec un identifiant de traitement, et vous recevrez une notification dans l'application lorsque l'import sera terminé. Vous pouvez continuer à utiliser la plateforme pendant l'import.
 
 **Validation :** VOÏA vérifie les doublons d'email et les données invalides
 

@@ -28,6 +28,14 @@ Par défaut, une seule campagne peut être active à la fois par compte. Si votr
 
 ---
 
+## Plafond de campagnes en pré-activation
+
+Un maximum de **10 campagnes** peuvent exister simultanément en état de pré-activation (Brouillon ou Prêt) par compte. Tenter de créer une onzième campagne alors que 10 sont déjà en état Brouillon ou Prêt sera bloqué tant que le nombre ne redescend pas sous ce plafond.
+
+**Libérer de l'espace :** Les campagnes en état Prêt peuvent être supprimées pour réduire le comptage de pré-activation et permettre la création de nouvelles campagnes. La suppression d'une campagne Prête est permanente et irréversible.
+
+---
+
 ## Création d'une campagne
 
 **Étape 1 : Informations de base**

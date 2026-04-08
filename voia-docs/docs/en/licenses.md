@@ -24,8 +24,8 @@ Your VOÏA license determines:
 **Best for:** Small teams starting with customer feedback
 
 **Limits:**
-- **4 campaigns per year**
-- **5 users maximum**
+- **4 campaigns per year** (custom limits available — see below)
+- **5 users maximum** (custom limits available — see below)
 - **20 client companies** (across all campaigns, all time)
 - **12-month duration**
 
@@ -45,8 +45,8 @@ Your VOÏA license determines:
 **Best for:** Growing businesses with regular feedback needs
 
 **Limits:**
-- **4 campaigns per year**
-- **10 users maximum**
+- **4 campaigns per year** (custom limits available — see below)
+- **10 users maximum** (custom limits available — see below)
 - **100 client companies** (across all campaigns, all time)
 - **12-month duration**
 
@@ -59,6 +59,12 @@ Your VOÏA license determines:
 - ✓ Executive PDF reports
 
 **Pricing:** Contact sales for pricing
+
+---
+
+### Custom Limits for Core and Plus
+
+Platform administrators can configure custom user and campaign limits for Core and Plus licenses — for example, increasing the campaign quota or user cap beyond the standard defaults. Custom limits are granted by a platform admin and do not require an upgrade to Pro. Contact your account administrator or VOÏA sales to request a custom limit.
 
 ---
 
@@ -140,6 +146,10 @@ Licenses operate on an annual anniversary basis:
 
 **Important:** Campaign limits reset on your anniversary date, not January 1st. Client company counts do **not** reset — they accumulate over the life of your account.
 
+### Custom License Start and End Dates
+
+Platform administrators can configure a **custom start date and end date** when assigning a license — for example, to back-date a license to align with a contract start date or to set an exact expiration that matches a billing cycle. Contact your account administrator if you need a license period that differs from the standard 12-month default.
+
 ---
 
 ### License Expiration
@@ -201,6 +211,19 @@ Navigate to **Settings → License Info** to see:
 ---
 
 ## Upgrading or Downgrading
+
+### Campaign Add-On Bundle
+
+If you need additional campaigns beyond your license quota mid-year, a **Campaign Add-On Bundle** is available. Each bundle adds **4 extra campaigns** to your current license period without requiring a full license upgrade.
+
+**Details:**
+- Available within the current license period (does not roll over to the next year)
+- Granted by a platform admin — there is no in-app self-serve purchase flow
+- **Pricing:** Core tier — $8,500 / Plus tier — $15,000
+
+To request a Campaign Add-On Bundle, contact your account administrator or VOÏA sales.
+
+---
 
 ### When to Upgrade
 
@@ -344,7 +367,7 @@ A **participant** is an individual contact. A **client company** is the organisa
 
 ### Can I buy additional campaigns mid-year?
 
-Yes, contact sales for campaign add-on packages. Pricing varies based on your current license.
+Yes. A **Campaign Add-On Bundle** adds 4 extra campaigns to your current license period. Pricing is $8,500 for Core and $15,000 for Plus. Bundles are admin-granted — contact your account administrator or VOÏA sales to request one.
 
 ### What if I deactivate a campaign — does it free up my quota?
 

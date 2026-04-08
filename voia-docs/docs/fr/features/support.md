@@ -15,6 +15,15 @@ Démonstrations pas à pas en vidéo
 
 ---
 
+## Retours depuis la plateforme
+
+Les utilisateurs authentifiés peuvent soumettre des rapports de bogues ou des demandes de fonctionnalités directement depuis la plateforme, sans quitter l'application.
+
+**Comment y accéder :**  
+Cliquez sur le bouton **Donner un retour** dans le menu utilisateur, situé en bas de la barre latérale sur ordinateur. Vous pouvez alors décrire votre problème ou suggestion et le soumettre directement à l'équipe VOÏA.
+
+---
+
 ## Contacter le support
 
 Contactez votre administrateur de compte ou écrivez-nous :

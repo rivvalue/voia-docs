@@ -25,7 +25,9 @@ Centralized database of all your customers:
 1. Download CSV template
 2. Fill in participant data
 3. Upload file
-4. VOÏA validates and imports automatically
+4. VOÏA validates and begins the import
+
+**Background processing:** Large CSV imports are processed in the background. The upload returns immediately with a job ID, and you will receive an in-app notification when the import has completed. You can continue using the platform while the import runs.
 
 **Validation:** VOÏA checks for duplicate emails and invalid data
 
