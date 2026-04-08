@@ -103,10 +103,9 @@ def create_issue(title: str, description: str, issue_type: str, priority: str = 
         )
         resolved_type = _find_enum_value(fields_data, "type", type_candidates)
         if resolved_type is None:
-            resolved_type = issue_type
             logger.warning(
                 f"Could not resolve YouTrack 'Type' value for '{issue_type}'; "
-                f"using '{resolved_type}' as-is."
+                f"omitting Type field to avoid 400 error."
             )
         else:
             logger.debug(f"Resolved YouTrack Type value: '{resolved_type}'")
@@ -115,10 +114,9 @@ def create_issue(title: str, description: str, issue_type: str, priority: str = 
             priority_candidates = [priority, "High", "Normal", "Medium", "Low"]
             resolved_priority = _find_enum_value(fields_data, "priority", priority_candidates)
             if resolved_priority is None:
-                resolved_priority = priority
                 logger.warning(
                     f"Could not resolve YouTrack 'Priority' value for '{priority}'; "
-                    f"using '{resolved_priority}' as-is."
+                    f"omitting Priority field to avoid 400 error."
                 )
             else:
                 logger.debug(f"Resolved YouTrack Priority value: '{resolved_priority}'")
@@ -134,18 +132,21 @@ def create_issue(title: str, description: str, issue_type: str, priority: str = 
             elif fname.lower() == "priority":
                 priority_field_name = fname
     else:
-        resolved_type = issue_type
-        resolved_priority = priority
+        resolved_type = None
+        resolved_priority = None
         type_field_name = "Type"
         priority_field_name = "Priority"
 
-    custom_fields = [
-        {
-            "name": type_field_name,
-            "$type": "SingleEnumIssueCustomField",
-            "value": {"name": resolved_type},
-        }
-    ]
+    custom_fields = []
+
+    if resolved_type:
+        custom_fields.append(
+            {
+                "name": type_field_name,
+                "$type": "SingleEnumIssueCustomField",
+                "value": {"name": resolved_type},
+            }
+        )
 
     if resolved_priority:
         custom_fields.append(
