@@ -10,8 +10,6 @@ Your VOÏA license determines:
 - How many campaigns you can run per year
 - How many distinct **client companies** you can survey across all campaigns
 - How many team members can use the platform
-- Which features are available
-- Support level
 
 **Check your current license:** Navigate to Settings → License Info
 
@@ -31,10 +29,12 @@ Your VOÏA license determines:
 
 **Features included:**
 - ✓ Traditional and conversational surveys
-- ✓ Basic analytics and NPS tracking
+- ✓ Advanced analytics and NPS tracking
 - ✓ Email delivery
-- ✓ Standard support
-- ✓ Basic templates
+- ✓ Email support
+- ✓ Custom survey templates
+- ✓ API access
+- ✓ Executive PDF reports
 
 **Pricing:** Contact sales for pricing
 
@@ -51,12 +51,15 @@ Your VOÏA license determines:
 - **12-month duration**
 
 **Features included:**
-- ✓ Everything in Core
-- ✓ Advanced analytics and segmentation
-- ✓ Priority email support
+- ✓ Traditional and conversational surveys
+- ✓ Advanced analytics and NPS tracking
+- ✓ Email delivery
+- ✓ Email support
 - ✓ Custom survey templates
 - ✓ API access
 - ✓ Executive PDF reports
+
+> **Note:** Core and Plus include the same full feature set. The difference between these tiers is limits only — number of users, client companies, and campaigns.
 
 **Pricing:** Contact sales for pricing
 
@@ -230,7 +233,6 @@ To request a Campaign Add-On Bundle, contact your account administrator or VOÏA
 **You might need to upgrade if:**
 - You hit your campaign limit mid-year
 - You need more users
-- You want advanced features (API access, white-label)
 - You are approaching your client company limit
 
 **Upgrade process:**
@@ -381,6 +383,8 @@ Yes, anyone with access to your VOÏA account counts as a user.
 
 ## License Comparison Table
 
+> **Core vs Plus:** Both tiers include the same full feature set. The rows showing differences between Core and Plus reflect usage limits only (users, client companies, campaigns) — not feature access.
+
 | Feature | Core | Plus | Pro | Trial |
 |---------|------|------|-----|-------|
 | Campaigns/year | 4 | 4 | 12+ (custom) | 1 |
@@ -391,10 +395,10 @@ Yes, anyone with access to your VOÏA account counts as a user.
 | NPS tracking | ✓ | ✓ | ✓ | ✓ |
 | Email delivery | ✓ | ✓ | ✓ | ✓ |
 | Basic analytics | ✓ | ✓ | ✓ | ✓ |
-| Advanced analytics | ✗ | ✓ | ✓ | ✗ |
-| API access | ✗ | ✓ | ✓ | ✗ |
-| Custom templates | ✗ | ✓ | ✓ | ✗ |
-| PDF reports | ✗ | ✓ | ✓ | ✗ |
+| Advanced analytics | ✓ | ✓ | ✓ | ✗ |
+| API access | ✓ | ✓ | ✓ | ✗ |
+| Custom templates | ✓ | ✓ | ✓ | ✗ |
+| PDF reports | ✓ | ✓ | ✓ | ✗ |
 | White-label | ✗ | ✗ | ✓ | ✗ |
 | Custom integrations | ✗ | ✗ | ✓ | ✗ |
 | Dedicated support | ✗ | ✗ | ✓ | ✗ |
