@@ -31,11 +31,18 @@ Votre licence VOÏA détermine :
 - Durée : 12 mois
 
 **Fonctionnalités :**
-- ✓ Sondages traditionnels et conversationnels
-- ✓ Analytiques de base et suivi NPS
+- ✓ Sondages classiques
+- ✓ Sondages conversationnels
+- ✓ Suivi NPS
 - ✓ Envoi par email
-- ✓ Support standard
-- ✓ Modèles de base
+- ✓ Analyse de sentiment
+- ✓ Analyse des thèmes clés
+- ✓ Analytiques avancés
+- ✓ Génération de rapports exécutifs
+- ✓ Export de données (CSV / Excel)
+- ✓ Modèles de sondage personnalisés
+- ✓ Intelligence QBR
+- ✓ Service d'assistance (help desk)
 
 ---
 
@@ -50,12 +57,21 @@ Votre licence VOÏA détermine :
 - Durée : 12 mois
 
 **Fonctionnalités :**
-- ✓ Tout ce qui est inclus dans Core
-- ✓ Analytiques avancés et segmentation
-- ✓ Support email prioritaire
-- ✓ Modèles personnalisés
+- ✓ Sondages classiques
+- ✓ Sondages conversationnels
+- ✓ Suivi NPS
+- ✓ Envoi par email
+- ✓ Analyse de sentiment
+- ✓ Analyse des thèmes clés
+- ✓ Analytiques avancés
+- ✓ Génération de rapports exécutifs
+- ✓ Export de données (CSV / Excel)
+- ✓ Modèles de sondage personnalisés
+- ✓ Intelligence QBR
+- ✓ Service d'assistance (help desk)
 - ✓ Accès API
-- ✓ Rapports PDF executive
+
+> **Remarque :** Core et Plus incluent le même ensemble complet de fonctionnalités, à l'exception de l'accès API, disponible uniquement sur Plus et Pro. Les autres différences entre ces niveaux concernent uniquement les limites d'utilisation (utilisateurs, entreprises clientes, campagnes).
 
 ---
 
@@ -77,12 +93,9 @@ Les administrateurs de plateforme peuvent configurer des limites d'utilisateurs 
 
 **Fonctionnalités :**
 - ✓ Tout ce qui est inclus dans Plus
-- ✓ Tableaux de bord analytiques personnalisés
-- ✓ Gestionnaire de compte dédié
 - ✓ Branding white-label
 - ✓ Intégrations personnalisées
 - ✓ Garantie SLA (disponibilité 99,9 %)
-- ✓ Accès API avancé
 - ✓ Support prioritaire 24/7
 
 ---
@@ -98,8 +111,10 @@ Les administrateurs de plateforme peuvent configurer des limites d'utilisateurs 
 - Durée : 1 mois
 
 **Fonctionnalités :**
-- ✓ Fonctionnalités de base de la plateforme
-- ✓ Support limité
+- ✓ Sondages classiques
+- ✓ Sondages conversationnels
+- ✓ Suivi NPS
+- ✓ Envoi par email
 - ✓ Exemples de modèles de sondage
 
 ---
@@ -334,24 +349,31 @@ Un **participant** est un contact individuel. Une **entreprise cliente** est l'o
 
 ## Tableau comparatif des licences
 
+> **Core vs Plus :** Core et Plus incluent le même ensemble complet de fonctionnalités, à l'exception de l'accès API, disponible uniquement sur Plus et Pro. Les autres différences entre ces niveaux concernent uniquement les limites d'utilisation (utilisateurs, entreprises clientes, campagnes).
+
 | Fonctionnalité | Core | Plus | Pro | Trial |
 |----------------|------|------|-----|-------|
 | Campagnes/an | 4 | 4 | 12+ (personnalisable) | 1 |
 | Utilisateurs | 5 | 10 | 25+ (personnalisable) | 2 |
 | **Entreprises clientes** | **20** | **100** | **Illimitées (configurables)** | **Illimitées** |
 | Durée | 12 mois | 12 mois | 12+ mois (personnalisable) | 1 mois |
+| Sondages classiques | ✓ | ✓ | ✓ | ✓ |
 | Sondages conversationnels | ✓ | ✓ | ✓ | ✓ |
 | Suivi NPS | ✓ | ✓ | ✓ | ✓ |
 | Envoi par email | ✓ | ✓ | ✓ | ✓ |
-| Analytiques de base | ✓ | ✓ | ✓ | ✓ |
-| Analytiques avancés | ✗ | ✓ | ✓ | ✗ |
+| Analyse de sentiment | ✓ | ✓ | ✓ | ✗ |
+| Analyse des thèmes clés | ✓ | ✓ | ✓ | ✗ |
+| Analytiques avancés | ✓ | ✓ | ✓ | ✗ |
+| Génération de rapports exécutifs | ✓ | ✓ | ✓ | ✗ |
+| Export de données (CSV / Excel) | ✓ | ✓ | ✓ | ✗ |
+| Modèles de sondage personnalisés | ✓ | ✓ | ✓ | ✗ |
+| Intelligence QBR | ✓ | ✓ | ✓ | ✗ |
+| Service d'assistance (help desk) | ✓ | ✓ | ✓ | ✗ |
 | Accès API | ✗ | ✓ | ✓ | ✗ |
-| Modèles personnalisés | ✗ | ✓ | ✓ | ✗ |
-| Rapports PDF | ✗ | ✓ | ✓ | ✗ |
-| White-label | ✗ | ✗ | ✓ | ✗ |
+| Branding white-label | ✗ | ✗ | ✓ | ✗ |
 | Intégrations personnalisées | ✗ | ✗ | ✓ | ✗ |
-| Support dédié | ✗ | ✗ | ✓ | ✗ |
-| Garantie SLA | ✗ | ✗ | ✓ | ✗ |
+| Garantie SLA (99,9 %) | ✗ | ✗ | ✓ | ✗ |
+| Support prioritaire (24/7) | ✗ | ✗ | ✓ | ✗ |
 
 ---
 

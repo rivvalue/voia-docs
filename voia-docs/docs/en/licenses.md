@@ -28,13 +28,18 @@ Your VOÏA license determines:
 - **12-month duration**
 
 **Features included:**
-- ✓ Traditional and conversational surveys
-- ✓ Advanced analytics and NPS tracking
+- ✓ Classic surveys
+- ✓ Conversational surveys
+- ✓ NPS tracking
 - ✓ Email delivery
-- ✓ Email support
+- ✓ Sentiment analysis
+- ✓ Key themes analysis
+- ✓ Advanced analytics
+- ✓ Executive report generation
+- ✓ Data export (CSV / Excel)
 - ✓ Custom survey templates
-- ✓ API access
-- ✓ Executive PDF reports
+- ✓ QBR Intelligence
+- ✓ Help desk
 
 **Pricing:** Contact sales for pricing
 
@@ -51,15 +56,21 @@ Your VOÏA license determines:
 - **12-month duration**
 
 **Features included:**
-- ✓ Traditional and conversational surveys
-- ✓ Advanced analytics and NPS tracking
+- ✓ Classic surveys
+- ✓ Conversational surveys
+- ✓ NPS tracking
 - ✓ Email delivery
-- ✓ Email support
+- ✓ Sentiment analysis
+- ✓ Key themes analysis
+- ✓ Advanced analytics
+- ✓ Executive report generation
+- ✓ Data export (CSV / Excel)
 - ✓ Custom survey templates
+- ✓ QBR Intelligence
+- ✓ Help desk
 - ✓ API access
-- ✓ Executive PDF reports
 
-> **Note:** Core and Plus include the same full feature set. The difference between these tiers is limits only — number of users, client companies, and campaigns.
+> **Note:** Core and Plus include the same full feature set except API access, which is available on Plus and Pro only. The difference between these tiers is otherwise limits only — number of users, client companies, and campaigns.
 
 **Pricing:** Contact sales for pricing
 
@@ -83,12 +94,9 @@ Platform administrators can configure custom user and campaign limits for Core a
 
 **Features included:**
 - ✓ Everything in Plus
-- ✓ Custom analytics dashboards
-- ✓ Dedicated account manager
 - ✓ White-label branding
 - ✓ Custom integrations
 - ✓ SLA guarantee (99.9% uptime)
-- ✓ Advanced API access
 - ✓ Priority support (24/7)
 
 **Pricing:** Custom pricing based on your needs
@@ -106,8 +114,10 @@ Platform administrators can configure custom user and campaign limits for Core a
 - **1-month duration**
 
 **Features included:**
-- ✓ Basic platform features
-- ✓ Limited support
+- ✓ Classic surveys
+- ✓ Conversational surveys
+- ✓ NPS tracking
+- ✓ Email delivery
 - ✓ Sample survey templates
 
 **Pricing:** Free trial
@@ -383,7 +393,7 @@ Yes, anyone with access to your VOÏA account counts as a user.
 
 ## License Comparison Table
 
-> **Core vs Plus:** Both tiers include the same full feature set. The rows showing differences between Core and Plus reflect usage limits only (users, client companies, campaigns) — not feature access.
+> **Core vs Plus:** Core and Plus include the same full feature set except API access, which is available on Plus and Pro only. All other differences between these tiers are usage limits only (users, client companies, campaigns).
 
 | Feature | Core | Plus | Pro | Trial |
 |---------|------|------|-----|-------|
@@ -391,18 +401,23 @@ Yes, anyone with access to your VOÏA account counts as a user.
 | Users | 5 | 10 | 25+ (custom) | 2 |
 | **Client companies** | **20** | **100** | **Unlimited (configurable)** | **Unlimited** |
 | Duration | 12 months | 12 months | 12+ months (custom) | 1 month |
+| Classic surveys | ✓ | ✓ | ✓ | ✓ |
 | Conversational surveys | ✓ | ✓ | ✓ | ✓ |
 | NPS tracking | ✓ | ✓ | ✓ | ✓ |
 | Email delivery | ✓ | ✓ | ✓ | ✓ |
-| Basic analytics | ✓ | ✓ | ✓ | ✓ |
+| Sentiment analysis | ✓ | ✓ | ✓ | ✗ |
+| Key themes analysis | ✓ | ✓ | ✓ | ✗ |
 | Advanced analytics | ✓ | ✓ | ✓ | ✗ |
-| API access | ✓ | ✓ | ✓ | ✗ |
-| Custom templates | ✓ | ✓ | ✓ | ✗ |
-| PDF reports | ✓ | ✓ | ✓ | ✗ |
-| White-label | ✗ | ✗ | ✓ | ✗ |
+| Executive report generation | ✓ | ✓ | ✓ | ✗ |
+| Data export (CSV / Excel) | ✓ | ✓ | ✓ | ✗ |
+| Custom survey templates | ✓ | ✓ | ✓ | ✗ |
+| QBR Intelligence | ✓ | ✓ | ✓ | ✗ |
+| Help desk | ✓ | ✓ | ✓ | ✗ |
+| API access | ✗ | ✓ | ✓ | ✗ |
+| White-label branding | ✗ | ✗ | ✓ | ✗ |
 | Custom integrations | ✗ | ✗ | ✓ | ✗ |
-| Dedicated support | ✗ | ✗ | ✓ | ✗ |
-| SLA guarantee | ✗ | ✗ | ✓ | ✗ |
+| SLA guarantee (99.9%) | ✗ | ✗ | ✓ | ✗ |
+| Priority support (24/7) | ✗ | ✗ | ✓ | ✗ |
 
 ---
 
