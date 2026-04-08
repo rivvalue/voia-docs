@@ -202,38 +202,46 @@ class LicenseTemplateManager:
     """
     
     # Predefined License Templates
+    _SHARED_FEATURES = [
+        'Full platform access',
+        'Survey builder & templates',
+        'Analytics & reporting',
+        'Email campaign management',
+        'Technical support',
+    ]
+
     CORE_TEMPLATE = LicenseTemplate(
         license_type='core',
         display_name='Core',
-        description='Small teams - 200 target responses (up to 1,000 invitations)',
+        description='Up to 5 users · up to 20 client companies · 200 responses per campaign',
         max_campaigns_per_year=4,
         max_users=5,
         max_participants_per_campaign=200,
         max_invitations_per_campaign=1000,
         max_client_companies=20,
-        annual_price=8000.00,
+        annual_price=12000.00,
         default_duration_months=12,
-        features=['Basic Analytics', 'Email Support', 'Standard Templates']
+        features=['Full platform access', 'Survey builder & templates', 'Analytics & reporting', 'Email campaign management', 'Technical support']
     )
     
     PLUS_TEMPLATE = LicenseTemplate(
         license_type='plus',
         display_name='Plus',
-        description='Growing teams - 1,000 target responses (up to 5,000 invitations)',
+        description='Up to 10 users · up to 100 client companies · 1,000 responses per campaign',
         max_campaigns_per_year=4,
         max_users=10,
         max_participants_per_campaign=1000,
         max_invitations_per_campaign=5000,
         max_client_companies=100,
-        annual_price=12000.00,
+        annual_price=25000.00,
         default_duration_months=12,
-        features=['Advanced Analytics', 'Priority Support', 'Custom Templates', 'API Access']
+        features=['Full platform access', 'Survey builder & templates', 'Analytics & reporting', 'Email campaign management', 'Technical support']
     )
     
     PRO_TEMPLATE = LicenseTemplate(
         license_type='pro',
         display_name='Pro',
-        description='Enterprise teams - 10,000 target responses (up to 50,000 invitations)',
+        description='Up to 25 users · unlimited client companies · 10,000 responses per campaign',
         max_campaigns_per_year=12,  # Default for Pro, but customizable
         max_users=25,  # Default for Pro, but customizable
         max_participants_per_campaign=10000,  # Default for Pro, but customizable
@@ -241,7 +249,7 @@ class LicenseTemplateManager:
         max_client_companies=None,  # Unlimited by default, configurable by admin
         is_custom=True,
         default_duration_months=12,
-        features=['Custom Analytics', 'Dedicated Support', 'White Label', 'Custom Integrations', 'SLA Guarantee']
+        features=['Full platform access', 'Survey builder & templates', 'Analytics & reporting', 'Email campaign management', 'Technical support']
     )
     
     TRIAL_TEMPLATE = LicenseTemplate(

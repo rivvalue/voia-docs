@@ -654,3 +654,182 @@ class TestConsumerEmailDomains:
         from license_service import LicenseService
         for corporate in ['acme.com', 'globex.com', 'initech.com']:
             assert corporate not in LicenseService.CONSUMER_EMAIL_DOMAINS
+
+
+# ---------------------------------------------------------------------------
+# 10. Core/Plus custom override validation (Task #100)
+# ---------------------------------------------------------------------------
+
+class TestCorePlusOverridePricing:
+    """Verify updated pricing and descriptions in Core/Plus templates."""
+
+    def test_core_price_is_12000(self):
+        from license_templates import LicenseTemplateManager
+        tmpl = LicenseTemplateManager.get_template('core')
+        assert tmpl is not None
+        assert tmpl.annual_price == 12000
+
+    def test_plus_price_is_25000(self):
+        from license_templates import LicenseTemplateManager
+        tmpl = LicenseTemplateManager.get_template('plus')
+        assert tmpl is not None
+        assert tmpl.annual_price == 25000
+
+    def test_core_description_mentions_20_client_companies(self):
+        from license_templates import LicenseTemplateManager
+        tmpl = LicenseTemplateManager.get_template('core')
+        assert tmpl is not None
+        assert '20' in (tmpl.description or '')
+
+    def test_plus_description_mentions_100_client_companies(self):
+        from license_templates import LicenseTemplateManager
+        tmpl = LicenseTemplateManager.get_template('plus')
+        assert tmpl is not None
+        assert '100' in (tmpl.description or '')
+
+
+class TestCorePlusOverrideLimitValidation:
+    """_validate_downgrade_usage blocks same-tier re-assignments with reduced custom limits."""
+
+    def test_core_to_core_with_lower_user_override_blocked_if_over_usage(self, db_session):
+        """Re-assigning core with lower user limit is blocked when usage exceeds new limit."""
+        from license_service import LicenseService
+        from license_templates import LicenseTemplateManager
+        from models import BusinessAccountUser
+        from werkzeug.security import generate_password_hash
+
+        account = _make_account(db_session)
+        current_lic = _make_license(db_session, account, license_type='core',
+                                    max_client_companies=20)
+        current_lic.max_users = 5
+
+        for i in range(3):
+            user = BusinessAccountUser(
+                email=f'extra_user_{uuid.uuid4().hex[:6]}@test.com',
+                password_hash=generate_password_hash('pass'),
+                first_name='Ex', last_name='User',
+                role='member',
+                is_active_user=True,
+                email_verified=True,
+                business_account_id=account.id,
+            )
+            db_session.add(user)
+        db_session.flush()
+        db_session.commit()
+
+        target = LicenseTemplateManager.get_template('core')
+        custom_config = {'max_users': 2}
+
+        success, message = LicenseService._validate_downgrade_usage(
+            account.id, current_lic, target, custom_config=custom_config
+        )
+        assert success is False
+
+    def test_core_to_core_with_same_defaults_passes_validation(self, db_session):
+        """Re-assigning core without changing limits always passes."""
+        from license_service import LicenseService
+        from license_templates import LicenseTemplateManager
+
+        account = _make_account(db_session)
+        current_lic = _make_license(db_session, account, license_type='core',
+                                    max_client_companies=20)
+        current_lic.max_users = 5
+        db_session.commit()
+
+        target = LicenseTemplateManager.get_template('core')
+        success, _ = LicenseService._validate_downgrade_usage(
+            account.id, current_lic, target, custom_config=None
+        )
+        assert success is True
+
+    def test_core_to_core_with_higher_override_passes_validation(self, db_session):
+        """Increasing limits via custom_config on same tier should never fail validation."""
+        from license_service import LicenseService
+        from license_templates import LicenseTemplateManager
+
+        account = _make_account(db_session)
+        current_lic = _make_license(db_session, account, license_type='core',
+                                    max_client_companies=20)
+        current_lic.max_users = 5
+        db_session.commit()
+
+        target = LicenseTemplateManager.get_template('core')
+        custom_config = {'max_users': 10}
+
+        success, _ = LicenseService._validate_downgrade_usage(
+            account.id, current_lic, target, custom_config=custom_config
+        )
+        assert success is True
+
+    def test_plus_downgrade_with_custom_client_company_reduction_blocked(self, db_session):
+        """Reducing client company limit below current usage is blocked."""
+        from license_service import LicenseService
+        from license_templates import LicenseTemplateManager
+
+        account = _make_account(db_session)
+        current_lic = _make_license(db_session, account, license_type='plus',
+                                    max_client_companies=100)
+        for i in range(30):
+            _make_participant(db_session, account, f'user@override{i:02d}.com')
+        db_session.commit()
+
+        target = LicenseTemplateManager.get_template('plus')
+        custom_config = {'max_client_companies': 10}
+
+        success, message = LicenseService._validate_downgrade_usage(
+            account.id, current_lic, target, custom_config=custom_config
+        )
+        assert success is False
+
+    def test_pro_custom_config_path_still_works(self, db_session):
+        """Pro tier baseline validation should still pass when usage is within limits."""
+        from license_service import LicenseService
+        from license_templates import LicenseTemplateManager
+
+        account = _make_account(db_session)
+        current_lic = _make_license(db_session, account, license_type='pro',
+                                    max_client_companies=None)
+        current_lic.max_users = 50
+        db_session.commit()
+
+        target = LicenseTemplateManager.get_template('pro')
+        success, _ = LicenseService._validate_downgrade_usage(
+            account.id, current_lic, target, custom_config=None
+        )
+        assert success is True
+
+    def test_same_tier_revert_to_defaults_blocked_when_over_usage(self, db_session):
+        """Same-tier renewal reverting elevated custom limits to defaults is blocked when usage exceeds defaults."""
+        from license_service import LicenseService
+        from license_templates import LicenseTemplateManager
+        from models import BusinessAccountUser
+        from werkzeug.security import generate_password_hash
+
+        account = _make_account(db_session)
+        # Current core license has elevated user limit (10 users instead of 5)
+        current_lic = _make_license(db_session, account, license_type='core',
+                                    max_client_companies=20)
+        current_lic.max_users = 10
+
+        # Create 7 active users — above core default (5), but within current (10)
+        for i in range(7):
+            user = BusinessAccountUser(
+                email=f'samelevel_{uuid.uuid4().hex[:6]}@test.com',
+                password_hash=generate_password_hash('pass'),
+                first_name='U', last_name='User',
+                role='member',
+                is_active_user=True,
+                email_verified=True,
+                business_account_id=account.id,
+            )
+            db_session.add(user)
+        db_session.flush()
+        db_session.commit()
+
+        # Re-assign core with NO custom_config (reverts to default 5-user limit)
+        target = LicenseTemplateManager.get_template('core')  # max_users=5 by default
+        success, message = LicenseService._validate_downgrade_usage(
+            account.id, current_lic, target, custom_config=None
+        )
+        # Must be blocked because current usage (7) > target default (5)
+        assert success is False

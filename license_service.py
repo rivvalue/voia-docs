@@ -1234,8 +1234,19 @@ class LicenseService:
             if not template:
                 return False, None, f"License template not found for type '{license_type}'"
                 
-            if custom_config and template.is_custom:
-                license_config = LicenseTemplateManager.create_license_config(license_type, custom_config)
+            if custom_config and license_type in ('pro', 'core', 'plus'):
+                if template.is_custom:
+                    license_config = LicenseTemplateManager.create_license_config(license_type, custom_config)
+                else:
+                    # For core/plus, apply overrides directly on top of the template defaults
+                    license_config = template.to_dict()
+                    allowed_overrides = (
+                        'max_users', 'max_campaigns_per_year', 'max_participants_per_campaign',
+                        'max_invitations_per_campaign', 'max_client_companies'
+                    )
+                    for key in allowed_overrides:
+                        if key in custom_config:
+                            license_config[key] = custom_config[key]
             else:
                 license_config = template.to_dict()
             
@@ -1373,9 +1384,9 @@ class LicenseService:
             if not template:
                 return False, f"License template not found for type '{license_type}'"
             
-            # Check 4: Validate custom limits for Pro licenses
+            # Check 4: Validate custom limits for Pro, Core, and Plus licenses
             if custom_config:
-                if not template.is_custom:
+                if license_type not in ('pro', 'core', 'plus'):
                     return False, f"Custom limits not supported for {license_type} license type"
                 
                 # Validate custom limit parameters
@@ -1417,7 +1428,7 @@ class LicenseService:
             current_license = LicenseService.get_current_license(business_id)
             if current_license:
                 downgrade_validation = LicenseService._validate_downgrade_usage(
-                    business_id, current_license, template
+                    business_id, current_license, template, custom_config
                 )
                 if not downgrade_validation[0]:
                     return downgrade_validation  # Returns (False, error_message)
@@ -1607,7 +1618,8 @@ class LicenseService:
     def _validate_downgrade_usage(
         business_id: int,
         current_license: LicenseHistory, 
-        target_template: LicenseTemplate
+        target_template: LicenseTemplate,
+        custom_config: Optional[Dict[str, Any]] = None
     ) -> Tuple[bool, str]:
         """
         Validate that current usage is compatible with target license limits.
@@ -1617,6 +1629,7 @@ class LicenseService:
             business_id: Business account ID to validate
             current_license: Current active license
             target_template: Target license template with limits
+            custom_config: Optional custom limit overrides (for core/plus/pro)
             
         Returns:
             tuple: (is_safe: bool, error_message: str)
@@ -1632,9 +1645,33 @@ class LicenseService:
                 current_license.license_type, target_template.license_type
             )
             
-            # Only validate usage for downgrades - upgrades and lateral moves are safe
+            # Resolve effective limits: start from template defaults then apply any overrides
+            effective_max_users = target_template.max_users
+            effective_max_campaigns = target_template.max_campaigns_per_year
+            effective_max_companies = getattr(target_template, 'max_client_companies', None)
+            if custom_config:
+                if 'max_users' in custom_config and custom_config['max_users'] is not None:
+                    effective_max_users = custom_config['max_users']
+                if 'max_campaigns_per_year' in custom_config and custom_config['max_campaigns_per_year'] is not None:
+                    effective_max_campaigns = custom_config['max_campaigns_per_year']
+                if 'max_client_companies' in custom_config:
+                    effective_max_companies = custom_config['max_client_companies']
+            
+            # For non-downgrade transitions, only run usage validation when the effective
+            # limits are actually lower than what the current license provides.
+            # This covers: same-tier renewals that revert high custom limits back to
+            # tier defaults, or same-tier assignments with explicit lower overrides.
             if transition_type != 'downgrade':
-                return True, "No downgrade usage validation needed"
+                current_max_users = getattr(current_license, 'max_users', effective_max_users)
+                current_max_campaigns = getattr(current_license, 'max_campaigns_per_year', effective_max_campaigns)
+                current_max_companies = getattr(current_license, 'max_client_companies', None)
+                limits_reduced = (
+                    effective_max_users < (current_max_users or effective_max_users) or
+                    effective_max_campaigns < (current_max_campaigns or effective_max_campaigns) or
+                    (effective_max_companies is not None and (current_max_companies is None or effective_max_companies < current_max_companies))
+                )
+                if not limits_reduced:
+                    return True, "No limit reduction detected, usage validation not needed"
             
             validation_errors = []
             
@@ -1643,9 +1680,9 @@ class LicenseService:
                 business_account = BusinessAccount.query.get(business_id)
                 if business_account and hasattr(business_account, 'current_users_count'):
                     current_users = business_account.current_users_count
-                    if current_users > target_template.max_users:
+                    if current_users > effective_max_users:
                         validation_errors.append(
-                            f"Current users ({current_users}) exceeds target limit ({target_template.max_users})"
+                            f"Current users ({current_users}) exceeds target limit ({effective_max_users})"
                         )
             except Exception as e:
                 logger.warning(f"Could not validate user count for business_id {business_id}: {e}")
@@ -1657,23 +1694,22 @@ class LicenseService:
                     campaigns_used = LicenseService.get_campaigns_used_in_current_period(
                         business_id, period_start, period_end
                     )
-                    if campaigns_used > target_template.max_campaigns_per_year:
+                    if campaigns_used > effective_max_campaigns:
                         validation_errors.append(
-                            f"Campaigns used this period ({campaigns_used}) exceeds target limit ({target_template.max_campaigns_per_year})"
+                            f"Campaigns used this period ({campaigns_used}) exceeds target limit ({effective_max_campaigns})"
                         )
             except Exception as e:
                 logger.warning(f"Could not validate campaign usage for business_id {business_id}: {e}")
             
             # Check 3: Company domain count vs target max_client_companies limit
             try:
-                target_max_companies = getattr(target_template, 'max_client_companies', None)
-                if target_max_companies is not None:
+                if effective_max_companies is not None:
                     current_domain_count = LicenseService.get_unique_company_domain_count(business_id)
-                    if current_domain_count > target_max_companies:
+                    if current_domain_count > effective_max_companies:
                         validation_errors.append(
-                            f"Current client company count ({current_domain_count}) exceeds target limit ({target_max_companies}). "
+                            f"Current client company count ({current_domain_count}) exceeds target limit ({effective_max_companies}). "
                             f"The account has participants from {current_domain_count} distinct client companies, "
-                            f"but the target license only allows {target_max_companies}."
+                            f"but the target license only allows {effective_max_companies}."
                         )
             except Exception as e:
                 logger.warning(f"Could not validate company domain count for business_id {business_id}: {e}")

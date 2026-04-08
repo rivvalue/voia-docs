@@ -133,7 +133,7 @@
                                     <div class="d-flex justify-content-between align-items-start mb-2">
                                         <div>
                                             <h4 class="mb-1" style="font-weight: 600;">{{ _('Core License') }}</h4>
-                                            <p class="text-muted mb-0" style="font-size: var(--font-size-sm);">{{ _('Essential features for small teams') }}</p>
+                                            <p class="text-muted mb-0" style="font-size: var(--font-size-sm);">{{ core_template.description if core_template and core_template.description else _('Essential features for small teams') }}</p>
                                         </div>
                                         <div class="text-end">
                                             <div style="font-size: var(--font-size-xl); font-weight: 600; color: var(--primary-red);">{{ "${:,}".format(core_template.annual_price|int) if core_template and core_template.annual_price else 'N/A' }}</div>
@@ -143,17 +143,20 @@
                                     <div class="row mt-3">
                                         <div class="col-md-6">
                                             <ul class="license-features-list">
-                                                <li><i class="fas fa-check"></i> {{ _('Up to 5 users') }}</li>
-                                                <li><i class="fas fa-check"></i> 4 campaigns {{ _('per year') }}</li>
-                                                <li><i class="fas fa-check"></i> {{ _('200 target responses per campaign') }}</li>
-                                                <li><i class="fas fa-check"></i> {{ _('1,000 survey invitations per campaign') }}</li>
+                                                <li><i class="fas fa-check"></i> {{ _('Up to') }} {{ core_template.max_users if core_template else 5 }} {{ _('users') }}</li>
+                                                <li><i class="fas fa-check"></i> {{ _('Up to') }} {{ core_template.max_client_companies if core_template and core_template.max_client_companies else 20 }} {{ _('client companies') }}</li>
+                                                <li><i class="fas fa-check"></i> {{ core_template.max_campaigns_per_year if core_template else 4 }} {{ _('campaigns per year') }}</li>
+                                                <li><i class="fas fa-check"></i> {{ "{:,}".format(core_template.max_participants_per_campaign) if core_template else '200' }} {{ _('target responses per campaign') }}</li>
+                                                <li><i class="fas fa-check"></i> {{ "{:,}".format(core_template.max_invitations_per_campaign) if core_template else '1,000' }} {{ _('invitations per campaign') }}</li>
                                             </ul>
                                         </div>
                                         <div class="col-md-6">
                                             <ul class="license-features-list">
-                                                <li><i class="fas fa-check"></i> {{ _('Basic Analytics') }}</li>
-                                                <li><i class="fas fa-check"></i> {{ _('Email Support') }}</li>
-                                                <li><i class="fas fa-check"></i> {{ _('Standard Templates') }}</li>
+                                                <li><i class="fas fa-check"></i> {{ _('Full platform access') }}</li>
+                                                <li><i class="fas fa-check"></i> {{ _('Survey builder & templates') }}</li>
+                                                <li><i class="fas fa-check"></i> {{ _('Analytics & reporting') }}</li>
+                                                <li><i class="fas fa-check"></i> {{ _('Email campaign management') }}</li>
+                                                <li><i class="fas fa-check"></i> {{ _('Technical support') }}</li>
                                             </ul>
                                         </div>
                                     </div>
@@ -178,7 +181,7 @@
                                     <div class="d-flex justify-content-between align-items-start mb-2">
                                         <div>
                                             <h4 class="mb-1" style="font-weight: 600;">{{ _('Plus License') }}</h4>
-                                            <p class="text-muted mb-0" style="font-size: var(--font-size-sm);">{{ _('Advanced features for growing teams') }}</p>
+                                            <p class="text-muted mb-0" style="font-size: var(--font-size-sm);">{{ plus_template.description if plus_template and plus_template.description else _('Advanced features for growing teams') }}</p>
                                         </div>
                                         <div class="text-end">
                                             <div style="font-size: var(--font-size-xl); font-weight: 600; color: var(--primary-red);">{{ "${:,}".format(plus_template.annual_price|int) if plus_template and plus_template.annual_price else 'N/A' }}</div>
@@ -188,18 +191,20 @@
                                     <div class="row mt-3">
                                         <div class="col-md-6">
                                             <ul class="license-features-list">
-                                                <li><i class="fas fa-check"></i> {{ _('Up to 10 users') }}</li>
-                                                <li><i class="fas fa-check"></i> 4 campaigns {{ _('per year') }}</li>
-                                                <li><i class="fas fa-check"></i> {{ _('1,000 target responses per campaign') }}</li>
-                                                <li><i class="fas fa-check"></i> {{ _('5,000 survey invitations per campaign') }}</li>
+                                                <li><i class="fas fa-check"></i> {{ _('Up to') }} {{ plus_template.max_users if plus_template else 10 }} {{ _('users') }}</li>
+                                                <li><i class="fas fa-check"></i> {{ _('Up to') }} {{ plus_template.max_client_companies if plus_template and plus_template.max_client_companies else 100 }} {{ _('client companies') }}</li>
+                                                <li><i class="fas fa-check"></i> {{ plus_template.max_campaigns_per_year if plus_template else 4 }} {{ _('campaigns per year') }}</li>
+                                                <li><i class="fas fa-check"></i> {{ "{:,}".format(plus_template.max_participants_per_campaign) if plus_template else '1,000' }} {{ _('target responses per campaign') }}</li>
+                                                <li><i class="fas fa-check"></i> {{ "{:,}".format(plus_template.max_invitations_per_campaign) if plus_template else '5,000' }} {{ _('invitations per campaign') }}</li>
                                             </ul>
                                         </div>
                                         <div class="col-md-6">
                                             <ul class="license-features-list">
-                                                <li><i class="fas fa-check"></i> {{ _('Advanced Analytics') }}</li>
-                                                <li><i class="fas fa-check"></i> {{ _('Priority Support') }}</li>
-                                                <li><i class="fas fa-check"></i> {{ _('Custom Templates') }}</li>
-                                                <li><i class="fas fa-check"></i> API Access</li>
+                                                <li><i class="fas fa-check"></i> {{ _('Full platform access') }}</li>
+                                                <li><i class="fas fa-check"></i> {{ _('Survey builder & templates') }}</li>
+                                                <li><i class="fas fa-check"></i> {{ _('Analytics & reporting') }}</li>
+                                                <li><i class="fas fa-check"></i> {{ _('Email campaign management') }}</li>
+                                                <li><i class="fas fa-check"></i> {{ _('Technical support') }}</li>
                                             </ul>
                                         </div>
                                     </div>
@@ -224,7 +229,7 @@
                                     <div class="d-flex justify-content-between align-items-start mb-2">
                                         <div>
                                             <h4 class="mb-1" style="font-weight: 600;">{{ _('Pro License') }}</h4>
-                                            <p class="text-muted mb-0" style="font-size: var(--font-size-sm);">{{ _('Custom limits for enterprise needs') }}</p>
+                                            <p class="text-muted mb-0" style="font-size: var(--font-size-sm);">{{ pro_template.description if pro_template and pro_template.description else _('Custom limits for enterprise needs') }}</p>
                                         </div>
                                         <div class="text-end">
                                             <div style="font-size: var(--font-size-xl); font-weight: 600; color: var(--primary-red);">{{ _('Custom') }}</div>
@@ -234,19 +239,20 @@
                                     <div class="row mt-3">
                                         <div class="col-md-6">
                                             <ul class="license-features-list">
-                                                <li><i class="fas fa-check"></i> {{ _('Custom user limits (default: 25)') }}</li>
-                                                <li><i class="fas fa-check"></i> {{ _('Custom campaign limits (default: 12/year)') }}</li>
-                                                <li><i class="fas fa-check"></i> {{ _('Custom response targets (default: 10,000)') }}</li>
-                                                <li><i class="fas fa-check"></i> {{ _('Custom invitation capacity (default: 50,000)') }}</li>
+                                                <li><i class="fas fa-check"></i> {{ _('Up to') }} {{ pro_template.max_users if pro_template else 25 }} {{ _('users') }}</li>
+                                                <li><i class="fas fa-check"></i> {{ _('Unlimited client companies') }}</li>
+                                                <li><i class="fas fa-check"></i> {{ pro_template.max_campaigns_per_year if pro_template else 12 }} {{ _('campaigns per year') }}</li>
+                                                <li><i class="fas fa-check"></i> {{ "{:,}".format(pro_template.max_participants_per_campaign) if pro_template else '10,000' }} {{ _('target responses per campaign') }}</li>
+                                                <li><i class="fas fa-check"></i> {{ "{:,}".format(pro_template.max_invitations_per_campaign) if pro_template else '50,000' }} {{ _('invitations per campaign') }}</li>
                                             </ul>
                                         </div>
                                         <div class="col-md-6">
                                             <ul class="license-features-list">
-                                                <li><i class="fas fa-check"></i> {{ _('Custom Analytics') }}</li>
-                                                <li><i class="fas fa-check"></i> {{ _('Dedicated Support') }}</li>
-                                                <li><i class="fas fa-check"></i> {{ _('White Label Options') }}</li>
-                                                <li><i class="fas fa-check"></i> {{ _('Custom Integrations') }}</li>
-                                                <li><i class="fas fa-check"></i> {{ _('SLA Guarantee') }}</li>
+                                                <li><i class="fas fa-check"></i> {{ _('Full platform access') }}</li>
+                                                <li><i class="fas fa-check"></i> {{ _('Survey builder & templates') }}</li>
+                                                <li><i class="fas fa-check"></i> {{ _('Analytics & reporting') }}</li>
+                                                <li><i class="fas fa-check"></i> {{ _('Email campaign management') }}</li>
+                                                <li><i class="fas fa-check"></i> {{ _('Technical support') }}</li>
                                             </ul>
                                         </div>
                                     </div>
@@ -257,46 +263,49 @@
                 </div>
             </div>
 
-            <!-- Pro Custom Limits (shown when Pro is selected) -->
-            <div class="mt-4" id="proCustomLimits" style="display: none;">
+            <!-- Custom Limits (shown when Core, Plus, or Pro is selected) -->
+            <div class="mt-4" id="customLimitsPanel" style="display: none;">
                 <div class="card">
                     <div class="card-header" style="background: var(--light-gray); border-bottom: 2px solid var(--primary-red);">
-                        <h5 class="mb-0"><i class="fas fa-cog me-2"></i>{{ _('Custom Limits Configuration') }}</h5>
+                        <h5 class="mb-0"><i class="fas fa-cog me-2"></i>{{ _('Optional Limit Overrides') }}</h5>
                     </div>
                     <div class="card-body">
-                        <p class="text-muted mb-4">{{ _('Set specific limits for this Pro license account.') }}</p>
+                        <div class="alert alert-info mb-4 py-2">
+                            <i class="fas fa-info-circle me-2"></i>
+                            {{ _('Overriding limits does not change the tier price. Leave fields at their defaults to use the standard tier limits.') }}
+                        </div>
                         
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label for="max_users" class="form-label">Maximum {{ _('Users') }}</label>
                                 <input type="number" class="form-control" id="max_users" name="max_users" 
-                                       min="1" value="{{ current_license.max_users if current_license and current_license.type == 'pro' else 25 }}">
-                                <div class="form-text">{{ _('Number of users that can access the account') }}</div>
+                                       min="1" value="">
+                                <div class="form-text" id="max_users_hint">{{ _('Number of users that can access the account') }}</div>
                             </div>
                             <div class="col-md-6">
                                 <label for="max_campaigns_per_year" class="form-label">Maximum {{ _('Campaigns') }} per Year</label>
                                 <input type="number" class="form-control" id="max_campaigns_per_year" name="max_campaigns_per_year" 
-                                       min="1" max="1000" value="{{ current_license.max_campaigns_per_year if current_license and current_license.type == 'pro' else 12 }}">
-                                <div class="form-text">{{ _('Number of campaigns allowed per year') }}</div>
+                                       min="1" max="1000" value="">
+                                <div class="form-text" id="max_campaigns_hint">{{ _('Number of campaigns allowed per year') }}</div>
                             </div>
                             <div class="col-md-6">
                                 <label for="max_participants_per_campaign" class="form-label">{{ _('Target Responses per Campaign') }}</label>
                                 <input type="number" class="form-control" id="max_participants_per_campaign" name="max_participants_per_campaign" 
-                                       min="1" max="1000000" value="{{ current_license.max_participants_per_campaign if current_license and current_license.type == 'pro' else 10000 }}">
-                                <div class="form-text">{{ _('Expected number of completed survey responses (informational)') }}</div>
+                                       min="1" max="1000000" value="">
+                                <div class="form-text" id="max_participants_hint">{{ _('Expected number of completed survey responses (informational)') }}</div>
                             </div>
                             <div class="col-md-6">
                                 <label for="max_invitations_per_campaign" class="form-label">{{ _('Maximum Invitations per Campaign') }}</label>
                                 <input type="number" class="form-control" id="max_invitations_per_campaign" name="max_invitations_per_campaign" 
-                                       min="1" max="5000000" value="{{ current_license.max_invitations_per_campaign if current_license and current_license.type == 'pro' else 50000 }}">
-                                <div class="form-text">{{ _('Guideline on survey invitations (typically 5x responses for a 20 percent response rate)') }}</div>
+                                       min="1" max="5000000" value="">
+                                <div class="form-text" id="max_invitations_hint">{{ _('Guideline on survey invitations (typically 5x responses for a 20 percent response rate)') }}</div>
                             </div>
                             <div class="col-md-6">
                                 <label for="max_client_companies" class="form-label">{{ _('Maximum Client Companies') }}</label>
                                 <input type="number" class="form-control" id="max_client_companies" name="max_client_companies" 
-                                       min="1" value="{{ current_license.max_client_companies if current_license and current_license.type == 'pro' and current_license.max_client_companies else '' }}"
-                                       placeholder="{{ _('Leave empty for unlimited') }}">
-                                <div class="form-text">{{ _('Maximum distinct client companies (by email domain). Leave empty for unlimited.') }}</div>
+                                       min="1" value=""
+                                       placeholder="{{ _('Leave empty for tier default') }}">
+                                <div class="form-text" id="max_client_companies_hint">{{ _('Maximum distinct client companies (by email domain). Leave empty for tier default.') }}</div>
                             </div>
                         </div>
                     </div>
@@ -487,15 +496,16 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const licenseOptions = document.querySelectorAll('input[name="license_type"]');
-    const proCustomLimits = document.getElementById('proCustomLimits');
+    const customLimitsPanel = document.getElementById('customLimitsPanel');
     const licenseComparison = document.getElementById('licenseComparison');
     const downgradeWarning = document.getElementById('downgradeWarning');
     
-    // License limits configuration
+    // License limits configuration (tier defaults)
     const licenseLimits = {
-        core: { users: 5, campaigns: 4, participants: 200, invitations: 1000 },
-        plus: { users: 10, campaigns: 4, participants: 1000, invitations: 5000 },
-        pro: { users: 'custom', campaigns: 'custom', participants: 'custom', invitations: 'custom' }
+        core: { users: 5, campaigns: 4, participants: 200, invitations: 1000, client_companies: 20 },
+        plus: { users: 10, campaigns: 4, participants: 1000, invitations: 5000, client_companies: 100 },
+        pro: { users: 25, campaigns: 12, participants: 10000, invitations: 50000, client_companies: null },
+        trial: { users: 2, campaigns: 1, participants: 50, invitations: 250, client_companies: null }
     };
     
     // {{ _('Current') }} usage from backend
@@ -504,17 +514,59 @@ document.addEventListener('DOMContentLoaded', function() {
         campaigns: {{ usage_stats.campaigns_count }}
     };
     
-    function updateLicenseSelection() {
+    function populateDefaults(licenseType) {
+        const limits = licenseLimits[licenseType];
+        if (!limits) return;
+        const fields = [
+            ['max_users', limits.users, 'Default: ' + limits.users + ' users'],
+            ['max_campaigns_per_year', limits.campaigns, 'Default: ' + limits.campaigns + ' campaigns/year'],
+            ['max_participants_per_campaign', limits.participants, 'Default: ' + limits.participants + ' target responses'],
+            ['max_invitations_per_campaign', limits.invitations, 'Default: ' + limits.invitations + ' invitations'],
+        ];
+        fields.forEach(function([fieldId, defaultVal, hintText]) {
+            const field = document.getElementById(fieldId);
+            if (field) {
+                field.value = defaultVal;
+                field.placeholder = String(defaultVal);
+            }
+            const hint = document.getElementById(fieldId + '_hint');
+            if (hint) hint.textContent = hintText;
+        });
+        // Client companies field
+        const ccField = document.getElementById('max_client_companies');
+        const ccHint = document.getElementById('max_client_companies_hint');
+        if (ccField) {
+            if (limits.client_companies !== null) {
+                ccField.value = limits.client_companies;
+                ccField.placeholder = String(limits.client_companies);
+                if (ccHint) ccHint.textContent = 'Default: ' + limits.client_companies + ' client companies';
+            } else {
+                ccField.value = '';
+                ccField.placeholder = 'Leave empty for unlimited';
+                if (ccHint) ccHint.textContent = 'Maximum distinct client companies (by email domain). Leave empty for unlimited.';
+            }
+        }
+    }
+    
+    let currentLicenseType = null;
+
+    function onLicenseTypeChange() {
         const selectedLicense = document.querySelector('input[name="license_type"]:checked');
         if (!selectedLicense) return;
 
         const licenseType = selectedLicense.value;
         
-        // Show/hide Pro custom limits
-        if (licenseType === 'pro') {
-            proCustomLimits.style.display = 'block';
+        // Show custom limits panel for core, plus, pro and populate defaults only on type change
+        if (['core', 'plus', 'pro'].includes(licenseType)) {
+            customLimitsPanel.style.display = 'block';
+            // Only populate defaults when the license type actually changes, not on field input
+            if (licenseType !== currentLicenseType) {
+                populateDefaults(licenseType);
+                currentLicenseType = licenseType;
+            }
         } else {
-            proCustomLimits.style.display = 'none';
+            customLimitsPanel.style.display = 'none';
+            currentLicenseType = licenseType;
         }
         
         // Update license comparison
@@ -524,21 +576,33 @@ document.addEventListener('DOMContentLoaded', function() {
         checkForDowngrade(licenseType);
     }
     
+    function onOverrideFieldInput() {
+        const selectedLicense = document.querySelector('input[name="license_type"]:checked');
+        if (!selectedLicense) return;
+        const licenseType = selectedLicense.value;
+        updateComparison(licenseType);
+        checkForDowngrade(licenseType);
+    }
+    
+    function getEffectiveLimit(fieldId, defaultVal) {
+        const field = document.getElementById(fieldId);
+        if (field && field.value !== '') {
+            const parsed = parseInt(field.value);
+            if (!isNaN(parsed)) return parsed;
+        }
+        return defaultVal;
+    }
+    
     function updateComparison(licenseType) {
         const limits = licenseLimits[licenseType];
         
         document.getElementById('newLicenseType').textContent = licenseType.charAt(0).toUpperCase() + licenseType.slice(1);
         
-        if (licenseType === 'pro') {
-            document.getElementById('newMaxUsers').textContent = document.getElementById('max_users').value || 'Custom';
-            document.getElementById('newMaxCampaigns').textContent = document.getElementById('max_campaigns_per_year').value || 'Custom';
-            document.getElementById('newMaxParticipants').textContent = document.getElementById('max_participants_per_campaign').value || 'Custom';
-            document.getElementById('newMaxInvitations').textContent = document.getElementById('max_invitations_per_campaign').value || 'Custom';
-        } else {
-            document.getElementById('newMaxUsers').textContent = limits.users.toLocaleString();
-            document.getElementById('newMaxCampaigns').textContent = limits.campaigns.toLocaleString();
-            document.getElementById('newMaxParticipants').textContent = limits.participants.toLocaleString();
-            document.getElementById('newMaxInvitations').textContent = limits.invitations.toLocaleString();
+        if (limits) {
+            document.getElementById('newMaxUsers').textContent = getEffectiveLimit('max_users', limits.users).toLocaleString();
+            document.getElementById('newMaxCampaigns').textContent = getEffectiveLimit('max_campaigns_per_year', limits.campaigns).toLocaleString();
+            document.getElementById('newMaxParticipants').textContent = getEffectiveLimit('max_participants_per_campaign', limits.participants).toLocaleString();
+            document.getElementById('newMaxInvitations').textContent = getEffectiveLimit('max_invitations_per_campaign', limits.invitations).toLocaleString();
         }
         
         licenseComparison.style.display = 'block';
@@ -547,45 +611,32 @@ document.addEventListener('DOMContentLoaded', function() {
     function checkForDowngrade(licenseType) {
         let isDowngrade = false;
         const limits = licenseLimits[licenseType];
+        if (!limits) return;
         
-        if (licenseType !== 'pro') {
-            if (currentUsage.users > limits.users ||
-                currentUsage.campaigns > limits.campaigns) {
-                isDowngrade = true;
-            }
-        } else {
-            const maxUsers = parseInt(document.getElementById('max_users').value) || 0;
-            const maxCampaigns = parseInt(document.getElementById('max_campaigns_per_year').value) || 0;
-            
-            if (currentUsage.users > maxUsers ||
-                currentUsage.campaigns > maxCampaigns) {
-                isDowngrade = true;
-            }
+        const effectiveUsers = getEffectiveLimit('max_users', limits.users);
+        const effectiveCampaigns = getEffectiveLimit('max_campaigns_per_year', limits.campaigns);
+        
+        if (currentUsage.users > effectiveUsers || currentUsage.campaigns > effectiveCampaigns) {
+            isDowngrade = true;
         }
         
         downgradeWarning.style.display = isDowngrade ? 'block' : 'none';
     }
     
-    // Event listeners
+    // Event listeners — type changes trigger default population; field input only refreshes comparison
     licenseOptions.forEach(option => {
-        option.addEventListener('change', updateLicenseSelection);
+        option.addEventListener('change', onLicenseTypeChange);
     });
     
-    // Update Pro limits when changed
-    ['max_users', 'max_campaigns_per_year', 'max_participants_per_campaign', 'max_invitations_per_campaign'].forEach(fieldId => {
+    ['max_users', 'max_campaigns_per_year', 'max_participants_per_campaign', 'max_invitations_per_campaign', 'max_client_companies'].forEach(fieldId => {
         const field = document.getElementById(fieldId);
         if (field) {
-            field.addEventListener('input', function() {
-                const selectedLicense = document.querySelector('input[name="license_type"]:checked');
-                if (selectedLicense && selectedLicense.value === 'pro') {
-                    updateLicenseSelection();
-                }
-            });
+            field.addEventListener('input', onOverrideFieldInput);
         }
     });
     
     // Initialize
-    updateLicenseSelection();
+    onLicenseTypeChange();
 });
 </script>
 

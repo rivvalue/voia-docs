@@ -6,8 +6,8 @@ This migration adds the annual_price column to the license_history table
 and backfills existing licenses with pricing based on their license type.
 
 Pricing structure:
-- Core: $8,000/year
-- Plus: $12,000/year
+- Core: $12,000/year
+- Plus: $25,000/year
 - Pro: NULL (custom pricing)
 - Trial: NULL (no cost)
 """
@@ -57,8 +57,8 @@ def backfill_pricing():
         try:
             # Define pricing for each license type
             pricing_map = {
-                'core': 8000.00,
-                'plus': 12000.00,
+                'core': 12000.00,
+                'plus': 25000.00,
                 'pro': None,  # Custom pricing
                 'trial': None  # No cost
             }
@@ -101,14 +101,14 @@ def backfill_pricing():
             logger.info("=" * 60)
             
             # Show pricing breakdown
-            core_count = LicenseHistory.query.filter_by(license_type='core').filter(LicenseHistory.annual_price == 8000.00).count()
-            plus_count = LicenseHistory.query.filter_by(license_type='plus').filter(LicenseHistory.annual_price == 12000.00).count()
+            core_count = LicenseHistory.query.filter_by(license_type='core').filter(LicenseHistory.annual_price == 12000.00).count()
+            plus_count = LicenseHistory.query.filter_by(license_type='plus').filter(LicenseHistory.annual_price == 25000.00).count()
             pro_count = LicenseHistory.query.filter_by(license_type='pro').count()
             trial_count = LicenseHistory.query.filter_by(license_type='trial').count()
             
             logger.info("PRICING BREAKDOWN:")
-            logger.info(f"  Core licenses ($8,000): {core_count}")
-            logger.info(f"  Plus licenses ($12,000): {plus_count}")
+            logger.info(f"  Core licenses ($12,000): {core_count}")
+            logger.info(f"  Plus licenses ($25,000): {plus_count}")
             logger.info(f"  Pro licenses (custom): {pro_count}")
             logger.info(f"  Trial licenses (free): {trial_count}")
             logger.info("=" * 60)

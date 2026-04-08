@@ -5955,10 +5955,12 @@ def process_license_assignment():
         created_by = current_user.get_full_name()
         
         custom_config = None
-        if license_type == 'pro':
-            custom_config = {}
-            
+        if license_type in ('pro', 'core', 'plus'):
             try:
+                from license_templates import LicenseTemplateManager as _LTM
+                _tmpl = _LTM.get_template(license_type)
+                raw_overrides = {}
+                
                 campaigns_limit = request.form.get('max_campaigns_per_year', '').strip()
                 users_limit = request.form.get('max_users', '').strip()
                 participants_limit = request.form.get('max_participants_per_campaign', '').strip()
@@ -5968,21 +5970,21 @@ def process_license_assignment():
                     if campaigns_value < 1 or campaigns_value > 1000:
                         flash('Maximum campaigns per year must be between 1 and 1000.', 'error')
                         return redirect(url_for('business_auth.license_assignment_form', business_id=business_account.uuid))
-                    custom_config['max_campaigns_per_year'] = campaigns_value
+                    raw_overrides['max_campaigns_per_year'] = campaigns_value
                 
                 if users_limit:
                     users_value = int(users_limit)
                     if users_value < 1 or users_value > 10000:
                         flash('Maximum users must be between 1 and 10,000.', 'error')
                         return redirect(url_for('business_auth.license_assignment_form', business_id=business_account.uuid))
-                    custom_config['max_users'] = users_value
+                    raw_overrides['max_users'] = users_value
                 
                 if participants_limit:
                     participants_value = int(participants_limit)
                     if participants_value < 1 or participants_value > 1000000:
                         flash('Maximum target responses per campaign must be between 1 and 1,000,000.', 'error')
                         return redirect(url_for('business_auth.license_assignment_form', business_id=business_account.uuid))
-                    custom_config['max_participants_per_campaign'] = participants_value
+                    raw_overrides['max_participants_per_campaign'] = participants_value
                 
                 invitations_limit = request.form.get('max_invitations_per_campaign', '').strip()
                 if invitations_limit:
@@ -5990,7 +5992,7 @@ def process_license_assignment():
                     if invitations_value < 1 or invitations_value > 5000000:
                         flash('Maximum invitations per campaign must be between 1 and 5,000,000.', 'error')
                         return redirect(url_for('business_auth.license_assignment_form', business_id=business_account.uuid))
-                    custom_config['max_invitations_per_campaign'] = invitations_value
+                    raw_overrides['max_invitations_per_campaign'] = invitations_value
                 
                 client_companies_limit = request.form.get('max_client_companies', '').strip()
                 if client_companies_limit:
@@ -5998,9 +6000,29 @@ def process_license_assignment():
                     if client_companies_value < 1:
                         flash(_('Maximum client companies must be a positive number.'), 'error')
                         return redirect(url_for('business_auth.license_assignment_form', business_id=business_account.uuid))
-                    custom_config['max_client_companies'] = client_companies_value
+                    raw_overrides['max_client_companies'] = client_companies_value
+                elif license_type == 'pro':
+                    raw_overrides['max_client_companies'] = None  # Unlimited for Pro when left empty
+                
+                # Only keep overrides that differ from template defaults
+                # This ensures leaving fields at their defaults produces identical output to today
+                effective_overrides = {}
+                template_defaults = {
+                    'max_users': _tmpl.max_users,
+                    'max_campaigns_per_year': _tmpl.max_campaigns_per_year,
+                    'max_participants_per_campaign': _tmpl.max_participants_per_campaign,
+                    'max_invitations_per_campaign': _tmpl.max_invitations_per_campaign,
+                    'max_client_companies': _tmpl.max_client_companies,
+                }
+                for key, value in raw_overrides.items():
+                    if value != template_defaults.get(key):
+                        effective_overrides[key] = value
+                
+                # For Pro, always pass custom_config so Pro path works as before
+                if license_type == 'pro':
+                    custom_config = raw_overrides if raw_overrides else None
                 else:
-                    custom_config['max_client_companies'] = None  # Unlimited
+                    custom_config = effective_overrides if effective_overrides else None
                     
             except ValueError:
                 flash('Custom limit values must be valid positive numbers.', 'error')
