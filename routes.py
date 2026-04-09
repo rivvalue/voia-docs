@@ -1246,6 +1246,14 @@ def submit_classic_survey():
             )
             db.session.add(response)
         
+        # Mark association as completed atomically in the same commit as the response.
+        # Using auto_commit=False so both the response and the participant status update
+        # are committed together. If mark_survey_completed raises, the exception propagates
+        # to the outer try/except, which will roll back the session and return an error.
+        if association_id:
+            import campaign_participant_token_system
+            campaign_participant_token_system.mark_survey_completed(association_id, response.id, auto_commit=False)
+        
         db.session.commit()
         
         # Bust dashboard cache so the next Executive Summary load reflects fresh data
@@ -1257,14 +1265,6 @@ def submit_classic_survey():
                     bust_dashboard_cache(campaign_id, classic_ba_id, company_name=response.company_name)
             except Exception as cache_bust_err:
                 logger.warning(f"Cache bust failed after classic survey submit: {cache_bust_err}")
-        
-        # Mark association as completed
-        if association_id:
-            try:
-                import campaign_participant_token_system
-                campaign_participant_token_system.mark_survey_completed(association_id, response.id)
-            except Exception as e:
-                logger.error(f"Failed to mark association completed: {e}")
         
         # Queue AI analysis
         try:

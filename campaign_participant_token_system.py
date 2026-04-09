@@ -223,28 +223,33 @@ def mark_survey_completed(association_id, survey_response_id, auto_commit=True):
     Returns:
         CampaignParticipant object if successful, None otherwise
     """
-    try:
-        # Import models here to avoid circular imports
-        from models import CampaignParticipant, db
-        
-        association = CampaignParticipant.query.filter_by(id=association_id).first()
-        if not association:
-            logger.error(f"Association {association_id} not found")
-            return None
-        
-        association.status = 'completed'
-        association.completed_at = datetime.utcnow()
-        
-        if auto_commit:
+    # Import models here to avoid circular imports
+    from models import CampaignParticipant, db
+
+    if auto_commit:
+        try:
+            association = CampaignParticipant.query.filter_by(id=association_id).first()
+            if not association:
+                logger.error(f"Association {association_id} not found")
+                return None
+
+            association.status = 'completed'
+            association.completed_at = datetime.utcnow()
             db.session.commit()
             logger.info(f"Marked association {association_id} as completed with response {survey_response_id} (auto-commit)")
-        else:
-            logger.info(f"Marked association {association_id} as completed with response {survey_response_id} (deferred commit)")
-        
-        return association
-        
-    except Exception as e:
-        logger.error(f"Error marking survey completed for association {association_id}: {e}")
-        if auto_commit:
+            return association
+        except Exception as e:
+            logger.error(f"Error marking survey completed for association {association_id}: {e}")
             db.session.rollback()
-        return None
+            return None
+    else:
+        # Deferred commit mode: caller is responsible for committing.
+        # Raise on any failure so the caller's transaction rolls back cleanly.
+        association = CampaignParticipant.query.filter_by(id=association_id).first()
+        if not association:
+            raise ValueError(f"Association {association_id} not found — cannot mark survey completed")
+
+        association.status = 'completed'
+        association.completed_at = datetime.utcnow()
+        logger.info(f"Marked association {association_id} as completed with response {survey_response_id} (deferred commit)")
+        return association

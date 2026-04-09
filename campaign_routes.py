@@ -2306,15 +2306,39 @@ def individual_response(campaign_uuid, participant_id):
         loyalty_driver_labels = []
         classic_config = None
         
+        section_3_fields = {}
+        
         if is_classic:
             import json as json_mod
             if survey_response.general_feedback:
                 try:
-                    feature_evaluations = json_mod.loads(survey_response.general_feedback) if isinstance(survey_response.general_feedback, str) else survey_response.general_feedback
-                    if not isinstance(feature_evaluations, list):
-                        feature_evaluations = []
+                    raw_evals = json_mod.loads(survey_response.general_feedback) if isinstance(survey_response.general_feedback, str) else survey_response.general_feedback
+                    if isinstance(raw_evals, dict):
+                        # Convert dict keyed by feature name to a list for the template
+                        for feature_key, eval_data in raw_evals.items():
+                            entry = dict(eval_data) if isinstance(eval_data, dict) else {}
+                            entry['name'] = feature_key.replace('_', ' ').title()
+                            feature_evaluations.append(entry)
+                    elif isinstance(raw_evals, list):
+                        feature_evaluations = raw_evals
                 except (json_mod.JSONDecodeError, TypeError):
                     feature_evaluations = []
+            
+            # Parse additional_comments back into structured Section 3 fields
+            if survey_response.additional_comments:
+                prefix_map = {
+                    'Most valuable feature: ': 'most_valuable_feature',
+                    'Needs most improvement: ': 'most_improvement_needed',
+                    'Biggest pain point: ': 'biggest_pain_point',
+                    'Missing features: ': 'missing_features',
+                    'Recommendation blocker: ': 'recommendation_blocker',
+                }
+                for block in survey_response.additional_comments.split('\n\n'):
+                    block = block.strip()
+                    for prefix, field_name in prefix_map.items():
+                        if block.startswith(prefix):
+                            section_3_fields[field_name] = block[len(prefix):]
+                            break
             
             classic_config = ClassicSurveyConfig.query.filter_by(campaign_id=campaign.id).first()
             if classic_config and survey_response.loyalty_drivers:
@@ -2373,7 +2397,8 @@ def individual_response(campaign_uuid, participant_id):
                              business_account=current_account.to_dict(),
                              is_classic=is_classic,
                              feature_evaluations=feature_evaluations,
-                             loyalty_driver_labels=loyalty_driver_labels)
+                             loyalty_driver_labels=loyalty_driver_labels,
+                             section_3_fields=section_3_fields)
         
     except HTTPException:
         raise

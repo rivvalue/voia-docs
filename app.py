@@ -603,6 +603,15 @@ with app.app_context():
         )
 
     try:
+        from migrations.add_survey_response_unique_participant import run as _migrate_unique_participant
+        _migrate_unique_participant(db)
+    except Exception as e:
+        logger.error(
+            f"CRITICAL: Startup migration add_survey_response_unique_participant FAILED: {e}. "
+            "Duplicate FullRead survey submissions may occur until the UNIQUE constraint is applied."
+        )
+
+    try:
         from sqlalchemy import text as sa_text, inspect as sa_inspect
         inspector = sa_inspect(db.engine)
         available_tables = inspector.get_table_names()

@@ -730,6 +730,64 @@
                 <p class="text-muted">{{ _('This participant did not complete the feature evaluation section.') }}</p>
             </div>
             {% endif %}
+
+            {% if response.recommendation_reason or response.improvement_feedback %}
+            <div class="data-section">
+                <h4 class="section-title" style="font-size: 1rem;">
+                    <i class="fas fa-comment-dots"></i>{{ _('Open-Text Responses') }}
+                </h4>
+                {% if response.recommendation_reason %}
+                <div class="mb-3 p-3" style="background: #f8f9fa; border-left: 3px solid #2E5090; border-radius: 4px;">
+                    <span class="data-label d-block mb-1" style="font-size: 0.8rem; text-transform: uppercase; color: #6c757d;">{{ _('NPS Driver Explanation') }}</span>
+                    <p class="mb-0" style="font-size: 0.9rem;">{{ response.recommendation_reason }}</p>
+                </div>
+                {% endif %}
+                {% if response.improvement_feedback %}
+                <div class="mb-3 p-3" style="background: #f8f9fa; border-left: 3px solid #fd7e14; border-radius: 4px;">
+                    <span class="data-label d-block mb-1" style="font-size: 0.8rem; text-transform: uppercase; color: #6c757d;">{{ _('Improvement Feedback') }}</span>
+                    <p class="mb-0" style="font-size: 0.9rem;">{{ response.improvement_feedback }}</p>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            {% if section_3_fields %}
+            <div class="data-section">
+                <h4 class="section-title" style="font-size: 1rem;">
+                    <i class="fas fa-lightbulb"></i>{{ _('Section 3: Additional Insights') }}
+                </h4>
+                {% if section_3_fields.most_valuable_feature %}
+                <div class="mb-3 p-3" style="background: #f8f9fa; border-left: 3px solid #28a745; border-radius: 4px;">
+                    <span class="data-label d-block mb-1" style="font-size: 0.8rem; text-transform: uppercase; color: #6c757d;">{{ _('Most Valuable Feature') }}</span>
+                    <p class="mb-0" style="font-size: 0.9rem;">{{ section_3_fields.most_valuable_feature }}</p>
+                </div>
+                {% endif %}
+                {% if section_3_fields.most_improvement_needed %}
+                <div class="mb-3 p-3" style="background: #f8f9fa; border-left: 3px solid #ffc107; border-radius: 4px;">
+                    <span class="data-label d-block mb-1" style="font-size: 0.8rem; text-transform: uppercase; color: #6c757d;">{{ _('Most Improvement Needed') }}</span>
+                    <p class="mb-0" style="font-size: 0.9rem;">{{ section_3_fields.most_improvement_needed }}</p>
+                </div>
+                {% endif %}
+                {% if section_3_fields.biggest_pain_point %}
+                <div class="mb-3 p-3" style="background: #f8f9fa; border-left: 3px solid #dc3545; border-radius: 4px;">
+                    <span class="data-label d-block mb-1" style="font-size: 0.8rem; text-transform: uppercase; color: #6c757d;">{{ _('Biggest Pain Point') }}</span>
+                    <p class="mb-0" style="font-size: 0.9rem;">{{ section_3_fields.biggest_pain_point }}</p>
+                </div>
+                {% endif %}
+                {% if section_3_fields.missing_features %}
+                <div class="mb-3 p-3" style="background: #f8f9fa; border-left: 3px solid #6c757d; border-radius: 4px;">
+                    <span class="data-label d-block mb-1" style="font-size: 0.8rem; text-transform: uppercase; color: #6c757d;">{{ _('Missing Features') }}</span>
+                    <p class="mb-0" style="font-size: 0.9rem;">{{ section_3_fields.missing_features }}</p>
+                </div>
+                {% endif %}
+                {% if section_3_fields.recommendation_blocker %}
+                <div class="mb-3 p-3" style="background: #f8f9fa; border-left: 3px solid #E13A44; border-radius: 4px;">
+                    <span class="data-label d-block mb-1" style="font-size: 0.8rem; text-transform: uppercase; color: #6c757d;">{{ _('Recommendation Blocker') }}</span>
+                    <p class="mb-0" style="font-size: 0.9rem;">{{ section_3_fields.recommendation_blocker }}</p>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
         </div>
 
         {% else %}
