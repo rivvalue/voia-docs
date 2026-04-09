@@ -4717,6 +4717,7 @@ def feedback_submit():
     blocking = request.form.get('feedback_blocking', '').strip()
     steps = request.form.get('feedback_steps', '').strip()
     page_url = request.form.get('feedback_page_url', '').strip()
+    console_logs = request.form.get('console_logs', '').strip()
 
     if not title:
         return jsonify({'error': _t('Title is required.')}), 400
@@ -4754,6 +4755,9 @@ def feedback_submit():
         full_description += '\n\n**Steps to reproduce:**\n' + steps
 
     full_description += '\n'.join(env_block_lines)
+
+    if issue_type_raw == 'bug' and console_logs:
+        full_description += '\n\n**Console Logs:**\n```\n' + console_logs + '\n```'
 
     try:
         result = create_issue(

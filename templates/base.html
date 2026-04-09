@@ -314,6 +314,34 @@
         {% block content %}{% endblock %}
     </main>
 
+    <!-- Console log buffer for bug reports (capped at 75 entries, errors/warnings/exceptions only) -->
+    <script>
+    (function () {
+        var MAX = 75;
+        var buf = [];
+        function push(level, args) {
+            var entry = '[' + new Date().toISOString() + '] [' + level + '] ' +
+                Array.prototype.slice.call(args).map(function (a) {
+                    try { return (typeof a === 'object' && a !== null) ? JSON.stringify(a) : String(a); }
+                    catch (e) { return String(a); }
+                }).join(' ');
+            buf.push(entry);
+            if (buf.length > MAX) buf.shift();
+        }
+        var _error = console.error.bind(console);
+        var _warn  = console.warn.bind(console);
+        console.error = function () { push('ERROR', arguments); _error.apply(console, arguments); };
+        console.warn  = function () { push('WARN',  arguments); _warn.apply(console,  arguments); };
+        window.addEventListener('error', function (e) {
+            push('UNCAUGHT', [e.message + (e.filename ? ' @ ' + e.filename + ':' + e.lineno : '')]);
+        });
+        window.addEventListener('unhandledrejection', function (e) {
+            push('UNHANDLED_REJECTION', [e.reason]);
+        });
+        window.__voiaLogs = buf;
+    })();
+    </script>
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
@@ -578,6 +606,11 @@
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>{{ _("Submitting...") }}';
 
             const data = new FormData(form);
+
+            const feedbackType = form.querySelector('input[name="feedback_type"]:checked');
+            if (feedbackType && feedbackType.value === 'bug' && window.__voiaLogs && window.__voiaLogs.length > 0) {
+                data.append('console_logs', window.__voiaLogs.join('\n'));
+            }
 
             try {
                 const resp = await fetch('{{ url_for("feedback_submit") }}', {
