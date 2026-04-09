@@ -24,7 +24,11 @@ INDUSTRY_TOPIC_HINTS = {
         "Pricing Value": "cost competitiveness, volume pricing, contract terms",
         "User Experience": "order process, communication, documentation quality",
         "Satisfaction": "overall satisfaction rating, experience quality, expectations met",
-        "Improvement Suggestions": "efficiency gains, quality enhancements, delivery optimization"
+        "Improvement Suggestions": "efficiency gains, quality enhancements, delivery optimization",
+        "Additional Comments": "open feedback, general remarks, anything else, free-form comments",
+        "Competitor Comparison": "alternative solutions considered, competitor strengths, switching intent, market comparison",
+        "Usage Frequency": "how often used, adoption rate, daily vs occasional use, engagement level",
+        "Referral Likelihood": "word of mouth, peer recommendations, advocacy, likelihood to refer colleagues"
     },
     "Healthcare": {
         "Product Quality": "workflow reliability, data accuracy, patient safety, regulatory compliance, system uptime",
@@ -34,7 +38,11 @@ INDUSTRY_TOPIC_HINTS = {
         "Pricing Value": "ROI, total cost of ownership, value for investment",
         "User Experience": "interface usability, workflow integration, ease of use, learning curve",
         "Satisfaction": "overall satisfaction rating, clinical value, expectations met",
-        "Improvement Suggestions": "efficiency improvements, user interface enhancements, training resources"
+        "Improvement Suggestions": "efficiency improvements, user interface enhancements, training resources",
+        "Additional Comments": "open feedback, general remarks, anything else, free-form comments",
+        "Competitor Comparison": "alternative solutions considered, competitor strengths, switching intent, market comparison",
+        "Usage Frequency": "how often used, adoption rate, daily vs occasional use, engagement level",
+        "Referral Likelihood": "word of mouth, peer recommendations, advocacy, likelihood to refer colleagues"
     },
     "Software": {
         "Product Quality": "bug frequency, performance, reliability, feature completeness, stability",
@@ -44,7 +52,11 @@ INDUSTRY_TOPIC_HINTS = {
         "Pricing Value": "pricing competitiveness, feature value, subscription model",
         "User Experience": "interface design, ease of use, workflow efficiency, mobile experience",
         "Satisfaction": "overall satisfaction rating, product value, expectations met",
-        "Improvement Suggestions": "performance optimization, UI/UX enhancements, feature prioritization"
+        "Improvement Suggestions": "performance optimization, UI/UX enhancements, feature prioritization",
+        "Additional Comments": "open feedback, general remarks, anything else, free-form comments",
+        "Competitor Comparison": "alternative solutions considered, competitor strengths, switching intent, market comparison",
+        "Usage Frequency": "how often used, adoption rate, daily vs occasional use, engagement level",
+        "Referral Likelihood": "word of mouth, peer recommendations, advocacy, likelihood to refer colleagues"
     },
     "Financial Services": {
         "Product Quality": "accuracy, security, compliance, transaction reliability, data integrity",
@@ -54,7 +66,11 @@ INDUSTRY_TOPIC_HINTS = {
         "Pricing Value": "fee structure, cost transparency, value for services",
         "User Experience": "platform usability, statement clarity, mobile banking, self-service tools",
         "Satisfaction": "overall satisfaction rating, service quality, expectations met",
-        "Improvement Suggestions": "process streamlining, transparency, communication, digital experience"
+        "Improvement Suggestions": "process streamlining, transparency, communication, digital experience",
+        "Additional Comments": "open feedback, general remarks, anything else, free-form comments",
+        "Competitor Comparison": "alternative solutions considered, competitor strengths, switching intent, market comparison",
+        "Usage Frequency": "how often used, adoption rate, daily vs occasional use, engagement level",
+        "Referral Likelihood": "word of mouth, peer recommendations, advocacy, likelihood to refer colleagues"
     },
     "Professional Services": {
         "Product Quality": "deliverable quality, expertise, methodology, timeliness, results achieved",
@@ -64,7 +80,11 @@ INDUSTRY_TOPIC_HINTS = {
         "Pricing Value": "pricing transparency, ROI, value delivered, cost-effectiveness",
         "User Experience": "engagement process, communication style, collaboration tools, reporting",
         "Satisfaction": "overall satisfaction rating, value delivered, expectations met",
-        "Improvement Suggestions": "process improvements, communication enhancements, delivery optimization"
+        "Improvement Suggestions": "process improvements, communication enhancements, delivery optimization",
+        "Additional Comments": "open feedback, general remarks, anything else, free-form comments",
+        "Competitor Comparison": "alternative solutions considered, competitor strengths, switching intent, market comparison",
+        "Usage Frequency": "how often used, adoption rate, daily vs occasional use, engagement level",
+        "Referral Likelihood": "word of mouth, peer recommendations, advocacy, likelihood to refer colleagues"
     },
     "Retail": {
         "Product Quality": "product quality, inventory availability, freshness, selection, brand variety",
@@ -74,7 +94,11 @@ INDUSTRY_TOPIC_HINTS = {
         "Pricing Value": "price competitiveness, promotions, value for money, pricing transparency",
         "User Experience": "store layout, online ordering, mobile app, payment options, convenience",
         "Satisfaction": "overall satisfaction rating, shopping experience, expectations met",
-        "Improvement Suggestions": "shopping experience, product selection, convenience, service quality"
+        "Improvement Suggestions": "shopping experience, product selection, convenience, service quality",
+        "Additional Comments": "open feedback, general remarks, anything else, free-form comments",
+        "Competitor Comparison": "alternative solutions considered, competitor strengths, switching intent, market comparison",
+        "Usage Frequency": "how often used, adoption rate, daily vs occasional use, engagement level",
+        "Referral Likelihood": "word of mouth, peer recommendations, advocacy, likelihood to refer colleagues"
     },
     "Telecommunications": {
         "Product Quality": "network reliability, call quality, data speed, coverage, service uptime",
@@ -84,7 +108,11 @@ INDUSTRY_TOPIC_HINTS = {
         "Pricing Value": "plan pricing, contract terms, hidden fees, value for features",
         "User Experience": "account portal, mobile app, self-service tools, billing clarity",
         "Satisfaction": "overall satisfaction rating, service quality, expectations met",
-        "Improvement Suggestions": "network quality, billing transparency, support efficiency, pricing flexibility"
+        "Improvement Suggestions": "network quality, billing transparency, support efficiency, pricing flexibility",
+        "Additional Comments": "open feedback, general remarks, anything else, free-form comments",
+        "Competitor Comparison": "alternative solutions considered, competitor strengths, switching intent, market comparison",
+        "Usage Frequency": "how often used, adoption rate, daily vs occasional use, engagement level",
+        "Referral Likelihood": "word of mouth, peer recommendations, advocacy, likelihood to refer colleagues"
     },
     "Education": {
         "Product Quality": "content quality, curriculum relevance, learning outcomes, resource availability",
@@ -94,7 +122,11 @@ INDUSTRY_TOPIC_HINTS = {
         "Pricing Value": "tuition value, financial aid, cost transparency, ROI on education",
         "User Experience": "platform usability, course navigation, mobile access, learning tools",
         "Satisfaction": "overall satisfaction rating, learning value, expectations met",
-        "Improvement Suggestions": "teaching methods, platform improvements, support enhancements, course content"
+        "Improvement Suggestions": "teaching methods, platform improvements, support enhancements, course content",
+        "Additional Comments": "open feedback, general remarks, anything else, free-form comments",
+        "Competitor Comparison": "alternative solutions considered, competitor strengths, switching intent, market comparison",
+        "Usage Frequency": "how often used, adoption rate, daily vs occasional use, engagement level",
+        "Referral Likelihood": "word of mouth, peer recommendations, advocacy, likelihood to refer colleagues"
     },
     "Hospitality": {
         "Product Quality": "cleanliness, amenities, room quality, facility maintenance, comfort",
@@ -104,7 +136,11 @@ INDUSTRY_TOPIC_HINTS = {
         "Pricing Value": "rate fairness, value for money, pricing transparency, package deals",
         "User Experience": "booking process, amenity access, mobile app, loyalty program",
         "Satisfaction": "overall satisfaction rating, stay experience, expectations met",
-        "Improvement Suggestions": "service quality, facility updates, staff training, convenience features"
+        "Improvement Suggestions": "service quality, facility updates, staff training, convenience features",
+        "Additional Comments": "open feedback, general remarks, anything else, free-form comments",
+        "Competitor Comparison": "alternative solutions considered, competitor strengths, switching intent, market comparison",
+        "Usage Frequency": "how often used, adoption rate, daily vs occasional use, engagement level",
+        "Referral Likelihood": "word of mouth, peer recommendations, advocacy, likelihood to refer colleagues"
     },
     "Generic": {
         "Product Quality": "quality, reliability, performance, features, value delivered",
@@ -114,7 +150,11 @@ INDUSTRY_TOPIC_HINTS = {
         "Pricing Value": "pricing fairness, value for money, cost transparency",
         "User Experience": "ease of use, convenience, accessibility, overall experience",
         "Satisfaction": "overall satisfaction rating, experience quality, expectations met",
-        "Improvement Suggestions": "general improvements, quality enhancements, service optimization"
+        "Improvement Suggestions": "general improvements, quality enhancements, service optimization",
+        "Additional Comments": "open feedback, general remarks, anything else, free-form comments",
+        "Competitor Comparison": "alternative solutions considered, competitor strengths, switching intent, market comparison",
+        "Usage Frequency": "how often used, adoption rate, daily vs occasional use, engagement level",
+        "Referral Likelihood": "word of mouth, peer recommendations, advocacy, likelihood to refer colleagues"
     },
     "Events and Tradeshows": {
         "Product Quality": "registration systems, badging reliability, mobile app performance, lead capture accuracy, floorplan tools",
@@ -124,7 +164,11 @@ INDUSTRY_TOPIC_HINTS = {
         "Pricing Value": "ROI for exhibitors, value for participation, traffic generated vs cost",
         "User Experience": "ease of registration, app usability, navigation, session booking, signage clarity",
         "Satisfaction": "overall event satisfaction, exhibitor and attendee experience, expectations met",
-        "Improvement Suggestions": "better communication, smoother logistics, app enhancements, clearer guidelines"
+        "Improvement Suggestions": "better communication, smoother logistics, app enhancements, clearer guidelines",
+        "Additional Comments": "open feedback, general remarks, anything else, free-form comments",
+        "Competitor Comparison": "alternative solutions considered, competitor strengths, switching intent, market comparison",
+        "Usage Frequency": "how often used, adoption rate, daily vs occasional use, engagement level",
+        "Referral Likelihood": "word of mouth, peer recommendations, advocacy, likelihood to refer colleagues"
     }
 }
 

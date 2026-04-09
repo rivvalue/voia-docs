@@ -550,7 +550,11 @@
   "Pricing Value": "cost competitiveness, ROI, pricing transparency",
   "User Experience": "interface usability, ease of onboarding",
   "Satisfaction": "overall satisfaction, expectations met",
-  "Improvement Suggestions": "process improvements, communication, delivery"
+  "Improvement Suggestions": "process improvements, communication, delivery",
+  "Additional Comments": "open feedback, general remarks, anything else, free-form comments",
+  "Competitor Comparison": "alternative solutions considered, competitor strengths, switching intent, market comparison",
+  "Usage Frequency": "how often used, adoption rate, daily vs occasional use, engagement level",
+  "Referral Likelihood": "word of mouth, peer recommendations, advocacy, likelihood to refer colleagues"
 }</pre>
                     <p style="margin-top:0.5rem;margin-bottom:0;font-size:0.75rem;color:#6c757d;">{{ _('Edit this in an external editor and paste the result here. Only include the topics you want to override.') }}</p>
                 </div>
@@ -774,7 +778,7 @@
                                     <div class="mb-3">
                                         <label class="form-label">{{ _("Select Topics to Prioritize") }}</label>
                                         <div class="multi-select-container">
-                                            {% for topic in ["NPS Score", "Product Quality", "Support Experience", "Service Rating", "Pricing Value", "User Experience", "Feature Requests", "Improvement Suggestions"] %}
+                                            {% for topic in ["NPS Score", "Product Quality", "Support Experience", "Service Rating", "Pricing Value", "User Experience", "Satisfaction", "Improvement Suggestions"] %}
                                             <div class="multi-select-item">
                                                 <input type="checkbox" id="priority_{{ loop.index }}" name="prioritized_topics" value="{{ topic }}" 
                                                        {% if campaign.prioritized_topics and topic in campaign.prioritized_topics %}checked{% endif %}
