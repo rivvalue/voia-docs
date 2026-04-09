@@ -99,6 +99,7 @@ class LLMConfig:
         DEFAULT_OPENAI_PREMIUM_MODEL: Premium OpenAI model for escalations. Default: gpt-4o
         DEFAULT_CLAUDE_PREMIUM_MODEL: Premium Claude model for escalations. Default: claude-opus-4-5
         PROVIDER_FAILOVER_ORDER: Comma-separated failover order. Default: openai
+        QBR_LLM_MODEL: Model to use exclusively for QBR transcript analysis. Default: falls back to platform default
     """
     default_provider: LLMProvider = LLMProvider.OPENAI
     claude_enabled: bool = False
@@ -108,6 +109,7 @@ class LLMConfig:
     default_claude_model: str = "claude-sonnet-4-5"
     default_openai_premium_model: str = "gpt-4o"
     default_claude_premium_model: str = "claude-opus-4-5"
+    qbr_model: Optional[str] = None
     
     @classmethod
     def from_environment(cls) -> 'LLMConfig':
@@ -144,6 +146,15 @@ class LLMConfig:
             logger.warning(f"Invalid DEFAULT_CLAUDE_MODEL '{default_claude_model}', using claude-sonnet-4-5")
             default_claude_model = "claude-sonnet-4-5"
         
+        qbr_model_env = os.environ.get('QBR_LLM_MODEL')
+        qbr_model: Optional[str] = None
+        if qbr_model_env:
+            all_valid_models = set(VALID_MODELS['openai']) | set(VALID_MODELS['anthropic'])
+            if qbr_model_env in all_valid_models:
+                qbr_model = qbr_model_env
+            else:
+                logger.warning(f"Invalid QBR_LLM_MODEL '{qbr_model_env}', falling back to platform default")
+        
         return cls(
             default_provider=default_provider,
             claude_enabled=claude_enabled,
@@ -151,7 +162,8 @@ class LLMConfig:
             default_openai_model=default_openai_model,
             default_claude_model=default_claude_model,
             default_openai_premium_model=default_openai_premium_model,
-            default_claude_premium_model=default_claude_premium_model
+            default_claude_premium_model=default_claude_premium_model,
+            qbr_model=qbr_model
         )
     
     def get_default_model(self, provider: Optional[LLMProvider] = None) -> str:
@@ -179,6 +191,29 @@ class LLMConfig:
     def get_openai_model(self, premium: bool = False) -> str:
         """Get OpenAI model directly (for code using OpenAI SDK)."""
         return self.default_openai_premium_model if premium else self.default_openai_model
+    
+    def get_qbr_model(self) -> str:
+        """Get the model to use for QBR transcript analysis.
+        
+        Returns QBR_LLM_MODEL if set and valid, otherwise falls back to
+        default_claude_model if CLAUDE_ENABLED=true, or default_openai_model otherwise.
+        """
+        if self.qbr_model is not None:
+            return self.qbr_model
+        if self.claude_enabled:
+            return self.default_claude_model
+        return self.default_openai_model
+    
+    def get_qbr_provider(self) -> LLMProvider:
+        """Get the provider that should handle QBR transcript analysis.
+        
+        Derives the provider from the resolved QBR model family so the gateway
+        routes to the correct adapter without cross-provider model translation.
+        """
+        model = self.get_qbr_model()
+        if model in VALID_MODELS['anthropic']:
+            return LLMProvider.ANTHROPIC
+        return LLMProvider.OPENAI
 
 
 class LLMAdapter(ABC):

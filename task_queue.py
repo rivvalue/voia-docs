@@ -2011,31 +2011,42 @@ Rules:
 - key_themes: max 5 strings in transcript language
 - executive_summary: plain text in transcript language, max 300 characters"""
 
+            from llm_gateway import LLMConfig
+            qbr_config_env = LLMConfig.from_environment()
+            qbr_model = qbr_config_env.get_qbr_model()
+            qbr_provider = qbr_config_env.get_qbr_provider()
             gateway = _get_transcript_gateway()
             if gateway:
                 from llm_gateway import LLMRequest, LLMMessage
+                logger.debug(f"QBR analysis using LLM gateway with model: {qbr_model} provider: {qbr_provider}")
                 llm_request = LLMRequest(
                     messages=[LLMMessage(role="user", content=prompt)],
-                    model=gateway.config.default_openai_model if hasattr(gateway, 'config') else "gpt-4o-mini",
+                    model=qbr_model,
                     temperature=0.1,
                     max_tokens=2000,
                     json_mode=True
                 )
-                response = gateway.chat_completion(llm_request)
+                response = gateway.chat_completion(llm_request, provider_override=qbr_provider)
                 ai_response = response.content.strip() if response.content else ""
-                logger.debug("QBR analysis using LLM gateway")
             else:
+                from llm_gateway import VALID_MODELS as _VALID_MODELS
+                if qbr_model in _VALID_MODELS['anthropic']:
+                    logger.warning(
+                        f"QBR_LLM_MODEL resolves to Anthropic model '{qbr_model}' but LLM gateway "
+                        f"is unavailable. Falling back to default OpenAI model: {qbr_config_env.default_openai_model}"
+                    )
+                    qbr_model = qbr_config_env.default_openai_model
+                logger.debug(f"QBR analysis using direct OpenAI with model: {qbr_model}")
                 from openai import OpenAI
                 client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
                 response = client.chat.completions.create(
-                    model="gpt-4o-mini",
+                    model=qbr_model,
                     messages=[{"role": "user", "content": prompt}],
                     temperature=0.1,
                     max_tokens=2000,
                     response_format={"type": "json_object"}
                 )
                 ai_response = response.choices[0].message.content.strip()
-                logger.debug("QBR analysis using direct OpenAI")
 
             if ai_response.startswith('```'):
                 lines = ai_response.split('\n')
