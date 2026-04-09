@@ -414,9 +414,9 @@ Yes, anyone with access to your VOÏA account counts as a user.
 | QBR Intelligence | ✓ | ✓ | ✓ |
 | Help desk | ✓ | ✓ | ✓ |
 | API access | ✗ | ✗ | ✓ |
-| White-label branding | ✗ | ✗ | ✓ |
+| White-label branding | ✓ | ✓ | ✓ |
 | Custom integrations | ✗ | ✗ | ✓ |
-| SLA guarantee (99.9%) | ✗ | ✗ | ✓ |
+| SLA guarantee (99.9%) | ✓ | ✓ | ✓ |
 | Priority support (24/7) | ✗ | ✗ | ✓ |
 
 ---

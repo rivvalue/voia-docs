@@ -370,9 +370,9 @@ Un **participant** est un contact individuel. Une **entreprise cliente** est l'o
 | Intelligence QBR | ✓ | ✓ | ✓ |
 | Service d'assistance (help desk) | ✓ | ✓ | ✓ |
 | Accès API | ✗ | ✗ | ✓ |
-| Branding white-label | ✗ | ✗ | ✓ |
+| Branding white-label | ✓ | ✓ | ✓ |
 | Intégrations personnalisées | ✗ | ✗ | ✓ |
-| Garantie SLA (99,9 %) | ✗ | ✗ | ✓ |
+| Garantie SLA (99,9 %) | ✓ | ✓ | ✓ |
 | Support prioritaire (24/7) | ✗ | ✗ | ✓ |
 
 ---
