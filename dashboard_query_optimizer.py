@@ -77,57 +77,127 @@ def get_optimized_dashboard_data(campaign_id=None, business_account_id=None):
     nps_score = ((promoters - detractors) / total_responses * 100) if total_responses > 0 else 0
     
     # ============================================================================
-    # QUERY 2: Distribution Queries - Consolidated into single query with subqueries
+    # QUERY 2: Distribution Queries - All 4 distributions in a single round trip
+    #
+    # Previously: 4 separate GROUP BY queries × ~20-50ms Neon latency each = 80-200ms
+    # Now: 1 UNION ALL query dispatching all 4 distributions simultaneously = ~20-50ms
+    #
+    # The UNION ALL uses a 'dist_type' discriminator column so all four distributions
+    # travel in a single result set and are split back in Python. The growth distribution
+    # needs avg(growth_factor) and groups by two columns, so it occupies its own UNION
+    # arm with NULL placeholders for the columns irrelevant to the other distributions.
     # ============================================================================
-    
-    # NPS distribution
-    nps_dist_query = db.session.query(
-        SurveyResponse.nps_category,
-        func.count(SurveyResponse.id).label('count')
-    )
+
     if campaign_id:
-        nps_dist_query = nps_dist_query.filter(SurveyResponse.campaign_id == campaign_id)
+        campaign_filter_nps      = "sr.campaign_id = :cid"
+        campaign_filter_sentiment = "sr.campaign_id = :cid AND sr.sentiment_label IS NOT NULL"
+        campaign_filter_tenure   = "sr.campaign_id = :cid AND sr.tenure_with_fc IS NOT NULL"
+        campaign_filter_growth   = "sr.campaign_id = :cid AND sr.growth_factor IS NOT NULL"
+        bind_params = {"cid": campaign_id}
     elif business_account_id:
-        nps_dist_query = nps_dist_query.join(Campaign).filter(Campaign.business_account_id == business_account_id)
-    nps_distribution = nps_dist_query.group_by(SurveyResponse.nps_category).all()
-    
-    # Sentiment distribution
-    sentiment_dist_query = db.session.query(
-        SurveyResponse.sentiment_label,
-        func.count(SurveyResponse.id).label('count')
-    ).filter(SurveyResponse.sentiment_label.isnot(None))
-    if campaign_id:
-        sentiment_dist_query = sentiment_dist_query.filter(SurveyResponse.campaign_id == campaign_id)
-    elif business_account_id:
-        sentiment_dist_query = sentiment_dist_query.join(Campaign).filter(Campaign.business_account_id == business_account_id)
-    sentiment_distribution = sentiment_dist_query.group_by(SurveyResponse.sentiment_label).all()
-    
-    # Tenure distribution
-    tenure_dist_query = db.session.query(
-        SurveyResponse.tenure_with_fc,
-        func.count(SurveyResponse.id).label('count')
-    ).filter(SurveyResponse.tenure_with_fc.isnot(None))
-    if campaign_id:
-        tenure_dist_query = tenure_dist_query.filter(SurveyResponse.campaign_id == campaign_id)
-    elif business_account_id:
-        tenure_dist_query = tenure_dist_query.join(Campaign).filter(Campaign.business_account_id == business_account_id)
-    tenure_distribution = tenure_dist_query.group_by(SurveyResponse.tenure_with_fc).all()
-    
-    # Growth factor distribution
-    growth_dist_query = db.session.query(
-        SurveyResponse.growth_range,
-        SurveyResponse.growth_rate,
-        func.count(SurveyResponse.id).label('count'),
-        func.avg(SurveyResponse.growth_factor).label('avg_factor')
-    ).filter(SurveyResponse.growth_factor.isnot(None))
-    if campaign_id:
-        growth_dist_query = growth_dist_query.filter(SurveyResponse.campaign_id == campaign_id)
-    elif business_account_id:
-        growth_dist_query = growth_dist_query.join(Campaign).filter(Campaign.business_account_id == business_account_id)
-    growth_factor_distribution = growth_dist_query.group_by(
-        SurveyResponse.growth_range, 
-        SurveyResponse.growth_rate
-    ).all()
+        campaign_filter_nps      = "c.business_account_id = :baid"
+        campaign_filter_sentiment = "c.business_account_id = :baid AND sr.sentiment_label IS NOT NULL"
+        campaign_filter_tenure   = "c.business_account_id = :baid AND sr.tenure_with_fc IS NOT NULL"
+        campaign_filter_growth   = "c.business_account_id = :baid AND sr.growth_factor IS NOT NULL"
+        bind_params = {"baid": business_account_id}
+    else:
+        campaign_filter_nps      = "1=1"
+        campaign_filter_sentiment = "sr.sentiment_label IS NOT NULL"
+        campaign_filter_tenure   = "sr.tenure_with_fc IS NOT NULL"
+        campaign_filter_growth   = "sr.growth_factor IS NOT NULL"
+        bind_params = {}
+
+    # Campaign join clause is needed when filtering by business_account_id
+    if business_account_id and not campaign_id:
+        join_clause = "JOIN campaigns c ON sr.campaign_id = c.id"
+    else:
+        join_clause = "LEFT JOIN campaigns c ON sr.campaign_id = c.id"
+
+    combined_dist_sql = text(f"""
+        SELECT 'nps'       AS dist_type,
+               sr.nps_category   AS label1,
+               NULL              AS label2,
+               COUNT(sr.id)      AS cnt,
+               NULL::float       AS avg_val
+          FROM survey_response sr
+          {join_clause}
+         WHERE {campaign_filter_nps}
+         GROUP BY sr.nps_category
+
+        UNION ALL
+
+        SELECT 'sentiment' AS dist_type,
+               sr.sentiment_label AS label1,
+               NULL               AS label2,
+               COUNT(sr.id)       AS cnt,
+               NULL::float        AS avg_val
+          FROM survey_response sr
+          {join_clause}
+         WHERE {campaign_filter_sentiment}
+         GROUP BY sr.sentiment_label
+
+        UNION ALL
+
+        SELECT 'tenure'    AS dist_type,
+               sr.tenure_with_fc AS label1,
+               NULL              AS label2,
+               COUNT(sr.id)      AS cnt,
+               NULL::float       AS avg_val
+          FROM survey_response sr
+          {join_clause}
+         WHERE {campaign_filter_tenure}
+         GROUP BY sr.tenure_with_fc
+
+        UNION ALL
+
+        SELECT 'growth'         AS dist_type,
+               sr.growth_range  AS label1,
+               sr.growth_rate   AS label2,
+               COUNT(sr.id)     AS cnt,
+               AVG(sr.growth_factor) AS avg_val
+          FROM survey_response sr
+          {join_clause}
+         WHERE {campaign_filter_growth}
+         GROUP BY sr.growth_range, sr.growth_rate
+    """)
+
+    combined_rows = db.session.execute(combined_dist_sql, bind_params).fetchall()
+
+    # Split the unified result set back into the four distribution lists.
+    # Each list preserves the same attribute-style access the return dict expects.
+    class _Row:
+        """Lightweight named-attribute wrapper so downstream code is unchanged."""
+        __slots__ = ('nps_category', 'count', 'sentiment_label', 'tenure_with_fc',
+                     'growth_range', 'growth_rate', 'avg_factor')
+        def __init__(self, **kw):
+            for k, v in kw.items():
+                setattr(self, k, v)
+
+    nps_distribution = []
+    sentiment_distribution = []
+    tenure_distribution = []
+    growth_factor_distribution = []
+
+    for row in combined_rows:
+        dist_type = row[0]
+        label1    = row[1]
+        label2    = row[2]
+        cnt       = row[3]
+        avg_val   = row[4]
+
+        if dist_type == 'nps':
+            nps_distribution.append(_Row(nps_category=label1, count=cnt))
+        elif dist_type == 'sentiment':
+            sentiment_distribution.append(_Row(sentiment_label=label1, count=cnt))
+        elif dist_type == 'tenure':
+            tenure_distribution.append(_Row(tenure_with_fc=label1, count=cnt))
+        elif dist_type == 'growth':
+            growth_factor_distribution.append(_Row(
+                growth_range=label1,
+                growth_rate=label2,
+                count=cnt,
+                avg_factor=avg_val
+            ))
     
     # ============================================================================
     # QUERY 3: Company-Level Data - Single aggregated query for all companies
