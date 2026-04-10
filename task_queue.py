@@ -1994,7 +1994,7 @@ Rules:
 - detected_language: ISO 639-1 code of the transcript language ("en", "fr", "es", "de", "pt", etc.)
 - meeting_date: the date of the conversation as explicitly stated in the transcript (e.g. "March 12, 2025"); use "Not specified" if no date is mentioned
 - meeting_time_range: the time range of the conversation as explicitly stated in the transcript (e.g. "10:00 AM – 11:30 AM"); use "Not specified" if no time is mentioned
-- analysis_confidence: 0.0 to 1.0 — overall confidence in analysis quality (based on transcript length, clarity, completeness); 1.0 = very complete and clear
+- analysis_confidence (0.0–1.0): Rate your overall confidence in the accuracy and completeness of this analysis. Base this score on the following factors: how much of the transcript contains clear, attributable dialogue (vs. crosstalk, inaudible segments, or filler); whether key QBR topics were explicitly discussed (renewal, performance, concerns, next steps); and how unambiguous the sentiment signals are. A score of 1.0 means the transcript was detailed, clear, and provided strong signals across all sections. A score below 0.5 means significant content was missing, unclear, or too ambiguous to analyze reliably.
 - renewal_sentiment: "positive" if client is happy/renewing, "neutral" if uncertain, "at_risk" if showing churn signals
 - renewal_confidence_score: 0.0 to 1.0 (1.0 = very confident in renewal sentiment)
 - overall_relationship_health: "strong" if excellent partnership, "stable" if adequate, "fragile" if at risk
@@ -2023,7 +2023,7 @@ Rules:
                     messages=[LLMMessage(role="user", content=prompt)],
                     model=qbr_model,
                     temperature=0.1,
-                    max_tokens=2000,
+                    max_tokens=6000,
                     json_mode=True
                 )
                 response = gateway.chat_completion(llm_request, provider_override=qbr_provider)
@@ -2043,7 +2043,7 @@ Rules:
                     model=qbr_model,
                     messages=[{"role": "user", "content": prompt}],
                     temperature=0.1,
-                    max_tokens=2000,
+                    max_tokens=6000,
                     response_format={"type": "json_object"}
                 )
                 ai_response = response.choices[0].message.content.strip()
