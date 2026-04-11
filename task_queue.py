@@ -1452,6 +1452,7 @@ class TaskQueue:
             business_account_id = task_data.get('business_account_id')
             is_regenerating = task_data.get('regenerating', False)
             report_id = task_data.get('report_id')
+            user_language = task_data.get('user_language', 'en')
             
             if not all([campaign_id, business_account_id]):
                 logger.error(f"Missing executive report task parameters: {task_data}")
@@ -1474,7 +1475,7 @@ class TaskQueue:
             from executive_report_service import ExecutiveReportGenerator
             
             generator = ExecutiveReportGenerator()
-            report_file_path = generator.generate_campaign_report(campaign_id, business_account_id)
+            report_file_path = generator.generate_campaign_report(campaign_id, business_account_id, user_language=user_language)
             
             if report_file_path:
                 # Store report information in database

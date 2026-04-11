@@ -6679,6 +6679,7 @@ def generate_executive_report_manually(campaign_id):
         task_queue.add_task('executive_report', data_id=campaign.id, task_data={
             'campaign_id': campaign.id,
             'business_account_id': current_account.id,
+            'user_language': session.get('language', 'en'),
             'user_id': user.id,
             'user_email': user.email,
             'user_name': user.get_full_name()
@@ -6750,6 +6751,7 @@ def regenerate_executive_report(campaign_id):
             'business_account_id': current_account.id,
             'regenerating': True,
             'report_id': existing_report.id,
+            'user_language': session.get('language', 'en'),
             'user_id': user.id,
             'user_email': user.email,
             'user_name': user.get_full_name()

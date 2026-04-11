@@ -3942,7 +3942,10 @@ def classic_survey_analytics():
                     'drivers': json_module.loads(snapshot.driver_attribution) if snapshot.driver_attribution else {},
                     'features': json_module.loads(snapshot.feature_analytics) if snapshot.feature_analytics else {},
                     'recommendation': json_module.loads(snapshot.recommendation_distribution) if snapshot.recommendation_distribution else {},
-                    'correlation': json_module.loads(snapshot.correlation_data) if getattr(snapshot, 'correlation_data', None) else {'points': [], 'summary': {'avg_ces_by_nps_category': {}, 'nps_csat_alignment_pct': None, 'total_correlated_responses': 0}}
+                    'correlation': json_module.loads(snapshot.correlation_data) if getattr(snapshot, 'correlation_data', None) else {'points': [], 'summary': {'avg_ces_by_nps_category': {}, 'nps_csat_alignment_pct': None, 'total_correlated_responses': 0}},
+                    'waterfall_data': json_module.loads(snapshot.waterfall_data) if getattr(snapshot, 'waterfall_data', None) else None,
+                    'priority_matrix_data': json_module.loads(snapshot.priority_matrix_data) if getattr(snapshot, 'priority_matrix_data', None) else None,
+                    'driver_analysis_summary': json_module.loads(snapshot.driver_analysis_summary) if getattr(snapshot, 'driver_analysis_summary', None) else None,
                 })
 
         responses = SurveyResponse.query.filter_by(campaign_id=campaign_id).all()
@@ -4098,6 +4101,34 @@ def classic_survey_analytics():
             if r.recommendation_status:
                 rec_counts[r.recommendation_status] = rec_counts.get(r.recommendation_status, 0) + 1
 
+        waterfall_data_live = None
+        priority_matrix_live = None
+        driver_summary_live = None
+        try:
+            from executive_report_service import (
+                calculate_waterfall_data,
+                calculate_driver_priority_matrix,
+                generate_driver_analysis_summary,
+            )
+            waterfall_data_live = calculate_waterfall_data(responses, campaign=campaign)
+            priority_matrix_live = calculate_driver_priority_matrix(responses, campaign=campaign)
+            nps_all = [r.nps_score for r in responses if r.nps_score is not None]
+            if nps_all:
+                _t = len(nps_all)
+                _p = sum(1 for s in nps_all if s >= 9)
+                _d = sum(1 for s in nps_all if s <= 6)
+                _baseline = round((_p - _d) / _t * 100, 1)
+                driver_summary_live = generate_driver_analysis_summary(
+                    waterfall_data=waterfall_data_live,
+                    matrix_data=priority_matrix_live,
+                    baseline_nps=_baseline,
+                    total_responses=_t,
+                    use_ai=False,
+                    business_account_id=getattr(campaign, 'business_account_id', None),
+                )
+        except Exception as wf_err:
+            logger.warning(f"Live driver analysis failed for campaign {campaign_id}: {wf_err}")
+
         return jsonify({
             'total_responses': total,
             'csat': {'average': csat_avg, 'distribution': csat_dist, 'count': len(csat_scores)},
@@ -4108,7 +4139,10 @@ def classic_survey_analytics():
             'correlation': {
                 'points': correlation_points,
                 'summary': correlation_summary
-            }
+            },
+            'waterfall_data': waterfall_data_live,
+            'priority_matrix_data': priority_matrix_live,
+            'driver_analysis_summary': driver_summary_live,
         })
 
     except Exception as e:

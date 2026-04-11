@@ -33,10 +33,11 @@ class ExecutiveReportGenerator:
         self.report_dir = "static/reports"
         os.makedirs(self.report_dir, exist_ok=True)
     
-    def generate_campaign_report(self, campaign_id: int, business_account_id: int) -> Optional[str]:
+    def generate_campaign_report(self, campaign_id: int, business_account_id: int, user_language: str = 'en') -> Optional[str]:
         """
-        Generate executive report for a completed campaign
-        Returns file path of generated PDF or None if failed
+        Generate executive report for a completed campaign.
+        user_language controls which language is used for bilingual content (e.g. 'en' or 'fr').
+        Returns file path of generated PDF or None if failed.
         """
         try:
             from models import Campaign, SurveyResponse, BusinessAccount
@@ -58,8 +59,9 @@ class ExecutiveReportGenerator:
                 logger.error(f"Business account {business_account_id} not found")
                 return None
             
-            # Generate report data
+            # Generate report data and inject user language for template rendering
             report_data = self._collect_report_data(campaign, business_account)
+            report_data['user_language'] = user_language if user_language in ('en', 'fr') else 'en'
             
             # Generate PDF
             pdf_path = self._generate_pdf_report(report_data, campaign, business_account)
@@ -265,6 +267,29 @@ class ExecutiveReportGenerator:
             if r.recommendation_status:
                 rec_counts[r.recommendation_status] = rec_counts.get(r.recommendation_status, 0) + 1
         
+        waterfall_data = None
+        priority_matrix = None
+        driver_analysis_summary = None
+        try:
+            nps_all = [r.nps_score for r in responses if r.nps_score is not None]
+            if nps_all:
+                total_r = len(nps_all)
+                prom = sum(1 for s in nps_all if s >= 9)
+                det = sum(1 for s in nps_all if s <= 6)
+                baseline_nps = round((prom - det) / total_r * 100, 1)
+                waterfall_data = calculate_waterfall_data(responses, campaign=campaign)
+                priority_matrix = calculate_driver_priority_matrix(responses, campaign=campaign)
+                driver_analysis_summary = generate_driver_analysis_summary(
+                    waterfall_data=waterfall_data,
+                    matrix_data=priority_matrix,
+                    baseline_nps=baseline_nps,
+                    total_responses=total_r,
+                    use_ai=False,
+                    business_account_id=getattr(campaign, 'business_account_id', None),
+                )
+        except Exception as nps_err:
+            logger.warning(f"NPS driver analysis failed in executive report: {nps_err}")
+
         return {
             'csat': {'average': csat_avg, 'distribution': csat_dist, 'count': len(csat_scores)},
             'ces': {'average': ces_avg, 'distribution': ces_dist, 'count': len(ces_scores)},
@@ -279,7 +304,10 @@ class ExecutiveReportGenerator:
                     'total_correlated_responses': len(correlation_points),
                     'insight_text': insight_text
                 }
-            }
+            },
+            'waterfall_data': waterfall_data,
+            'priority_matrix': priority_matrix,
+            'driver_analysis_summary': driver_analysis_summary,
         }
     
     def _calculate_campaign_kpis(self, responses: List, campaign) -> Dict:
@@ -441,7 +469,7 @@ class ExecutiveReportGenerator:
         return charts
     
     def _generate_classic_charts(self, classic_analytics: Dict, chart_colors: List) -> Dict:
-        """Generate classic survey-specific charts (CSAT, CES, driver impact, correlation)"""
+        """Generate classic survey-specific charts (CSAT, CES, driver impact, correlation, NPS driver analysis)"""
         charts = {}
         
         try:
@@ -456,6 +484,14 @@ class ExecutiveReportGenerator:
             
             charts['correlation_scatter'] = self._create_correlation_scatter_chart(
                 classic_analytics['correlation']['points'], chart_colors)
+            
+            if classic_analytics.get('waterfall_data'):
+                charts['opportunity_waterfall'] = self._create_opportunity_waterfall_chart(
+                    classic_analytics['waterfall_data'], chart_colors)
+            
+            if classic_analytics.get('priority_matrix'):
+                charts['priority_matrix'] = self._create_priority_matrix_chart(
+                    classic_analytics['priority_matrix'], chart_colors)
             
         except Exception as e:
             logger.error(f"Error generating classic charts: {e}")
@@ -588,10 +624,11 @@ class ExecutiveReportGenerator:
         else:
             labels = [str(i) for i in range(1, 9)]
             values = [ces_distribution.get(str(i), 0) for i in range(1, 9)]
-            color_map = ['#198754', '#28a745', '#6bcf7f', '#ffc107', '#fd7e14', '#e05d44', '#dc3545', '#c82333']
+            # Scale: 1 = Very Difficult (bad) → red; 8 = Extremely Easy (good) → green
+            color_map = ['#c82333', '#dc3545', '#e05d44', '#fd7e14', '#ffc107', '#6bcf7f', '#28a745', '#198754']
             
             bars = ax.bar(labels, values, color=color_map, alpha=0.85, edgecolor='white', linewidth=0.5)
-            ax.set_xlabel('Effort Score (1 = Low Effort, 8 = High Effort)', fontsize=10)
+            ax.set_xlabel('CES Score (1 = Very Difficult, 8 = Extremely Easy)', fontsize=10)
             ax.set_ylabel('Number of Responses', fontsize=10)
             ax.set_title('Customer Effort Score (CES) Distribution', fontsize=12, fontweight='bold')
             ax.grid(axis='y', alpha=0.3)
@@ -673,6 +710,70 @@ class ExecutiveReportGenerator:
         plt.tight_layout()
         return self._fig_to_base64(fig)
     
+    def _create_opportunity_waterfall_chart(self, waterfall_data: List, chart_colors: List) -> Optional[str]:
+        """Create horizontal bar chart showing recoverable NPS points per driver"""
+        if not waterfall_data:
+            return None
+        bars = [b for b in waterfall_data if b.get('nps_lift') is not None]
+        if not bars:
+            return None
+        bars = sorted(bars, key=lambda x: x.get('nps_lift', 0), reverse=True)[:12]
+        labels = [b.get('label_en') or b.get('label_fr') or b.get('label', '') for b in bars]
+        lifts = [b.get('nps_lift', 0) for b in bars]
+        bar_colors = ['#dc3545' if l > 0 else '#cccccc' for l in lifts]
+        height = max(4, len(bars) * 0.55 + 1.5)
+        fig, ax = plt.subplots(figsize=(9, height))
+        y_pos = list(range(len(labels)))
+        ax.barh(y_pos, lifts, color=bar_colors, alpha=0.85, height=0.6)
+        ax.set_yticks(y_pos)
+        ax.set_yticklabels(labels, fontsize=9)
+        ax.set_xlabel('Recoverable NPS Points', fontsize=10)
+        ax.set_title('NPS Opportunity Waterfall by Driver', fontsize=12, fontweight='bold')
+        ax.axvline(x=0, color='#333333', linewidth=0.8)
+        ax.grid(axis='x', alpha=0.2)
+        for i, (y, v) in enumerate(zip(y_pos, lifts)):
+            if v > 0:
+                ax.text(v + 0.05, y, f'+{v:.1f}', va='center', fontsize=8, color='#dc3545')
+        plt.tight_layout()
+        return self._fig_to_base64(fig)
+
+    def _create_priority_matrix_chart(self, matrix_data: List, chart_colors: List) -> Optional[str]:
+        """Create bubble chart showing driver frequency vs NPS lift potential"""
+        if not matrix_data:
+            return None
+        fig, ax = plt.subplots(figsize=(8, 6))
+        freqs = [m.get('frequency_pct', 0) for m in matrix_data]
+        lifts = [m.get('nps_lift', 0) for m in matrix_data]
+        med_x = sorted(freqs)[len(freqs) // 2] if freqs else 0
+        med_y = sorted(lifts)[len(lifts) // 2] if lifts else 0
+        for item in matrix_data:
+            x = item.get('frequency_pct', 0)
+            y = item.get('nps_lift', 0)
+            det = item.get('detractor_count', 1) or 1
+            size = max(40, det * 25)
+            high_priority = x >= med_x and y >= med_y
+            color = '#dc3545' if high_priority else '#6c757d'
+            ax.scatter(x, y, s=size, c=color, alpha=0.75, edgecolors='white', linewidth=0.8, zorder=3)
+            lbl = item.get('label_en') or item.get('label_fr') or item.get('label', '')
+            ax.annotate(lbl, (x, y),
+                        textcoords='offset points', xytext=(6, 3),
+                        fontsize=7, color='#333333')
+        if freqs:
+            ax.axvline(x=med_x, color='#aaaaaa', linestyle='--', linewidth=0.8, alpha=0.7)
+            ax.axhline(y=med_y, color='#aaaaaa', linestyle='--', linewidth=0.8, alpha=0.7)
+        ax.set_xlabel('Citation Frequency (%)', fontsize=10)
+        ax.set_ylabel('NPS Lift Potential (pts)', fontsize=10)
+        ax.set_title('Driver Priority Matrix', fontsize=12, fontweight='bold')
+        ax.grid(True, alpha=0.15)
+        from matplotlib.lines import Line2D
+        legend_elements = [
+            Line2D([0], [0], marker='o', color='w', markerfacecolor='#dc3545', markersize=10, label='High Priority'),
+            Line2D([0], [0], marker='o', color='w', markerfacecolor='#6c757d', markersize=10, label='Other'),
+        ]
+        ax.legend(handles=legend_elements, loc='lower right', fontsize=9)
+        plt.tight_layout()
+        return self._fig_to_base64(fig)
+
     def _fig_to_base64(self, fig) -> str:
         """Convert matplotlib figure to base64 string"""
         buffer = BytesIO()
@@ -1811,6 +1912,49 @@ class ExecutiveReportGenerator:
                 {% endif %}
             </div>
             
+            {% if classic_analytics and (classic_analytics.waterfall_data or classic_analytics.driver_analysis_summary) %}
+            <!-- NPS Driver Analysis -->
+            <div class="section page-break">
+                <h2 class="section-title">🎯 NPS Driver Analysis</h2>
+                <p style="color: #666; margin-bottom: 15px;">Identifies which loyalty drivers represent the greatest NPS recovery opportunity if detractors citing them became promoters. Red bars indicate actionable improvement potential.</p>
+                
+                {% if classic_charts.opportunity_waterfall %}
+                <div class="chart-container">
+                    <h3>Opportunity Waterfall — Recoverable NPS Points by Driver</h3>
+                    <p style="color: #888; font-size: 0.85em; margin-bottom: 8px;">Formula: 2 × detractors citing driver ÷ total respondents × 100. Each bar shows the independent lift potential if all detractors citing that driver became promoters.</p>
+                    <img src="{{ classic_charts.opportunity_waterfall }}" alt="NPS Opportunity Waterfall" class="chart-image">
+                </div>
+                {% endif %}
+                
+                {% if classic_charts.priority_matrix %}
+                <div class="chart-container" style="margin-top: 20px;">
+                    <h3>Driver Priority Matrix</h3>
+                    <p style="color: #888; font-size: 0.85em; margin-bottom: 8px;">X-axis: citation frequency (% of respondents). Y-axis: NPS lift potential. Bubble size: detractor count. Red = high priority (above median on both axes).</p>
+                    <img src="{{ classic_charts.priority_matrix }}" alt="Driver Priority Matrix" class="chart-image">
+                </div>
+                {% endif %}
+                
+                {% if classic_analytics.driver_analysis_summary %}
+                <div class="summary-box" style="margin-top: 20px; border-left: 4px solid #dc3545;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                        <h4 style="margin: 0;">Driver Analysis Summary</h4>
+                        {% if classic_analytics.driver_analysis_summary.confidence_level %}
+                        <span style="font-size: 0.8em; background: #f8f9fa; border: 1px solid #dee2e6; padding: 2px 8px; border-radius: 12px; color: #555;">
+                            Statistical confidence: {{ classic_analytics.driver_analysis_summary.confidence_level }}
+                        </span>
+                        {% endif %}
+                    </div>
+                    {% if user_language == 'fr' %}
+                    <p style="line-height: 1.6; margin-bottom: 0;">{{ classic_analytics.driver_analysis_summary.summary_fr or classic_analytics.driver_analysis_summary.summary_en }}</p>
+                    {% else %}
+                    <p style="line-height: 1.6; margin-bottom: 0;">{{ classic_analytics.driver_analysis_summary.summary_en or classic_analytics.driver_analysis_summary.summary_fr }}</p>
+                    {% endif %}
+                    <p style="color: #888; font-size: 0.8em; margin-top: 10px;">Generated by rule-based analysis</p>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+            
             <!-- NPS-CSAT-CES Correlation -->
             <div class="section page-break">
                 <h2 class="section-title">🔗 NPS-CSAT-CES Correlation</h2>
@@ -2155,6 +2299,371 @@ class ExecutiveReportGenerator:
 # Global instance
 report_generator = ExecutiveReportGenerator()
 
-def generate_executive_report(campaign_id: int, business_account_id: int) -> Optional[str]:
+def generate_executive_report(campaign_id: int, business_account_id: int, user_language: str = 'en') -> Optional[str]:
     """Generate executive report for a campaign - main entry point"""
-    return report_generator.generate_campaign_report(campaign_id, business_account_id)
+    return report_generator.generate_campaign_report(campaign_id, business_account_id, user_language=user_language)
+
+
+def _build_driver_label_map(campaign) -> Dict[str, Dict]:
+    """Retrieve EN/FR driver labels from the campaign's ClassicSurveyConfig."""
+    driver_label_map: Dict[str, Dict] = {}
+    if campaign is None:
+        return driver_label_map
+    try:
+        from models import ClassicSurveyConfig
+        classic_config = ClassicSurveyConfig.query.filter_by(campaign_id=campaign.id).first()
+        if classic_config:
+            for dl in normalize_driver_labels(classic_config.driver_labels):
+                driver_label_map[dl['key']] = {
+                    'label_en': dl.get('label_en', dl['key']),
+                    'label_fr': dl.get('label_fr', dl['key'])
+                }
+    except Exception:
+        pass
+    return driver_label_map
+
+
+def _collect_driver_nps_data(responses: List, total_nps_responses: int) -> Dict[str, Dict]:
+    """Aggregate per-driver promoter/passive/detractor counts from a response list."""
+    driver_data: Dict[str, Dict] = {}
+    for r in responses:
+        if not r.loyalty_drivers or r.nps_score is None:
+            continue
+        drivers_list = r.loyalty_drivers if isinstance(r.loyalty_drivers, list) else []
+        for d in drivers_list:
+            if d not in driver_data:
+                driver_data[d] = {'promoters': 0, 'passives': 0, 'detractors': 0, 'total': 0}
+            driver_data[d]['total'] += 1
+            if r.nps_score >= 9:
+                driver_data[d]['promoters'] += 1
+            elif r.nps_score <= 6:
+                driver_data[d]['detractors'] += 1
+            else:
+                driver_data[d]['passives'] += 1
+    return driver_data
+
+
+def calculate_waterfall_data(responses: List, campaign=None, min_selections: int = 3) -> Optional[List[Dict]]:
+    """
+    Calculate NPS Opportunity Waterfall data by loyalty driver for FullRead campaigns.
+
+    Each driver's bar represents the NPS-point lift achievable by converting every
+    detractor who cited that driver into a promoter. This is a forward-looking
+    prioritisation view that answers "where should we invest to move NPS most?"
+
+    Formula per driver:
+        nps_lift = 2 × detractor_count / total_nps_responses × 100
+
+    The result is sorted from highest lift opportunity to lowest.
+
+    Args:
+        responses:      List of SurveyResponse ORM objects for the campaign.
+        campaign:       Campaign ORM object (used to look up driver labels).
+        min_selections: Minimum respondents who selected a driver for inclusion.
+
+    Returns:
+        List of dicts ready for Chart.js rendering, or None if data is
+        insufficient. Each dict contains:
+            key              – driver key string
+            label_en / label_fr – display labels
+            frequency        – respondents who selected this driver
+            frequency_pct    – frequency as % of all NPS-scored respondents
+            driver_nps       – NPS score of the sub-group who cited this driver
+            baseline_nps     – overall campaign NPS
+            detractor_count  – detractors in the sub-group
+            promoter_count   – promoters in the sub-group
+            passive_count    – passives in the sub-group
+            nps_lift         – recoverable NPS points (the bar value)
+    """
+    if not responses:
+        return None
+
+    nps_scores_all = [r.nps_score for r in responses if r.nps_score is not None]
+    if not nps_scores_all:
+        return None
+
+    total = len(nps_scores_all)
+    promoters_all = sum(1 for s in nps_scores_all if s >= 9)
+    detractors_all = sum(1 for s in nps_scores_all if s <= 6)
+    baseline_nps = round((promoters_all - detractors_all) / total * 100, 1)
+
+    driver_label_map = _build_driver_label_map(campaign)
+    driver_data = _collect_driver_nps_data(responses, total)
+
+    result = []
+    for key, dd in driver_data.items():
+        if dd['total'] < min_selections:
+            continue
+        driver_nps = round((dd['promoters'] - dd['detractors']) / dd['total'] * 100, 1)
+        nps_lift = round(2 * dd['detractors'] / total * 100, 1)
+        frequency_pct = round(dd['total'] / total * 100, 1)
+        labels = driver_label_map.get(key, {
+            'label_en': key.replace('_', ' ').title(),
+            'label_fr': key.replace('_', ' ').title()
+        })
+        result.append({
+            'key': key,
+            'label_en': labels['label_en'],
+            'label_fr': labels['label_fr'],
+            'frequency': dd['total'],
+            'frequency_pct': frequency_pct,
+            'driver_nps': driver_nps,
+            'baseline_nps': baseline_nps,
+            'detractor_count': dd['detractors'],
+            'promoter_count': dd['promoters'],
+            'passive_count': dd['passives'],
+            'nps_lift': nps_lift,
+        })
+
+    if not result:
+        return None
+
+    result.sort(key=lambda x: x['nps_lift'], reverse=True)
+    return result
+
+
+def calculate_driver_priority_matrix(responses: List, campaign=None, min_selections: int = 3) -> Optional[List[Dict]]:
+    """
+    Calculate Driver Priority Matrix data for FullRead campaigns.
+
+    Each driver is positioned on a 2D plane:
+        x-axis: frequency_pct  – how widely cited the driver is (% of respondents)
+        y-axis: nps_lift       – recoverable NPS points if all detractors converted
+        bubble size: detractor_count
+
+    This immediately surfaces the high-priority quadrant: frequent AND high-lift drivers.
+
+    Returns:
+        List of dicts, or None if insufficient data.
+    """
+    if not responses:
+        return None
+
+    nps_scores_all = [r.nps_score for r in responses if r.nps_score is not None]
+    if not nps_scores_all:
+        return None
+
+    total = len(nps_scores_all)
+    promoters_all = sum(1 for s in nps_scores_all if s >= 9)
+    detractors_all = sum(1 for s in nps_scores_all if s <= 6)
+    baseline_nps = round((promoters_all - detractors_all) / total * 100, 1)
+
+    driver_label_map = _build_driver_label_map(campaign)
+    driver_data = _collect_driver_nps_data(responses, total)
+
+    result = []
+    for key, dd in driver_data.items():
+        if dd['total'] < min_selections:
+            continue
+        driver_nps = round((dd['promoters'] - dd['detractors']) / dd['total'] * 100, 1)
+        nps_lift = round(2 * dd['detractors'] / total * 100, 1)
+        frequency_pct = round(dd['total'] / total * 100, 1)
+        labels = driver_label_map.get(key, {
+            'label_en': key.replace('_', ' ').title(),
+            'label_fr': key.replace('_', ' ').title()
+        })
+        result.append({
+            'key': key,
+            'label_en': labels['label_en'],
+            'label_fr': labels['label_fr'],
+            'frequency': dd['total'],
+            'frequency_pct': frequency_pct,
+            'nps_lift': nps_lift,
+            'detractor_count': dd['detractors'],
+            'promoter_count': dd['promoters'],
+            'driver_nps': driver_nps,
+            'baseline_nps': baseline_nps,
+        })
+
+    return result if result else None
+
+
+def _compute_confidence(waterfall_data: List[Dict], total_responses: int) -> Dict:
+    """
+    Compute a statistical confidence level for the driver analysis.
+
+    Confidence is based entirely on sample size and driver coverage — not AI confidence.
+
+    Returns dict with: level ('high'|'medium'|'low'), score (0.0–1.0), reasons (list[str])
+    """
+    reasons = []
+    score_parts = []
+
+    n = total_responses
+    if n >= 50:
+        score_parts.append(1.0)
+        reasons.append(f"{n} responses collected")
+    elif n >= 30:
+        score_parts.append(0.8)
+        reasons.append(f"{n} responses collected")
+    elif n >= 15:
+        score_parts.append(0.55)
+        reasons.append(f"Only {n} responses — medium sample")
+    else:
+        score_parts.append(0.25)
+        reasons.append(f"Only {n} responses — limited sample")
+
+    q_drivers = len(waterfall_data) if waterfall_data else 0
+    if q_drivers >= 6:
+        score_parts.append(1.0)
+        reasons.append(f"{q_drivers} drivers with sufficient data")
+    elif q_drivers >= 4:
+        score_parts.append(0.75)
+        reasons.append(f"{q_drivers} drivers with sufficient data")
+    elif q_drivers >= 2:
+        score_parts.append(0.5)
+        reasons.append(f"Only {q_drivers} drivers with sufficient selections")
+    else:
+        score_parts.append(0.2)
+        reasons.append("Too few drivers with sufficient data")
+
+    if waterfall_data:
+        avg_freq = sum(d['frequency'] for d in waterfall_data) / len(waterfall_data)
+        if avg_freq >= 10:
+            score_parts.append(1.0)
+        elif avg_freq >= 5:
+            score_parts.append(0.7)
+        else:
+            score_parts.append(0.4)
+            reasons.append("Some drivers have few selections")
+
+    confidence_score = round(sum(score_parts) / len(score_parts), 2) if score_parts else 0.0
+
+    if confidence_score >= 0.72:
+        level = 'high'
+    elif confidence_score >= 0.45:
+        level = 'medium'
+    else:
+        level = 'low'
+
+    return {'level': level, 'score': confidence_score, 'reasons': reasons}
+
+
+def generate_driver_analysis_summary(
+    waterfall_data: Optional[List[Dict]],
+    matrix_data: Optional[List[Dict]],
+    baseline_nps: float,
+    total_responses: int,
+    use_ai: bool = True,
+    business_account_id: Optional[int] = None
+) -> Dict:
+    """
+    Generate a bilingual (EN/FR) human-readable summary of the FullRead driver analysis
+    with a statistical confidence level.
+
+    For completed campaigns (use_ai=True): calls gpt-4o-mini with strictly
+    fact-anchored data to generate narrative paragraphs.
+    For active campaigns (use_ai=False): returns a rule-based template summary.
+
+    Returns dict:
+        summary_en      – English narrative paragraph
+        summary_fr      – French narrative paragraph
+        confidence      – {level, score, reasons}
+        generated_by    – 'ai' or 'rule_based'
+        generated_at    – ISO timestamp
+    """
+    from datetime import datetime as _dt
+
+    confidence = _compute_confidence(waterfall_data or [], total_responses)
+
+    if not waterfall_data:
+        msg_en = (f"Insufficient driver data to generate a summary "
+                  f"({total_responses} response{'s' if total_responses != 1 else ''} collected).")
+        msg_fr = (f"Données insuffisantes pour générer un résumé "
+                  f"({total_responses} réponse{'s' if total_responses != 1 else ''} collectée{'s' if total_responses != 1 else ''}).")
+        return {
+            'summary_en': msg_en,
+            'summary_fr': msg_fr,
+            'confidence': confidence,
+            'generated_by': 'rule_based',
+            'generated_at': _dt.utcnow().isoformat()
+        }
+
+    top_opportunity = waterfall_data[0] if waterfall_data else None
+    top_opportunities = [d for d in waterfall_data if d['nps_lift'] > 0][:3]
+    no_lift_drivers = [d for d in waterfall_data if d['detractor_count'] == 0]
+    total_lift = round(sum(d['nps_lift'] for d in waterfall_data), 1)
+    theoretical_ceiling = round(baseline_nps + total_lift, 1)
+
+    if use_ai:
+        try:
+            from ai_analysis import _call_llm_for_analysis
+            driver_summary_lines = []
+            for d in waterfall_data:
+                driver_summary_lines.append(
+                    f"- {d['label_en']}: cited by {d['frequency']} respondents "
+                    f"({d['frequency_pct']}%), driver NPS={d['driver_nps']}, "
+                    f"detractors={d['detractor_count']}, NPS lift potential={d['nps_lift']} pts"
+                )
+            driver_block = "\n".join(driver_summary_lines)
+
+            system_prompt = (
+                "You are a concise B2B customer experience analyst. "
+                "Generate a strictly fact-based summary of NPS driver analysis data. "
+                "Do NOT invent numbers, percentages, or trends not present in the input. "
+                "Use plain business language. No bullet points — flowing prose only. "
+                "Respond in JSON with keys: summary_en (1-2 sentences in English) and "
+                "summary_fr (1-2 sentences in French, not a word-for-word translation — "
+                "natural French). Each summary must cite specific numbers from the data."
+            )
+            user_prompt = (
+                f"Campaign NPS (baseline): {baseline_nps}\n"
+                f"Total responses: {total_responses}\n"
+                f"Theoretical NPS ceiling (if all detractors converted): {theoretical_ceiling}\n"
+                f"Driver data (sorted by NPS lift opportunity, highest first):\n{driver_block}\n\n"
+                "Write one tight paragraph per language summarising: the largest improvement "
+                "opportunity, any drivers where respondents are already fully satisfied, "
+                "and the theoretical NPS gain if all fixable issues were addressed."
+            )
+
+            raw = _call_llm_for_analysis(
+                system_prompt=system_prompt,
+                user_prompt=user_prompt,
+                model="gpt-4o-mini",
+                temperature=0.3,
+                json_mode=True,
+                max_tokens=500,
+                business_account_id=business_account_id
+            )
+            parsed = json.loads(raw)
+            summary_en = parsed.get('summary_en', '')
+            summary_fr = parsed.get('summary_fr', '')
+            generated_by = 'ai'
+        except Exception as exc:
+            logger.warning(f"AI summary generation failed, falling back to rule-based: {exc}")
+            summary_en = summary_fr = None
+            generated_by = 'rule_based'
+    else:
+        summary_en = summary_fr = None
+        generated_by = 'rule_based'
+
+    if not summary_en:
+        opp_en = (f"The biggest improvement opportunity is '{top_opportunity['label_en']}' "
+                  f"(cited by {top_opportunity['frequency']} respondents, "
+                  f"potential lift: +{top_opportunity['nps_lift']} NPS pts)."
+                  if top_opportunity else "")
+        no_lift_en = (f" Drivers with no detractors — {', '.join(d['label_en'] for d in no_lift_drivers)} — "
+                      f"show full advocacy among their sub-groups."
+                      if no_lift_drivers else "")
+        ceiling_en = (f" Addressing all addressable issues could lift NPS from {baseline_nps} "
+                      f"to a theoretical ceiling of {theoretical_ceiling}.")
+        summary_en = opp_en + no_lift_en + ceiling_en
+
+        opp_fr = (f"La plus grande opportunité d'amélioration concerne '{top_opportunity['label_fr']}' "
+                  f"(cité par {top_opportunity['frequency']} répondants, "
+                  f"gain potentiel : +{top_opportunity['nps_lift']} pts NPS)."
+                  if top_opportunity else "")
+        no_lift_fr = (f" Les facteurs sans détracteurs — {', '.join(d['label_fr'] for d in no_lift_drivers)} — "
+                      f"affichent une adhésion totale dans leurs sous-groupes."
+                      if no_lift_drivers else "")
+        ceiling_fr = (f" Résoudre l'ensemble des problèmes identifiés pourrait faire passer le NPS "
+                      f"de {baseline_nps} à un plafond théorique de {theoretical_ceiling}.")
+        summary_fr = opp_fr + no_lift_fr + ceiling_fr
+
+    return {
+        'summary_en': summary_en,
+        'summary_fr': summary_fr,
+        'confidence': confidence,
+        'generated_by': generated_by,
+        'generated_at': _dt.utcnow().isoformat()
+    }

@@ -573,6 +573,76 @@
                     </div>
                 </div>
 
+                <!-- NPS Opportunity Waterfall -->
+                <div class="row mb-4 g-3" id="waterfallRow">
+                    <div class="col-12">
+                        <div class="chart-card">
+                            <div class="card-header">
+                                <h5>{{ _('NPS Opportunity Waterfall by Loyalty Driver') }}</h5>
+                                <small class="text-muted">{{ _('Recoverable NPS points per driver if all detractors who cited it became promoters. Sorted from highest to lowest improvement opportunity.') }}</small>
+                            </div>
+                            <div class="card-body">
+                                <div id="waterfallChartContainer" style="display:none;">
+                                    <div class="chart-container" style="height: 400px; padding-top: 24px;">
+                                        <canvas id="classicWaterfallChart"></canvas>
+                                    </div>
+                                    <div class="mt-2 text-center" style="font-size: 0.82rem; color: #6c757d;">
+                                        <i class="fas fa-info-circle me-1"></i>{{ _('Formula: 2 × detractors citing driver ÷ total respondents × 100. Bars reflect independent lift potential, not additive decomposition.') }}
+                                    </div>
+                                </div>
+                                <div id="waterfallUnavailable" class="text-center py-4">
+                                    <i class="fas fa-info-circle fa-2x mb-2" style="color: #adb5bd;"></i>
+                                    <p class="text-muted mb-0">{{ _('NPS Waterfall Analysis not available for this campaign.') }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Driver Priority Matrix + Analysis Summary -->
+                <div class="row mb-4 g-3">
+                    <!-- Driver Priority Matrix -->
+                    <div class="col-md-7">
+                        <div class="chart-card h-100">
+                            <div class="card-header">
+                                <h5>{{ _('Driver Priority Matrix') }}</h5>
+                                <small class="text-muted">{{ _('Frequency (x) vs. NPS lift potential (y). Bubble size = detractor count. Top-right quadrant = highest priority.') }}</small>
+                            </div>
+                            <div class="card-body">
+                                <div id="priorityMatrixContainer" style="display:none;">
+                                    <div class="chart-container" style="height: 380px;">
+                                        <canvas id="classicPriorityMatrixChart"></canvas>
+                                    </div>
+                                </div>
+                                <div id="priorityMatrixUnavailable" class="text-center py-4">
+                                    <i class="fas fa-info-circle fa-2x mb-2" style="color: #adb5bd;"></i>
+                                    <p class="text-muted mb-0">{{ _('Priority matrix not available for this campaign.') }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Driver Analysis Summary -->
+                    <div class="col-md-5">
+                        <div class="chart-card h-100">
+                            <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                <div>
+                                    <h5 class="mb-0">{{ _('Driver Analysis Summary') }}</h5>
+                                    <small class="text-muted">{{ _('Fact-based narrative. Confidence reflects sample size and driver coverage.') }}</small>
+                                </div>
+                                <span id="confidenceBadge" class="badge" style="display:none; font-size:0.78rem;"></span>
+                            </div>
+                            <div class="card-body d-flex flex-column justify-content-between">
+                                <div id="driverSummaryText" class="text-muted" style="display:none; font-size: 0.92rem; line-height: 1.65;"></div>
+                                <div id="driverSummaryUnavailable" class="text-center py-4">
+                                    <i class="fas fa-info-circle fa-2x mb-2" style="color: #adb5bd;"></i>
+                                    <p class="text-muted mb-0">{{ _('Summary not available for this campaign.') }}</p>
+                                </div>
+                                <div id="driverSummaryGeneratedBy" class="mt-3" style="display:none; font-size: 0.75rem; color: #adb5bd;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Recommendation Status & NPS-CSAT-CES Correlation -->
                 <div class="row mb-4 g-3">
                     <div class="col-md-6">
@@ -1424,7 +1494,9 @@ let classicCharts = {
     drivers: null,
     recommendation: null,
     features: null,
-    correlation: null
+    correlation: null,
+    waterfall: null,
+    priorityMatrix: null,
 };
 
 let currentSurveyType = null;
@@ -1480,6 +1552,9 @@ async function loadClassicAnalyticsData(campaignId) {
         if (data.correlation) {
             renderCorrelationChart(data.correlation);
         }
+        renderWaterfallChart(data.waterfall_data);
+        renderPriorityMatrixChart(data.priority_matrix_data);
+        renderDriverSummaryCard(data.driver_analysis_summary);
     } catch (err) {
         console.error('Classic analytics error:', err);
     }
@@ -1950,6 +2025,247 @@ function renderFeatureChart(featuresData) {
         }
     });
 }
+
+function renderWaterfallChart(waterfallData) {
+    const container = document.getElementById('waterfallChartContainer');
+    const unavailable = document.getElementById('waterfallUnavailable');
+    const ctx = document.getElementById('classicWaterfallChart');
+    if (!container || !unavailable || !ctx) return;
+
+    if (!waterfallData || waterfallData.length === 0) {
+        container.style.display = 'none';
+        unavailable.style.display = 'block';
+        return;
+    }
+    container.style.display = 'block';
+    unavailable.style.display = 'none';
+    if (classicCharts.waterfall) classicCharts.waterfall.destroy();
+
+    const lang = document.documentElement.lang || 'en';
+    const labels = waterfallData.map(d => lang === 'fr' ? (d.label_fr || d.label_en) : d.label_en);
+    const lifts = waterfallData.map(d => d.nps_lift);
+    const detCounts = waterfallData.map(d => d.detractor_count);
+    const freqs = waterfallData.map(d => d.frequency);
+    const driverNpsList = waterfallData.map(d => d.driver_nps);
+    const baseline = waterfallData[0] ? waterfallData[0].baseline_nps : 0;
+
+    const totalLift = lifts.reduce((a, b) => a + b, 0).toFixed(1);
+    const ceiling = (baseline + parseFloat(totalLift)).toFixed(1);
+
+    const liftLabel = '{{ _("NPS Lift Potential (pts)") }}';
+    const detLabel = '{{ _("Detractors citing driver") }}';
+    const freqLabel = '{{ _("Respondents citing driver") }}';
+    const driverNpsLabel = '{{ _("Driver NPS") }}';
+    const baselineLabel = '{{ _("Campaign NPS") }}';
+    const ceilingLabel = '{{ _("Theoretical ceiling") }}';
+
+    const ceilingPlugin = {
+        id: 'waterfallCeilingPlugin',
+        afterDraw(chart) {
+            const { ctx: c, chartArea, scales } = chart;
+            if (!scales.x || !chartArea) return;
+            c.save();
+            c.fillStyle = '#495057';
+            c.font = 'bold 11px sans-serif';
+            c.textAlign = 'right';
+            c.fillText(`${baselineLabel}: ${baseline}  |  ${ceilingLabel}: ${ceiling}`, chartArea.right, chartArea.top - 8);
+            c.restore();
+        }
+    };
+
+    classicCharts.waterfall = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [{
+                label: liftLabel,
+                data: lifts,
+                backgroundColor: lifts.map(v => v > 0 ? 'rgba(220,53,69,0.75)' : 'rgba(173,181,189,0.5)'),
+                borderColor: lifts.map(v => v > 0 ? '#dc3545' : '#adb5bd'),
+                borderWidth: 2,
+                borderRadius: 4,
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            layout: { padding: { top: 28 } },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const i = context.dataIndex;
+                            return [
+                                `${liftLabel}: +${lifts[i].toFixed(1)} pts`,
+                                `${detLabel}: ${detCounts[i]}`,
+                                `${freqLabel}: ${freqs[i]}`,
+                                `${driverNpsLabel}: ${driverNpsList[i].toFixed(1)}`,
+                            ];
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    min: 0,
+                    title: { display: true, text: liftLabel },
+                    ticks: { callback: v => '+' + v }
+                },
+                y: { ticks: { font: { size: 12 } } }
+            }
+        },
+        plugins: [ceilingPlugin]
+    });
+}
+
+function renderPriorityMatrixChart(matrixData) {
+    const container = document.getElementById('priorityMatrixContainer');
+    const unavailable = document.getElementById('priorityMatrixUnavailable');
+    const ctx = document.getElementById('classicPriorityMatrixChart');
+    if (!container || !unavailable || !ctx) return;
+
+    if (!matrixData || matrixData.length === 0) {
+        container.style.display = 'none';
+        unavailable.style.display = 'block';
+        return;
+    }
+    container.style.display = 'block';
+    unavailable.style.display = 'none';
+    if (classicCharts.priorityMatrix) classicCharts.priorityMatrix.destroy();
+
+    const lang = document.documentElement.lang || 'en';
+    const maxDet = Math.max(...matrixData.map(d => d.detractor_count), 1);
+    const maxFreq = Math.max(...matrixData.map(d => d.frequency_pct), 1);
+    const maxLift = Math.max(...matrixData.map(d => d.nps_lift), 1);
+
+    const datasets = matrixData.map(d => {
+        const label = lang === 'fr' ? (d.label_fr || d.label_en) : d.label_en;
+        const r = Math.max(8, Math.round(8 + (d.detractor_count / maxDet) * 28));
+        const isHighPriority = d.frequency_pct >= maxFreq / 2 && d.nps_lift >= maxLift / 2;
+        return {
+            label,
+            data: [{ x: d.frequency_pct, y: d.nps_lift, r, detractor_count: d.detractor_count, driver_nps: d.driver_nps }],
+            backgroundColor: isHighPriority ? 'rgba(220,53,69,0.72)' : 'rgba(108,117,125,0.45)',
+            borderColor: isHighPriority ? '#dc3545' : '#6c757d',
+            borderWidth: 2,
+        };
+    });
+
+    const freqLabel = '{{ _("Citation frequency") }}' + ' (%)';
+    const liftLabel = '{{ _("NPS lift potential (pts)") }}';
+    const detLabel = '{{ _("Detractors") }}';
+    const driverNpsLabel = '{{ _("Driver NPS") }}';
+
+    const quadrantPlugin = {
+        id: 'priorityQuadrantPlugin',
+        beforeDraw(chart) {
+            const { ctx: c, chartArea, scales } = chart;
+            if (!chartArea) return;
+            const xMid = scales.x.getPixelForValue(maxFreq / 2);
+            const yMid = scales.y.getPixelForValue(maxLift / 2);
+            c.save();
+            c.fillStyle = 'rgba(220,53,69,0.06)';
+            c.fillRect(xMid, chartArea.top, chartArea.right - xMid, yMid - chartArea.top);
+            c.fillStyle = 'rgba(108,117,125,0.04)';
+            c.fillRect(chartArea.left, chartArea.top, xMid - chartArea.left, yMid - chartArea.top);
+            c.fillRect(chartArea.left, yMid, chartArea.right - chartArea.left, chartArea.bottom - yMid);
+            c.fillStyle = '#dc3545';
+            c.font = 'bold 10px sans-serif';
+            c.fillText('{{ _("High Priority") }}', xMid + 6, chartArea.top + 14);
+            c.restore();
+        }
+    };
+
+    classicCharts.priorityMatrix = new Chart(ctx, {
+        type: 'bubble',
+        data: { datasets },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const d = context.raw;
+                            return [
+                                context.dataset.label,
+                                `${freqLabel}: ${d.x.toFixed(1)}%`,
+                                `${liftLabel}: +${d.y.toFixed(1)} pts`,
+                                `${detLabel}: ${d.detractor_count}`,
+                                `${driverNpsLabel}: ${d.driver_nps.toFixed(1)}`,
+                            ];
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    min: 0,
+                    title: { display: true, text: freqLabel },
+                    ticks: { callback: v => v + '%' }
+                },
+                y: {
+                    min: 0,
+                    title: { display: true, text: liftLabel },
+                    ticks: { callback: v => '+' + v }
+                }
+            }
+        },
+        plugins: [quadrantPlugin]
+    });
+}
+
+function renderDriverSummaryCard(summaryData) {
+    const textEl = document.getElementById('driverSummaryText');
+    const unavailableEl = document.getElementById('driverSummaryUnavailable');
+    const badge = document.getElementById('confidenceBadge');
+    const generatedByEl = document.getElementById('driverSummaryGeneratedBy');
+    if (!textEl || !unavailableEl) return;
+
+    if (!summaryData) {
+        textEl.style.display = 'none';
+        unavailableEl.style.display = 'block';
+        if (badge) badge.style.display = 'none';
+        return;
+    }
+
+    const lang = document.documentElement.lang || 'en';
+    const text = lang === 'fr' ? (summaryData.summary_fr || summaryData.summary_en) : (summaryData.summary_en || summaryData.summary_fr);
+    if (!text) {
+        textEl.style.display = 'none';
+        unavailableEl.style.display = 'block';
+        return;
+    }
+
+    textEl.textContent = text;
+    textEl.style.display = 'block';
+    unavailableEl.style.display = 'none';
+
+    if (badge && summaryData.confidence) {
+        const conf = summaryData.confidence;
+        const colorMap = { high: '#198754', medium: '#fd7e14', low: '#dc3545' };
+        const labelMap = {
+            high: '{{ _("High confidence") }}',
+            medium: '{{ _("Medium confidence") }}',
+            low: '{{ _("Low confidence") }}'
+        };
+        badge.textContent = labelMap[conf.level] || conf.level;
+        badge.style.backgroundColor = colorMap[conf.level] || '#6c757d';
+        badge.style.color = '#fff';
+        badge.style.display = 'inline-block';
+        badge.title = (conf.reasons || []).join(' · ');
+    }
+
+    if (generatedByEl && summaryData.generated_by) {
+        const aiLabel = '{{ _("AI-generated narrative") }}';
+        const ruleLabel = '{{ _("Rule-based summary") }}';
+        generatedByEl.textContent = summaryData.generated_by === 'ai' ? aiLabel : ruleLabel;
+        generatedByEl.style.display = 'block';
+    }
+}
 </script>
 
 <!-- Segmentation Analytics Rendering -->
@@ -1993,15 +2309,17 @@ function renderSegmentationInsights(data) {
     document.getElementById('segmentationEmptyState').style.display = 'none';
     document.getElementById('segmentationContent').style.display = 'block';
 
-    renderSegHorizontalChart('npsByRoleChart', 'role', segmentationData.nps_by_role || {}, segmentationData.satisfaction_by_role || {}, '{{ _("Role") }}');
-    renderSegHorizontalChart('npsByRegionChart', 'region', segmentationData.nps_by_region || {}, segmentationData.satisfaction_by_region || {}, '{{ _("Region") }}');
-    renderSegHorizontalChart('npsByTierChart', 'tier', segmentationData.nps_by_tier || {}, segmentationData.satisfaction_by_tier || {}, '{{ _("Tier") }}');
-    renderSegHorizontalChart('npsByClientIndustryChart', 'industry', segmentationData.nps_by_industry || {}, segmentationData.satisfaction_by_industry || {}, '{{ _("Industry") }}');
+    const globalNPS = (data.nps_score != null) ? parseFloat(data.nps_score) : null;
+
+    renderSegHorizontalChart('npsByRoleChart', 'role', segmentationData.nps_by_role || {}, segmentationData.satisfaction_by_role || {}, '{{ _("Role") }}', globalNPS);
+    renderSegHorizontalChart('npsByRegionChart', 'region', segmentationData.nps_by_region || {}, segmentationData.satisfaction_by_region || {}, '{{ _("Region") }}', globalNPS);
+    renderSegHorizontalChart('npsByTierChart', 'tier', segmentationData.nps_by_tier || {}, segmentationData.satisfaction_by_tier || {}, '{{ _("Tier") }}', globalNPS);
+    renderSegHorizontalChart('npsByClientIndustryChart', 'industry', segmentationData.nps_by_industry || {}, segmentationData.satisfaction_by_industry || {}, '{{ _("Industry") }}', globalNPS);
     renderCompositionChart('segCompositionChart', segmentationData);
     renderCrossDimensionalCharts(segmentationData);
 }
 
-function renderSegHorizontalChart(canvasId, chartKey, npsData, satisfactionData, label) {
+function renderSegHorizontalChart(canvasId, chartKey, npsData, satisfactionData, label, globalNPS) {
     const ctx = document.getElementById(canvasId);
     if (!ctx) return;
 
@@ -2020,6 +2338,31 @@ function renderSegHorizontalChart(canvasId, chartKey, npsData, satisfactionData,
         const s = satisfactionData[k];
         return (s !== null && s !== undefined) ? parseFloat(s) : null;
     });
+
+    const globalNpsLinePlugin = globalNPS != null ? {
+        id: `globalNpsLine_${chartKey}`,
+        afterDraw(chart) {
+            const { ctx: c, scales: { x, y }, chartArea } = chart;
+            const xPixel = x.getPixelForValue(globalNPS);
+            c.save();
+            c.beginPath();
+            c.setLineDash([5, 4]);
+            c.strokeStyle = 'rgba(80,80,80,0.55)';
+            c.lineWidth = 1.5;
+            c.moveTo(xPixel, chartArea.top);
+            c.lineTo(xPixel, chartArea.bottom);
+            c.stroke();
+            c.setLineDash([]);
+            const sign = globalNPS >= 0 ? '+' : '';
+            const txt = `Campaign NPS: ${sign}${globalNPS}`;
+            c.font = '600 10px Karla, sans-serif';
+            c.fillStyle = 'rgba(60,60,60,0.75)';
+            const textWidth = c.measureText(txt).width;
+            const labelX = xPixel + 4 + textWidth > chartArea.right ? xPixel - textWidth - 6 : xPixel + 4;
+            c.fillText(txt, labelX, chartArea.top + 10);
+            c.restore();
+        }
+    } : null;
 
     segmentationCharts[chartKey] = new Chart(ctx, {
         type: 'bar',
@@ -2070,7 +2413,14 @@ function renderSegHorizontalChart(canvasId, chartKey, npsData, satisfactionData,
                                 const satVal = context.parsed.x / 20;
                                 return `{{ _("Avg Satisfaction") }}: ${satVal.toFixed(1)} / 5`;
                             }
-                            return `{{ _("NPS Score") }}: ${context.parsed.x}`;
+                            const score = context.parsed.x;
+                            let line = `{{ _("NPS Score") }}: ${score}`;
+                            if (globalNPS != null) {
+                                const delta = score - globalNPS;
+                                const sign = delta >= 0 ? '+' : '';
+                                line += `  (${sign}${delta} vs campaign)`;
+                            }
+                            return line;
                         },
                         afterLabel: function(context) {
                             if (context.datasetIndex !== 0) return '';
@@ -2100,7 +2450,8 @@ function renderSegHorizontalChart(canvasId, chartKey, npsData, satisfactionData,
                     ticks: { font: { family: 'Karla, sans-serif', size: 11 } }
                 }
             }
-        }
+        },
+        plugins: globalNpsLinePlugin ? [globalNpsLinePlugin] : []
     });
 }
 

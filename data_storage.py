@@ -1272,7 +1272,8 @@ def convert_snapshot_to_dashboard_format(snapshot):
                 'drivers': json.loads(snapshot.driver_attribution) if snapshot.driver_attribution else {},
                 'features': json.loads(snapshot.feature_analytics) if snapshot.feature_analytics else {},
                 'recommendation': json.loads(snapshot.recommendation_distribution) if snapshot.recommendation_distribution else {},
-                'correlation': json.loads(snapshot.correlation_data) if getattr(snapshot, 'correlation_data', None) else {'points': [], 'summary': {'avg_ces_by_nps_category': {}, 'nps_csat_alignment_pct': None, 'total_correlated_responses': 0}}
+                'correlation': json.loads(snapshot.correlation_data) if getattr(snapshot, 'correlation_data', None) else {'points': [], 'summary': {'avg_ces_by_nps_category': {}, 'nps_csat_alignment_pct': None, 'total_correlated_responses': 0}},
+                'waterfall_data': json.loads(snapshot.waterfall_data) if getattr(snapshot, 'waterfall_data', None) else None
             }
         
         return result
@@ -2257,6 +2258,35 @@ def generate_campaign_kpi_snapshot(campaign_id):
                 if r.recommendation_status:
                     rec_counts[r.recommendation_status] = rec_counts.get(r.recommendation_status, 0) + 1
             
+            waterfall_result = None
+            priority_matrix_result = None
+            driver_summary_result = None
+            try:
+                from executive_report_service import (
+                    calculate_waterfall_data,
+                    calculate_driver_priority_matrix,
+                    generate_driver_analysis_summary,
+                )
+                waterfall_result = calculate_waterfall_data(responses_list, campaign=campaign)
+                priority_matrix_result = calculate_driver_priority_matrix(responses_list, campaign=campaign)
+                nps_scores_all = [r.nps_score for r in responses_list if r.nps_score is not None]
+                if nps_scores_all:
+                    _total = len(nps_scores_all)
+                    _p = sum(1 for s in nps_scores_all if s >= 9)
+                    _d = sum(1 for s in nps_scores_all if s <= 6)
+                    _baseline = round((_p - _d) / _total * 100, 1)
+                    ba_id = getattr(campaign, 'business_account_id', None)
+                    driver_summary_result = generate_driver_analysis_summary(
+                        waterfall_data=waterfall_result,
+                        matrix_data=priority_matrix_result,
+                        baseline_nps=_baseline,
+                        total_responses=_total,
+                        use_ai=True,
+                        business_account_id=ba_id,
+                    )
+            except Exception as wf_err:
+                logger.warning(f"Driver analysis calculation failed for campaign {campaign_id}: {wf_err}")
+
             classic_snapshot_data = {
                 'avg_csat': csat_avg,
                 'avg_ces': ces_avg,
@@ -2266,6 +2296,9 @@ def generate_campaign_kpi_snapshot(campaign_id):
                 'feature_analytics': json.dumps(features_summary),
                 'recommendation_distribution': json.dumps(rec_counts),
                 'correlation_data': json.dumps(correlation_result),
+                'waterfall_data': json.dumps(waterfall_result) if waterfall_result is not None else None,
+                'priority_matrix_data': json.dumps(priority_matrix_result) if priority_matrix_result is not None else None,
+                'driver_analysis_summary': json.dumps(driver_summary_result) if driver_summary_result is not None else None,
             }
             
             print(f"   ✅ CSAT: avg={csat_avg}, {len(csat_scores)} scores")
@@ -2274,6 +2307,9 @@ def generate_campaign_kpi_snapshot(campaign_id):
             print(f"   ✅ Features: {len(features_summary)} evaluated")
             print(f"   ✅ Recommendations: {len(rec_counts)} statuses")
             print(f"   ✅ Correlation: {len(correlation_points)} data points")
+            print(f"   ✅ Waterfall: {len(waterfall_result) if waterfall_result else 0} drivers")
+            print(f"   ✅ Priority Matrix: {len(priority_matrix_result) if priority_matrix_result else 0} drivers")
+            print(f"   ✅ Driver Summary: {'AI' if driver_summary_result and driver_summary_result.get('generated_by') == 'ai' else 'rule-based' if driver_summary_result else 'none'}")
         
         # ============================================================================
         # CREATE SNAPSHOT RECORD
@@ -2326,6 +2362,9 @@ def generate_campaign_kpi_snapshot(campaign_id):
             feature_analytics=classic_snapshot_data.get('feature_analytics'),
             recommendation_distribution=classic_snapshot_data.get('recommendation_distribution'),
             correlation_data=classic_snapshot_data.get('correlation_data'),
+            waterfall_data=classic_snapshot_data.get('waterfall_data'),
+            priority_matrix_data=classic_snapshot_data.get('priority_matrix_data'),
+            driver_analysis_summary=classic_snapshot_data.get('driver_analysis_summary'),
             data_period_start=campaign.start_date,
             data_period_end=campaign.end_date
         )

@@ -848,9 +848,12 @@ class CampaignKPISnapshot(db.Model):
     feature_analytics = db.Column(db.Text, nullable=True)  # JSON: {feature_key: {name_en, name_fr, adoption_rate, avg_satisfaction, ...}}
     recommendation_distribution = db.Column(db.Text, nullable=True)  # JSON: {recommended: N, would_consider: N, ...}
     correlation_data = db.Column(db.Text, nullable=True)  # JSON: {points: [{csat, ces, nps_score, nps_category}], summary: {...}}
-    
+    waterfall_data = db.Column(db.Text, nullable=True)  # JSON: [{key, label_en, label_fr, frequency, frequency_pct, driver_nps, baseline_nps, detractor_count, promoter_count, passive_count, nps_lift}, ...]
+    priority_matrix_data = db.Column(db.Text, nullable=True)  # JSON: [{key, label_en, label_fr, frequency_pct, nps_lift, detractor_count, driver_nps}, ...]
+    driver_analysis_summary = db.Column(db.Text, nullable=True)  # JSON: {summary_en, summary_fr, confidence: {level, score, reasons}, generated_by, generated_at}
+
     # Snapshot Metadata
-    snapshot_version = db.Column(db.String(10), nullable=False, default='v1.0')  # Track engine versions
+    snapshot_version = db.Column(db.String(10), nullable=False, default='v3.0')  # Track engine versions
     snapshot_created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
     data_period_start = db.Column(db.Date, nullable=False)  # Campaign start date
     data_period_end = db.Column(db.Date, nullable=False)  # Campaign end date

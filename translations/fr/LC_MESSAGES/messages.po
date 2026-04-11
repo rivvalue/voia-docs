@@ -11420,3 +11420,93 @@ msgstr "Le titre est requis."
 
 msgid "Description is required."
 msgstr "La description est requise."
+
+msgid "NPS Waterfall Analysis by Loyalty Driver"
+msgstr "Analyse en cascade NPS par facteur de fidélité"
+
+msgid "Signed NPS-point delta per driver relative to the campaign baseline. Drivers are sorted from highest positive impact to most negative. Multi-select: steps reflect relative pull, not additive decomposition."
+msgstr "Écart NPS signé par facteur par rapport à la référence de la campagne. Les facteurs sont triés du plus positif au plus négatif. Sélection multiple : les étapes reflètent l'influence relative, non une décomposition additive."
+
+msgid "Baseline NPS shown as a reference line. Each bar shows the NPS score of respondents who selected that driver."
+msgstr "Le NPS de référence est affiché sous forme de ligne de référence. Chaque barre représente le score NPS des répondants ayant sélectionné ce facteur."
+
+msgid "NPS Waterfall Analysis not available for this campaign."
+msgstr "L'analyse en cascade NPS n'est pas disponible pour cette campagne."
+
+msgid "Campaign NPS Baseline"
+msgstr "Référence NPS de la campagne"
+
+msgid "Delta vs baseline"
+msgstr "Écart par rapport à la référence"
+
+msgid "Driver NPS"
+msgstr "NPS du facteur"
+
+msgid "NPS Delta vs Baseline (pts)"
+msgstr "Écart NPS vs référence (pts)"
+
+msgid "NPS Delta"
+msgstr "Écart NPS"
+
+msgid "NPS Opportunity Waterfall by Loyalty Driver"
+msgstr "Cascade d'opportunités NPS par facteur de fidélité"
+
+msgid "Recoverable NPS points per driver if all detractors who cited it became promoters. Sorted from highest to lowest improvement opportunity."
+msgstr "Points NPS récupérables par facteur si tous les détracteurs l'ayant cité devenaient promoteurs. Triés de la plus haute à la plus faible opportunité d'amélioration."
+
+msgid "Formula: 2 × detractors citing driver ÷ total respondents × 100. Bars reflect independent lift potential, not additive decomposition."
+msgstr "Formule : 2 × détracteurs citant le facteur ÷ total répondants × 100. Les barres reflètent le potentiel de gain indépendant, non une décomposition additive."
+
+msgid "Driver Priority Matrix"
+msgstr "Matrice de priorisation des facteurs"
+
+msgid "Frequency (x) vs. NPS lift potential (y). Bubble size = detractor count. Top-right quadrant = highest priority."
+msgstr "Fréquence (x) vs. potentiel de gain NPS (y). Taille de la bulle = nombre de détracteurs. Quadrant supérieur droit = priorité maximale."
+
+msgid "Priority matrix not available for this campaign."
+msgstr "La matrice de priorisation n'est pas disponible pour cette campagne."
+
+msgid "Driver Analysis Summary"
+msgstr "Synthèse de l'analyse des facteurs"
+
+msgid "Fact-based narrative. Confidence reflects sample size and driver coverage."
+msgstr "Synthèse factuelle. La confiance reflète la taille de l'échantillon et la couverture des facteurs."
+
+msgid "Summary not available for this campaign."
+msgstr "La synthèse n'est pas disponible pour cette campagne."
+
+msgid "High confidence"
+msgstr "Confiance élevée"
+
+msgid "Medium confidence"
+msgstr "Confiance modérée"
+
+msgid "Low confidence"
+msgstr "Confiance faible"
+
+msgid "AI-generated narrative"
+msgstr "Synthèse générée par IA"
+
+msgid "Rule-based summary"
+msgstr "Résumé basé sur des règles"
+
+msgid "NPS Lift Potential (pts)"
+msgstr "Potentiel de gain NPS (pts)"
+
+msgid "Detractors citing driver"
+msgstr "Détracteurs citant ce facteur"
+
+msgid "Respondents citing driver"
+msgstr "Répondants citant ce facteur"
+
+msgid "Theoretical ceiling"
+msgstr "Plafond théorique"
+
+msgid "Citation frequency"
+msgstr "Fréquence de citation"
+
+msgid "NPS lift potential (pts)"
+msgstr "Potentiel de gain NPS (pts)"
+
+msgid "High Priority"
+msgstr "Haute priorité"

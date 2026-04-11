@@ -198,12 +198,20 @@ class TestClassicSurveyConfigRoutes:
 
     def test_config_page_blocked_for_active_campaign(self, authenticated_client, db_session, sample_data, app_context):
         """Config editor redirects for active campaigns."""
+        from models import Campaign
         client, user, account = authenticated_client
+        for c in Campaign.query.filter_by(business_account_id=account.id, status='active').all():
+            c.status = 'completed'
+        db_session.flush()
         campaign = sample_data.create_campaign(db_session, account, survey_type='classic', status='active')
         db_session.commit()
 
-        response = client.get(f'/business/campaigns/{campaign.id}/classic-survey-config')
-        assert response.status_code in [302, 403]
+        try:
+            response = client.get(f'/business/campaigns/{campaign.id}/classic-survey-config')
+            assert response.status_code in [302, 403]
+        finally:
+            campaign.status = 'completed'
+            db_session.commit()
 
     def test_config_page_blocked_for_conversational(self, authenticated_client, db_session, sample_data, app_context):
         """Config editor should not work for conversational campaigns."""

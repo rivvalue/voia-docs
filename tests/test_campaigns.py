@@ -81,15 +81,22 @@ class TestCampaignStatusTransitions:
     
     def test_cannot_edit_active_campaign(self, authenticated_client, db_session, sample_data):
         """Active campaigns should not be editable."""
+        from models import Campaign
         client, user, account = authenticated_client
+        for c in Campaign.query.filter_by(business_account_id=account.id, status='active').all():
+            c.status = 'completed'
+        db_session.flush()
         campaign = sample_data.create_campaign(db_session, account, status='active')
         db_session.commit()
         
-        response = client.post(f'/business/campaigns/{campaign.id}/edit', data={
-            'name': 'Updated Name'
-        })
-        
-        assert response.status_code in [302, 400, 403]
+        try:
+            response = client.post(f'/business/campaigns/{campaign.id}/edit', data={
+                'name': 'Updated Name'
+            })
+            assert response.status_code in [302, 400, 403]
+        finally:
+            campaign.status = 'completed'
+            db_session.commit()
 
 
 class TestCampaignValidation:
@@ -162,11 +169,19 @@ class TestCampaignResponses:
     
     def test_view_campaign_responses(self, authenticated_client, db_session, sample_data):
         """Should view responses for a campaign."""
+        from models import Campaign
         client, user, account = authenticated_client
+        for c in Campaign.query.filter_by(business_account_id=account.id, status='active').all():
+            c.status = 'completed'
+        db_session.flush()
         campaign = sample_data.create_campaign(db_session, account, status='active')
         sample_data.create_survey_response(db_session, campaign=campaign, nps_score=9)
         sample_data.create_survey_response(db_session, campaign=campaign, nps_score=7)
         db_session.commit()
         
-        response = client.get(f'/business/campaigns/{campaign.id}/responses')
-        assert response.status_code in [200, 302]
+        try:
+            response = client.get(f'/business/campaigns/{campaign.id}/responses')
+            assert response.status_code in [200, 302]
+        finally:
+            campaign.status = 'completed'
+            db_session.commit()
