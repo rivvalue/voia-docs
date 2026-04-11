@@ -612,6 +612,23 @@ with app.app_context():
         )
 
     try:
+        from sqlalchemy import text as sa_text_snapshot
+        db.session.execute(sa_text_snapshot(
+            "ALTER TABLE campaign_kpi_snapshots ADD COLUMN IF NOT EXISTS waterfall_data TEXT"
+        ))
+        db.session.execute(sa_text_snapshot(
+            "ALTER TABLE campaign_kpi_snapshots ADD COLUMN IF NOT EXISTS priority_matrix_data TEXT"
+        ))
+        db.session.execute(sa_text_snapshot(
+            "ALTER TABLE campaign_kpi_snapshots ADD COLUMN IF NOT EXISTS driver_analysis_summary TEXT"
+        ))
+        db.session.commit()
+        logger.info("Ensured waterfall_data, priority_matrix_data, driver_analysis_summary columns exist on campaign_kpi_snapshots")
+    except Exception as e:
+        logger.error(f"CRITICAL: Startup migration add_waterfall_data_to_snapshot FAILED: {e}.")
+        db.session.rollback()
+
+    try:
         from sqlalchemy import text as sa_text, inspect as sa_inspect
         inspector = sa_inspect(db.engine)
         available_tables = inspector.get_table_names()
