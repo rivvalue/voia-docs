@@ -2684,6 +2684,36 @@ def get_company_detail_data(campaign_id, company_name, business_account_id=None)
             'is_high_influence': tier_name in ('C-Level', 'VP/Director'),
         })
 
+    # --- Account Signal Balance (qualitative risk vs. opportunity) ---
+    agg_opportunities = {}
+    agg_risk_factors = {}
+    for resp in responses:
+        if resp.growth_opportunities:
+            try:
+                opps = json_module.loads(resp.growth_opportunities) if isinstance(resp.growth_opportunities, str) else resp.growth_opportunities
+                if isinstance(opps, list):
+                    for opp in opps:
+                        opp_type = (opp.get('type', '') if isinstance(opp, dict) else str(opp)).lower().replace('-', '_')
+                        agg_opportunities[opp_type] = agg_opportunities.get(opp_type, 0) + 1
+            except (json_module.JSONDecodeError, TypeError):
+                pass
+        for field in ('account_risk_factors', 'churn_risk_factors'):
+            raw = getattr(resp, field, None)
+            if raw:
+                try:
+                    factors = json_module.loads(raw) if isinstance(raw, str) else raw
+                    if isinstance(factors, list):
+                        for f in factors:
+                            severity = (f.get('severity', 'Medium') if isinstance(f, dict) else 'Medium')
+                            key = severity
+                            agg_risk_factors[key] = agg_risk_factors.get(key, 0) + 1
+                except (json_module.JSONDecodeError, TypeError):
+                    pass
+
+    opp_list = [{'type': k, 'count': v} for k, v in agg_opportunities.items()]
+    risk_list = [{'severity': k, 'count': v} for k, v in agg_risk_factors.items()]
+    signal_balance, opp_score, risk_score, health_ratio = calculate_weighted_account_balance(opp_list, risk_list)
+
     result = {
         "nps_summary": {
             "company_nps": company_nps,
@@ -2702,6 +2732,10 @@ def get_company_detail_data(campaign_id, company_name, business_account_id=None)
         "avg_churn_risk_score": avg_churn_risk_score,
         "analysis_summary": analysis_summary,
         "nps_by_tier": nps_by_tier,
+        "signal_balance": signal_balance,
+        "signal_opp_score": round(opp_score, 2),
+        "signal_risk_score": round(risk_score, 2),
+        "signal_health_ratio": round(health_ratio, 3),
     }
 
     if use_cache and result is not None:

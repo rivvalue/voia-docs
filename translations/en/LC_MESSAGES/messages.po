@@ -6129,6 +6129,34 @@ msgstr ""
 msgid "Download CSV template file"
 msgstr ""
 
+#: templates/company_responses.html
+msgid "NPS Risk Level"
+msgstr ""
+
+#: templates/company_responses.html
+msgid "NPS Risk is derived from the company's NPS score: above +20 = Low Risk, -20 to +20 = Medium Risk, -50 to -21 = High Risk, -100 to -51 = Critical Risk."
+msgstr ""
+
+#: templates/company_responses.html
+msgid "Signal Balance"
+msgstr ""
+
+#: templates/company_responses.html
+msgid "Signal Balance reflects the ratio of growth opportunity signals to risk signals detected in open-ended feedback, weighted by severity and type. It measures a different dimension than NPS risk."
+msgstr ""
+
+#: templates/company_responses.html
+msgid "Risk-Heavy"
+msgstr ""
+
+#: templates/company_responses.html
+msgid "Opportunity-Heavy"
+msgstr ""
+
+#: templates/company_responses.html
+msgid "Balanced"
+msgstr ""
+
 #~ msgid "How long have you been working with FC inc?"
 #~ msgstr ""
 

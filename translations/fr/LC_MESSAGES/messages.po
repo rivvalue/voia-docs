@@ -11535,3 +11535,30 @@ msgstr "Cohorte"
 msgid "All Cohorts"
 msgstr "Toutes les cohortes"
 
+#: templates/company_responses.html
+msgid "NPS Risk Level"
+msgstr "Niveau de risque NPS"
+
+#: templates/company_responses.html
+msgid "NPS Risk is derived from the company's NPS score: above +20 = Low Risk, -20 to +20 = Medium Risk, -50 to -21 = High Risk, -100 to -51 = Critical Risk."
+msgstr "Le risque NPS est déterminé par le score NPS de l'entreprise : au-dessus de +20 = Risque faible, de -20 à +20 = Risque moyen, de -50 à -21 = Risque élevé, de -100 à -51 = Risque critique."
+
+#: templates/company_responses.html
+msgid "Signal Balance"
+msgstr "Balance des signaux"
+
+#: templates/company_responses.html
+msgid "Signal Balance reflects the ratio of growth opportunity signals to risk signals detected in open-ended feedback, weighted by severity and type. It measures a different dimension than NPS risk."
+msgstr "La balance des signaux reflète le rapport entre les signaux d'opportunité de croissance et les signaux de risque détectés dans les réponses ouvertes, pondérés par sévérité et type. Elle mesure une dimension différente du risque NPS."
+
+#: templates/company_responses.html
+msgid "Risk-Heavy"
+msgstr "Axé sur les risques"
+
+#: templates/company_responses.html
+msgid "Opportunity-Heavy"
+msgstr "Axé sur les opportunités"
+
+#: templates/company_responses.html
+msgid "Balanced"
+msgstr "Équilibré"
