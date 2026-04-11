@@ -275,7 +275,8 @@ def get_dashboard_data_cached(campaign_id=None, business_account_id=None):
     start_time = time.time()
 
     # Generate TENANT-SCOPED cache key for multi-tenant security
-    cache_key = f"dashboard_data_campaign{campaign_id}_tenant{business_account_id}"
+    # v2: includes segmentation dimension fields (tiers/regions/industries/roles/cohorts)
+    cache_key = f"dashboard_data_campaign{campaign_id}_tenant{business_account_id}_v2"
 
     # --- CACHE GUARD ---
     # Only use the cache when business_account_id is resolved and non-null.
@@ -306,6 +307,10 @@ def get_dashboard_data_cached(campaign_id=None, business_account_id=None):
             result = get_optimized_dashboard_data(campaign_id, business_account_id)
         except Exception as e:
             logger.warning(f"⚠️ Optimized queries FAILED, falling back to original: {e}")
+            try:
+                db.session.rollback()
+            except Exception:
+                pass
 
     if result is None:
         logger.info(f"⏪ Using ORIGINAL dashboard queries")
@@ -354,7 +359,7 @@ def bust_dashboard_cache(campaign_id, business_account_id, company_name=None):
     current gunicorn worker. Other workers maintain independent in-memory caches and will
     continue serving stale data until their TTL expires or they are restarted.
     """
-    cache_key = f"dashboard_data_campaign{campaign_id}_tenant{business_account_id}"
+    cache_key = f"dashboard_data_campaign{campaign_id}_tenant{business_account_id}_v2"
     try:
         # NOTE: SimpleCache invalidation is in-process only; does not propagate to other gunicorn workers.
         cache.delete(cache_key)
@@ -367,6 +372,75 @@ def bust_dashboard_cache(campaign_id, business_account_id, company_name=None):
             bust_company_detail_cache(campaign_id, company_name, business_account_id)
         except Exception as e:
             logger.warning(f"⚠️ Failed to bust company detail cache: {e}")
+
+def get_segmentation_by_company(campaign_id):
+    """
+    Query segmentation dimension values (tier, region, industry, role, cohort)
+    per company for a given campaign. Returns a dict keyed by UPPER(company_name).
+    Used to enrich snapshot-based account_intelligence entries which predate
+    the segmentation feature and therefore lack these fields.
+    """
+    import re as _re_seg
+    try:
+        rows = db.session.query(
+            func.upper(SurveyResponse.company_name).label('upper_company'),
+            Participant.role,
+            Participant.region,
+            Participant.customer_tier,
+            Participant.client_industry,
+            SurveyResponse.tenure_with_fc,
+        ).outerjoin(
+            CampaignParticipant,
+            SurveyResponse.campaign_participant_id == CampaignParticipant.id
+        ).outerjoin(
+            Participant,
+            CampaignParticipant.participant_id == Participant.id
+        ).filter(
+            SurveyResponse.campaign_id == campaign_id,
+            SurveyResponse.company_name.isnot(None),
+        ).all()
+    except Exception as e:
+        logger.warning(f"⚠️ get_segmentation_by_company failed: {e}")
+        try:
+            db.session.rollback()
+        except Exception:
+            pass
+        return {}
+
+    result = {}
+    for row in rows:
+        key = row.upper_company
+        if not key:
+            continue
+        if key not in result:
+            result[key] = {'tiers': set(), 'regions': set(), 'industries': set(), 'roles': set(), 'cohorts': set()}
+        seg = result[key]
+        if row.customer_tier:
+            seg['tiers'].add(row.customer_tier)
+        if row.region:
+            seg['regions'].add(row.region)
+        if row.client_industry:
+            seg['industries'].add(row.client_industry)
+        if row.role:
+            seg['roles'].add(row.role)
+        if row.tenure_with_fc:
+            try:
+                nums = _re_seg.findall(r'\d+', str(row.tenure_with_fc))
+                if nums:
+                    years = int(nums[0])
+                    if years <= 2:
+                        seg['cohorts'].add('1-2 years')
+                    elif years <= 5:
+                        seg['cohorts'].add('3-5 years')
+                    elif years <= 8:
+                        seg['cohorts'].add('6-8 years')
+                    else:
+                        seg['cohorts'].add('9+ years')
+            except (ValueError, TypeError):
+                pass
+
+    return {k: {f: sorted(v) for f, v in dims.items()} for k, dims in result.items()}
+
 
 def get_dashboard_data(campaign_id=None, business_account_id=None):
     """Compile dashboard data for visualization with optional campaign filtering"""
@@ -747,6 +821,66 @@ def get_dashboard_data(campaign_id=None, business_account_id=None):
             for _row in invited_rows:
                 if _row.upper_company:
                     invited_count_map[_row.upper_company] = _row.cnt
+
+        # 4. Segmentation fields per respondent (role, region, customer_tier, client_industry)
+        #    joined from Participant via CampaignParticipant for campaign responses.
+        #    Used to aggregate unique segmentation values per account.
+        segmentation_by_company = {}
+        if campaign_id:
+            seg_rows = db.session.query(
+                func.upper(SurveyResponse.company_name).label('upper_company'),
+                Participant.role,
+                Participant.region,
+                Participant.customer_tier,
+                Participant.client_industry,
+                SurveyResponse.tenure_with_fc
+            ).outerjoin(
+                CampaignParticipant,
+                SurveyResponse.campaign_participant_id == CampaignParticipant.id
+            ).outerjoin(
+                Participant,
+                CampaignParticipant.participant_id == Participant.id
+            ).filter(
+                SurveyResponse.campaign_id == campaign_id
+            ).all()
+            for _row in seg_rows:
+                if not _row.upper_company:
+                    continue
+                _key = _row.upper_company
+                if _key not in segmentation_by_company:
+                    segmentation_by_company[_key] = {
+                        'tiers': set(),
+                        'regions': set(),
+                        'industries': set(),
+                        'roles': set(),
+                        'cohorts': set(),
+                    }
+                seg = segmentation_by_company[_key]
+                if _row.customer_tier:
+                    seg['tiers'].add(_row.customer_tier)
+                if _row.region:
+                    seg['regions'].add(_row.region)
+                if _row.client_industry:
+                    seg['industries'].add(_row.client_industry)
+                if _row.role:
+                    seg['roles'].add(_row.role)
+                if _row.tenure_with_fc:
+                    try:
+                        import re as _re
+                        _nums = _re.findall(r'\d+', str(_row.tenure_with_fc))
+                        if _nums:
+                            _years = int(_nums[0])
+                            if _years <= 2:
+                                _band = '1-2 years'
+                            elif _years <= 5:
+                                _band = '3-5 years'
+                            elif _years <= 8:
+                                _band = '6-8 years'
+                            else:
+                                _band = '9+ years'
+                            seg['cohorts'].add(_band)
+                    except (ValueError, TypeError):
+                        pass
         # ---------------------------------------------------------------
 
         # Create unified account intelligence structure
@@ -883,6 +1017,8 @@ def get_dashboard_data(campaign_id=None, business_account_id=None):
                     opportunities, risk_factors
                 )
                 
+                # Collect unique segmentation values for this company
+                _seg = segmentation_by_company.get(company_key, {})
                 account_intelligence.append({
                     'company_name': company_name,
                     'opportunities': opportunities,
@@ -900,7 +1036,12 @@ def get_dashboard_data(campaign_id=None, business_account_id=None):
                     'confidence_level': company_confidence_level,
                     'opportunity_score': round(opp_score, 1),
                     'risk_score': round(risk_score, 1),
-                    'health_ratio': round(health_ratio, 2)
+                    'health_ratio': round(health_ratio, 2),
+                    'tiers': sorted(_seg.get('tiers', set())),
+                    'regions': sorted(_seg.get('regions', set())),
+                    'industries': sorted(_seg.get('industries', set())),
+                    'roles': sorted(_seg.get('roles', set())),
+                    'cohorts': sorted(_seg.get('cohorts', set())),
                 })
         
         # Sort accounts by priority (most critical risks first, then by balance)

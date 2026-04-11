@@ -11510,3 +11510,28 @@ msgstr "Potentiel de gain NPS (pts)"
 
 msgid "High Priority"
 msgstr "Haute priorité"
+
+msgid "Filter by segment"
+msgstr "Filtrer par segment"
+
+msgid "All Tiers"
+msgstr "Tous les niveaux"
+
+msgid "All Regions"
+msgstr "Toutes les régions"
+
+msgid "All Industries"
+msgstr "Tous les secteurs"
+
+msgid "Segment"
+msgstr "Segment"
+
+msgid "All Segments"
+msgstr "Tous les segments"
+
+msgid "Cohort"
+msgstr "Cohorte"
+
+msgid "All Cohorts"
+msgstr "Toutes les cohortes"
+

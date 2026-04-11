@@ -215,7 +215,10 @@ def get_optimized_dashboard_data(campaign_id=None, business_account_id=None):
         SurveyResponse.tenure_with_fc,
         SurveyResponse.commercial_value,
         SurveyResponse.created_at,
-        Participant.role.label('participant_role')
+        Participant.role.label('participant_role'),
+        Participant.region.label('participant_region'),
+        Participant.customer_tier.label('participant_tier'),
+        Participant.client_industry.label('participant_industry'),
     ).outerjoin(
         CampaignParticipant, SurveyResponse.campaign_participant_id == CampaignParticipant.id
     ).outerjoin(
@@ -243,6 +246,8 @@ def get_optimized_dashboard_data(campaign_id=None, business_account_id=None):
     all_companies = set()
     # Influence tracking: stores role-level NPS, executive coverage, high-influence detractors
     influence_by_company = {}
+    # Segmentation tracking: unique dimension values per company
+    segmentation_by_company = {}
 
     # Influence tier classification helper
     HIGH_INFLUENCE_ROLES = {'c-level', 'c level', 'clevel', 'ceo', 'cto', 'cfo', 'coo', 'cmo', 'cso',
@@ -403,6 +408,42 @@ def get_optimized_dashboard_data(campaign_id=None, business_account_id=None):
             except json.JSONDecodeError:
                 continue
 
+        # Process segmentation dimension data
+        if company_key not in segmentation_by_company:
+            segmentation_by_company[company_key] = {
+                'tiers': set(), 'regions': set(), 'industries': set(), 'roles': set(), 'cohorts': set()
+            }
+        _seg = segmentation_by_company[company_key]
+        _p_tier = getattr(response, 'participant_tier', None)
+        _p_region = getattr(response, 'participant_region', None)
+        _p_industry = getattr(response, 'participant_industry', None)
+        _p_role = getattr(response, 'participant_role', None)
+        if _p_tier:
+            _seg['tiers'].add(_p_tier)
+        if _p_region:
+            _seg['regions'].add(_p_region)
+        if _p_industry:
+            _seg['industries'].add(_p_industry)
+        if _p_role:
+            _seg['roles'].add(_p_role)
+        _tenure_str = response.tenure_with_fc
+        if _tenure_str:
+            try:
+                import re as _re2
+                _nums2 = _re2.findall(r'\d+', str(_tenure_str))
+                if _nums2:
+                    _years2 = int(_nums2[0])
+                    if _years2 <= 2:
+                        _seg['cohorts'].add('1-2 years')
+                    elif _years2 <= 5:
+                        _seg['cohorts'].add('3-5 years')
+                    elif _years2 <= 8:
+                        _seg['cohorts'].add('6-8 years')
+                    else:
+                        _seg['cohorts'].add('9+ years')
+            except (ValueError, TypeError):
+                pass
+
         # Process influence data
         role = getattr(response, 'participant_role', None)
         tier = get_influence_tier(role)
@@ -562,6 +603,7 @@ def get_optimized_dashboard_data(campaign_id=None, business_account_id=None):
         # Influence coverage warning: no executive (C-Level or VP) responded
         missing_executive_coverage = not has_executive_response
 
+        _acct_seg = segmentation_by_company.get(company_key, {})
         account_intelligence.append({
             'company_name': display_name,
             'opportunities': opps_list,
@@ -580,6 +622,11 @@ def get_optimized_dashboard_data(campaign_id=None, business_account_id=None):
             'nps_by_tier': nps_by_tier,
             'c_level_promoter_opps': c_level_promoter_opps,
             'high_influence_detractor_count': len(high_influence_detractor_nps),
+            'tiers': sorted(_acct_seg.get('tiers', set())),
+            'regions': sorted(_acct_seg.get('regions', set())),
+            'industries': sorted(_acct_seg.get('industries', set())),
+            'roles': sorted(_acct_seg.get('roles', set())),
+            'cohorts': sorted(_acct_seg.get('cohorts', set())),
         })
     
     priority_order = {'risk_heavy': 0, 'balanced': 1, 'opportunity_heavy': 2}

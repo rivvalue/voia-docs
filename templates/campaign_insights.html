@@ -336,9 +336,9 @@
                 </div>
                 <div class="card-body">
                             <!-- {{ _('Search') }} and Filters -->
-                            <div class="row g-3 mb-4">
-                                <div class="col-md-4">
-                                    <label for="accountIntel{{ _('Search') }}" class="form-label">{{ _('Search') }}</label>
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-4 col-12">
+                                    <label for="accountIntelSearch" class="form-label">{{ _('Search') }}</label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fas fa-search"></i></span>
                                         <input type="text" class="form-control" id="accountIntelSearch" 
@@ -346,16 +346,16 @@
                                                onkeyup="searchAccountIntelligence()">
                                     </div>
                                 </div>
-                                <div class="col-md-2">
-                                    <label for="account{{ _('Balance') }}Filter" class="form-label">{{ _('Balance') }}</label>
+                                <div class="col-md-2 col-12">
+                                    <label for="accountBalanceFilter" class="form-label">{{ _('Balance') }}</label>
                                     <select class="form-select" id="accountBalanceFilter" onchange="searchAccountIntelligence()">
                                         <option value="">{{ _('All') }}</option>
                                         <option value="risk_heavy">Risk-Heavy</option>
-                                        <option value="balanced">{{ _('Balance') }}d</option>
+                                        <option value="balanced">{{ _('Balanced') }}</option>
                                         <option value="opportunity_heavy">{{ _('High') }} Potential</option>
                                     </select>
                                 </div>
-                                <div class="col-md-2">
+                                <div class="col-md-2 col-12">
                                     <label for="accountRiskFilter" class="form-label">{{ _('Risk Level') }}</label>
                                     <select class="form-select" id="accountRiskFilter" onchange="searchAccountIntelligence()">
                                         <option value="">{{ _('All') }}</option>
@@ -365,20 +365,59 @@
                                         <option value="low">{{ _('Low') }}</option>
                                     </select>
                                 </div>
-                                <div class="col-md-2">
+                                <div class="col-md-2 col-12">
                                     <label for="accountOppFilter" class="form-label">{{ _('Opportunities') }}</label>
                                     <select class="form-select" id="accountOppFilter" onchange="searchAccountIntelligence()">
                                         <option value="">{{ _('All') }}</option>
-                                        <option value="yes">Has {{ _('Opportunities') }}</option>
-                                        <option value="no">No {{ _('Opportunities') }}</option>
+                                        <option value="yes">{{ _('Has Opportunities') }}</option>
+                                        <option value="no">{{ _('No Opportunities') }}</option>
                                     </select>
                                 </div>
-                                <div class="col-md-2">
+                                <div class="col-md-2 col-12">
                                     <label for="accountRisksFilter" class="form-label">{{ _('Has Risks') }}</label>
                                     <select class="form-select" id="accountRisksFilter" onchange="searchAccountIntelligence()">
                                         <option value="">{{ _('All') }}</option>
                                         <option value="yes">{{ _('Has Risks') }}</option>
                                         <option value="no">{{ _('No Risks') }}</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Segmentation dimension filters (second row) -->
+                            <div class="row g-3 mb-4 pt-3" id="accountIntelSegmentFilters" style="display:none; border-top: 1px solid #dee2e6;">
+                                <div class="col-12 mb-1">
+                                    <small class="text-muted fw-semibold" style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em;">
+                                        <i class="fas fa-users me-1" style="color: #8A8A8A;"></i>{{ _('Filter by segment') }}
+                                    </small>
+                                </div>
+                                <div class="col-md-2 col-12" id="accountTierFilterCol" style="display:none;">
+                                    <label for="accountTierFilter" class="form-label">{{ _('Tier') }}</label>
+                                    <select class="form-select" id="accountTierFilter" onchange="searchAccountIntelligence()">
+                                        <option value="">{{ _('All Tiers') }}</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2 col-12" id="accountRegionFilterCol" style="display:none;">
+                                    <label for="accountRegionFilter" class="form-label">{{ _('Region') }}</label>
+                                    <select class="form-select" id="accountRegionFilter" onchange="searchAccountIntelligence()">
+                                        <option value="">{{ _('All Regions') }}</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2 col-12" id="accountIndustryFilterCol" style="display:none;">
+                                    <label for="accountIndustryFilter" class="form-label">{{ _('Industry') }}</label>
+                                    <select class="form-select" id="accountIndustryFilter" onchange="searchAccountIntelligence()">
+                                        <option value="">{{ _('All Industries') }}</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2 col-12" id="accountSegmentFilterCol" style="display:none;">
+                                    <label for="accountSegmentFilter" class="form-label">{{ _('Segment') }}</label>
+                                    <select class="form-select" id="accountSegmentFilter" onchange="searchAccountIntelligence()">
+                                        <option value="">{{ _('All Segments') }}</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2 col-12" id="accountCohortFilterCol" style="display:none;">
+                                    <label for="accountCohortFilter" class="form-label">{{ _('Cohort') }}</label>
+                                    <select class="form-select" id="accountCohortFilter" onchange="searchAccountIntelligence()">
+                                        <option value="">{{ _('All Cohorts') }}</option>
                                     </select>
                                 </div>
                             </div>

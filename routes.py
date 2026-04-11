@@ -2827,6 +2827,12 @@ def api_account_intelligence():
         has_risks = request.args.get('has_risks', '').strip().lower()
         min_responses = request.args.get('min_responses', type=int)
         campaign_id = request.args.get('campaign', type=int)
+        # Segmentation dimension filters
+        tier_filter = request.args.get('tier', '').strip()
+        region_filter = request.args.get('region', '').strip()
+        industry_filter = request.args.get('industry', '').strip()
+        segment_filter = request.args.get('segment', '').strip()
+        cohort_filter = request.args.get('cohort', '').strip()
         
         logger.info(f"📊 /api/account_intelligence called - campaign_id: {campaign_id}, page: {page}")
         
@@ -2876,6 +2882,27 @@ def api_account_intelligence():
         # SECURITY: Pass business_account_id to enable segmentation analytics filtering
         dashboard_data = get_dashboard_data_cached(campaign_id=campaign_id, business_account_id=target_business_account_id)
         all_accounts = dashboard_data.get('account_intelligence', [])
+
+        # Segmentation enrichment: completed-campaign snapshots predate the segmentation feature
+        # and lack tiers/regions/industries/roles/cohorts fields. Detect this and back-fill
+        # by running a direct query — this result is lightweight (one row per respondent).
+        has_segmentation = any(
+            account.get('tiers') or account.get('regions') or account.get('industries')
+            or account.get('roles') or account.get('cohorts')
+            for account in all_accounts
+        )
+        if not has_segmentation and all_accounts and campaign_id:
+            from data_storage import get_segmentation_by_company
+            seg_map = get_segmentation_by_company(campaign_id)
+            if seg_map:
+                for account in all_accounts:
+                    key = account.get('company_name', '').upper()
+                    seg = seg_map.get(key, {})
+                    account['tiers'] = seg.get('tiers', [])
+                    account['regions'] = seg.get('regions', [])
+                    account['industries'] = seg.get('industries', [])
+                    account['roles'] = seg.get('roles', [])
+                    account['cohorts'] = seg.get('cohorts', [])
         
         # Apply filters
         filtered_accounts = []
@@ -2926,12 +2953,44 @@ def api_account_intelligence():
                 continue
             elif has_risks == 'no' and account.get('risk_count', 0) > 0:
                 continue
-            
+
+            # Segmentation dimension filters (inclusive: account matches if any respondent has the value)
+            if tier_filter and tier_filter not in account.get('tiers', []):
+                continue
+            if region_filter and region_filter not in account.get('regions', []):
+                continue
+            if industry_filter and industry_filter not in account.get('industries', []):
+                continue
+            if segment_filter and segment_filter not in account.get('roles', []):
+                continue
+            if cohort_filter and cohort_filter not in account.get('cohorts', []):
+                continue
+
             # Minimum responses filter (if applicable)
             # Note: current structure doesn't have response count per company, skip for now
             
             filtered_accounts.append(account)
         
+        # Compute available segmentation values from the full (unfiltered) account list
+        all_tiers = set()
+        all_regions = set()
+        all_industries = set()
+        all_segments = set()
+        all_cohorts = set()
+        for _acct in all_accounts:
+            all_tiers.update(_acct.get('tiers', []))
+            all_regions.update(_acct.get('regions', []))
+            all_industries.update(_acct.get('industries', []))
+            all_segments.update(_acct.get('roles', []))
+            all_cohorts.update(_acct.get('cohorts', []))
+
+        available_segments = {
+            'tiers': sorted(all_tiers),
+            'regions': sorted(all_regions),
+            'industries': sorted(all_industries),
+            'segments': sorted(all_segments),
+            'cohorts': sorted(all_cohorts),
+        }
         # Apply pagination
         total_accounts = len(filtered_accounts)
         start_idx = (page - 1) * per_page
@@ -2959,8 +3018,14 @@ def api_account_intelligence():
                 'balance': balance_filter if balance_filter else None,
                 'risk_level': risk_level_filter if risk_level_filter else None,
                 'has_opportunities': has_opportunities if has_opportunities else None,
-                'has_risks': has_risks if has_risks else None
-            }
+                'has_risks': has_risks if has_risks else None,
+                'tier': tier_filter if tier_filter else None,
+                'region': region_filter if region_filter else None,
+                'industry': industry_filter if industry_filter else None,
+                'segment': segment_filter if segment_filter else None,
+                'cohort': cohort_filter if cohort_filter else None,
+            },
+            'available_segments': available_segments,
         })
     except Exception as e:
         logger.error(f"Error getting account intelligence data: {e}")

@@ -3476,29 +3476,36 @@ function loadAccountIntelligence(page = 1) {
     const riskLevel = document.getElementById('accountRiskFilter')?.value || '';
     const hasOpp = document.getElementById('accountOppFilter')?.value || '';
     const hasRisks = document.getElementById('accountRisksFilter')?.value || '';
-    
-    // Build query params
+    const tier = document.getElementById('accountTierFilter')?.value || '';
+    const region = document.getElementById('accountRegionFilter')?.value || '';
+    const industry = document.getElementById('accountIndustryFilter')?.value || '';
+    const segment = document.getElementById('accountSegmentFilter')?.value || '';
+    const cohort = document.getElementById('accountCohortFilter')?.value || '';
+
     const params = new URLSearchParams({
         page: page,
         per_page: 10
     });
-    
+
     if (search) params.append('search', search);
     if (balance) params.append('balance', balance);
     if (riskLevel) params.append('risk_level', riskLevel);
     if (hasOpp) params.append('has_opportunities', hasOpp);
     if (hasRisks) params.append('has_risks', hasRisks);
-    
-    // Get current campaign if set
+    if (tier) params.append('tier', tier);
+    if (region) params.append('region', region);
+    if (industry) params.append('industry', industry);
+    if (segment) params.append('segment', segment);
+    if (cohort) params.append('cohort', cohort);
+
     const numericCampaignIdAI = getSelectedCampaignNumericId();
     if (numericCampaignIdAI) {
         params.append('campaign', numericCampaignIdAI);
     }
-    
-    // Show loading
+
     const container = document.getElementById('accountIntelligence');
     container.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
-    
+
     fetch(`/api/account_intelligence?${params}`)
         .then(response => response.json())
         .then(data => {
@@ -3506,6 +3513,7 @@ function loadAccountIntelligence(page = 1) {
                 accountIntelCurrentPage = page;
                 renderAccountIntelligence(data.data, data.pagination);
                 updateAccountIntelFiltersUI(data.pagination.total, data.filters_applied);
+                populateSegmentFilterDropdowns(data.available_segments || {});
             } else {
                 container.innerHTML = `<div class="alert alert-danger">${translations.errorLoadingAccountIntelligence}</div>`;
             }
@@ -3514,6 +3522,40 @@ function loadAccountIntelligence(page = 1) {
             console.error('Error loading account intelligence:', error);
             container.innerHTML = '<div class="alert alert-danger">Error: ' + error.message + '</div>';
         });
+}
+
+function populateSegmentFilterDropdowns(available) {
+    const configs = [
+        { key: 'tiers',      selectId: 'accountTierFilter',     colId: 'accountTierFilterCol',     defaultLabel: window.t ? window.t('All Tiers') : 'All Tiers' },
+        { key: 'regions',    selectId: 'accountRegionFilter',   colId: 'accountRegionFilterCol',   defaultLabel: window.t ? window.t('All Regions') : 'All Regions' },
+        { key: 'industries', selectId: 'accountIndustryFilter', colId: 'accountIndustryFilterCol', defaultLabel: window.t ? window.t('All Industries') : 'All Industries' },
+        { key: 'segments',   selectId: 'accountSegmentFilter',  colId: 'accountSegmentFilterCol',  defaultLabel: window.t ? window.t('All Segments') : 'All Segments' },
+        { key: 'cohorts',    selectId: 'accountCohortFilter',   colId: 'accountCohortFilterCol',   defaultLabel: window.t ? window.t('All Cohorts') : 'All Cohorts' },
+    ];
+
+    let anyVisible = false;
+    configs.forEach(cfg => {
+        const values = available[cfg.key] || [];
+        const col = document.getElementById(cfg.colId);
+        const sel = document.getElementById(cfg.selectId);
+        if (!col || !sel) return;
+
+        if (values.length === 0) {
+            col.style.display = 'none';
+            sel.value = '';
+            return;
+        }
+
+        anyVisible = true;
+        col.style.display = '';
+        const currentVal = sel.value;
+        const defaultOpt = `<option value="">${escapeHtml(cfg.defaultLabel)}</option>`;
+        const opts = values.map(v => `<option value="${escapeHtml(v)}"${v === currentVal ? ' selected' : ''}>${escapeHtml(v)}</option>`).join('');
+        sel.innerHTML = defaultOpt + opts;
+    });
+
+    const segRow = document.getElementById('accountIntelSegmentFilters');
+    if (segRow) segRow.style.display = anyVisible ? '' : 'none';
 }
 
 function renderAccountIntelligence(accountData, pagination) {
@@ -3794,6 +3836,8 @@ function clearAccountIntelFilters() {
     document.getElementById('accountRiskFilter').value = '';
     document.getElementById('accountOppFilter').value = '';
     document.getElementById('accountRisksFilter').value = '';
+    const segIds = ['accountTierFilter', 'accountRegionFilter', 'accountIndustryFilter', 'accountSegmentFilter', 'accountCohortFilter'];
+    segIds.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
     loadAccountIntelligence(1);
 }
 
