@@ -2613,6 +2613,8 @@ function createTenureChart() {
     const npsData    = cohorts.map(c => c.avgNps);
     const barColors  = cohorts.map(c => c.color);
     const rawCounts  = cohorts.map(c => c.count);
+    const globalNps  = dashboardData.nps_score ?? null;
+    const globalNpsData = globalNps !== null ? cohorts.map(() => globalNps) : null;
 
     const config = getMobileChartConfig();
 
@@ -2636,7 +2638,7 @@ function createTenureChart() {
                     ctx.restore();
                 }
             });
-            // Draw NPS value labels above each line point (dataset 1)
+            // Draw NPS value labels above each line point (dataset 1 only, not reference line)
             const lineMeta = chart.getDatasetMeta(1);
             lineMeta.data.forEach((point, i) => {
                 const val = npsData[i];
@@ -2651,6 +2653,7 @@ function createTenureChart() {
                     ctx.restore();
                 }
             });
+            // Dataset 2 (Campaign NPS reference line) gets no point labels
         }
     };
 
@@ -2685,7 +2688,21 @@ function createTenureChart() {
                     spanGaps: true,
                     xAxisID: 'xNps',
                     order: 1
-                }
+                },
+                ...(globalNpsData ? [{
+                    type: 'line',
+                    label: 'Campaign NPS',
+                    data: globalNpsData,
+                    borderColor: '#E13A44',
+                    backgroundColor: 'transparent',
+                    borderWidth: 2,
+                    borderDash: [6, 4],
+                    pointRadius: 0,
+                    pointHoverRadius: 0,
+                    spanGaps: true,
+                    xAxisID: 'xNps',
+                    order: 0
+                }] : [])
             ]
         },
         plugins: [pctLabelPlugin],
@@ -2710,6 +2727,10 @@ function createTenureChart() {
                             if (context.dataset.label === 'Share of Accounts (%)') {
                                 const i = context.dataIndex;
                                 return ` ${context.dataset.label}: ${pctData[i]}% (${rawCounts[i]} accounts)`;
+                            }
+                            if (context.dataset.label === 'Campaign NPS') {
+                                const val = context.parsed.x;
+                                return val !== null ? ` Campaign NPS: ${val >= 0 ? '+' : ''}${val}` : ' Campaign NPS: n/a';
                             }
                             const val = context.parsed.x;
                             return val !== null ? ` NPS Score: ${val}` : ' NPS Score: n/a';
