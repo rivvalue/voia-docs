@@ -8,6 +8,7 @@
 {# Breadcrumb Navigation #}
 {% set breadcrumb_items = [
     {'label': bi_label, 'url': bi_url},
+    {'label': campaign.name, 'url': url_for('campaign_insights') ~ '?campaign_id=' ~ campaign.id},
     {'label': company_name, 'current': true}
 ] %}
 {% include 'components/breadcrumb.html' %}
