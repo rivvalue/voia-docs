@@ -626,6 +626,10 @@ msgstr "Participation à la campagne"
 msgid "Recent (30 days)"
 msgstr ""
 
+#: templates/campaign_insights.html:229
+msgid "Distinct companies responded"
+msgstr "Entreprises distinctes ayant répondu"
+
 #: templates/campaign_insights.html:226 templates/dashboard.html:428
 #, fuzzy
 msgid "Latest customer feedback"

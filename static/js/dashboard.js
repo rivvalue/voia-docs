@@ -1607,6 +1607,7 @@ function populateDashboard() {
     document.getElementById('npsScore').textContent = dashboardData.nps_score || 0;
     document.getElementById('recentResponses').textContent = dashboardData.recent_responses || 0;
     document.getElementById('highRiskCount').textContent = dashboardData.high_risk_accounts?.length || 0;
+    document.getElementById('totalCompanies').textContent = dashboardData.total_companies || 0;
     
     // Response Rate - show percentage or N/A if not available
     const responseRateEl = document.getElementById('responseRate');

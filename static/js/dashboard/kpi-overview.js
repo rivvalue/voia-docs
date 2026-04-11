@@ -121,6 +121,7 @@
         document.getElementById('npsScore').textContent = dashboardData.nps_score || 0;
         document.getElementById('recentResponses').textContent = dashboardData.recent_responses || 0;
         document.getElementById('highRiskCount').textContent = dashboardData.high_risk_accounts?.length || 0;
+        document.getElementById('totalCompanies').textContent = dashboardData.total_companies || 0;
         
         // Growth potential as percentage
         const growthPotential = dashboardData.growth_factor_analysis?.total_growth_potential || 0;
