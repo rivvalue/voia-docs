@@ -2684,35 +2684,94 @@ def get_company_detail_data(campaign_id, company_name, business_account_id=None)
             'is_high_influence': tier_name in ('C-Level', 'VP/Director'),
         })
 
-    # --- Account Signal Balance (qualitative risk vs. opportunity) ---
-    agg_opportunities = {}
-    agg_risk_factors = {}
+    # --- Account Signal Balance + consolidated risk/opportunity details ---
+    _sev_priority = {'Critical': 4, 'High': 3, 'Medium': 2, 'Low': 1}
+    risk_by_type = {}   # normalized_type -> {type, descriptions, actions, severities, count}
+    opp_by_type = {}    # normalized_type -> {type, descriptions, actions, count}
+
     for resp in responses:
         if resp.growth_opportunities:
             try:
                 opps = json_module.loads(resp.growth_opportunities) if isinstance(resp.growth_opportunities, str) else resp.growth_opportunities
                 if isinstance(opps, list):
                     for opp in opps:
-                        opp_type = (opp.get('type', '') if isinstance(opp, dict) else str(opp)).lower().replace('-', '_')
-                        agg_opportunities[opp_type] = agg_opportunities.get(opp_type, 0) + 1
+                        if not isinstance(opp, dict):
+                            continue
+                        raw_type = opp.get('type', 'unknown')
+                        ntype = raw_type.lower().replace('-', '_').replace(' ', '_')
+                        if ntype not in opp_by_type:
+                            opp_by_type[ntype] = {'type': raw_type, 'descriptions': [], 'actions': [], 'count': 0}
+                        grp = opp_by_type[ntype]
+                        desc = (opp.get('description') or '').strip()
+                        action = (opp.get('action') or '').strip()
+                        if desc and desc not in grp['descriptions']:
+                            grp['descriptions'].append(desc)
+                        if action and action not in grp['actions']:
+                            grp['actions'].append(action)
+                        grp['count'] += 1
             except (json_module.JSONDecodeError, TypeError):
                 pass
-        for field in ('account_risk_factors', 'churn_risk_factors'):
-            raw = getattr(resp, field, None)
-            if raw:
-                try:
-                    factors = json_module.loads(raw) if isinstance(raw, str) else raw
-                    if isinstance(factors, list):
-                        for f in factors:
-                            severity = (f.get('severity', 'Medium') if isinstance(f, dict) else 'Medium')
-                            key = severity
-                            agg_risk_factors[key] = agg_risk_factors.get(key, 0) + 1
-                except (json_module.JSONDecodeError, TypeError):
-                    pass
 
-    opp_list = [{'type': k, 'count': v} for k, v in agg_opportunities.items()]
-    risk_list = [{'severity': k, 'count': v} for k, v in agg_risk_factors.items()]
+        if resp.account_risk_factors:
+            try:
+                factors = json_module.loads(resp.account_risk_factors) if isinstance(resp.account_risk_factors, str) else resp.account_risk_factors
+                if isinstance(factors, list):
+                    for f in factors:
+                        if not isinstance(f, dict):
+                            continue
+                        raw_type = f.get('type', 'unknown')
+                        ntype = raw_type.lower().replace('-', '_').replace(' ', '_')
+                        sev = f.get('severity', 'Medium')
+                        if ntype not in risk_by_type:
+                            risk_by_type[ntype] = {'type': raw_type, 'descriptions': [], 'actions': [], 'severities': [], 'count': 0}
+                        grp = risk_by_type[ntype]
+                        desc = (f.get('description') or '').strip()
+                        action = (f.get('action') or '').strip()
+                        if desc and desc not in grp['descriptions']:
+                            grp['descriptions'].append(desc)
+                        if action and action not in grp['actions']:
+                            grp['actions'].append(action)
+                        if sev not in grp['severities']:
+                            grp['severities'].append(sev)
+                        grp['count'] += 1
+            except (json_module.JSONDecodeError, TypeError):
+                pass
+
+    consolidated_risk_factors = []
+    for ntype, grp in risk_by_type.items():
+        highest_sev = max(grp['severities'], key=lambda s: _sev_priority.get(s, 0)) if grp['severities'] else 'Medium'
+        consolidated_risk_factors.append({
+            'type': grp['type'],
+            'description': '; '.join(grp['descriptions'][:2]),
+            'action': '; '.join(grp['actions'][:2]),
+            'severity': highest_sev,
+            'count': grp['count'],
+        })
+    consolidated_risk_factors.sort(key=lambda x: (-_sev_priority.get(x['severity'], 0), -x['count']))
+
+    consolidated_opportunities = []
+    for ntype, grp in opp_by_type.items():
+        consolidated_opportunities.append({
+            'type': grp['type'],
+            'description': '; '.join(grp['descriptions'][:2]),
+            'action': '; '.join(grp['actions'][:2]),
+            'count': grp['count'],
+        })
+    consolidated_opportunities.sort(key=lambda x: -x['count'])
+
+    opp_list = [{'type': g['type'], 'count': g['count']} for g in consolidated_opportunities]
+    risk_list = [{'severity': g['severity'], 'count': g['count']} for g in consolidated_risk_factors]
     signal_balance, opp_score, risk_score, health_ratio = calculate_weighted_account_balance(opp_list, risk_list)
+
+    # --- Customer tier (most common across respondents) ---
+    tier_counts = {}
+    for resp in responses:
+        cp = resp.campaign_participant
+        if cp and cp.participant and cp.participant.customer_tier:
+            t = cp.participant.customer_tier.strip()
+            if t:
+                tier_counts[t] = tier_counts.get(t, 0) + 1
+    customer_tier = max(tier_counts, key=tier_counts.get) if tier_counts else None
 
     result = {
         "nps_summary": {
@@ -2736,6 +2795,9 @@ def get_company_detail_data(campaign_id, company_name, business_account_id=None)
         "signal_opp_score": round(opp_score, 2),
         "signal_risk_score": round(risk_score, 2),
         "signal_health_ratio": round(health_ratio, 3),
+        "risk_factors": consolidated_risk_factors,
+        "opportunities": consolidated_opportunities,
+        "customer_tier": customer_tier,
     }
 
     if use_cache and result is not None:
@@ -2798,9 +2860,17 @@ def get_strategic_accounts_data(campaign_id, business_account_id=None):
         if not campaign_id:
             return {'accounts': [], 'kpi': {'at_risk_count': 0, 'growth_count': 0, 'no_response_count': 0, 'coverage_rate': 0.0}}
 
-        TIER_PRIORITY = {'strategic': 0, 'key': 1}
-        STRATEGIC_TIERS = {'strategic', 'key'}
+        TIER_KEYWORDS = [('strategic', 0), ('key', 1)]
         RISK_SEVERITY_ORDER = {'Critical': 0, 'High': 1, 'Medium': 2, 'Low': 3, 'Minimal': 4}
+
+        def _tier_priority(tier_lower):
+            for keyword, priority in TIER_KEYWORDS:
+                if keyword in tier_lower:
+                    return priority
+            return 999
+
+        def _is_strategic_tier(tier_lower):
+            return any(keyword in tier_lower for keyword, _ in TIER_KEYWORDS)
 
         # --- Step 1: Build the canonical company set from campaign participants ---
         # This is the primary set: ALL Strategic/Key companies in the campaign,
@@ -2824,13 +2894,13 @@ def get_strategic_accounts_data(campaign_id, business_account_id=None):
             upper = row.upper_company
             tier = (row.customer_tier or '').strip()
             tier_lower = tier.lower()
-            if tier_lower not in STRATEGIC_TIERS:
+            if not _is_strategic_tier(tier_lower):
                 continue  # Skip non-strategic companies entirely
             if upper not in company_tier_map:
                 company_tier_map[upper] = {'tier': tier, 'display_name': row.company_name}
             else:
-                existing_priority = TIER_PRIORITY.get(company_tier_map[upper]['tier'].lower(), 999)
-                new_priority = TIER_PRIORITY.get(tier_lower, 999)
+                existing_priority = _tier_priority(company_tier_map[upper]['tier'].lower())
+                new_priority = _tier_priority(tier_lower)
                 if new_priority < existing_priority:
                     company_tier_map[upper] = {'tier': tier, 'display_name': row.company_name}
 

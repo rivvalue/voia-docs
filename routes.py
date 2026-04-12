@@ -4419,9 +4419,13 @@ def get_company_responses(campaign_uuid, company_name):
         # Get total count before pagination
         total_count = query.count()
         
-        # Apply pagination
+        # Apply pagination with participant joinedload for role/tier
+        from models import CampaignParticipant, Participant
+        from sqlalchemy.orm import joinedload as _joinedload
         offset = (page - 1) * per_page
-        responses = query.limit(per_page).offset(offset).all()
+        responses = query.options(
+            _joinedload(SurveyResponse.campaign_participant).joinedload(CampaignParticipant.participant)
+        ).limit(per_page).offset(offset).all()
         
         # Build response data
         response_list = []
@@ -4447,11 +4451,21 @@ def get_company_responses(campaign_uuid, company_name):
             else:
                 # Public user cannot view business responses
                 can_view = False
+
+            # Pull participant role and customer tier
+            respondent_role = None
+            respondent_customer_tier = None
+            cp = response.campaign_participant
+            if cp and cp.participant:
+                respondent_role = cp.participant.role
+                respondent_customer_tier = cp.participant.customer_tier
             
             response_list.append({
                 'id': response.id,
                 'uuid': response.uuid,
                 'respondent_name': response_data['respondent_name'],
+                'respondent_role': respondent_role,
+                'customer_tier': respondent_customer_tier,
                 'nps_score': response.nps_score,
                 'satisfaction_rating': response.satisfaction_rating,
                 'product_value_rating': response.product_value_rating,

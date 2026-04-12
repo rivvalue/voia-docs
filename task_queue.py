@@ -933,6 +933,8 @@ class TaskQueue:
             created_count = 0
             error_count = 0
             row_errors = []
+            tier_warnings = []
+            RECOGNIZED_TIER_KEYWORDS = ('strategic', 'key')
 
             for i in range(0, total_count, BATCH_SIZE):
                 batch = rows[i:i + BATCH_SIZE]
@@ -968,6 +970,11 @@ class TaskQueue:
                         role = row.get('role') or None
                         region = row.get('region') or None
                         customer_tier = row.get('customer_tier') or None
+                        if customer_tier and not any(kw in customer_tier.lower() for kw in RECOGNIZED_TIER_KEYWORDS):
+                            tier_warnings.append(
+                                f"Row {row_num}: customer_tier \"{customer_tier}\" does not contain a recognized tier keyword "
+                                f"(expected to include \"strategic\" or \"key\") — this participant will not appear in the Strategic Accounts tab"
+                            )
                         language = row.get('language') or 'en'
                         client_industry = row.get('client_industry') or None
                         commercial_value = row.get('commercial_value')
@@ -1032,7 +1039,8 @@ class TaskQueue:
                 'total': total_count,
                 'created': created_count,
                 'failed': error_count,
-                'errors': row_errors[:50]
+                'errors': row_errors[:50],
+                'tier_warnings': tier_warnings[:50]
             })
             db.session.commit()
 

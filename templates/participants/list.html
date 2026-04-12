@@ -210,10 +210,28 @@
                         var icon = document.getElementById('importJobSpinnerIcon');
                         var title = document.getElementById('importJobBannerTitle');
                         var text = document.getElementById('importJobBannerText');
-                        if (banner) { banner.classList.remove('alert-info'); banner.classList.add('alert-success'); }
-                        if (icon) { icon.className = 'fas fa-check-circle me-2'; }
-                        if (title) { title.textContent = 'Import complete'; }
-                        if (text) { text.textContent = 'Your CSV import finished successfully.'; }
+                        var tierWarnings = (data.result && data.result.tier_warnings) ? data.result.tier_warnings : [];
+                        if (tierWarnings.length > 0) {
+                            if (banner) { banner.classList.remove('alert-info'); banner.classList.add('alert-warning'); }
+                            if (icon) { icon.className = 'fas fa-exclamation-triangle me-2'; }
+                            if (title) { title.textContent = 'Import complete with warnings'; }
+                            if (text) {
+                                text.textContent = 'Your CSV import finished, but ' + tierWarnings.length + ' row(s) had unrecognized customer_tier values:';
+                                var ul = document.createElement('ul');
+                                ul.className = 'mb-0 mt-2';
+                                tierWarnings.forEach(function(w) {
+                                    var li = document.createElement('li');
+                                    li.textContent = w;
+                                    ul.appendChild(li);
+                                });
+                                text.appendChild(ul);
+                            }
+                        } else {
+                            if (banner) { banner.classList.remove('alert-info'); banner.classList.add('alert-success'); }
+                            if (icon) { icon.className = 'fas fa-check-circle me-2'; }
+                            if (title) { title.textContent = 'Import complete'; }
+                            if (text) { text.textContent = 'Your CSV import finished successfully.'; }
+                        }
                         refreshParticipantData();
                     } else if (data.status === 'failed') {
                         stopPolling();

@@ -134,104 +134,54 @@
     // ============================================================================
 
     function renderAccountCard(account, campaignId, campaignName) {
+        const severityPriority = { 'Critical': 4, 'High': 3, 'Medium': 2, 'Low': 1 };
+        const intensityMap = { 'Critical': '●●●', 'High': '●●', 'Medium': '●', 'Low': '○' };
+
         const balanceClass = account.balance === 'risk_heavy' ? 'border-danger' : 'border-secondary';
         const balanceIconColor = account.balance === 'risk_heavy' ? '#E13A44' :
                                  account.balance === 'opportunity_heavy' ? '#8A8A8A' : '#BDBDBD';
         const balanceLabel = account.balance === 'risk_heavy' ? 'Risk-Heavy' :
                              account.balance === 'opportunity_heavy' ? 'High Potential' : 'Balanced';
 
-        const tierBadgeColor = (account.customer_tier || '').toLowerCase() === 'strategic' ? '#2E5090' : '#6c757d';
+        const tierIsStrategic = (account.customer_tier || '').toLowerCase().includes('strategic');
+        const tierBadgeColor = tierIsStrategic ? '#2E5090' : '#6c757d';
         const tierLabel = escapeHtml(account.customer_tier || 'Unknown');
 
         const coverageWarning = !account.has_responses
             ? `<div class="alert alert-warning py-1 px-2 mb-2 d-flex align-items-center gap-2" style="font-size:0.82em;">
                    <i class="fas fa-exclamation-triangle me-1"></i>
-                   <span>No responses in this campaign — account coverage gap</span>
+                   <span>No responses in this campaign — schedule an executive check-in to capture sentiment before renewal</span>
                </div>`
             : '';
 
-        const opportunityMap = new Map();
-        (account.opportunities || []).forEach(opp => {
-            const normalizedType = normalizeTypeForVisual(opp.type);
-            if (opportunityMap.has(normalizedType)) {
-                opportunityMap.get(normalizedType).count += (opp.count || 1);
-                if (opp.strategic_advocate) {
-                    opportunityMap.get(normalizedType).strategic_advocate = true;
-                }
-            } else {
-                opportunityMap.set(normalizedType, {
-                    type: opp.type,
-                    normalizedType,
-                    count: opp.count || 1,
-                    strategic_advocate: opp.strategic_advocate || false
-                });
-            }
-        });
-
-        const opportunityIndicators = Array.from(opportunityMap.values()).map(opp => {
-            const visual = getVisualIndicator(opp.normalizedType, 'opportunity');
-            const advocateLabel = opp.strategic_advocate
-                ? ` <span style="background:#1A5E20; color:#fff; border-radius:6px; font-size:0.7em; padding:1px 5px; vertical-align:middle;">Strategic Advocate</span>`
-                : '';
-            return `<span class="visual-indicator opportunity-indicator"
-                          style="background-color:${visual.color}20; border:2px solid ${visual.color}; padding:4px 8px; margin:2px; border-radius:12px; display:inline-block;"
-                          title="${escapeHtml(opp.type)}${opp.count > 1 ? ` (${opp.count} opportunities)` : ''}">
-                        ${escapeHtml(visual.label)}${opp.count > 1 ? ` (${opp.count})` : ''}${advocateLabel}
-                    </span>`;
-        }).join('');
-
-        const riskMap = new Map();
-        (account.risk_factors || []).forEach(risk => {
-            const normalizedType = normalizeTypeForVisual(risk.type);
-            if (riskMap.has(normalizedType)) {
-                riskMap.get(normalizedType).count += (risk.count || 1);
-                const severityPriority = { 'Critical': 4, 'High': 3, 'Medium': 2, 'Low': 1 };
-                if (severityPriority[risk.severity] > severityPriority[riskMap.get(normalizedType).severity]) {
-                    riskMap.get(normalizedType).severity = risk.severity;
-                }
-            } else {
-                riskMap.set(normalizedType, {
-                    type: risk.type,
-                    normalizedType,
-                    severity: risk.severity,
-                    count: risk.count || 1
-                });
-            }
-        });
-
-        const riskIndicators = Array.from(riskMap.values()).map(risk => {
-            const visual = getVisualIndicator(risk.normalizedType, 'risk');
-            const intensityMap = { 'Critical': '●●●', 'High': '●●', 'Medium': '●', 'Low': '○' };
-            const intensity = intensityMap[risk.severity] || '●';
-            return `<span class="visual-indicator risk-indicator"
-                          style="background-color:${visual.color}20; border:2px solid ${visual.color}; padding:4px 8px; margin:2px; border-radius:12px; display:inline-block;"
-                          title="${escapeHtml(risk.type)} - ${escapeHtml(risk.severity)}${risk.count > 1 ? ` (${risk.count} instances)` : ''}">
-                        ${escapeHtml(visual.label)} ${intensity}${risk.count > 1 ? ` (${risk.count})` : ''}
-                    </span>`;
-        }).join('');
-
+        // ── Influence badges ──────────────────────────────────────────────────────
         const decisionMakerRiskBadge = account.decision_maker_risk
             ? `<span class="badge ms-1" style="background-color:#7B1B1B; color:#fff; font-size:0.72em; cursor:help;"
-                   title="Churn risk driven by decision-makers.">
+                   title="A C-Level or VP/Director respondent is a Detractor — executive sponsorship is at risk.">
                    <i class="fas fa-user-tie me-1"></i>DM Risk
                </span>` : '';
 
-        const coverageWarningBadge = account.missing_executive_coverage
+        const execCoverageBadge = account.missing_executive_coverage
             ? `<span class="badge ms-1" style="background-color:#6C4A00; color:#fff; font-size:0.72em; cursor:help;"
-                   title="No C-Level or VP/Director response captured.">
+                   title="No C-Level or VP/Director response captured — executive sentiment is unknown.">
                    <i class="fas fa-eye-slash me-1"></i>No Exec Coverage
                </span>` : '';
 
         const strategicAdvocateBadge = account.c_level_promoter_opps
             ? `<span class="badge ms-1" style="background-color:#1A5E20; color:#fff; font-size:0.72em; cursor:help;"
-                   title="Strategic Advocate opportunity: a C-Level or VP/Director gave a Promoter score.">
+                   title="A C-Level or VP/Director gave a Promoter score (9–10) — a high-value reference candidate.">
                    <i class="fas fa-star me-1"></i>Strategic Advocate
                </span>` : '';
 
-        const influenceBadges = [decisionMakerRiskBadge, coverageWarningBadge, strategicAdvocateBadge].filter(Boolean).join('');
+        const influenceBadges = [decisionMakerRiskBadge, execCoverageBadge, strategicAdvocateBadge].filter(Boolean).join('');
 
-        const npsDisplay = account.company_nps !== undefined && account.company_nps !== null ? account.company_nps : 'N/A';
+        // ── NPS display ───────────────────────────────────────────────────────────
+        const npsDisplay = account.company_nps !== undefined && account.company_nps !== null
+            ? (account.company_nps > 0 ? '+' : '') + account.company_nps
+            : 'N/A';
+        const npsColor = (account.company_nps >= 30) ? '#1A5E20' : (account.company_nps >= 0) ? '#856600' : '#7B1B1B';
 
+        // ── NPS by Influence Tier ─────────────────────────────────────────────────
         const npsByTierHtml = account.nps_by_tier && Object.keys(account.nps_by_tier).length > 0 ? (() => {
             const tierOrder = ['C-Level', 'VP/Director', 'Manager', 'Team Lead', 'End User'];
             const rows = tierOrder
@@ -241,16 +191,89 @@
                     const nps = td.nps;
                     const color = nps >= 30 ? '#1A5E20' : nps >= 0 ? '#856600' : '#7B1B1B';
                     const isHighInfluence = t === 'C-Level' || t === 'VP/Director';
+                    const warningNote = isHighInfluence && nps < 0
+                        ? `<span style="font-size:0.75em; color:#7B1B1B;" title="Executive detractor — priority escalation needed"> ⚠</span>` : '';
                     return `<div class="d-flex align-items-center justify-content-between py-1" style="border-bottom:1px solid #E0E0E0;">
-                        <span style="font-size:0.78em; color:#555;">${isHighInfluence ? '<i class="fas fa-user-tie me-1" style="color:#2E5090;"></i>' : ''}<span>${t}</span> <span class="text-muted">(${td.count})</span></span>
+                        <span style="font-size:0.78em; color:#555;">${isHighInfluence ? '<i class="fas fa-user-tie me-1" style="color:#2E5090;"></i>' : ''}<span>${escapeHtml(t)}</span> <span class="text-muted">(${td.count})</span>${warningNote}</span>
                         <span class="badge" style="background-color:${color}20; color:${color}; border:1px solid ${color}; font-size:0.78em;">${nps > 0 ? '+' : ''}${nps}</span>
                     </div>`;
                 }).join('');
             return rows ? `<div class="mb-3 p-2 rounded" style="background-color:#F4F3F0; border:1px solid #BDBDBD;">
-                <div class="fw-bold mb-1" style="font-size:0.8em; color:#555;">NPS by Influence Tier</div>
+                <div class="fw-bold mb-1" style="font-size:0.8em; color:#555;"><i class="fas fa-layer-group me-1"></i>NPS by Influence Tier</div>
                 ${rows}
             </div>` : '';
         })() : '';
+
+        // ── Priority Action callout ────────────────────────────────────────────────
+        // Surface the single highest-severity risk action as an explicit callout
+        const risks = (account.risk_factors || []).slice().sort((a, b) =>
+            (severityPriority[b.severity] || 0) - (severityPriority[a.severity] || 0)
+        );
+        const topRisk = risks.find(r => r.action && r.action.trim());
+        const priorityActionHtml = topRisk
+            ? (() => {
+                const sev = topRisk.severity || 'Medium';
+                const borderColor = sev === 'Critical' || sev === 'High' ? '#E13A44' : '#856600';
+                const bgColor = sev === 'Critical' || sev === 'High' ? '#FFF5F5' : '#FFFBF0';
+                const sevLabel = escapeHtml(sev);
+                const actionText = escapeHtml(topRisk.action);
+                return `<div class="mb-3 p-2 rounded" style="background-color:${bgColor}; border-left:3px solid ${borderColor};">
+                    <div class="fw-bold mb-1" style="font-size:0.8em; color:${borderColor};">
+                        <i class="fas fa-bolt me-1"></i>Priority Action <span style="font-weight:normal; opacity:0.8;">(${sevLabel} Risk)</span>
+                    </div>
+                    <div style="font-size:0.82em; color:#333;">${actionText}</div>
+                </div>`;
+            })()
+            : '';
+
+        // ── Risk factor rows (with description + action) ──────────────────────────
+        const riskRowsHtml = risks.length > 0
+            ? risks.map(risk => {
+                const visual = getVisualIndicator(normalizeTypeForVisual(risk.type), 'risk');
+                const sev = risk.severity || 'Medium';
+                const intensity = intensityMap[sev] || '●';
+                const description = risk.description ? escapeHtml(risk.description) : '';
+                const action = risk.action ? escapeHtml(risk.action) : '';
+                const isTopRisk = risk === topRisk;
+                return `<div class="mb-2 p-2 rounded" style="background-color:#FFF5F5; border:1px solid #F5C6CB;">
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <span style="font-size:0.82em; font-weight:600; color:#7B1B1B;">
+                            <i class="fas fa-exclamation-circle me-1"></i>${escapeHtml(visual.label)} ${intensity}
+                        </span>
+                        <span class="badge" style="background-color:#E13A4420; color:#E13A44; border:1px solid #E13A44; font-size:0.72em;">${escapeHtml(sev)}</span>
+                    </div>
+                    ${description ? `<div style="font-size:0.8em; color:#555; margin-bottom:${action ? '4px' : '0'};">${description}</div>` : ''}
+                    ${action && !isTopRisk ? `<div style="font-size:0.78em; color:#856600;"><i class="fas fa-arrow-right me-1"></i>${action}</div>` : ''}
+                </div>`;
+            }).join('')
+            : '';
+
+        // ── Opportunity rows (with description + action) ──────────────────────────
+        const opps = (account.opportunities || []).slice().sort((a, b) => (b.count || 1) - (a.count || 1));
+        const oppRowsHtml = opps.length > 0
+            ? opps.map(opp => {
+                const visual = getVisualIndicator(normalizeTypeForVisual(opp.type), 'opportunity');
+                const description = opp.description ? escapeHtml(opp.description) : '';
+                const action = opp.action ? escapeHtml(opp.action) : '';
+                const advocateTag = opp.strategic_advocate
+                    ? `<span class="badge ms-1" style="background:#1A5E20; color:#fff; font-size:0.7em;">Strategic Advocate</span>`
+                    : '';
+                return `<div class="mb-2 p-2 rounded" style="background-color:#F0FFF4; border:1px solid #B2DFDB;">
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <span style="font-size:0.82em; font-weight:600; color:#1A5E20;">
+                            <i class="fas fa-arrow-trend-up me-1"></i>${escapeHtml(visual.label)}${opp.count > 1 ? ` (${opp.count})` : ''}
+                        </span>
+                        ${advocateTag}
+                    </div>
+                    ${description ? `<div style="font-size:0.8em; color:#555; margin-bottom:${action ? '4px' : '0'};">${description}</div>` : ''}
+                    ${action ? `<div style="font-size:0.78em; color:#1A5E20;"><i class="fas fa-arrow-right me-1"></i>${action}</div>` : ''}
+                </div>`;
+            }).join('')
+            : '';
+
+        const noInsights = risks.length === 0 && opps.length === 0
+            ? '<div class="text-muted text-center py-2" style="font-size:0.9em;">No specific indicators identified for this campaign</div>'
+            : '';
 
         const companyNameEscaped = escapeHtml(account.company_name);
         const campaignNameEscaped = escapeHtml(campaignName);
@@ -259,6 +282,7 @@
             <div class="account-visual-card card mb-3 ${balanceClass}" style="border-width:2px;">
                 <div class="card-body p-3">
                     ${coverageWarning}
+
                     <div class="d-flex justify-content-between align-items-start mb-2">
                         <div>
                             <h5 class="mb-1">
@@ -286,15 +310,15 @@
                     <div class="account-details mb-3 p-2 rounded" style="background-color:#E9E8E4; border:1px solid #BDBDBD;">
                         <div class="row">
                             <div class="col-4">
-                                <small class="text-muted">NPS:</small>
-                                <div class="fw-bold" style="color:#8A8A8A;">${npsDisplay}</div>
+                                <small class="text-muted">NPS</small>
+                                <div class="fw-bold" style="color:${npsDisplay === 'N/A' ? '#8A8A8A' : npsColor};">${npsDisplay}</div>
                             </div>
                             <div class="col-4">
-                                <small class="text-muted">Max Tenure:</small>
-                                <div class="fw-bold" style="color:#8A8A8A;">${account.max_tenure ? account.max_tenure + ' years' : 'N/A'}</div>
+                                <small class="text-muted">Max Tenure</small>
+                                <div class="fw-bold" style="color:#8A8A8A;">${account.max_tenure ? account.max_tenure + ' yrs' : 'N/A'}</div>
                             </div>
                             <div class="col-4">
-                                <small class="text-muted">Responses:</small>
+                                <small class="text-muted">Responses</small>
                                 <div class="fw-bold" style="color:#8A8A8A;">${account.response_count !== undefined ? account.response_count : 'N/A'}</div>
                             </div>
                         </div>
@@ -302,21 +326,25 @@
 
                     ${npsByTierHtml}
 
-                    <div class="account-indicators">
-                        ${opportunityIndicators ? `
-                            <div class="mb-2">
-                                <div class="fw-bold text-success mb-1" style="font-size:0.9em;">Growth Opportunities</div>
-                                <div>${opportunityIndicators}</div>
-                            </div>` : ''}
-                        ${riskIndicators ? `
-                            <div class="mb-2">
-                                <div class="fw-bold text-danger mb-1" style="font-size:0.9em;">Risk Factors</div>
-                                <div>${riskIndicators}</div>
-                            </div>` : ''}
-                        ${!opportunityIndicators && !riskIndicators
-                            ? '<div class="text-muted text-center py-2" style="font-size:0.9em;">No specific indicators identified</div>'
-                            : ''}
-                    </div>
+                    ${priorityActionHtml}
+
+                    ${riskRowsHtml ? `
+                        <div class="mb-3">
+                            <div class="fw-bold mb-2" style="font-size:0.85em; color:#E13A44;">
+                                <i class="fas fa-triangle-exclamation me-1"></i>Risk Factors
+                            </div>
+                            ${riskRowsHtml}
+                        </div>` : ''}
+
+                    ${oppRowsHtml ? `
+                        <div class="mb-2">
+                            <div class="fw-bold mb-2" style="font-size:0.85em; color:#1A5E20;">
+                                <i class="fas fa-seedling me-1"></i>Growth Opportunities
+                            </div>
+                            ${oppRowsHtml}
+                        </div>` : ''}
+
+                    ${noInsights}
                 </div>
             </div>
         `;
