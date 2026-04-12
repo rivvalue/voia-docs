@@ -724,7 +724,7 @@ function updateSelectedCampaignInfo() {
         const surveyType = option.getAttribute('data-survey-type') || 'conversational';
         if (surveyTypeBadge && surveyTypeText) {
             if (surveyType === 'classic') {
-                surveyTypeText.textContent = translations.classicSurvey || 'Classic Survey';
+                surveyTypeText.textContent = translations.classicSurvey || 'FullRead';
                 surveyTypeBadge.style.backgroundColor = '#6f42c1';
                 surveyTypeBadge.style.color = 'white';
             } else {

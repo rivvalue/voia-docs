@@ -96,33 +96,32 @@
                     </div>
                     
                     <!-- Filter Controls -->
-                    <div class="row align-items-center mb-2">
+                    <div class="row align-items-center">
                         <div class="col-12 col-md-auto mb-2 mb-md-0">
                             <label for="campaignFilter" class="form-label mb-0">{{ _('Campaign:') }}</label>
                         </div>
-                        <div class="col-12 col-md">
+                        <div class="col-12 col-md-auto mb-2 mb-md-0">
                             <select class="form-select" id="campaignFilter" onchange="applyCampaignFilter()" style="max-width: 400px;">
                                 <!-- Will be populated by JavaScript -->
                             </select>
                         </div>
-                    </div>
-                    
-                    <!-- Campaign Metadata (appears when campaign selected) -->
-                    <div id="selectedCampaignInfo" class="mt-3 pt-3 border-top" style="display: none; background-color: #f8f9fa; margin: 0 -1.5rem -1.5rem; padding: 1rem 1.5rem !important; border-radius: 0 0 0.375rem 0.375rem;">
-                        <div class="d-flex gap-2 align-items-center flex-wrap">
-                            <small class="text-muted me-2">Campaign {{ _('Details') }}:</small>
-                            <span class="badge bg-light text-dark border" id="selectedCampaignDates">
-                                <i class="fas fa-calendar-alt me-1"></i><span class="campaign-dates-text"></span>
-                            </span>
-                            <span class="badge" id="selectedCampaignStatus">
-                                <span class="campaign-status-text"></span>
-                            </span>
-                            <span class="badge text-dark border" id="selectedCampaignDaysLeft" style="display: none; background: #f5f5f5;">
-                                <i class="fas fa-clock me-1" style="color: #E13A44;"></i><span class="campaign-days-text"></span>
-                            </span>
-                            <span class="badge" id="selectedCampaignSurveyType" style="display: none;">
-                                <i class="fas fa-clipboard-list me-1"></i><span class="campaign-survey-type-text"></span>
-                            </span>
+                        <!-- Campaign Metadata (appears when campaign selected) -->
+                        <div id="selectedCampaignInfo" class="col-12 col-md mt-2 mt-md-0" style="display: none;">
+                            <div class="d-flex gap-2 align-items-center flex-wrap">
+                                <small class="text-muted me-2">Campaign {{ _('Details') }}:</small>
+                                <span class="badge bg-light text-dark border" id="selectedCampaignDates">
+                                    <i class="fas fa-calendar-alt me-1"></i><span class="campaign-dates-text"></span>
+                                </span>
+                                <span class="badge" id="selectedCampaignStatus">
+                                    <span class="campaign-status-text"></span>
+                                </span>
+                                <span class="badge text-dark border" id="selectedCampaignDaysLeft" style="display: none; background: #f5f5f5;">
+                                    <i class="fas fa-clock me-1" style="color: #E13A44;"></i><span class="campaign-days-text"></span>
+                                </span>
+                                <span class="badge" id="selectedCampaignSurveyType" style="display: none;">
+                                    <i class="fas fa-clipboard-list me-1"></i><span class="campaign-survey-type-text"></span>
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
