@@ -2368,7 +2368,6 @@ function renderSegmentationInsights(data) {
     renderCompositionChart('segCompositionChart', segmentationData);
     renderCrossDimensionalCharts(segmentationData);
 
-    // Hop A: npsByTierChart — click on a tier bar → Whiteboard filtered by that tier
     (function() {
         var tierNpsData = segmentationData.nps_by_tier || {};
         var tierKeys = Object.keys(tierNpsData);

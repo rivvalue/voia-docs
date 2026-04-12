@@ -65,9 +65,7 @@
   "waterfallTooltipDriverNps": "Driver NPS",
   "waterfallTooltipCount": "Selections",
   "waterfallAxisLabel": "NPS Delta vs Baseline (pts)",
-  "Whiteboard": "Whiteboard",
   "Accumulated insights from across your dashboard": "Accumulated insights from across your dashboard",
-  "Your whiteboard is empty": "Your whiteboard is empty",
   "Use the hop buttons across the dashboard to pin accounts or survey responses here.": "Use the hop buttons across the dashboard to pin accounts or survey responses here.",
   "Clear All": "Clear All",
   "Account": "Account",
@@ -76,16 +74,5 @@
   "View Response": "View Response",
   "Remove": "Remove",
   "Unknown Account": "Unknown Account",
-  "Unknown Respondent": "Unknown Respondent",
-  "Send to Whiteboard": "Send to Whiteboard",
-  "View in Whiteboard": "View in Whiteboard",
-  "Add to Whiteboard": "Add to Whiteboard",
-  "Open Whiteboard filtered by this tier": "Open Whiteboard filtered by this tier",
-  "Open Whiteboard filtered by churn risk level": "Open Whiteboard filtered by churn risk level",
-  "Open Whiteboard with accounts needing attention": "Open Whiteboard with accounts needing attention",
-  "Open Whiteboard filtered by NPS band": "Open Whiteboard filtered by NPS band",
-  "Open Whiteboard for Strategic and Key accounts": "Open Whiteboard for Strategic and Key accounts",
-  "Open Whiteboard filtered by NPS category": "Open Whiteboard filtered by NPS category",
-  "Open Whiteboard filtered by recommendation stance": "Open Whiteboard filtered by recommendation stance",
-  "Open Whiteboard for this account": "Open Whiteboard for this account"
+  "Unknown Respondent": "Unknown Respondent"
 }

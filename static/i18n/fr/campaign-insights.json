@@ -76,9 +76,7 @@
   "Industry": "Secteur",
   "Segment": "Segment",
   "Cohort": "Cohorte",
-  "Whiteboard": "Tableau blanc",
   "Accumulated insights from across your dashboard": "Informations accumulées depuis votre tableau de bord",
-  "Your whiteboard is empty": "Votre tableau blanc est vide",
   "Use the hop buttons across the dashboard to pin accounts or survey responses here.": "Utilisez les boutons de navigation du tableau de bord pour épingler des comptes ou des réponses ici.",
   "Clear All": "Tout effacer",
   "Account": "Compte",
@@ -87,16 +85,5 @@
   "View Response": "Voir la réponse",
   "Remove": "Supprimer",
   "Unknown Account": "Compte inconnu",
-  "Unknown Respondent": "Répondant inconnu",
-  "Send to Whiteboard": "Envoyer au Tableau blanc",
-  "View in Whiteboard": "Voir dans le Tableau blanc",
-  "Add to Whiteboard": "Ajouter au Tableau blanc",
-  "Open Whiteboard filtered by this tier": "Ouvrir le Tableau blanc filtré par ce segment",
-  "Open Whiteboard filtered by churn risk level": "Ouvrir le Tableau blanc filtré par niveau de risque",
-  "Open Whiteboard with accounts needing attention": "Ouvrir le Tableau blanc avec les comptes à risque",
-  "Open Whiteboard filtered by NPS band": "Ouvrir le Tableau blanc filtré par bande NPS",
-  "Open Whiteboard for Strategic and Key accounts": "Ouvrir le Tableau blanc pour les comptes Stratégiques et Clés",
-  "Open Whiteboard filtered by NPS category": "Ouvrir le Tableau blanc filtré par catégorie NPS",
-  "Open Whiteboard filtered by recommendation stance": "Ouvrir le Tableau blanc filtré par stance de recommandation",
-  "Open Whiteboard for this account": "Ouvrir le Tableau blanc pour ce compte"
+  "Unknown Respondent": "Répondant inconnu"
 }
