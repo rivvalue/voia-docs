@@ -1401,11 +1401,9 @@ document.addEventListener('DOMContentLoaded', function() {
 <script src="{{ url_for('static', filename='js/dashboard/kpi-overview.js') }}?v={{ range(1000, 9999) | random }}"></script>
 <script src="{{ url_for('static', filename='js/dashboard/strategic-accounts.js') }}?v={{ range(1000, 9999) | random }}"></script>
 <script src="{{ url_for('static', filename='js/dashboard/dashboard-init.js') }}?v={{ range(1000, 9999) | random }}"></script>
-<script src="{{ url_for('static', filename='js/dashboard/hop-manager.js') }}?v={{ range(1000, 9999) | random }}"></script>
 {% else %}
 <!-- Legacy: Monolithic Dashboard JavaScript -->
 <script src="{{ url_for('static', filename='js/dashboard.js') }}?v={{ range(1000, 9999) | random }}"></script>
-<script src="{{ url_for('static', filename='js/dashboard/hop-manager.js') }}?v={{ range(1000, 9999) | random }}"></script>
 {% endif %}
 
 <!-- Demo Segmentation Insights Charts -->

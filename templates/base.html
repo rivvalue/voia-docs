@@ -86,9 +86,6 @@
                 <a href="{{ url_for('campaign_insights') }}" class="sidebar-submenu-item" data-page="campaign-insights">
                     <span>{{ _('Campaign Insights') }}</span>
                 </a>
-                <a href="{{ url_for('whiteboard') }}" class="sidebar-submenu-item" data-page="whiteboard">
-                    <span>{{ _('Whiteboard') }}</span>
-                </a>
             </div>
             <a href="{{ url_for('campaigns.list_campaigns') }}" class="sidebar-nav-item" data-page="campaigns">
                 <i class="fas fa-bullhorn"></i>
@@ -368,7 +365,7 @@
             if (biSubmenuToggle && biSubmenu) {
                 // Check if current page is within BI section to auto-expand
                 const currentPage = document.body.getAttribute('data-page') || '';
-                const biPages = ['dashboard', 'executive-summary', 'campaign-insights', 'whiteboard'];
+                const biPages = ['dashboard', 'executive-summary', 'campaign-insights'];
                 const shouldAutoExpand = biPages.some(page => currentPage.includes(page));
                 
                 if (shouldAutoExpand) {

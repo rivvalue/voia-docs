@@ -747,9 +747,6 @@ with app.app_context():
     app.register_blueprint(qbr_bp)
     app.register_blueprint(qbr_api_bp)
 
-    from whiteboard_routes import whiteboard_api_bp
-    app.register_blueprint(whiteboard_api_bp)
-    
     # Initialize Rivvalue admin user (Phase 2)
     try:
         init_result = init_rivvalue_admin_user()

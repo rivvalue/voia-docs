@@ -2961,29 +2961,8 @@ function createGrowthFactorChart() {
                     grid: { color: '#f1f5f9' }
                 }
             },
-            // Hop D: click on a positive NPS band bar → Whiteboard filtered by nps_opportunity
-            onClick: function(evt, elements) {
-                if (!elements || !elements.length) return;
-                const d = distribution[elements[0].index];
-                if (!d) return;
-                const positiveRanges = ['50-69', '70-100'];
-                if (positiveRanges.indexOf(d.nps_range) !== -1) {
-                    var _selD = document.getElementById('campaignFilter');
-                    var _cid = (typeof getSelectedCampaignNumericId === 'function') ? (getSelectedCampaignNumericId() || '') : '';
-                    var _cnD = (_selD && _selD.selectedIndex >= 0) ? (_selD.options[_selD.selectedIndex].getAttribute('data-name') || '') : '';
-                    var _fd  = {nps_opportunity: d.nps_range, campaign_id: _cid, campaign_name: _cnD};
-                    if (typeof hopTo === 'function') hopTo('whiteboard', _fd);
-                    else { var _pd=new URLSearchParams(); _pd.set('hop','1'); Object.keys(_fd).forEach(function(k){if(_fd[k]!==''&&_fd[k]!=null)_pd.set(k,_fd[k]);}); window.location.href='/dashboard/whiteboard?'+_pd.toString(); }
-                }
-            }
         }
     });
-
-    // Hop D: hover affordance — cursor:pointer on the growth factor chart canvas
-    if (chartElement) {
-        chartElement.style.cursor = 'pointer';
-        chartElement.title = (window.translations && window.translations['Open Whiteboard filtered by NPS band']) || 'Open Whiteboard filtered by NPS band';
-    }
 
     // --- Priority Focus panel ---
     if (focusEl && total > 0) {
@@ -3000,10 +2979,7 @@ function createGrowthFactorChart() {
                      || null;
         const championTop = topBand;
 
-        // Hop H: per-account "Add to Whiteboard" links in each Priority Focus row
         const _hrAccounts = (dashboardData && dashboardData.high_risk_accounts) || [];
-        const _addToWB       = (window.translations && window.translations['Add to Whiteboard']) || 'Add to Whiteboard';
-        const _openForAcct   = (window.translations && window.translations['Open Whiteboard for this account']) || 'Open Whiteboard for this account';
         const _priorityFocus = (window.translations && window.translations['Priority Focus']) || 'Priority Focus';
         const _getAccountsForRange = (ranges) => {
             return _hrAccounts.filter(a => {
@@ -3018,25 +2994,6 @@ function createGrowthFactorChart() {
                     return false;
                 });
             }).sort((a, b) => Number(a.nps_score) - Number(b.nps_score)).slice(0, 3);
-        };
-        const _hopHLinks = (accounts, sourceLabel) => {
-            if (!accounts || !accounts.length) return '';
-            return accounts.map(account => {
-                const enc    = encodeURIComponent(account.company_name);
-                const encLb  = encodeURIComponent(sourceLabel);
-                const titleTxt = `${escapeHtml(_openForAcct)}: ${escapeHtml(account.company_name)}`;
-                return `<a href="/dashboard/whiteboard?hop=1&company_name=${enc}&source_label=${encLb}"
-                           onclick="if(typeof hopTo==='function'){var _sh=document.getElementById('campaignFilter');var _cid=(typeof getSelectedCampaignNumericId==='function')?(getSelectedCampaignNumericId()||''):'';var _cn=(_sh&&_sh.selectedIndex>=0)?(_sh.options[_sh.selectedIndex].getAttribute('data-name')||''):'';var _uuid=_sh?(_sh.value||''):'';hopTo('whiteboard',{company_name:this.dataset.companyName,source_label:this.dataset.sourceLabel,campaign_id:_cid,campaign_name:_cn,campaign_uuid:_uuid});return false;}"
-                           data-company-name="${escapeHtml(account.company_name)}"
-                           data-source-label="${escapeHtml(sourceLabel)}"
-                           class="hop-link d-block mt-1"
-                           style="font-size:0.72rem;color:#E13A44;text-decoration:none;white-space:nowrap;cursor:pointer;"
-                           title="${titleTxt}"
-                           onmouseover="this.style.textDecoration='underline';"
-                           onmouseout="this.style.textDecoration='none';">
-                           <i class="fas fa-external-link-alt" style="font-size:0.6rem;"></i>&nbsp;${escapeHtml(account.company_name)} – ${escapeHtml(_addToWB)}
-                       </a>`;
-            }).join('');
         };
 
         const rows = [];
@@ -3090,7 +3047,6 @@ function createGrowthFactorChart() {
 
         if (rows.length > 0) {
             const rowsHtml = rows.map(r => {
-                const hopHtml = _hopHLinks(r.accounts, _priorityFocus);
                 return `
                 <div class="d-flex gap-2 mb-2 pb-2 ${rows.indexOf(r) < rows.length - 1 ? 'border-bottom' : ''}">
                     <div class="flex-shrink-0 mt-1">
@@ -3102,7 +3058,6 @@ function createGrowthFactorChart() {
                             ${r.title}
                         </div>
                         <div class="text-muted" style="font-size:0.78rem;line-height:1.45;">${r.body}</div>
-                        ${hopHtml}
                     </div>
                 </div>`;
             }).join('');
