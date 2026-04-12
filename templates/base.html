@@ -73,12 +73,11 @@
             </div>
         </div>
         <nav class="sidebar-nav">
-            <div class="sidebar-nav-item has-submenu" data-page="dashboard" id="biSubmenuToggle">
+            <div class="sidebar-nav-item" data-page="dashboard">
                 <i class="fas fa-chart-line"></i>
                 <span>{{ _('Business Intelligence') }}</span>
-                <i class="fas fa-chevron-down submenu-toggle"></i>
             </div>
-            <div class="sidebar-submenu" id="biSubmenu">
+            <div class="sidebar-submenu open" id="biSubmenu">
                 <!-- Overview removed - only for unauthenticated demo users -->
                 <a href="{{ url_for('executive_summary') }}" class="sidebar-submenu-item" data-page="executive-summary">
                     <span>{{ _('Executive Summary') }}</span>
@@ -357,28 +356,6 @@
             const sidebar = document.getElementById('voiaSidebar');
             const toggleBtn = document.getElementById('sidebarToggle');
             const overlay = document.getElementById('sidebarOverlay');
-            
-            // {{ _('Business Intelligence') }} Submenu Toggle
-            const biSubmenuToggle = document.getElementById('biSubmenuToggle');
-            const biSubmenu = document.getElementById('biSubmenu');
-            
-            if (biSubmenuToggle && biSubmenu) {
-                // Check if current page is within BI section to auto-expand
-                const currentPage = document.body.getAttribute('data-page') || '';
-                const biPages = ['dashboard', 'executive-summary', 'campaign-insights'];
-                const shouldAutoExpand = biPages.some(page => currentPage.includes(page));
-                
-                if (shouldAutoExpand) {
-                    biSubmenuToggle.classList.add('open');
-                    biSubmenu.classList.add('open');
-                }
-                
-                biSubmenuToggle.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    biSubmenuToggle.classList.toggle('open');
-                    biSubmenu.classList.toggle('open');
-                });
-            }
             
             // Highlight active submenu item
             const currentPath = window.location.pathname;
