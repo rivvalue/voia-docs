@@ -11566,3 +11566,51 @@ msgstr "Axé sur les opportunités"
 #: templates/company_responses.html
 msgid "Balanced"
 msgstr "Équilibré"
+
+#: templates/whiteboard.html
+msgid "Whiteboard"
+msgstr "Tableau blanc"
+
+#: templates/whiteboard.html
+msgid "Accumulated insights from across your dashboard"
+msgstr "Informations accumulées depuis votre tableau de bord"
+
+#: templates/whiteboard.html
+msgid "Your whiteboard is empty"
+msgstr "Votre tableau blanc est vide"
+
+#: templates/whiteboard.html
+msgid "Use the hop buttons across the dashboard to pin accounts or survey responses here."
+msgstr "Utilisez les boutons de navigation du tableau de bord pour épingler des comptes ou des réponses ici."
+
+#: templates/whiteboard.html
+msgid "Clear All"
+msgstr "Tout effacer"
+
+#: templates/whiteboard.html
+msgid "Account"
+msgstr "Compte"
+
+#: templates/whiteboard.html
+msgid "Survey Response"
+msgstr "Réponse à l'enquête"
+
+#: templates/whiteboard.html
+msgid "View Account"
+msgstr "Voir le compte"
+
+#: templates/whiteboard.html
+msgid "View Response"
+msgstr "Voir la réponse"
+
+#: templates/whiteboard.html
+msgid "Remove"
+msgstr "Supprimer"
+
+#: templates/whiteboard.html
+msgid "Unknown Account"
+msgstr "Compte inconnu"
+
+#: templates/whiteboard.html
+msgid "Unknown Respondent"
+msgstr "Répondant inconnu"

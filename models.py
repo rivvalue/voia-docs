@@ -3492,3 +3492,21 @@ class ClassicSurveyConfig(db.Model):
             'frozen_at': self.frozen_at.isoformat() if self.frozen_at else None,
             'is_frozen': self.is_frozen(),
         }
+
+
+class WhiteboardState(db.Model):
+    """Persists the whiteboard query descriptors per authenticated business user."""
+    __tablename__ = 'whiteboard_states'
+
+    id = db.Column(db.Integer, primary_key=True)
+    business_user_id = db.Column(
+        db.Integer,
+        db.ForeignKey('business_account_users.id', ondelete='CASCADE'),
+        nullable=False,
+        unique=True,
+        index=True
+    )
+    queries = db.Column(db.JSON, nullable=False, default=list)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    user = db.relationship('BusinessAccountUser', backref=db.backref('whiteboard_state', uselist=False))

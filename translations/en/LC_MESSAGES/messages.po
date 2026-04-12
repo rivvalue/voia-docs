@@ -6429,3 +6429,51 @@ msgstr ""
 #~ msgid "Custom pricing for this add-on period"
 #~ msgstr ""
 
+
+#: templates/whiteboard.html
+msgid "Whiteboard"
+msgstr ""
+
+#: templates/whiteboard.html
+msgid "Accumulated insights from across your dashboard"
+msgstr ""
+
+#: templates/whiteboard.html
+msgid "Your whiteboard is empty"
+msgstr ""
+
+#: templates/whiteboard.html
+msgid "Use the hop buttons across the dashboard to pin accounts or survey responses here."
+msgstr ""
+
+#: templates/whiteboard.html
+msgid "Clear All"
+msgstr ""
+
+#: templates/whiteboard.html
+msgid "Account"
+msgstr ""
+
+#: templates/whiteboard.html
+msgid "Survey Response"
+msgstr ""
+
+#: templates/whiteboard.html
+msgid "View Account"
+msgstr ""
+
+#: templates/whiteboard.html
+msgid "View Response"
+msgstr ""
+
+#: templates/whiteboard.html
+msgid "Remove"
+msgstr ""
+
+#: templates/whiteboard.html
+msgid "Unknown Account"
+msgstr ""
+
+#: templates/whiteboard.html
+msgid "Unknown Respondent"
+msgstr ""

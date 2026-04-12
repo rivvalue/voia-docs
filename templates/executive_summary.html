@@ -360,6 +360,7 @@
 
 <!-- JavaScript for {{ _('Executive Summary') }} -->
 <script src="{{ url_for('static', filename='js/executive_summary.js') }}?v={{ range(1000, 9999) | random }}"></script>
+<script src="{{ url_for('static', filename='js/dashboard/hop-manager.js') }}?v={{ range(1000, 9999) | random }}"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         var tooltipEls = document.querySelectorAll('[data-bs-toggle="tooltip"]');

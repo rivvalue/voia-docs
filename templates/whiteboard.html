@@ -1,0 +1,393 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Whiteboard') }} - VOÏA - Voice Of Client Agent{% endblock %}
+
+{% block page_class %}page-dashboard{% endblock %}
+
+{% block scripts %}
+<script>
+    window.isBusinessAuthenticated = {{ 'true' if is_business_authenticated else 'false' }};
+</script>
+<script src="{{ url_for('static', filename='js/translation-loader.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dashboard/bootstrap.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dashboard/hop-manager.js') }}"></script>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+.whiteboard-header { border-bottom: 2px solid #E13A44; margin-bottom: 1.5rem; padding-bottom: 1rem; }
+.whiteboard-empty { text-align: center; padding: 4rem 2rem; color: #8A8A8A; }
+.whiteboard-empty i { font-size: 3rem; margin-bottom: 1rem; opacity: 0.4; }
+.wb-card { background: #fff; border: 1px solid #BDBDBD; border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 1rem; position: relative; box-shadow: 0 1px 3px rgba(0,0,0,0.06); transition: box-shadow 0.15s; }
+.wb-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.10); }
+.wb-card-type { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; margin-bottom: 0.4rem; }
+.wb-card-type-account { color: #2E5090; }
+.wb-card-type-response { color: #E13A44; }
+.wb-card-title { font-size: 1rem; font-weight: 600; color: #000; margin-bottom: 0.25rem; }
+.wb-card-meta { font-size: 0.82rem; color: #8A8A8A; }
+.wb-card-source { display: inline-block; background: #E9E8E4; border-radius: 4px; padding: 1px 8px; font-size: 0.75rem; color: #555; margin-top: 0.4rem; }
+.wb-card-remove { position: absolute; top: 0.6rem; right: 0.75rem; background: none; border: none; color: #BDBDBD; cursor: pointer; font-size: 1rem; padding: 2px 6px; border-radius: 4px; transition: color 0.15s, background 0.15s; }
+.wb-card-remove:hover { color: #E13A44; background: rgba(225,58,68,0.07); }
+.wb-card-link { font-size: 0.82rem; color: #2E5090; text-decoration: none; }
+.wb-card-link:hover { text-decoration: underline; }
+</style>
+{% endblock %}
+
+{% block content %}
+{# Breadcrumb Navigation #}
+{% set breadcrumb_items = [
+    {'label': _('Business Intelligence')},
+    {'label': _('Whiteboard'), 'current': true}
+] %}
+{% include 'components/breadcrumb.html' %}
+
+<div class="container">
+    <div data-page="whiteboard"></div>
+
+    <!-- Page Header -->
+    <div class="page-header-band whiteboard-header">
+        <div class="row align-items-center">
+            <div class="col-12 col-md-8 mb-2 mb-md-0">
+                <h1 class="h2 mb-1">
+                    <i class="fas fa-clipboard me-2" style="color: var(--primary-red);"></i>{{ _('Whiteboard') }}
+                </h1>
+                <p class="text-muted mb-0">{{ _('Accumulated insights from across your dashboard') }}</p>
+            </div>
+            <div class="col-12 col-md-4 d-flex justify-content-md-end align-items-center gap-2">
+                <button class="btn btn-outline-secondary btn-sm" id="wbClearAllBtn" onclick="wbClearAll()">
+                    <i class="fas fa-trash-alt me-1"></i>{{ _('Clear All') }}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card Board -->
+    <div id="wbBoard">
+        <!-- Cards injected here by JS -->
+    </div>
+
+    <!-- Empty state -->
+    <div class="whiteboard-empty" id="wbEmpty" style="display:none;">
+        <i class="fas fa-clipboard"></i>
+        <div class="mb-2" style="font-size: 1.1rem; font-weight: 600;">{{ _('Your whiteboard is empty') }}</div>
+        <div>{{ _('Use the hop buttons across the dashboard to pin accounts or survey responses here.') }}</div>
+    </div>
+</div>
+
+<script>
+(function () {
+    'use strict';
+
+    var WB_API = '/api/whiteboard/state';
+
+    /*
+     * `queries` is the in-memory array of QUERY DESCRIPTORS — minimal
+     * objects that capture enough parameters to re-fetch fresh data from
+     * the backend on every page load.  Display fields (company_name, etc.)
+     * are stored in the descriptor so cards can render immediately while
+     * re-fetches are in flight; fresh API data overwrites them when ready.
+     *
+     * Account descriptor:
+     *   { card_type: 'account', company_name, campaign_id, campaign_name, source_label, company_url }
+     *
+     * Response descriptor:
+     *   { card_type: 'response', respondent, nps_type, campaign_id, campaign_name, source_label, response_url }
+     *
+     * Internal-only (never persisted) prefixed with _:
+     *   _fresh_nps, _fresh_summary, _fresh_score, _fresh_nps_type
+     */
+    var queries = [];
+
+    function t(key, fallback) {
+        return (window.t && window.t(key, fallback)) || fallback || key;
+    }
+
+    function escapeHtml(text) {
+        if (text == null) return '';
+        var d = document.createElement('div');
+        d.textContent = text;
+        return d.innerHTML;
+    }
+
+    function safeUrl(url) {
+        if (!url) return '';
+        if (/^\//.test(url)) return url;
+        try {
+            var parsed = new URL(url);
+            if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return '';
+        } catch (e) { return ''; }
+        return url;
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Rendering                                                            */
+    /* ------------------------------------------------------------------ */
+
+    function render() {
+        var board = document.getElementById('wbBoard');
+        var empty = document.getElementById('wbEmpty');
+        if (!board) return;
+        if (queries.length === 0) {
+            board.innerHTML = '';
+            if (empty) empty.style.display = '';
+            return;
+        }
+        if (empty) empty.style.display = 'none';
+        board.innerHTML = queries.map(function (q, idx) {
+            return q.card_type === 'account' ? renderAccountCard(q, idx) : renderResponseCard(q, idx);
+        }).join('');
+    }
+
+    function renderAccountCard(q, idx) {
+        var linkHtml = safeUrl(q.company_url)
+            ? '<a href="' + escapeHtml(safeUrl(q.company_url)) + '" class="wb-card-link" target="_blank">' +
+              '<i class="fas fa-external-link-alt me-1"></i>' + t('wb.view_account', '{{ _("View Account") }}') + '</a>'
+            : '';
+
+        var npsHtml = '';
+        if (q._fresh_nps != null) {
+            var c = q._fresh_nps > 0 ? '#198754' : (q._fresh_nps < 0 ? '#dc3545' : '#997404');
+            npsHtml = ' <span style="color:' + c + '; font-weight:600; font-size:0.8rem;">' +
+                'NPS ' + (q._fresh_nps > 0 ? '+' : '') + q._fresh_nps + '</span>';
+        }
+
+        return '<div class="wb-card" id="wbCard-' + idx + '">' +
+            '<button class="wb-card-remove" onclick="wbRemove(' + idx + ')" title="' + t('wb.remove', '{{ _("Remove") }}') + '">' +
+            '<i class="fas fa-times"></i></button>' +
+            '<div class="wb-card-type wb-card-type-account"><i class="fas fa-building me-1"></i>' +
+            t('wb.account', '{{ _("Account") }}') + '</div>' +
+            '<div class="wb-card-title">' + escapeHtml(q.company_name || t('wb.unknown_account', '{{ _("Unknown Account") }}')) + npsHtml + '</div>' +
+            '<div class="wb-card-meta">' + escapeHtml(q.campaign_name || '') + '</div>' +
+            (q.source_label ? '<div><span class="wb-card-source">' + escapeHtml(q.source_label) + '</span></div>' : '') +
+            (linkHtml ? '<div class="mt-2">' + linkHtml + '</div>' : '') +
+            '</div>';
+    }
+
+    function renderResponseCard(q, idx) {
+        var linkHtml = safeUrl(q.response_url)
+            ? '<a href="' + escapeHtml(safeUrl(q.response_url)) + '" class="wb-card-link" target="_blank">' +
+              '<i class="fas fa-external-link-alt me-1"></i>' + t('wb.view_response', '{{ _("View Response") }}') + '</a>'
+            : '';
+
+        var npsType = q._fresh_nps_type || q.nps_type || '';
+        var npsLabel = '';
+        if (npsType) {
+            var nc = npsType === 'promoter' ? '#198754' : (npsType === 'detractor' ? '#dc3545' : '#997404');
+            npsLabel = ' <span style="color:' + nc + '; font-weight:600; font-size:0.8rem;">' +
+                escapeHtml(npsType.charAt(0).toUpperCase() + npsType.slice(1)) + '</span>';
+        }
+
+        var scoreHtml = '';
+        if (q._fresh_score != null) {
+            scoreHtml = ' <span style="color:#555; font-size:0.8rem;">' + q._fresh_score + '/10</span>';
+        }
+
+        return '<div class="wb-card" id="wbCard-' + idx + '">' +
+            '<button class="wb-card-remove" onclick="wbRemove(' + idx + ')" title="' + t('wb.remove', '{{ _("Remove") }}') + '">' +
+            '<i class="fas fa-times"></i></button>' +
+            '<div class="wb-card-type wb-card-type-response"><i class="fas fa-comment-dots me-1"></i>' +
+            t('wb.survey_response', '{{ _("Survey Response") }}') + '</div>' +
+            '<div class="wb-card-title">' + escapeHtml(q.respondent || t('wb.unknown_respondent', '{{ _("Unknown Respondent") }}')) + npsLabel + scoreHtml + '</div>' +
+            '<div class="wb-card-meta">' + escapeHtml(q.campaign_name || '') + '</div>' +
+            (q.source_label ? '<div><span class="wb-card-source">' + escapeHtml(q.source_label) + '</span></div>' : '') +
+            (linkHtml ? '<div class="mt-2">' + linkHtml + '</div>' : '') +
+            '</div>';
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Fresh data re-fetch for a single descriptor                         */
+    /*                                                                      */
+    /* Called on restore to update each card with latest API data.         */
+    /* Account cards: /api/company_detail (campaign + company_name)        */
+    /* Response cards: /api/survey_responses (campaign + respondent name)  */
+    /* ------------------------------------------------------------------ */
+
+    function refetchCardData(descriptor, idx) {
+        if (descriptor.card_type === 'account') {
+            if (!descriptor.campaign_id || !descriptor.company_name) return;
+            var url = '/api/company_detail?campaign=' + encodeURIComponent(descriptor.campaign_id) +
+                      '&company=' + encodeURIComponent(descriptor.company_name);
+            fetch(url)
+                .then(function (r) { return r.ok ? r.json() : null; })
+                .then(function (data) {
+                    if (!data || !data.data || queries[idx] !== descriptor) return;
+                    var fresh = data.data;
+                    if (fresh.nps_summary != null) descriptor._fresh_nps = fresh.nps_summary;
+                    if (fresh.analysis_summary) descriptor._fresh_summary = fresh.analysis_summary;
+                    var card = document.getElementById('wbCard-' + idx);
+                    if (card) card.outerHTML = renderAccountCard(descriptor, idx);
+                })
+                .catch(function () {});
+
+        } else if (descriptor.card_type === 'response') {
+            if (!descriptor.campaign_id || !descriptor.respondent) return;
+            var npsCategory = '';
+            if (descriptor.nps_type === 'promoter') npsCategory = 'promoters';
+            else if (descriptor.nps_type === 'detractor') npsCategory = 'detractors';
+            else if (descriptor.nps_type === 'passive') npsCategory = 'passives';
+
+            var rUrl = '/api/survey_responses?campaign=' + encodeURIComponent(descriptor.campaign_id) +
+                       '&search=' + encodeURIComponent(descriptor.respondent) +
+                       '&per_page=1';
+            if (npsCategory) rUrl += '&nps_category=' + encodeURIComponent(npsCategory);
+
+            fetch(rUrl)
+                .then(function (r) { return r.ok ? r.json() : null; })
+                .then(function (data) {
+                    if (!data || !data.responses || !data.responses.length) return;
+                    if (queries[idx] !== descriptor) return;
+                    var fresh = data.responses[0];
+                    if (fresh.nps_score != null) descriptor._fresh_score = fresh.nps_score;
+                    if (fresh.nps_category) {
+                        var rawCat = fresh.nps_category.toLowerCase();
+                        descriptor._fresh_nps_type = rawCat === 'promoters' ? 'promoter'
+                            : rawCat === 'detractors' ? 'detractor' : 'passive';
+                    }
+                    var card = document.getElementById('wbCard-' + idx);
+                    if (card) card.outerHTML = renderResponseCard(descriptor, idx);
+                })
+                .catch(function () {});
+        }
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* State management                                                     */
+    /* ------------------------------------------------------------------ */
+
+    function wbRemove(idx) {
+        queries.splice(idx, 1);
+        render();
+        saveState();
+    }
+
+    function wbClearAll() {
+        queries = [];
+        render();
+        saveState();
+    }
+
+    function wbAdd(descriptor) {
+        queries.push(descriptor);
+        render();
+        saveState();
+        refetchCardData(descriptor, queries.length - 1);
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Backend persistence                                                  */
+    /* ------------------------------------------------------------------ */
+
+    function getCsrfToken() {
+        var meta = document.querySelector('meta[name="csrf-token"]');
+        return meta ? meta.getAttribute('content') : '';
+    }
+
+    function saveState() {
+        var toSave = queries.map(function (q) {
+            var clean = {};
+            Object.keys(q).forEach(function (k) {
+                if (k.charAt(0) !== '_') clean[k] = q[k];
+            });
+            return clean;
+        });
+        fetch(WB_API, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            },
+            body: JSON.stringify({ queries: toSave })
+        }).catch(function (e) {
+            console.warn('Whiteboard: failed to save state', e);
+        });
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Backend restore — deterministic ordering:                            */
+    /*   1. Load persisted descriptors from server.                         */
+    /*   2. Append any hop-param descriptor from URL (no overwrite).        */
+    /*   3. Render.                                                          */
+    /*   4. Re-fetch fresh data for every descriptor.                       */
+    /*   5. Strip hop params from URL via history.replaceState.             */
+    /* ------------------------------------------------------------------ */
+
+    function ingestHopParams() {
+        var params = new URLSearchParams(window.location.search);
+        if (!params.get('hop')) return null;
+
+        var cardType = params.get('card_type') || 'account';
+        var descriptor = { card_type: cardType };
+        var fields = ['company_name', 'campaign_name', 'campaign_id', 'source_label',
+                      'company_url', 'respondent', 'nps_type', 'response_url'];
+        fields.forEach(function (f) {
+            var v = params.get(f);
+            if (v) descriptor[f] = v;
+        });
+
+        if (cardType === 'account' && !descriptor.company_name) return null;
+        if (cardType === 'response' && !descriptor.respondent) return null;
+
+        var cleanParams = new URLSearchParams(window.location.search);
+        cleanParams.delete('hop');
+        cleanParams.delete('card_type');
+        fields.forEach(function (f) { cleanParams.delete(f); });
+        var newUrl = window.location.pathname;
+        if (cleanParams.toString()) newUrl += '?' + cleanParams.toString();
+        history.replaceState(null, '', newUrl);
+
+        return descriptor;
+    }
+
+    function loadAndRestore() {
+        fetch(WB_API)
+            .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+            .then(function (data) {
+                queries = (data.queries && Array.isArray(data.queries)) ? data.queries : [];
+
+                var hopDescriptor = ingestHopParams();
+                if (hopDescriptor) {
+                    var isDuplicate = queries.some(function (q) {
+                        if (q.card_type !== hopDescriptor.card_type) return false;
+                        if (q.card_type === 'account') return q.company_name === hopDescriptor.company_name && String(q.campaign_id) === String(hopDescriptor.campaign_id);
+                        return q.respondent === hopDescriptor.respondent && String(q.campaign_id) === String(hopDescriptor.campaign_id);
+                    });
+                    if (!isDuplicate) queries.push(hopDescriptor);
+                    saveState();
+                }
+
+                render();
+
+                queries.forEach(function (descriptor, idx) {
+                    refetchCardData(descriptor, idx);
+                });
+            })
+            .catch(function (e) {
+                console.warn('Whiteboard: failed to load state', e);
+                var hopDescriptor = ingestHopParams();
+                if (hopDescriptor) {
+                    queries.push(hopDescriptor);
+                    saveState();
+                }
+                render();
+            });
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Public API                                                           */
+    /* ------------------------------------------------------------------ */
+
+    window.wbRemove = wbRemove;
+    window.wbClearAll = wbClearAll;
+    window.wbAdd = wbAdd;
+
+    window.whiteboard = { add: wbAdd, remove: wbRemove, clearAll: wbClearAll };
+
+    /* ------------------------------------------------------------------ */
+    /* Init                                                                 */
+    /* ------------------------------------------------------------------ */
+
+    document.addEventListener('DOMContentLoaded', loadAndRestore);
+
+})();
+</script>
+{% endblock %}
