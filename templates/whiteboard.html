@@ -30,6 +30,14 @@
 .wb-card-remove:hover { color: #E13A44; background: rgba(225,58,68,0.07); }
 .wb-card-link { font-size: 0.82rem; color: #2E5090; text-decoration: none; }
 .wb-card-link:hover { text-decoration: underline; }
+.wb-card-type-list { color: #6f42c1; }
+.wb-list-items { margin-top: 0.5rem; border-top: 1px solid #f0f0f0; padding-top: 0.4rem; }
+.wb-list-item { display: flex; align-items: center; justify-content: space-between; padding: 0.2rem 0; font-size: 0.83rem; border-bottom: 1px dashed #f0f0f0; }
+.wb-list-item:last-child { border-bottom: none; }
+.wb-list-item-label { color: #333; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-right: 0.5rem; }
+.wb-list-item-value { font-weight: 600; color: #2E5090; flex-shrink: 0; font-size: 0.8rem; }
+.wb-list-item-link { color: #8A8A8A; margin-left: 0.35rem; font-size: 0.75rem; }
+.wb-list-item-link:hover { color: #2E5090; }
 </style>
 {% endblock %}
 
@@ -134,7 +142,9 @@
         }
         if (empty) empty.style.display = 'none';
         board.innerHTML = queries.map(function (q, idx) {
-            return q.card_type === 'account' ? renderAccountCard(q, idx) : renderResponseCard(q, idx);
+            if (q.card_type === 'account') return renderAccountCard(q, idx);
+            if (q.card_type === 'list') return renderListCard(q, idx);
+            return renderResponseCard(q, idx);
         }).join('');
     }
 
@@ -194,6 +204,47 @@
             '</div>';
     }
 
+    function renderListCard(q, idx) {
+        var items = [];
+        if (q.items) {
+            try { items = JSON.parse(q.items); } catch (e) { items = []; }
+        }
+
+        var itemsHtml = '';
+        if (items.length > 0) {
+            itemsHtml = '<div class="wb-list-items">' +
+                items.map(function (item) {
+                    var linkPart = safeUrl(item.url)
+                        ? '<a href="' + escapeHtml(safeUrl(item.url)) + '" class="wb-list-item-link" target="_blank" title="' + t('wb.view_response', '{{ _("View Response") }}') + '">' +
+                          '<i class="fas fa-external-link-alt"></i></a>'
+                        : '';
+                    return '<div class="wb-list-item">' +
+                        '<span class="wb-list-item-label" title="' + escapeHtml(item.label || '') + '">' + escapeHtml(item.label || '') + '</span>' +
+                        '<span class="wb-list-item-value">' + escapeHtml(item.value || '') + '</span>' +
+                        linkPart +
+                        '</div>';
+                }).join('') +
+                '</div>';
+        } else {
+            itemsHtml = '<div class="text-muted" style="font-size:0.8rem;margin-top:0.4rem;">{{ _("No entries") }}</div>';
+        }
+
+        var countBadge = items.length
+            ? ' <span style="font-size:0.72rem;font-weight:400;color:#8A8A8A;">(' + items.length + ')</span>'
+            : '';
+
+        return '<div class="wb-card" id="wbCard-' + idx + '">' +
+            '<button class="wb-card-remove" onclick="wbRemove(' + idx + ')" title="' + t('wb.remove', '{{ _("Remove") }}') + '">' +
+            '<i class="fas fa-times"></i></button>' +
+            '<div class="wb-card-type wb-card-type-list"><i class="fas fa-list me-1"></i>' +
+            t('wb.list', '{{ _("List") }}') + '</div>' +
+            '<div class="wb-card-title">' + escapeHtml(q.title || t('wb.list', '{{ _("List") }}')) + countBadge + '</div>' +
+            '<div class="wb-card-meta">' + escapeHtml(q.campaign_name || '') + '</div>' +
+            (q.source_label ? '<div><span class="wb-card-source">' + escapeHtml(q.source_label) + '</span></div>' : '') +
+            itemsHtml +
+            '</div>';
+    }
+
     /* ------------------------------------------------------------------ */
     /* Fresh data re-fetch for a single descriptor                         */
     /*                                                                      */
@@ -203,6 +254,7 @@
     /* ------------------------------------------------------------------ */
 
     function refetchCardData(descriptor, idx) {
+        if (descriptor.card_type === 'list') return;
         if (descriptor.card_type === 'account') {
             if (!descriptor.campaign_id || !descriptor.company_name) return;
             var url = '/api/company_detail?campaign=' + encodeURIComponent(descriptor.campaign_id) +
@@ -318,7 +370,8 @@
         var cardType = params.get('card_type') || 'account';
         var descriptor = { card_type: cardType };
         var fields = ['company_name', 'campaign_name', 'campaign_id', 'source_label',
-                      'company_url', 'respondent', 'nps_type', 'response_url'];
+                      'company_url', 'respondent', 'nps_type', 'response_url',
+                      'title', 'items'];
         fields.forEach(function (f) {
             var v = params.get(f);
             if (v) descriptor[f] = v;
@@ -326,6 +379,7 @@
 
         if (cardType === 'account' && !descriptor.company_name) return null;
         if (cardType === 'response' && !descriptor.respondent) return null;
+        if (cardType === 'list' && !descriptor.title && !descriptor.items) return null;
 
         var cleanParams = new URLSearchParams(window.location.search);
         cleanParams.delete('hop');
@@ -349,6 +403,7 @@
                     var isDuplicate = queries.some(function (q) {
                         if (q.card_type !== hopDescriptor.card_type) return false;
                         if (q.card_type === 'account') return q.company_name === hopDescriptor.company_name && String(q.campaign_id) === String(hopDescriptor.campaign_id);
+                        if (q.card_type === 'list') return q.title === hopDescriptor.title && String(q.campaign_id) === String(hopDescriptor.campaign_id);
                         return q.respondent === hopDescriptor.respondent && String(q.campaign_id) === String(hopDescriptor.campaign_id);
                     });
                     if (!isDuplicate) queries.push(hopDescriptor);
