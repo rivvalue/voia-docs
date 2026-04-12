@@ -277,11 +277,20 @@
             <div class="row mb-4">
                 <div class="col-md-6">
                     <div class="chart-card">
-                        <div class="card-header">
+                        <div class="card-header d-flex justify-content-between align-items-start">
                             <h5>{{ _('Accounts Needing Attention') }}
                                 <i class="fas fa-info-circle ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
                                    title="Companies likely in need of re-engagement" style="font-size: 0.8em; opacity: 0.7;"></i>
                             </h5>
+                            <a href="/dashboard/whiteboard?hop=1&balance=risk_heavy"
+                               onclick="if(typeof hopTo==='function'){var _s=document.getElementById('campaignFilter');var _cid=(typeof getSelectedCampaignNumericId==='function')?(getSelectedCampaignNumericId()||''):'';var _cn=(_s&&_s.selectedIndex>=0)?(_s.options[_s.selectedIndex].getAttribute('data-name')||''):'';hopTo('whiteboard',{balance:'risk_heavy',campaign_id:_cid,campaign_name:_cn});return false;}"
+                               class="hop-link ms-2 text-nowrap"
+                               style="font-size:0.78rem; color:#E13A44; text-decoration:none; white-space:nowrap;"
+                               title="{{ _('Open Whiteboard with accounts needing attention') }}"
+                               onmouseover="this.style.textDecoration='underline';"
+                               onmouseout="this.style.textDecoration='none';">
+                                <i class="fas fa-external-link-alt me-1"></i>{{ _('View in Whiteboard') }}
+                            </a>
                         </div>
                         <div class="card-body" style="padding: 1.5rem;">
                             <div id="highRiskAccounts">
@@ -1259,14 +1268,25 @@
 
             <!-- Account Cards -->
             <div class="chart-card">
-                <div class="card-header">
-                    <h5 class="mb-0">
-                        <i class="fas fa-crown me-2" style="color: #E13A44;"></i>{{ _('Strategic & Key Accounts') }}
-                        <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" data-bs-placement="top"
-                           data-bs-title="{{ _('Showing only Strategic and Key tier accounts. Sorted by churn risk level descending.') }}"
-                           style="font-size: 0.8em; opacity: 0.7;"></i>
-                    </h5>
-                    <small class="text-muted">{{ _('Account health cards for your highest-tier customers') }}</small>
+                <div class="card-header d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5 class="mb-0">
+                            <i class="fas fa-crown me-2" style="color: #E13A44;"></i>{{ _('Strategic & Key Accounts') }}
+                            <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" data-bs-placement="top"
+                               data-bs-title="{{ _('Showing only Strategic and Key tier accounts. Sorted by churn risk level descending.') }}"
+                               style="font-size: 0.8em; opacity: 0.7;"></i>
+                        </h5>
+                        <small class="text-muted">{{ _('Account health cards for your highest-tier customers') }}</small>
+                    </div>
+                    <a href="/dashboard/whiteboard?hop=1&tier=Strategic%2CKey"
+                       onclick="if(typeof hopTo==='function'){var _s=document.getElementById('campaignFilter');var _cn=(_s&&_s.selectedIndex>=0)?(_s.options[_s.selectedIndex].getAttribute('data-name')||''):'';var _ci=(typeof getSelectedCampaignNumericId==='function')?(getSelectedCampaignNumericId()||''):'';hopTo('whiteboard',{tier:'Strategic,Key',campaign_name:_cn,campaign_id:_ci});return false;}"
+                       class="hop-link ms-2 text-nowrap"
+                       style="font-size:0.78rem; color:#E13A44; text-decoration:none; white-space:nowrap;"
+                       title="{{ _('Open Whiteboard for Strategic and Key accounts') }}"
+                       onmouseover="this.style.textDecoration='underline';"
+                       onmouseout="this.style.textDecoration='none';">
+                        <i class="fas fa-external-link-alt me-1"></i>{{ _('Send to Whiteboard') }}
+                    </a>
                 </div>
                 <div class="card-body">
                     <!-- Loading State -->
@@ -1952,9 +1972,39 @@ function renderCorrelationChart(correlationData) {
                     ticks: { stepSize: 1 },
                     grid: { color: '#f0f0f0' }
                 }
+            },
+            // Hop I: click on a bubble cluster → Whiteboard filtered by nps_category
+            onClick: function(evt, elements) {
+                if (!elements || !elements.length) return;
+                const dsLabel = datasets[elements[0].datasetIndex] ? datasets[elements[0].datasetIndex].label : null;
+                if (!dsLabel || typeof hopTo !== 'function') return;
+                const catMap = {
+                    '{{ _("Promoters (9-10)") }}': 'Promoter',
+                    '{{ _("Passives (7-8)") }}':   'Passive',
+                    '{{ _("Detractors (0-6)") }}':  'Detractor'
+                };
+                var _dl2 = (dsLabel || '').toLowerCase();
+                var cat = catMap[dsLabel] ||
+                    (_dl2.indexOf('promoter')  !== -1 ? 'Promoter'  :
+                     _dl2.indexOf('passive')   !== -1 ? 'Passive'   :
+                     _dl2.indexOf('detractor') !== -1 ? 'Detractor' : null);
+                if (!cat) return;
+                var _sel2 = document.getElementById('campaignFilter');
+                var _cid = (typeof getSelectedCampaignNumericId === 'function') ? (getSelectedCampaignNumericId() || '') : '';
+                var _cn2 = (_sel2 && _sel2.selectedIndex >= 0) ? (_sel2.options[_sel2.selectedIndex].getAttribute('data-name') || '') : '';
+                var _pt2 = datasets[elements[0].datasetIndex] ? datasets[elements[0].datasetIndex].data[elements[0].index] : null;
+                var _fi2 = {nps_category: cat, campaign_id: _cid, campaign_name: _cn2};
+                if (_pt2 && _pt2.x != null) _fi2.csat = _pt2.x;
+                if (_pt2 && _pt2.y != null) _fi2.ces  = _pt2.y;
+                if (typeof hopTo === 'function') hopTo('whiteboard', _fi2);
+                else { var _p2=new URLSearchParams(); _p2.set('hop','1'); Object.keys(_fi2).forEach(function(k){if(_fi2[k]!==''&&_fi2[k]!=null)_p2.set(k,_fi2[k]);}); window.location.href='/dashboard/whiteboard?'+_p2.toString(); }
             }
         }
     });
+
+    // Hop I: hover affordance for correlation chart
+    ctx.style.cursor = 'pointer';
+    ctx.title = '{{ _("Open Whiteboard filtered by NPS category") }}';
 }
 
 function renderRecommendationChart(recData) {
@@ -1976,6 +2026,8 @@ function renderRecommendationChart(recData) {
     const labels = Object.keys(recData).map(k => labelMap[k] || k);
     const values = Object.values(recData);
     const colors = Object.keys(recData).map(k => colorMap[k] || '#6c757d');
+
+    const recKeys = Object.keys(recData);
 
     classicCharts.recommendation = new Chart(ctx, {
         type: 'doughnut',
@@ -2002,9 +2054,26 @@ function renderRecommendationChart(recData) {
                         }
                     }
                 }
+            },
+            // Hop J: click on a doughnut segment → Whiteboard filtered by recommendation stance
+            onClick: function(evt, elements) {
+                if (!elements || !elements.length) return;
+                const stance = recKeys[elements[0].index];
+                if (stance) {
+                    var _sel3 = document.getElementById('campaignFilter');
+                    var _cid3 = (typeof getSelectedCampaignNumericId === 'function') ? (getSelectedCampaignNumericId() || '') : '';
+                    var _cn3  = (_sel3 && _sel3.selectedIndex >= 0) ? (_sel3.options[_sel3.selectedIndex].getAttribute('data-name') || '') : '';
+                    var _fj   = {recommendation: stance, campaign_id: _cid3, campaign_name: _cn3};
+                    if (typeof hopTo === 'function') hopTo('whiteboard', _fj);
+                    else { var _pj=new URLSearchParams(); _pj.set('hop','1'); Object.keys(_fj).forEach(function(k){if(_fj[k]!==''&&_fj[k]!=null)_pj.set(k,_fj[k]);}); window.location.href='/dashboard/whiteboard?'+_pj.toString(); }
+                }
             }
         }
     });
+
+    // Hop J: hover affordance for recommendation chart
+    ctx.style.cursor = 'pointer';
+    ctx.title = '{{ _("Open Whiteboard filtered by recommendation stance") }}';
 }
 
 function renderFeatureChart(featuresData) {
@@ -2364,6 +2433,33 @@ function renderSegmentationInsights(data) {
     renderSegHorizontalChart('npsByClientIndustryChart', 'industry', segmentationData.nps_by_industry || {}, segmentationData.satisfaction_by_industry || {}, '{{ _("Industry") }}', globalNPS);
     renderCompositionChart('segCompositionChart', segmentationData);
     renderCrossDimensionalCharts(segmentationData);
+
+    // Hop A: npsByTierChart — click on a tier bar → Whiteboard filtered by that tier
+    (function() {
+        var tierNpsData = segmentationData.nps_by_tier || {};
+        var tierKeys = Object.keys(tierNpsData);
+        if (!tierKeys.length) return;
+        var sorted = tierKeys.slice().sort(function(a,b){ return (tierNpsData[b].nps_score||0)-(tierNpsData[a].nps_score||0); });
+        var tierChart = segmentationCharts['tier'];
+        var tierCanvas = document.getElementById('npsByTierChart');
+        if (!tierChart || !tierCanvas) return;
+        tierCanvas.style.cursor = 'pointer';
+        tierCanvas.title = '{{ _("Open Whiteboard filtered by this tier") }}';
+        tierCanvas.addEventListener('click', function(evt) {
+            var points = tierChart.getElementsAtEventForMode(evt, 'nearest', {intersect: true}, true);
+            if (!points.length) return;
+            var idx = points[0].index;
+            var tierName = sorted[idx];
+            if (tierName) {
+                var _sel   = document.getElementById('campaignFilter');
+                var _cName = (_sel && _sel.selectedIndex >= 0) ? (_sel.options[_sel.selectedIndex].getAttribute('data-name') || '') : '';
+                var _cId   = (typeof getSelectedCampaignNumericId === 'function') ? (getSelectedCampaignNumericId() || '') : '';
+                var _fe    = {tier: tierName, campaign_name: _cName, campaign_id: _cId};
+                if (typeof hopTo === 'function') hopTo('whiteboard', _fe);
+                else { var _pe=new URLSearchParams(); _pe.set('hop','1'); Object.keys(_fe).forEach(function(k){if(_fe[k]!==''&&_fe[k]!=null)_pe.set(k,_fe[k]);}); window.location.href='/dashboard/whiteboard?'+_pe.toString(); }
+            }
+        });
+    })();
 }
 
 function renderSegHorizontalChart(canvasId, chartKey, npsData, satisfactionData, label, globalNPS) {
@@ -2699,9 +2795,30 @@ function renderChurnRiskChart(segmentationData, dimKey) {
                         }
                     }
                 }
+            },
+            onClick: function(evt, elements) {
+                if (!elements || !elements.length) return;
+                const el = elements[0];
+                const riskLevel   = datasets[el.datasetIndex] ? datasets[el.datasetIndex].label : null;
+                const segmentName = segments[el.index] || null;
+                if (riskLevel) {
+                    var _sel     = document.getElementById('campaignFilter');
+                    var _cid     = (typeof getSelectedCampaignNumericId === 'function') ? (getSelectedCampaignNumericId() || '') : '';
+                    var _cn      = (_sel && _sel.selectedIndex >= 0) ? (_sel.options[_sel.selectedIndex].getAttribute('data-name') || '') : '';
+                    var _activeBtn = document.querySelector('#churnDimTabs .nav-link.active');
+                    var _dim     = _activeBtn ? _activeBtn.getAttribute('data-churn-dim') : 'by_tier';
+                    var filters  = {churn_risk: riskLevel, campaign_id: _cid, campaign_name: _cn};
+                    if (_dim === 'by_tier' && segmentName) filters.tier = segmentName;
+                    if (typeof hopTo === 'function') hopTo('whiteboard', filters);
+                    else { var _pb=new URLSearchParams(); _pb.set('hop','1'); Object.keys(filters).forEach(function(k){if(filters[k]!==''&&filters[k]!=null)_pb.set(k,filters[k]);}); window.location.href='/dashboard/whiteboard?'+_pb.toString(); }
+                }
             }
         }
     });
+
+    // Hop B: hover affordance for churn risk chart
+    ctx.style.cursor = 'pointer';
+    ctx.title = '{{ _("Open Whiteboard filtered by churn risk level") }}';
 }
 
 function renderTenureCohortChart(segmentationData) {

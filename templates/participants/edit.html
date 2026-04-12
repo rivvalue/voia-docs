@@ -175,9 +175,9 @@
                                 name="customer_tier"
                                 aria-describedby="customer_tier_help">
                             <option value="">{{ _('Select tier (optional)') }}</option>
-                            <option value="T1: Strategic (Top 5–10% clients)" {% if participant.customer_tier == "T1: Strategic (Top 5–10% clients)" %}selected{% endif %}>{{ _('T1: Strategic (Top 5–10%% clients)') }}</option>
-                            <option value="T2: Managed (bulk of paying clients)" {% if participant.customer_tier == "T2: Managed (bulk of paying clients)" %}selected{% endif %}>{{ _('T2: Managed (bulk of paying clients)') }}</option>
-                            <option value="T3: Self-serve or small" {% if participant.customer_tier == "T3: Self-serve or small" %}selected{% endif %}>{{ _('T3: Self-serve or small') }}</option>
+                            <option value="T1: Key Account" {% if participant.customer_tier == "T1: Key Account" %}selected{% endif %}>{{ _('T1: Key Account') }}</option>
+                            <option value="T2: Strategic" {% if participant.customer_tier == "T2: Strategic" %}selected{% endif %}>{{ _('T2: Strategic') }}</option>
+                            <option value="T3: Low Revenue" {% if participant.customer_tier == "T3: Low Revenue" %}selected{% endif %}>{{ _('T3: Low Revenue') }}</option>
                         </select>
                         <div class="participant-help-text" id="customer_tier_help">{{ _('Customer segment for tier-based analysis') }}</div>
                     </div>

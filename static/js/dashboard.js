@@ -2960,9 +2960,30 @@ function createGrowthFactorChart() {
                     },
                     grid: { color: '#f1f5f9' }
                 }
+            },
+            // Hop D: click on a positive NPS band bar → Whiteboard filtered by nps_opportunity
+            onClick: function(evt, elements) {
+                if (!elements || !elements.length) return;
+                const d = distribution[elements[0].index];
+                if (!d) return;
+                const positiveRanges = ['50-69', '70-100'];
+                if (positiveRanges.indexOf(d.nps_range) !== -1) {
+                    var _selD = document.getElementById('campaignFilter');
+                    var _cid = (typeof getSelectedCampaignNumericId === 'function') ? (getSelectedCampaignNumericId() || '') : '';
+                    var _cnD = (_selD && _selD.selectedIndex >= 0) ? (_selD.options[_selD.selectedIndex].getAttribute('data-name') || '') : '';
+                    var _fd  = {nps_opportunity: d.nps_range, campaign_id: _cid, campaign_name: _cnD};
+                    if (typeof hopTo === 'function') hopTo('whiteboard', _fd);
+                    else { var _pd=new URLSearchParams(); _pd.set('hop','1'); Object.keys(_fd).forEach(function(k){if(_fd[k]!==''&&_fd[k]!=null)_pd.set(k,_fd[k]);}); window.location.href='/dashboard/whiteboard?'+_pd.toString(); }
+                }
             }
         }
     });
+
+    // Hop D: hover affordance — cursor:pointer on the growth factor chart canvas
+    if (chartElement) {
+        chartElement.style.cursor = 'pointer';
+        chartElement.title = (window.translations && window.translations['Open Whiteboard filtered by NPS band']) || 'Open Whiteboard filtered by NPS band';
+    }
 
     // --- Priority Focus panel ---
     if (focusEl && total > 0) {
@@ -2979,6 +3000,45 @@ function createGrowthFactorChart() {
                      || null;
         const championTop = topBand;
 
+        // Hop H: per-account "Add to Whiteboard" links in each Priority Focus row
+        const _hrAccounts = (dashboardData && dashboardData.high_risk_accounts) || [];
+        const _addToWB       = (window.translations && window.translations['Add to Whiteboard']) || 'Add to Whiteboard';
+        const _openForAcct   = (window.translations && window.translations['Open Whiteboard for this account']) || 'Open Whiteboard for this account';
+        const _priorityFocus = (window.translations && window.translations['Priority Focus']) || 'Priority Focus';
+        const _getAccountsForRange = (ranges) => {
+            return _hrAccounts.filter(a => {
+                const s = Number(a.nps_score);
+                if (isNaN(s)) return false;
+                return ranges.some(r => {
+                    if (r === '<0')    return s < 0;
+                    if (r === '0-29')  return s >= 0 && s <= 29;
+                    if (r === '30-49') return s >= 30 && s <= 49;
+                    if (r === '50-69') return s >= 50 && s <= 69;
+                    if (r === '70-100')return s >= 70;
+                    return false;
+                });
+            }).sort((a, b) => Number(a.nps_score) - Number(b.nps_score)).slice(0, 3);
+        };
+        const _hopHLinks = (accounts, sourceLabel) => {
+            if (!accounts || !accounts.length) return '';
+            return accounts.map(account => {
+                const enc    = encodeURIComponent(account.company_name);
+                const encLb  = encodeURIComponent(sourceLabel);
+                const titleTxt = `${escapeHtml(_openForAcct)}: ${escapeHtml(account.company_name)}`;
+                return `<a href="/dashboard/whiteboard?hop=1&company_name=${enc}&source_label=${encLb}"
+                           onclick="if(typeof hopTo==='function'){var _sh=document.getElementById('campaignFilter');var _cid=(typeof getSelectedCampaignNumericId==='function')?(getSelectedCampaignNumericId()||''):'';var _cn=(_sh&&_sh.selectedIndex>=0)?(_sh.options[_sh.selectedIndex].getAttribute('data-name')||''):'';var _uuid=_sh?(_sh.value||''):'';hopTo('whiteboard',{company_name:this.dataset.companyName,source_label:this.dataset.sourceLabel,campaign_id:_cid,campaign_name:_cn,campaign_uuid:_uuid});return false;}"
+                           data-company-name="${escapeHtml(account.company_name)}"
+                           data-source-label="${escapeHtml(sourceLabel)}"
+                           class="hop-link d-block mt-1"
+                           style="font-size:0.72rem;color:#E13A44;text-decoration:none;white-space:nowrap;cursor:pointer;"
+                           title="${titleTxt}"
+                           onmouseover="this.style.textDecoration='underline';"
+                           onmouseout="this.style.textDecoration='none';">
+                           <i class="fas fa-external-link-alt" style="font-size:0.6rem;"></i>&nbsp;${escapeHtml(account.company_name)} – ${escapeHtml(_addToWB)}
+                       </a>`;
+            }).join('');
+        };
+
         const rows = [];
 
         if (riskTop && riskTop.count > 0) {
@@ -2987,10 +3047,12 @@ function createGrowthFactorChart() {
                 icon: 'fas fa-exclamation-triangle',
                 iconColor: '#E13A44',
                 priority: '1',
+                npsRange: riskTop.nps_range,
                 title: 'Address Churn Risk',
                 body: `<strong>${riskTop.count} account${riskTop.count !== 1 ? 's' : ''} (${pct}%)</strong> in the ${riskTop.nps_range} NPS band. ` +
                       `Bain research links this zone to ` + (riskTop.growth_rate ? `${riskTop.growth_rate} organic growth` : 'minimal organic growth') + `. ` +
-                      `Run targeted executive outreach and resolve top pain points to prevent churn.`
+                      `Run targeted executive outreach and resolve top pain points to prevent churn.`,
+                accounts: _getAccountsForRange(['<0', '0-29'])
             });
         }
 
@@ -3000,10 +3062,12 @@ function createGrowthFactorChart() {
                 icon: 'fas fa-exchange-alt',
                 iconColor: '#f59e0b',
                 priority: riskTop && riskTop.count > 0 ? '2' : '1',
+                npsRange: passiveTop.nps_range,
                 title: 'Convert Passive Accounts',
                 body: `<strong>${passiveTop.count} account${passiveTop.count !== 1 ? 's' : ''} (${pct}%)</strong> in the 30–49 NPS band — your conversion opportunity. ` +
                       `A shift to the 50–69 band would lift expected growth from ~15% to ~25%. ` +
-                      `Focus on closing known service gaps and demonstrating new value.`
+                      `Focus on closing known service gaps and demonstrating new value.`,
+                accounts: _getAccountsForRange(['30-49'])
             });
         }
 
@@ -3014,28 +3078,34 @@ function createGrowthFactorChart() {
                 icon: 'fas fa-star',
                 iconColor: '#E13A44',
                 priority: rows.length + 1,
+                npsRange: championTop.nps_range,
                 title: 'Activate Promoter Growth',
                 body: `<strong>${championTop.count} account${championTop.count !== 1 ? 's' : ''} (${pct}%)</strong> in the ${topRange} NPS band. ` +
                       `These are your growth engine — expected organic growth of ` +
                       (championTop.growth_rate ? `${championTop.growth_rate}` : 'up to 40%') + `. ` +
-                      `Engage them for referrals, case studies, and co-marketing to compound growth.`
+                      `Engage them for referrals, case studies, and co-marketing to compound growth.`,
+                accounts: _getAccountsForRange(['50-69', '70-100'])
             });
         }
 
         if (rows.length > 0) {
-            const rowsHtml = rows.map(r => `
+            const rowsHtml = rows.map(r => {
+                const hopHtml = _hopHLinks(r.accounts, _priorityFocus);
+                return `
                 <div class="d-flex gap-2 mb-2 pb-2 ${rows.indexOf(r) < rows.length - 1 ? 'border-bottom' : ''}">
                     <div class="flex-shrink-0 mt-1">
                         <i class="${r.icon}" style="color:${r.iconColor};font-size:1rem;"></i>
                     </div>
-                    <div>
+                    <div class="flex-grow-1">
                         <div class="fw-semibold" style="font-size:0.82rem;color:#1e293b;">
                             <span class="badge me-1" style="background:${r.iconColor};font-size:0.7rem;">P${r.priority}</span>
                             ${r.title}
                         </div>
                         <div class="text-muted" style="font-size:0.78rem;line-height:1.45;">${r.body}</div>
+                        ${hopHtml}
                     </div>
-                </div>`).join('');
+                </div>`;
+            }).join('');
 
             focusEl.innerHTML = `<div class="border rounded p-3" style="background:#E9E8E4;">
                 <div class="fw-semibold mb-2" style="font-size:0.82rem;color:#000000;letter-spacing:0.03em;">
@@ -3091,15 +3161,17 @@ function populateHighRiskAccounts() {
         return `<span class="badge" style="background:${bg};color:${color};border:1px solid ${color};font-size:0.72em;">${escapeHtml(l)}</span>`;
     }
 
-    const html = top3.map(account => `
+    const html = top3.map(account => {
+        return `
         <div class="d-flex justify-content-between align-items-center py-2" style="border-bottom:1px solid #eee;">
-            <span class="fw-medium text-truncate me-2" style="max-width:50%;font-size:0.9rem;" title="${escapeHtml(account.company_name)}">${escapeHtml(account.company_name)}</span>
+            <span class="fw-medium text-truncate me-2" style="max-width:55%;font-size:0.9rem;" title="${escapeHtml(account.company_name)}">${escapeHtml(account.company_name)}</span>
             <span class="d-flex gap-1 align-items-center flex-shrink-0">
                 ${getNpsBadge(account.nps_score)}
                 ${getRiskBadge(account.risk_level)}
             </span>
         </div>
-    `).join('');
+        `;
+    }).join('');
 
     container.innerHTML = html;
 

@@ -676,11 +676,10 @@
                                 </label>
                             </div>
                             <select class="form-select" id="customer_tier" disabled>
-                                <option value="">Select tier...</option>
-                                <option value="Enterprise">Enterprise</option>
-                                <option value="Premium">Premium</option>
-                                <option value="Standard">Standard</option>
-                                <option value="Basic">Basic</option>
+                                <option value="">{{ _('Select tier...') }}</option>
+                                <option value="T1: Key Account">{{ _('T1: Key Account') }}</option>
+                                <option value="T2: Strategic">{{ _('T2: Strategic') }}</option>
+                                <option value="T3: Low Revenue">{{ _('T3: Low Revenue') }}</option>
                             </select>
                             <small class="text-muted">⚠️ Locked for participants with survey history</small>
                         </div>

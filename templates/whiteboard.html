@@ -16,19 +16,37 @@
 {% block extra_head %}
 <style>
 .whiteboard-header { border-bottom: 2px solid #E13A44; margin-bottom: 1.5rem; padding-bottom: 1rem; }
-.whiteboard-empty { text-align: center; padding: 4rem 2rem; color: #8A8A8A; }
+.whiteboard-empty  { text-align: center; padding: 4rem 2rem; color: #8A8A8A; }
 .whiteboard-empty i { font-size: 3rem; margin-bottom: 1rem; opacity: 0.4; }
-.wb-card { background: #fff; border: 1px solid #BDBDBD; border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 1rem; position: relative; box-shadow: 0 1px 3px rgba(0,0,0,0.06); transition: box-shadow 0.15s; }
-.wb-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.10); }
-.wb-card-type { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; margin-bottom: 0.4rem; }
-.wb-card-type-account { color: #2E5090; }
+
+/* Card shell */
+.wb-card {
+    background: #fff;
+    border: 1px solid #BDBDBD;
+    border-left: 4px solid #BDBDBD;
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    height: 100%;
+    position: relative;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    transition: box-shadow 0.15s;
+    display: flex;
+    flex-direction: column;
+}
+.wb-card:hover          { box-shadow: 0 3px 10px rgba(0,0,0,0.10); }
+.wb-card-account        { border-left-color: #2E5090; }
+.wb-card-response       { border-left-color: #E13A44; }
+.wb-card-filter         { border-left-color: #6c757d; }
+
+/* Typography */
+.wb-card-type    { font-size: 0.70rem; text-transform: uppercase; letter-spacing: 0.07em; font-weight: 700; margin-bottom: 0.3rem; }
+.wb-card-type-account  { color: #2E5090; }
 .wb-card-type-response { color: #E13A44; }
-.wb-card-title { font-size: 1rem; font-weight: 600; color: #000; margin-bottom: 0.25rem; }
-.wb-card-meta { font-size: 0.82rem; color: #8A8A8A; }
-.wb-card-source { display: inline-block; background: #E9E8E4; border-radius: 4px; padding: 1px 8px; font-size: 0.75rem; color: #555; margin-top: 0.4rem; }
-.wb-card-remove { position: absolute; top: 0.6rem; right: 0.75rem; background: none; border: none; color: #BDBDBD; cursor: pointer; font-size: 1rem; padding: 2px 6px; border-radius: 4px; transition: color 0.15s, background 0.15s; }
-.wb-card-remove:hover { color: #E13A44; background: rgba(225,58,68,0.07); }
-.wb-card-link { font-size: 0.82rem; color: #2E5090; text-decoration: none; }
+.wb-card-type-filter   { color: #6c757d; }
+.wb-card-title   { font-size: 0.97rem; font-weight: 700; color: #111; margin-bottom: 0.2rem; line-height: 1.3; }
+.wb-card-meta    { font-size: 0.78rem; color: #8A8A8A; margin-bottom: 0.3rem; }
+.wb-card-source  { display: inline-block; background: #E9E8E4; border-radius: 4px; padding: 1px 8px; font-size: 0.73rem; color: #555; }
+.wb-card-link    { font-size: 0.80rem; color: #2E5090; text-decoration: none; }
 .wb-card-link:hover { text-decoration: underline; }
 .wb-card-type-list { color: #6f42c1; }
 .wb-list-items { margin-top: 0.5rem; border-top: 1px solid #f0f0f0; padding-top: 0.4rem; }
@@ -38,6 +56,46 @@
 .wb-list-item-value { font-weight: 600; color: #2E5090; flex-shrink: 0; font-size: 0.8rem; }
 .wb-list-item-link { color: #8A8A8A; margin-left: 0.35rem; font-size: 0.75rem; }
 .wb-list-item-link:hover { color: #2E5090; }
+
+/* Remove button */
+.wb-card-remove {
+    position: absolute; top: 0.5rem; right: 0.6rem;
+    background: none; border: none; color: #BDBDBD; cursor: pointer;
+    font-size: 0.9rem; padding: 2px 6px; border-radius: 4px;
+    transition: color 0.15s, background 0.15s;
+}
+.wb-card-remove:hover { color: #E13A44; background: rgba(225,58,68,0.07); }
+
+/* Filter card account list — scrollable */
+.wb-account-list {
+    margin-top: 0.6rem;
+    border-top: 1px solid #E9E8E4;
+    padding-top: 0.5rem;
+    max-height: 220px;
+    overflow-y: auto;
+    flex: 1;
+}
+.wb-account-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 3px 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 0.81rem;
+    color: #333;
+}
+.wb-account-row:last-child { border-bottom: none; }
+.wb-account-row a {
+    color: #2E5090;
+    text-decoration: none;
+    font-weight: 500;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.wb-account-row a:hover { text-decoration: underline; }
+.wb-account-score { font-size: 0.73rem; font-weight: 600; margin-left: 0.4rem; white-space: nowrap; }
 </style>
 {% endblock %}
 
@@ -69,8 +127,8 @@
         </div>
     </div>
 
-    <!-- Card Board -->
-    <div id="wbBoard">
+    <!-- Card Board — responsive 3-column grid -->
+    <div id="wbBoard" class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3">
         <!-- Cards injected here by JS -->
     </div>
 
@@ -89,22 +147,27 @@
     var WB_API = '/api/whiteboard/state';
 
     /*
-     * `queries` is the in-memory array of QUERY DESCRIPTORS — minimal
-     * objects that capture enough parameters to re-fetch fresh data from
-     * the backend on every page load.  Display fields (company_name, etc.)
-     * are stored in the descriptor so cards can render immediately while
-     * re-fetches are in flight; fresh API data overwrites them when ready.
+     * Descriptor shapes:
      *
-     * Account descriptor:
-     *   { card_type: 'account', company_name, campaign_id, campaign_name, source_label, company_url }
+     * Account:
+     *   { card_type:'account', company_name, campaign_id, campaign_uuid,
+     *     campaign_name, source_label, company_url }
      *
-     * Response descriptor:
-     *   { card_type: 'response', respondent, nps_type, campaign_id, campaign_name, source_label, response_url }
+     * Response:
+     *   { card_type:'response', respondent, nps_type, campaign_id,
+     *     campaign_uuid, campaign_name, source_label, response_url }
      *
-     * Internal-only (never persisted) prefixed with _:
-     *   _fresh_nps, _fresh_summary, _fresh_score, _fresh_nps_type
+     * Filter:
+     *   { card_type:'filter', campaign_id, campaign_uuid, campaign_name,
+     *     tier?, churn_risk?, balance?, nps_category?,
+     *     recommendation?, nps_opportunity?, csat?, ces?,
+     *     _accounts (runtime, not persisted) }
      */
     var queries = [];
+
+    /* ------------------------------------------------------------------ */
+    /* Utilities                                                            */
+    /* ------------------------------------------------------------------ */
 
     function t(key, fallback) {
         return (window.t && window.t(key, fallback)) || fallback || key;
@@ -127,9 +190,182 @@
         return url;
     }
 
+    function accountDetailUrl(companyName, campaignUuid) {
+        if (!companyName || !campaignUuid) return '';
+        return '/dashboard/company-responses/' + encodeURIComponent(companyName) + '?campaign=' + campaignUuid;
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Filter card helpers                                                  */
+    /* ------------------------------------------------------------------ */
+
+    function formatFilterVal(val) {
+        if (!val) return val;
+        var known = {
+            'risk_heavy':           '{{ _("Risk-Heavy") }}',
+            'opportunity_heavy':    '{{ _("High-Potential") }}',
+            'balanced':             '{{ _("Balanced") }}',
+            'recommended':          '{{ _("Recommended") }}',
+            'would_consider':       '{{ _("Would Consider") }}',
+            'would_not_recommend':  '{{ _("Would Not Recommend") }}',
+            'Strategic,Key':        '{{ _("Strategic & Key") }}',
+        };
+        if (known[val] !== undefined) return known[val];
+        return val.replace(/_/g, ' ').replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+    }
+
+    function filterCardBadge(q) {
+        var tags = [];
+        if (q.tier)            tags.push('{{ _("Tier") }}');
+        if (q.churn_risk)      tags.push('{{ _("Churn") }}');
+        if (q.balance)         tags.push('{{ _("Balance") }}');
+        if (q.nps_category)    tags.push('{{ _("NPS Category") }}');
+        if (q.nps_opportunity) tags.push('{{ _("NPS Band") }}');
+        if (q.recommendation)  tags.push('{{ _("Recommendation") }}');
+        if (q.csat != null)    tags.push('CSAT');
+        if (q.ces  != null)    tags.push('CES');
+        return tags.length ? tags.join(' · ') : '{{ _("Filter") }}';
+    }
+
+    function filterCardTitle(q) {
+        var parts = [];
+        if (q.tier)            parts.push(q.tier.replace(/,/g, ' & '));
+        if (q.churn_risk)      parts.push(q.churn_risk + ' {{ _("Churn Risk") }}');
+        if (q.balance) {
+            var bt = { risk_heavy: '{{ _("Risk-Heavy") }}', opportunity_heavy: '{{ _("High-Potential") }}', balanced: '{{ _("Balanced") }}' };
+            parts.push((bt[q.balance] || formatFilterVal(q.balance)) + ' {{ _("Balance") }}');
+        }
+        if (q.nps_category)    parts.push(q.nps_category + 's');
+        if (q.nps_opportunity) {
+            if (q.nps_opportunity === '70-100') parts.push('{{ _("NPS Champions") }} (70–100)');
+            else if (q.nps_opportunity === '50-69') parts.push('{{ _("NPS Growth Band") }} (50–69)');
+            else parts.push('{{ _("NPS Band") }}: ' + q.nps_opportunity);
+        }
+        if (q.recommendation)  parts.push(formatFilterVal(q.recommendation));
+        if (q.csat != null)    parts.push('CSAT ' + q.csat);
+        if (q.ces  != null)    parts.push('CES ' + q.ces);
+        return parts.length ? parts.join(' · ') : '{{ _("Filtered View") }}';
+    }
+
     /* ------------------------------------------------------------------ */
     /* Rendering                                                            */
     /* ------------------------------------------------------------------ */
+
+    function npsScoreColor(score) {
+        if (score == null) return '#8A8A8A';
+        return score >= 7 ? '#198754' : (score >= 5 ? '#997404' : '#dc3545');
+    }
+
+    function renderFilterCard(q, idx) {
+        var title = filterCardTitle(q);
+
+        var accountsHtml = '';
+        if (!q._accounts) {
+            accountsHtml = '<div class="wb-account-list" style="border-top:none;">' +
+                '<em style="color:#8A8A8A;font-size:0.81rem;">{{ _("Loading accounts\u2026") }}</em></div>';
+        } else if (q._accounts.length === 0) {
+            accountsHtml = '<div class="wb-account-list" style="border-top:none;">' +
+                '<span style="color:#8A8A8A;font-size:0.81rem;">{{ _("No matching accounts found.") }}</span></div>';
+        } else {
+            accountsHtml = '<div class="wb-account-list">' +
+                '<div style="display:flex;gap:0.75rem;font-size:0.70rem;color:#6c757d;padding-bottom:0.35rem;border-bottom:1px solid #eee;margin-bottom:0.25rem;flex-wrap:wrap;">' +
+                '<span><span style="color:#198754;font-weight:700;">&#9679;</span> &#x2265;7 — {{ _("High") }}</span>' +
+                '<span><span style="color:#997404;font-weight:700;">&#9679;</span> 5–6 — {{ _("Mid") }}</span>' +
+                '<span><span style="color:#dc3545;font-weight:700;">&#9679;</span> &lt;5 — {{ _("Low") }}</span>' +
+                '<span style="margin-left:auto;font-style:italic;">{{ _("Avg NPS / 10") }}</span>' +
+                '</div>';
+            q._accounts.forEach(function (acc) {
+                var scoreHtml = '';
+                if (acc.avg_nps_score != null) {
+                    var sc = npsScoreColor(acc.avg_nps_score);
+                    scoreHtml = '<span class="wb-account-score" style="color:' + sc + ';">' +
+                        acc.avg_nps_score.toFixed(1) + '/10</span>';
+                }
+                var nameHtml = safeUrl(acc.detail_url)
+                    ? '<a href="' + escapeHtml(acc.detail_url) + '">' + escapeHtml(acc.company_name) + '</a>'
+                    : '<span>' + escapeHtml(acc.company_name) + '</span>';
+                accountsHtml += '<div class="wb-account-row">' + nameHtml + scoreHtml + '</div>';
+            });
+            accountsHtml += '</div>';
+        }
+
+        var metaHtml = q.campaign_name
+            ? '<div class="wb-card-meta"><i class="fas fa-bullhorn me-1" style="opacity:0.5;"></i>' + escapeHtml(q.campaign_name) + '</div>'
+            : '';
+
+        return '<div class="col"><div class="wb-card wb-card-filter" id="wbCard-' + idx + '">' +
+            '<button class="wb-card-remove" onclick="wbRemove(' + idx + ')" title="{{ _("Remove") }}">' +
+            '<i class="fas fa-times"></i></button>' +
+            '<div class="wb-card-type wb-card-type-filter"><i class="fas fa-filter me-1"></i>' + filterCardBadge(q) + '</div>' +
+            '<div class="wb-card-title">' + escapeHtml(title) + '</div>' +
+            metaHtml +
+            (q.source_label ? '<div style="margin-bottom:0.3rem;"><span class="wb-card-source">' + escapeHtml(q.source_label) + '</span></div>' : '') +
+            accountsHtml +
+            '</div></div>';
+    }
+
+    function renderAccountCard(q, idx) {
+        var detailUrl = safeUrl(q.company_url)
+            || accountDetailUrl(q.company_name, q.campaign_uuid);
+        var linkHtml = detailUrl
+            ? '<a href="' + escapeHtml(detailUrl) + '" class="wb-card-link">' +
+              '<i class="fas fa-external-link-alt me-1"></i>{{ _("View Account") }}</a>'
+            : '';
+
+        var npsHtml = '';
+        if (q._fresh_nps != null) {
+            var c = q._fresh_nps > 0 ? '#198754' : (q._fresh_nps < 0 ? '#dc3545' : '#997404');
+            npsHtml = ' <span style="color:' + c + '; font-weight:700; font-size:0.78rem;">' +
+                'NPS ' + (q._fresh_nps > 0 ? '+' : '') + q._fresh_nps + '</span>';
+        }
+
+        var metaHtml = q.campaign_name
+            ? '<div class="wb-card-meta"><i class="fas fa-bullhorn me-1" style="opacity:0.5;"></i>' + escapeHtml(q.campaign_name) + '</div>'
+            : '';
+
+        return '<div class="col"><div class="wb-card wb-card-account" id="wbCard-' + idx + '">' +
+            '<button class="wb-card-remove" onclick="wbRemove(' + idx + ')" title="{{ _("Remove") }}">' +
+            '<i class="fas fa-times"></i></button>' +
+            '<div class="wb-card-type wb-card-type-account"><i class="fas fa-building me-1"></i>{{ _("Pinned Account") }}</div>' +
+            '<div class="wb-card-title">' + escapeHtml(q.company_name || '{{ _("Unknown Account") }}') + npsHtml + '</div>' +
+            metaHtml +
+            (q.source_label ? '<div style="margin-bottom:0.3rem;"><span class="wb-card-source">' + escapeHtml(q.source_label) + '</span></div>' : '') +
+            (linkHtml ? '<div class="mt-auto pt-2">' + linkHtml + '</div>' : '') +
+            '</div></div>';
+    }
+
+    function renderResponseCard(q, idx) {
+        var linkHtml = safeUrl(q.response_url)
+            ? '<a href="' + escapeHtml(safeUrl(q.response_url)) + '" class="wb-card-link">' +
+              '<i class="fas fa-external-link-alt me-1"></i>{{ _("View Response") }}</a>'
+            : '';
+
+        var npsType  = q._fresh_nps_type || q.nps_type || '';
+        var npsLabel = '';
+        if (npsType) {
+            var nc = npsType === 'promoter' ? '#198754' : (npsType === 'detractor' ? '#dc3545' : '#997404');
+            npsLabel = ' <span style="color:' + nc + '; font-weight:700; font-size:0.78rem;">' +
+                escapeHtml(npsType.charAt(0).toUpperCase() + npsType.slice(1)) + '</span>';
+        }
+
+        var scoreHtml = q._fresh_score != null
+            ? ' <span style="color:#555; font-size:0.78rem;">' + q._fresh_score + '/10</span>'
+            : '';
+
+        var metaHtml = q.campaign_name
+            ? '<div class="wb-card-meta"><i class="fas fa-bullhorn me-1" style="opacity:0.5;"></i>' + escapeHtml(q.campaign_name) + '</div>'
+            : '';
+
+        return '<div class="col"><div class="wb-card wb-card-response" id="wbCard-' + idx + '">' +
+            '<button class="wb-card-remove" onclick="wbRemove(' + idx + ')" title="{{ _("Remove") }}">' +
+            '<i class="fas fa-times"></i></button>' +
+            '<div class="wb-card-type wb-card-type-response"><i class="fas fa-comment-dots me-1"></i>{{ _("Pinned Response") }}</div>' +
+            '<div class="wb-card-title">' + escapeHtml(q.respondent || '{{ _("Unknown Respondent") }}') + npsLabel + scoreHtml + '</div>' +
+            metaHtml +
+            (q.source_label ? '<div style="margin-bottom:0.3rem;"><span class="wb-card-source">' + escapeHtml(q.source_label) + '</span></div>' : '') +
+            (linkHtml ? '<div class="mt-auto pt-2">' + linkHtml + '</div>' : '') +
+            '</div></div>';
+    }
 
     function render() {
         var board = document.getElementById('wbBoard');
@@ -142,9 +378,11 @@
         }
         if (empty) empty.style.display = 'none';
         board.innerHTML = queries.map(function (q, idx) {
-            if (q.card_type === 'account') return renderAccountCard(q, idx);
-            if (q.card_type === 'list') return renderListCard(q, idx);
-            return renderResponseCard(q, idx);
+            if (q.card_type === 'account')  return renderAccountCard(q, idx);
+            if (q.card_type === 'response') return renderResponseCard(q, idx);
+            if (q.card_type === 'list')   return renderListCard(q, idx);
+            if (q.card_type === 'filter') return renderFilterCard(q, idx);
+            return '';
         }).join('');
     }
 
@@ -245,12 +483,9 @@
             '</div>';
     }
 
+
     /* ------------------------------------------------------------------ */
-    /* Fresh data re-fetch for a single descriptor                         */
-    /*                                                                      */
-    /* Called on restore to update each card with latest API data.         */
-    /* Account cards: /api/company_detail (campaign + company_name)        */
-    /* Response cards: /api/survey_responses (campaign + respondent name)  */
+    /* Fresh data re-fetch                                                  */
     /* ------------------------------------------------------------------ */
 
     function refetchCardData(descriptor, idx) {
@@ -267,16 +502,42 @@
                     if (fresh.nps_summary != null) descriptor._fresh_nps = fresh.nps_summary;
                     if (fresh.analysis_summary) descriptor._fresh_summary = fresh.analysis_summary;
                     var card = document.getElementById('wbCard-' + idx);
-                    if (card) card.outerHTML = renderAccountCard(descriptor, idx);
+                    if (card) card.closest('.col').outerHTML = renderAccountCard(descriptor, idx);
                 })
                 .catch(function () {});
+
+        } else if (descriptor.card_type === 'filter') {
+            var fParams = [];
+            if (descriptor.campaign_id) fParams.push('campaign_id=' + encodeURIComponent(descriptor.campaign_id));
+            var filterKeys = ['tier', 'churn_risk', 'balance', 'nps_category', 'recommendation', 'nps_opportunity', 'csat', 'ces'];
+            filterKeys.forEach(function (k) {
+                if (descriptor[k] != null && descriptor[k] !== '') fParams.push(k + '=' + encodeURIComponent(descriptor[k]));
+            });
+            if (!fParams.length) return;
+            fetch('/api/whiteboard/filter-accounts?' + fParams.join('&'))
+                .then(function (r) { return r.ok ? r.json() : null; })
+                .then(function (data) {
+                    if (!data || queries[idx] !== descriptor) return;
+                    descriptor._accounts = data.accounts || [];
+                    if (data.campaign_uuid && !descriptor.campaign_uuid) descriptor.campaign_uuid = data.campaign_uuid;
+                    if (data.campaign_name && !descriptor.campaign_name) descriptor.campaign_name = data.campaign_name;
+                    var card = document.getElementById('wbCard-' + idx);
+                    if (card) card.closest('.col').outerHTML = renderFilterCard(descriptor, idx);
+                })
+                .catch(function () {
+                    if (queries[idx] === descriptor) {
+                        descriptor._accounts = [];
+                        var card = document.getElementById('wbCard-' + idx);
+                        if (card) card.closest('.col').outerHTML = renderFilterCard(descriptor, idx);
+                    }
+                });
 
         } else if (descriptor.card_type === 'response') {
             if (!descriptor.campaign_id || !descriptor.respondent) return;
             var npsCategory = '';
             if (descriptor.nps_type === 'promoter') npsCategory = 'promoters';
             else if (descriptor.nps_type === 'detractor') npsCategory = 'detractors';
-            else if (descriptor.nps_type === 'passive') npsCategory = 'passives';
+            else if (descriptor.nps_type === 'passive')   npsCategory = 'passives';
 
             var rUrl = '/api/survey_responses?campaign=' + encodeURIComponent(descriptor.campaign_id) +
                        '&search=' + encodeURIComponent(descriptor.respondent) +
@@ -296,7 +557,7 @@
                             : rawCat === 'detractors' ? 'detractor' : 'passive';
                     }
                     var card = document.getElementById('wbCard-' + idx);
-                    if (card) card.outerHTML = renderResponseCard(descriptor, idx);
+                    if (card) card.closest('.col').outerHTML = renderResponseCard(descriptor, idx);
                 })
                 .catch(function () {});
         }
@@ -334,57 +595,81 @@
         return meta ? meta.getAttribute('content') : '';
     }
 
+    var LS_KEY = 'voia_wb_filter_cards';
+
+    function loadFilterCardsFromStorage() {
+        try {
+            var raw = localStorage.getItem(LS_KEY);
+            return raw ? JSON.parse(raw) : [];
+        } catch (e) { return []; }
+    }
+
+    function saveFilterCardsToStorage(filterCards) {
+        try { localStorage.setItem(LS_KEY, JSON.stringify(filterCards)); } catch (e) {}
+    }
+
     function saveState() {
-        var toSave = queries.map(function (q) {
-            var clean = {};
-            Object.keys(q).forEach(function (k) {
-                if (k.charAt(0) !== '_') clean[k] = q[k];
+        var filterCards = queries
+            .filter(function (q) { return q.card_type === 'filter'; })
+            .map(function (q) {
+                var clean = {};
+                Object.keys(q).forEach(function (k) { if (k.charAt(0) !== '_') clean[k] = q[k]; });
+                return clean;
             });
-            return clean;
-        });
+        saveFilterCardsToStorage(filterCards);
+
+        var toSave = queries
+            .filter(function (q) { return q.card_type !== 'filter'; })
+            .map(function (q) {
+                var clean = {};
+                Object.keys(q).forEach(function (k) { if (k.charAt(0) !== '_') clean[k] = q[k]; });
+                return clean;
+            });
         fetch(WB_API, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCsrfToken()
-            },
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
             body: JSON.stringify({ queries: toSave })
-        }).catch(function (e) {
-            console.warn('Whiteboard: failed to save state', e);
-        });
+        }).catch(function (e) { console.warn('Whiteboard: failed to save state', e); });
     }
 
     /* ------------------------------------------------------------------ */
-    /* Backend restore — deterministic ordering:                            */
-    /*   1. Load persisted descriptors from server.                         */
-    /*   2. Append any hop-param descriptor from URL (no overwrite).        */
-    /*   3. Render.                                                          */
-    /*   4. Re-fetch fresh data for every descriptor.                       */
-    /*   5. Strip hop params from URL via history.replaceState.             */
+    /* Restore                                                              */
     /* ------------------------------------------------------------------ */
 
     function ingestHopParams() {
         var params = new URLSearchParams(window.location.search);
         if (!params.get('hop')) return null;
 
-        var cardType = params.get('card_type') || 'account';
+        var cardType   = params.get('card_type') || 'account';
         var descriptor = { card_type: cardType };
-        var fields = ['company_name', 'campaign_name', 'campaign_id', 'source_label',
-                      'company_url', 'respondent', 'nps_type', 'response_url',
+        var fields = ['company_name', 'campaign_name', 'campaign_id', 'campaign_uuid',
+                      'source_label', 'company_url', 'respondent', 'nps_type', 'response_url',
                       'title', 'items'];
         fields.forEach(function (f) {
             var v = params.get(f);
             if (v) descriptor[f] = v;
         });
 
-        if (cardType === 'account' && !descriptor.company_name) return null;
+        var filterFields = ['tier', 'churn_risk', 'balance', 'nps_category', 'recommendation', 'nps_opportunity', 'csat', 'ces'];
+        var filterParts  = [];
+        filterFields.forEach(function (f) {
+            var v = params.get(f);
+            if (v) { descriptor[f] = v; filterParts.push(f + ':' + v); }
+        });
+        /* ---------------------------------------------------------------- */
+
+        if (cardType === 'account' && !descriptor.company_name) {
+            if (filterParts.length === 0) return null;
+            descriptor.card_type = 'filter';
+        }
         if (cardType === 'response' && !descriptor.respondent) return null;
         if (cardType === 'list' && !descriptor.title && !descriptor.items) return null;
 
+        var allFields   = fields.concat(filterFields);
         var cleanParams = new URLSearchParams(window.location.search);
         cleanParams.delete('hop');
         cleanParams.delete('card_type');
-        fields.forEach(function (f) { cleanParams.delete(f); });
+        allFields.forEach(function (f) { cleanParams.delete(f); });
         var newUrl = window.location.pathname;
         if (cleanParams.toString()) newUrl += '?' + cleanParams.toString();
         history.replaceState(null, '', newUrl);
@@ -392,35 +677,51 @@
         return descriptor;
     }
 
+    function isFilterDuplicate(existing, incoming) {
+        if (existing.card_type !== 'filter' || incoming.card_type !== 'filter') return false;
+        var filterKeys = ['tier', 'churn_risk', 'balance', 'nps_category', 'recommendation', 'nps_opportunity', 'csat', 'ces'];
+        return filterKeys.every(function (k) { return (existing[k] != null ? String(existing[k]) : '') === (incoming[k] != null ? String(incoming[k]) : ''); });
+    }
+
+    function mergeFilterCards(base, incoming) {
+        incoming.forEach(function (fc) {
+            var alreadyIn = base.some(function (q) { return isFilterDuplicate(q, fc); });
+            if (!alreadyIn) base.push(fc);
+        });
+    }
+
     function loadAndRestore() {
         fetch(WB_API)
             .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
             .then(function (data) {
                 queries = (data.queries && Array.isArray(data.queries)) ? data.queries : [];
+                mergeFilterCards(queries, loadFilterCardsFromStorage());
 
                 var hopDescriptor = ingestHopParams();
                 if (hopDescriptor) {
                     var isDuplicate = queries.some(function (q) {
                         if (q.card_type !== hopDescriptor.card_type) return false;
-                        if (q.card_type === 'account') return q.company_name === hopDescriptor.company_name && String(q.campaign_id) === String(hopDescriptor.campaign_id);
-                        if (q.card_type === 'list') return q.title === hopDescriptor.title && String(q.campaign_id) === String(hopDescriptor.campaign_id);
-                        return q.respondent === hopDescriptor.respondent && String(q.campaign_id) === String(hopDescriptor.campaign_id);
+                        if (q.card_type === 'account')  return q.company_name === hopDescriptor.company_name && String(q.campaign_id) === String(hopDescriptor.campaign_id);
+                        if (q.card_type === 'response') return q.respondent  === hopDescriptor.respondent   && String(q.campaign_id) === String(hopDescriptor.campaign_id);
+                        if (q.card_type === 'list')     return q.title === hopDescriptor.title && String(q.campaign_id) === String(hopDescriptor.campaign_id);
+                        if (q.card_type === 'filter')   return isFilterDuplicate(q, hopDescriptor);
+                        return false;
                     });
                     if (!isDuplicate) queries.push(hopDescriptor);
                     saveState();
                 }
 
                 render();
-
-                queries.forEach(function (descriptor, idx) {
-                    refetchCardData(descriptor, idx);
-                });
+                queries.forEach(function (descriptor, idx) { refetchCardData(descriptor, idx); });
             })
             .catch(function (e) {
                 console.warn('Whiteboard: failed to load state', e);
+                queries = [];
+                mergeFilterCards(queries, loadFilterCardsFromStorage());
                 var hopDescriptor = ingestHopParams();
                 if (hopDescriptor) {
-                    queries.push(hopDescriptor);
+                    var alreadyIn = queries.some(function (q) { return isFilterDuplicate(q, hopDescriptor); });
+                    if (!alreadyIn) queries.push(hopDescriptor);
                     saveState();
                 }
                 render();
@@ -431,15 +732,10 @@
     /* Public API                                                           */
     /* ------------------------------------------------------------------ */
 
-    window.wbRemove = wbRemove;
+    window.wbRemove  = wbRemove;
     window.wbClearAll = wbClearAll;
-    window.wbAdd = wbAdd;
-
+    window.wbAdd     = wbAdd;
     window.whiteboard = { add: wbAdd, remove: wbRemove, clearAll: wbClearAll };
-
-    /* ------------------------------------------------------------------ */
-    /* Init                                                                 */
-    /* ------------------------------------------------------------------ */
 
     document.addEventListener('DOMContentLoaded', loadAndRestore);
 

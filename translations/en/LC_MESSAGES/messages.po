@@ -6477,3 +6477,39 @@ msgstr ""
 #: templates/whiteboard.html
 msgid "Unknown Respondent"
 msgstr ""
+
+#: templates/campaign_insights.html
+msgid "View in Whiteboard"
+msgstr ""
+
+#: templates/campaign_insights.html
+msgid "Open Whiteboard with accounts needing attention"
+msgstr ""
+
+#: templates/campaign_insights.html
+msgid "Send to Whiteboard"
+msgstr ""
+
+#: templates/campaign_insights.html
+msgid "Open Whiteboard for Strategic and Key accounts"
+msgstr ""
+
+#: templates/whiteboard.html
+msgid "Filtered View"
+msgstr ""
+
+#: templates/campaign_insights.html
+msgid "Open Whiteboard filtered by this tier"
+msgstr ""
+
+#: templates/campaign_insights.html
+msgid "Open Whiteboard filtered by churn risk level"
+msgstr ""
+
+#: templates/campaign_insights.html
+msgid "Open Whiteboard filtered by NPS category"
+msgstr ""
+
+#: templates/campaign_insights.html
+msgid "Open Whiteboard filtered by recommendation stance"
+msgstr ""

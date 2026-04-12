@@ -746,6 +746,9 @@ with app.app_context():
     from qbr_routes import qbr_bp, qbr_api_bp
     app.register_blueprint(qbr_bp)
     app.register_blueprint(qbr_api_bp)
+
+    from whiteboard_routes import whiteboard_api_bp
+    app.register_blueprint(whiteboard_api_bp)
     
     # Initialize Rivvalue admin user (Phase 2)
     try:
