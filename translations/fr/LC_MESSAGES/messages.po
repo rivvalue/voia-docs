@@ -10683,7 +10683,6 @@ msgstr "Télécharger le modèle de fichier CSV"
 #~ msgid "Yes, Activate Campaign"
 #~ msgstr "Campagnes actives"
 
-
 #: routes.py campaign_routes.py participant_routes.py
 msgid "You do not have permission to view this survey response."
 msgstr "Vous n'avez pas l'autorisation d'afficher cette réponse à l'enquête."
@@ -11566,87 +11565,3 @@ msgstr "Axé sur les opportunités"
 #: templates/company_responses.html
 msgid "Balanced"
 msgstr "Équilibré"
-
-#: templates/whiteboard.html
-msgid "Whiteboard"
-msgstr "Tableau blanc"
-
-#: templates/whiteboard.html
-msgid "Accumulated insights from across your dashboard"
-msgstr "Informations accumulées depuis votre tableau de bord"
-
-#: templates/whiteboard.html
-msgid "Your whiteboard is empty"
-msgstr "Votre tableau blanc est vide"
-
-#: templates/whiteboard.html
-msgid "Use the hop buttons across the dashboard to pin accounts or survey responses here."
-msgstr "Utilisez les boutons de navigation du tableau de bord pour épingler des comptes ou des réponses ici."
-
-#: templates/whiteboard.html
-msgid "Clear All"
-msgstr "Tout effacer"
-
-#: templates/whiteboard.html
-msgid "Account"
-msgstr "Compte"
-
-#: templates/whiteboard.html
-msgid "Survey Response"
-msgstr "Réponse à l'enquête"
-
-#: templates/whiteboard.html
-msgid "View Account"
-msgstr "Voir le compte"
-
-#: templates/whiteboard.html
-msgid "View Response"
-msgstr "Voir la réponse"
-
-#: templates/whiteboard.html
-msgid "Remove"
-msgstr "Supprimer"
-
-#: templates/whiteboard.html
-msgid "Unknown Account"
-msgstr "Compte inconnu"
-
-#: templates/whiteboard.html
-msgid "Unknown Respondent"
-msgstr "Répondant inconnu"
-
-#: templates/campaign_insights.html
-msgid "View in Whiteboard"
-msgstr "Voir dans le Tableau blanc"
-
-#: templates/campaign_insights.html
-msgid "Open Whiteboard with accounts needing attention"
-msgstr "Ouvrir le Tableau blanc avec les comptes à risque"
-
-#: templates/campaign_insights.html
-msgid "Send to Whiteboard"
-msgstr "Envoyer au Tableau blanc"
-
-#: templates/campaign_insights.html
-msgid "Open Whiteboard for Strategic and Key accounts"
-msgstr "Ouvrir le Tableau blanc pour les comptes Stratégiques et Clés"
-
-#: templates/whiteboard.html
-msgid "Filtered View"
-msgstr "Vue filtrée"
-
-#: templates/campaign_insights.html
-msgid "Open Whiteboard filtered by this tier"
-msgstr "Ouvrir le Tableau blanc filtré par ce niveau"
-
-#: templates/campaign_insights.html
-msgid "Open Whiteboard filtered by churn risk level"
-msgstr "Ouvrir le Tableau blanc filtré par niveau de risque d'attrition"
-
-#: templates/campaign_insights.html
-msgid "Open Whiteboard filtered by NPS category"
-msgstr "Ouvrir le Tableau blanc filtré par catégorie NPS"
-
-#: templates/campaign_insights.html
-msgid "Open Whiteboard filtered by recommendation stance"
-msgstr "Ouvrir le Tableau blanc filtré par position de recommandation"
