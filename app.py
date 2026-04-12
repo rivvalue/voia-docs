@@ -240,11 +240,13 @@ if error_monitor.enabled or cloudwatch_logger.enabled:
 # Calls both monitoring backends to preserve the shared behavior of handle_500_shared.
 if cloudwatch_logger.enabled:
     from werkzeug.exceptions import HTTPException
+    import traceback as _traceback
 
     @app.errorhandler(Exception)
     def handle_global_exception(exc):
         if isinstance(exc, HTTPException):
             return exc
+        app.logger.error('UNHANDLED EXCEPTION: %s\n%s', exc, _traceback.format_exc())
         error_monitor.capture_exception(exc, context={'error_code': 500})
         cloudwatch_logger.capture_exception(exc, context={'error_code': 500})
         return "Internal Server Error", 500

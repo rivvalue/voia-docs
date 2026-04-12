@@ -51,6 +51,7 @@
     }
 
     function normalizeTypeForVisual(originalType) {
+        if (!originalType) return 'unknown';
         const typeMap = {
             'pricing concerns': 'pricing_concerns',
             'pricing concern': 'pricing_concerns',
@@ -117,16 +118,48 @@
     // KPI STRIP
     // ============================================================================
 
-    function renderKpiStrip(kpi) {
+    function renderKpiStrip(kpi, accounts) {
         const atRiskEl = document.getElementById('strategicAtRiskCount');
         const growthEl = document.getElementById('strategicGrowthCount');
         const coverageEl = document.getElementById('strategicCoverageRate');
         const noResponseEl = document.getElementById('strategicNoResponseCount');
+        const tier1El = document.getElementById('strategicTier1Count');
+        const tier2El = document.getElementById('strategicTier2Count');
 
         if (atRiskEl) atRiskEl.textContent = kpi.at_risk_count !== undefined ? kpi.at_risk_count : '—';
         if (growthEl) growthEl.textContent = kpi.growth_count !== undefined ? kpi.growth_count : '—';
         if (coverageEl) coverageEl.textContent = kpi.coverage_rate !== undefined ? Math.round(kpi.coverage_rate * 100) + '%' : '—';
         if (noResponseEl) noResponseEl.textContent = kpi.no_response_count !== undefined ? kpi.no_response_count : '—';
+
+        if (accounts) {
+            const isTier1 = a => /^t1\b/i.test(a.customer_tier || '');
+            const isTier2 = a => /^t2\b/i.test(a.customer_tier || '');
+            const tier1Accounts = accounts.filter(isTier1);
+            const tier2Accounts = accounts.filter(isTier2);
+            if (tier1El) tier1El.textContent = tier1Accounts.length;
+            if (tier2El) tier2El.textContent = tier2Accounts.length;
+
+            const avgNps = accs => {
+                const withNps = accs.filter(a => a.company_nps !== null && a.company_nps !== undefined);
+                if (!withNps.length) return null;
+                return Math.round(withNps.reduce((s, a) => s + a.company_nps, 0) / withNps.length);
+            };
+
+            const renderNpsEl = (el, accs) => {
+                if (!el) return;
+                const nps = avgNps(accs);
+                if (nps !== null) {
+                    const sign = nps > 0 ? '+' : '';
+                    const color = nps >= 30 ? '#1A5E20' : nps >= 0 ? '#856600' : '#7B1B1B';
+                    el.innerHTML = `NPS <strong style="color:${color};">${sign}${nps}</strong>`;
+                } else {
+                    el.textContent = 'NPS —';
+                }
+            };
+
+            renderNpsEl(document.getElementById('strategicTier1Nps'), tier1Accounts);
+            renderNpsEl(document.getElementById('strategicTier2Nps'), tier2Accounts);
+        }
     }
 
     // ============================================================================
@@ -143,8 +176,8 @@
         const balanceLabel = account.balance === 'risk_heavy' ? 'Risk-Heavy' :
                              account.balance === 'opportunity_heavy' ? 'High Potential' : 'Balanced';
 
-        const tierIsStrategic = (account.customer_tier || '').toLowerCase().includes('strategic');
-        const tierBadgeColor = tierIsStrategic ? '#2E5090' : '#6c757d';
+        const tierIsT1 = /^t1\b/i.test(account.customer_tier || '');
+        const tierBadgeColor = tierIsT1 ? '#2E5090' : '#6c757d';
         const tierLabel = escapeHtml(account.customer_tier || 'Unknown');
 
         const coverageWarning = !account.has_responses
@@ -204,37 +237,16 @@
             </div>` : '';
         })() : '';
 
-        // ── Priority Action callout ────────────────────────────────────────────────
-        // Surface the single highest-severity risk action as an explicit callout
+        // ── Risk factor rows (icon, label, severity badge, description only) ────────
         const risks = (account.risk_factors || []).slice().sort((a, b) =>
             (severityPriority[b.severity] || 0) - (severityPriority[a.severity] || 0)
         );
-        const topRisk = risks.find(r => r.action && r.action.trim());
-        const priorityActionHtml = topRisk
-            ? (() => {
-                const sev = topRisk.severity || 'Medium';
-                const borderColor = sev === 'Critical' || sev === 'High' ? '#E13A44' : '#856600';
-                const bgColor = sev === 'Critical' || sev === 'High' ? '#FFF5F5' : '#FFFBF0';
-                const sevLabel = escapeHtml(sev);
-                const actionText = escapeHtml(topRisk.action);
-                return `<div class="mb-3 p-2 rounded" style="background-color:${bgColor}; border-left:3px solid ${borderColor};">
-                    <div class="fw-bold mb-1" style="font-size:0.8em; color:${borderColor};">
-                        <i class="fas fa-bolt me-1"></i>Priority Action <span style="font-weight:normal; opacity:0.8;">(${sevLabel} Risk)</span>
-                    </div>
-                    <div style="font-size:0.82em; color:#333;">${actionText}</div>
-                </div>`;
-            })()
-            : '';
-
-        // ── Risk factor rows (with description + action) ──────────────────────────
         const riskRowsHtml = risks.length > 0
             ? risks.map(risk => {
                 const visual = getVisualIndicator(normalizeTypeForVisual(risk.type), 'risk');
                 const sev = risk.severity || 'Medium';
                 const intensity = intensityMap[sev] || '●';
                 const description = risk.description ? escapeHtml(risk.description) : '';
-                const action = risk.action ? escapeHtml(risk.action) : '';
-                const isTopRisk = risk === topRisk;
                 return `<div class="mb-2 p-2 rounded" style="background-color:#FFF5F5; border:1px solid #F5C6CB;">
                     <div class="d-flex align-items-center justify-content-between mb-1">
                         <span style="font-size:0.82em; font-weight:600; color:#7B1B1B;">
@@ -242,19 +254,17 @@
                         </span>
                         <span class="badge" style="background-color:#E13A4420; color:#E13A44; border:1px solid #E13A44; font-size:0.72em;">${escapeHtml(sev)}</span>
                     </div>
-                    ${description ? `<div style="font-size:0.8em; color:#555; margin-bottom:${action ? '4px' : '0'};">${description}</div>` : ''}
-                    ${action && !isTopRisk ? `<div style="font-size:0.78em; color:#856600;"><i class="fas fa-arrow-right me-1"></i>${action}</div>` : ''}
+                    ${description ? `<div style="font-size:0.8em; color:#555;">${description}</div>` : ''}
                 </div>`;
             }).join('')
             : '';
 
-        // ── Opportunity rows (with description + action) ──────────────────────────
+        // ── Opportunity rows (icon, label, description only) ──────────────────────
         const opps = (account.opportunities || []).slice().sort((a, b) => (b.count || 1) - (a.count || 1));
         const oppRowsHtml = opps.length > 0
             ? opps.map(opp => {
                 const visual = getVisualIndicator(normalizeTypeForVisual(opp.type), 'opportunity');
                 const description = opp.description ? escapeHtml(opp.description) : '';
-                const action = opp.action ? escapeHtml(opp.action) : '';
                 const advocateTag = opp.strategic_advocate
                     ? `<span class="badge ms-1" style="background:#1A5E20; color:#fff; font-size:0.7em;">Strategic Advocate</span>`
                     : '';
@@ -265,8 +275,7 @@
                         </span>
                         ${advocateTag}
                     </div>
-                    ${description ? `<div style="font-size:0.8em; color:#555; margin-bottom:${action ? '4px' : '0'};">${description}</div>` : ''}
-                    ${action ? `<div style="font-size:0.78em; color:#1A5E20;"><i class="fas fa-arrow-right me-1"></i>${action}</div>` : ''}
+                    ${description ? `<div style="font-size:0.8em; color:#555;">${description}</div>` : ''}
                 </div>`;
             }).join('')
             : '';
@@ -279,58 +288,55 @@
         const campaignNameEscaped = escapeHtml(campaignName);
 
         return `
-            <div class="account-visual-card card mb-3 ${balanceClass}" style="border-width:2px;">
+            <div class="account-visual-card card h-100 ${balanceClass}" style="border-width:2px; background-color:#E9E8E4; box-shadow:0 2px 6px rgba(0,0,0,0.07); border-radius:0.75rem;">
                 <div class="card-body p-3">
                     ${coverageWarning}
 
-                    <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
                         <div>
-                            <h5 class="mb-1">
+                            <h5 class="mb-1" style="font-family:var(--font-family-headings); font-weight:700; font-size:1em; color:#2B2B2B;">
                                 <a href="#" onclick="openCompanyResponsesModal('${companyNameEscaped.replace(/'/g, "\\'")}', '${campaignId || ''}', '${campaignNameEscaped.replace(/'/g, "\\'")}'); return false;"
-                                   style="color:#2E5090; text-decoration:none; cursor:pointer;"
+                                   style="color:#2E5090; text-decoration:none; cursor:pointer; font-family:var(--font-family-headings); font-weight:700;"
                                    onmouseover="this.style.textDecoration='underline';"
                                    onmouseout="this.style.textDecoration='none';">
                                     ${companyNameEscaped}
-                                    <i class="fas fa-external-link-alt ms-2" style="font-size:0.7em; color:#8A8A8A;"></i>
+                                    <i class="fas fa-external-link-alt ms-2" style="font-size:0.65em; color:#8A8A8A;"></i>
                                 </a>
                             </h5>
                             <div class="d-flex flex-wrap gap-1 mt-1">
-                                <span class="badge" style="background-color:${tierBadgeColor}; color:#fff; font-size:0.72em;">
+                                <span class="badge" style="background-color:${tierBadgeColor}; color:#fff; font-size:0.72em; font-family:var(--font-family-headings); letter-spacing:0.02em;">
                                     <i class="fas fa-crown me-1"></i>${tierLabel}
                                 </span>
                                 ${influenceBadges}
                             </div>
                         </div>
                         <div class="d-flex align-items-center ms-2">
-                            <span style="font-size:1.2em; margin-right:5px; color:${balanceIconColor};">●</span>
-                            <span class="badge" style="background-color:${balanceIconColor}20; color:${balanceIconColor}; border:1px solid ${balanceIconColor};">${balanceLabel}</span>
+                            <span class="badge" style="background-color:${balanceIconColor}20; color:${balanceIconColor}; border:1px solid ${balanceIconColor}; font-family:var(--font-family-headings); font-size:0.72em; font-weight:600; letter-spacing:0.02em;">${balanceLabel}</span>
                         </div>
                     </div>
 
-                    <div class="account-details mb-3 p-2 rounded" style="background-color:#E9E8E4; border:1px solid #BDBDBD;">
+                    <div class="account-details mb-3 p-2 rounded" style="background-color:#fff; border:1px solid #BDBDBD;">
                         <div class="row">
-                            <div class="col-4">
-                                <small class="text-muted">NPS</small>
-                                <div class="fw-bold" style="color:${npsDisplay === 'N/A' ? '#8A8A8A' : npsColor};">${npsDisplay}</div>
+                            <div class="col-4 text-center">
+                                <small style="font-family:var(--font-family-base); color:#8A8A8A; font-size:0.75em; text-transform:uppercase; letter-spacing:0.04em;">NPS</small>
+                                <div class="fw-bold" style="font-family:var(--font-family-headings); color:${npsDisplay === 'N/A' ? '#8A8A8A' : npsColor}; font-size:1.1em;">${npsDisplay}</div>
                             </div>
-                            <div class="col-4">
-                                <small class="text-muted">Max Tenure</small>
-                                <div class="fw-bold" style="color:#8A8A8A;">${account.max_tenure ? account.max_tenure + ' yrs' : 'N/A'}</div>
+                            <div class="col-4 text-center">
+                                <small style="font-family:var(--font-family-base); color:#8A8A8A; font-size:0.75em; text-transform:uppercase; letter-spacing:0.04em;">Tenure</small>
+                                <div class="fw-bold" style="font-family:var(--font-family-headings); color:#8A8A8A; font-size:1.1em;">${account.max_tenure ? account.max_tenure + ' yrs' : 'N/A'}</div>
                             </div>
-                            <div class="col-4">
-                                <small class="text-muted">Responses</small>
-                                <div class="fw-bold" style="color:#8A8A8A;">${account.response_count !== undefined ? account.response_count : 'N/A'}</div>
+                            <div class="col-4 text-center">
+                                <small style="font-family:var(--font-family-base); color:#8A8A8A; font-size:0.75em; text-transform:uppercase; letter-spacing:0.04em;">Responses</small>
+                                <div class="fw-bold" style="font-family:var(--font-family-headings); color:#8A8A8A; font-size:1.1em;">${account.response_count !== undefined ? account.response_count : 'N/A'}</div>
                             </div>
                         </div>
                     </div>
 
                     ${npsByTierHtml}
 
-                    ${priorityActionHtml}
-
                     ${riskRowsHtml ? `
                         <div class="mb-3">
-                            <div class="fw-bold mb-2" style="font-size:0.85em; color:#E13A44;">
+                            <div class="fw-bold mb-2" style="font-size:0.8em; font-family:var(--font-family-headings); color:#E13A44; text-transform:uppercase; letter-spacing:0.05em;">
                                 <i class="fas fa-triangle-exclamation me-1"></i>Risk Factors
                             </div>
                             ${riskRowsHtml}
@@ -338,7 +344,7 @@
 
                     ${oppRowsHtml ? `
                         <div class="mb-2">
-                            <div class="fw-bold mb-2" style="font-size:0.85em; color:#1A5E20;">
+                            <div class="fw-bold mb-2" style="font-size:0.8em; font-family:var(--font-family-headings); color:#1A5E20; text-transform:uppercase; letter-spacing:0.05em;">
                                 <i class="fas fa-seedling me-1"></i>Growth Opportunities
                             </div>
                             ${oppRowsHtml}
@@ -348,6 +354,120 @@
                 </div>
             </div>
         `;
+    }
+
+    // ============================================================================
+    // ACCOUNT LIST RENDERER (tier grouping + balance filter)
+    // ============================================================================
+
+    let _allAccounts = [];
+    let _campaignId = null;
+    let _campaignName = null;
+
+    function renderAccountList(listEl, accounts, campaignId, campaignName) {
+        _allAccounts = accounts;
+        _campaignId = campaignId;
+        _campaignName = campaignName;
+
+        const activeFilter = (listEl.dataset.balanceFilter) || 'all';
+        _renderFilteredList(listEl, activeFilter);
+    }
+
+    function _renderFilteredList(listEl, balanceFilter) {
+        listEl.dataset.balanceFilter = balanceFilter;
+
+        const filtered = balanceFilter === 'all'
+            ? _allAccounts
+            : _allAccounts.filter(a => {
+                const b = (a.balance || '').toLowerCase();
+                if (balanceFilter === 'risk_heavy') return b === 'risk_heavy';
+                if (balanceFilter === 'balanced') return b === 'balanced';
+                if (balanceFilter === 'high_potential') return b === 'opportunity_heavy' || b === 'high_potential';
+                return true;
+            });
+
+        const isTier1 = a => /^t1\b/i.test(a.customer_tier || '');
+        const isTier2 = a => /^t2\b/i.test(a.customer_tier || '');
+        const tier1 = filtered.filter(isTier1);
+        const tier2 = filtered.filter(isTier2);
+        const tierOther = filtered.filter(a => !isTier1(a) && !isTier2(a));
+
+        const filterHtml = `
+            <div class="d-flex align-items-center gap-2 mb-4 flex-wrap" id="balanceFilterBar">
+                <span style="font-family:var(--font-family-headings); font-size:0.8em; font-weight:600; color:#8A8A8A; text-transform:uppercase; letter-spacing:0.05em;">Filter:</span>
+                <div class="btn-group btn-group-sm" role="group" aria-label="Balance filter">
+                    ${['all','risk_heavy','balanced','high_potential'].map(val => {
+                        const labels = { all: 'All', risk_heavy: 'Risk-Heavy', balanced: 'Balanced', high_potential: 'High Potential' };
+                        const active = balanceFilter === val;
+                        return `<button type="button"
+                            class="btn ${active ? 'btn-dark' : 'btn-outline-secondary'} strategic-balance-btn"
+                            style="font-family:var(--font-family-headings); font-size:0.78em; font-weight:600; letter-spacing:0.03em; ${active ? 'background-color:#2B2B2B; border-color:#2B2B2B; color:#fff;' : 'color:#8A8A8A; border-color:#BDBDBD;'}"
+                            data-filter="${val}">${labels[val]}</button>`;
+                    }).join('')}
+                </div>
+                <span style="font-size:0.82em; color:#8A8A8A; font-family:var(--font-family-base);">${filtered.length} account${filtered.length !== 1 ? 's' : ''}</span>
+            </div>`;
+
+        let sectionsHtml = '';
+
+        if (tier1.length > 0) {
+            sectionsHtml += `
+                <div class="strategic-tier-section mb-5">
+                    <div class="d-flex align-items-center mb-3 pb-2" style="border-bottom:2px solid #2E5090;">
+                        <i class="fas fa-crown me-2" style="color:#2E5090;"></i>
+                        <span style="font-family:var(--font-family-headings); font-size:1em; font-weight:700; color:#2E5090; text-transform:uppercase; letter-spacing:0.04em;">Tier 1</span>
+                        <span class="ms-2" style="font-family:var(--font-family-base); font-size:0.82em; color:#8A8A8A;">${tier1.length} account${tier1.length !== 1 ? 's' : ''}</span>
+                    </div>
+                    <div class="row g-3">
+                        ${tier1.map(a => `<div class="col-12 col-md-6 col-xl-4">${renderAccountCard(a, _campaignId, _campaignName)}</div>`).join('')}
+                    </div>
+                </div>`;
+        }
+
+        if (tier2.length > 0) {
+            sectionsHtml += `
+                <div class="strategic-tier-section mb-5">
+                    <div class="d-flex align-items-center mb-3 pb-2" style="border-bottom:2px solid #6c757d;">
+                        <i class="fas fa-key me-2" style="color:#6c757d;"></i>
+                        <span style="font-family:var(--font-family-headings); font-size:1em; font-weight:700; color:#6c757d; text-transform:uppercase; letter-spacing:0.04em;">Tier 2</span>
+                        <span class="ms-2" style="font-family:var(--font-family-base); font-size:0.82em; color:#8A8A8A;">${tier2.length} account${tier2.length !== 1 ? 's' : ''}</span>
+                    </div>
+                    <div class="row g-3">
+                        ${tier2.map(a => `<div class="col-12 col-md-6 col-xl-4">${renderAccountCard(a, _campaignId, _campaignName)}</div>`).join('')}
+                    </div>
+                </div>`;
+        }
+
+        if (tierOther.length > 0) {
+            sectionsHtml += `
+                <div class="strategic-tier-section mb-5">
+                    <div class="d-flex align-items-center mb-3 pb-2" style="border-bottom:2px solid #BDBDBD;">
+                        <i class="fas fa-building me-2" style="color:#8A8A8A;"></i>
+                        <span style="font-family:var(--font-family-headings); font-size:1em; font-weight:700; color:#8A8A8A; text-transform:uppercase; letter-spacing:0.04em;">Other Strategic / Key</span>
+                        <span class="ms-2" style="font-family:var(--font-family-base); font-size:0.82em; color:#8A8A8A;">${tierOther.length} account${tierOther.length !== 1 ? 's' : ''}</span>
+                    </div>
+                    <div class="row g-3">
+                        ${tierOther.map(a => `<div class="col-12 col-md-6 col-xl-4">${renderAccountCard(a, _campaignId, _campaignName)}</div>`).join('')}
+                    </div>
+                </div>`;
+        }
+
+        if (filtered.length === 0) {
+            sectionsHtml = `<div class="text-center py-4 text-muted" style="font-family:var(--font-family-base);">No accounts match this filter.</div>`;
+        }
+
+        listEl.innerHTML = filterHtml + sectionsHtml;
+
+        listEl.querySelectorAll('.strategic-balance-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                _renderFilteredList(listEl, this.dataset.filter);
+                if (typeof applyColorOverrides === 'function') applyColorOverrides(listEl, 100);
+            });
+        });
+
+        if (typeof applyColorOverrides === 'function') {
+            applyColorOverrides(listEl, 100);
+        }
     }
 
     // ============================================================================
@@ -364,15 +484,20 @@
         if (listEl) listEl.classList.add('d-none');
 
         const campaignSelect = document.getElementById('campaignFilter');
-        const campaignId = campaignSelect && campaignSelect.value ? campaignSelect.value : null;
-        const campaignName = campaignSelect && campaignId
-            ? campaignSelect.options[campaignSelect.selectedIndex].text
+        // dashboard.js stores integer ID in data-id and UUID in option.value
+        // API call needs the integer; company-responses link needs the UUID
+        const selectedOption = campaignSelect && campaignSelect.selectedOptions[0];
+        const campaignId = selectedOption
+            ? (selectedOption.getAttribute('data-id') || null)
+            : (window.dashboardState && window.dashboardState.selectedCampaignId
+                ? String(window.dashboardState.selectedCampaignId) : null);
+        const campaignUuid = selectedOption ? (selectedOption.value || null) : null;
+        const campaignName = selectedOption && selectedOption.text
+            ? selectedOption.text
             : 'Current Campaign';
-        const numericCampaignId = campaignSelect && campaignSelect.selectedOptions[0]
-            ? campaignSelect.selectedOptions[0].getAttribute('data-id') : null;
 
         const params = new URLSearchParams();
-        if (numericCampaignId) params.append('campaign_id', numericCampaignId);
+        if (campaignId) params.append('campaign_id', campaignId);
         params.append('_t', Date.now());
 
         fetch(`/api/strategic_accounts?${params}`)
@@ -386,7 +511,8 @@
                 const accounts = data.accounts || [];
                 const kpi = data.kpi || {};
 
-                renderKpiStrip(kpi);
+                renderKpiStrip(kpi, accounts);
+                renderNoResponseList(accounts);
 
                 if (accounts.length === 0) {
                     listEl.innerHTML = `
@@ -399,14 +525,7 @@
                             </p>
                         </div>`;
                 } else {
-                    const cardsHtml = accounts.map(account =>
-                        renderAccountCard(account, campaignId, campaignName)
-                    ).join('');
-                    listEl.innerHTML = cardsHtml;
-
-                    if (typeof applyColorOverrides === 'function') {
-                        applyColorOverrides(listEl, 100);
-                    }
+                    renderAccountList(listEl, accounts, campaignUuid || campaignId, campaignName);
                 }
 
                 if (loadingEl) loadingEl.classList.add('d-none');
@@ -428,11 +547,57 @@
     }
 
     // ============================================================================
+    // NO-RESPONSE LIST
+    // ============================================================================
+
+    function renderNoResponseList(accounts) {
+        const section = document.getElementById('strategicNoResponseSection');
+        const tbody   = document.getElementById('strategicNoResponseList');
+        const badge   = document.getElementById('strategicNoResponseBadge');
+        if (!section || !tbody) return;
+
+        const noResponse = accounts.filter(a => !a.has_responses);
+
+        if (noResponse.length === 0) {
+            section.classList.add('d-none');
+            return;
+        }
+
+        if (badge) badge.textContent = noResponse.length;
+
+        const tierLabel = tier => {
+            if (!tier) return '—';
+            const t = tier.toLowerCase();
+            if (t.includes('strategic')) return '<span class="badge" style="background:#1A3D5C;color:#fff;">Strategic</span>';
+            if (t.includes('key'))       return '<span class="badge" style="background:#2E6DA4;color:#fff;">Key</span>';
+            return `<span class="badge bg-secondary">${escapeHtml(tier)}</span>`;
+        };
+
+        tbody.innerHTML = noResponse.map(a => `
+            <tr>
+                <td class="ps-4 fw-semibold" style="vertical-align:middle;">
+                    <i class="fas fa-building me-2 text-muted" style="font-size:0.85rem;"></i>
+                    ${escapeHtml(a.company_name || '—')}
+                </td>
+                <td style="vertical-align:middle;">${tierLabel(a.customer_tier)}</td>
+                <td style="vertical-align:middle;">
+                    <span class="badge bg-warning text-dark">
+                        <i class="fas fa-hourglass-half me-1"></i>No response yet
+                    </span>
+                </td>
+            </tr>
+        `).join('');
+
+        section.classList.remove('d-none');
+    }
+
+    // ============================================================================
     // EXPORTS
     // ============================================================================
 
     window.dashboardModules.strategicAccounts = {
-        loadStrategicAccounts
+        loadStrategicAccounts,
+        isLoaded: function() { return loaded; }
     };
 
     console.log('📦 Dashboard Strategic Accounts module loaded');

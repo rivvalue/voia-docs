@@ -1076,28 +1076,42 @@
         <div class="tab-pane fade" id="strategic-accounts" role="tabpanel" aria-labelledby="strategic-accounts-tab">
             <!-- KPI Strip -->
             <div class="row mb-4 g-3" id="strategicAccountsKpiStrip">
-                <div class="col-md-3">
+                <div class="col-md-2">
+                    <div class="kpi-card text-center">
+                        <div class="kpi-value" id="strategicTier1Count">—</div>
+                        <div class="kpi-label">{{ _('Tier 1 Accounts') }}</div>
+                        <div class="kpi-trend" id="strategicTier1Nps">NPS —</div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="kpi-card text-center">
+                        <div class="kpi-value" id="strategicTier2Count">—</div>
+                        <div class="kpi-label">{{ _('Tier 2 Accounts') }}</div>
+                        <div class="kpi-trend" id="strategicTier2Nps">NPS —</div>
+                    </div>
+                </div>
+                <div class="col-md-2">
                     <div class="kpi-card text-center">
                         <div class="kpi-value text-danger" id="strategicAtRiskCount">—</div>
                         <div class="kpi-label">{{ _('Accounts at Risk') }}</div>
                         <div class="kpi-trend">{{ _('Any risk level above Minimal') }}</div>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <div class="kpi-card text-center">
                         <div class="kpi-value text-success" id="strategicGrowthCount">—</div>
                         <div class="kpi-label">{{ _('Growth Opportunities') }}</div>
                         <div class="kpi-trend">{{ _('Accounts with active opportunities') }}</div>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <div class="kpi-card text-center">
                         <div class="kpi-value" id="strategicCoverageRate">—</div>
                         <div class="kpi-label">{{ _('Response Coverage') }}</div>
                         <div class="kpi-trend">{{ _('Accounts with responses / total') }}</div>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <div class="kpi-card text-center">
                         <div class="kpi-value text-warning" id="strategicNoResponseCount">—</div>
                         <div class="kpi-label">{{ _('No Response') }}</div>
@@ -1118,8 +1132,7 @@
                     <small class="text-muted">{{ _('Account health cards for your highest-tier customers') }}</small>
                 </div>
                 <div class="card-body">
-                    {% if use_refactored_frontend %}
-                    <!-- Loading State (modular mode: JS module takes over) -->
+                    <!-- Loading State (populated by strategic-accounts.js in both legacy and modular modes) -->
                     <div id="strategicAccountsLoading" class="text-center py-5">
                         <div class="spinner-border text-primary" role="status">
                             <span class="visually-hidden">{{ _('Loading...') }}</span>
@@ -1130,15 +1143,6 @@
                     <div id="strategicAccountsList" class="d-none">
                         <!-- Populated by strategic-accounts.js -->
                     </div>
-                    {% else %}
-                    <!-- Legacy mode: strategic-accounts.js is not loaded -->
-                    <div id="strategicAccountsLoading" class="d-none"></div>
-                    <div id="strategicAccountsList" class="text-center py-5">
-                        <i class="fas fa-crown fa-3x mb-3" style="color:#BDBDBD;"></i>
-                        <h5 class="text-muted">{{ _('Strategic Accounts') }}</h5>
-                        <p class="text-muted">{{ _('This view requires the updated dashboard. Please enable the new UI version to access Strategic Accounts.') }}</p>
-                    </div>
-                    {% endif %}
                 </div>
             </div>
         </div>
@@ -1403,6 +1407,9 @@ document.addEventListener('DOMContentLoaded', function() {
 <script src="{{ url_for('static', filename='js/dashboard/dashboard-init.js') }}?v={{ range(1000, 9999) | random }}"></script>
 {% else %}
 <!-- Legacy: Monolithic Dashboard JavaScript -->
+<!-- Strategic Accounts module runs in both modes — load its two dependencies before dashboard.js -->
+<script src="{{ url_for('static', filename='js/dashboard/bootstrap.js') }}?v={{ range(1000, 9999) | random }}"></script>
+<script src="{{ url_for('static', filename='js/dashboard/strategic-accounts.js') }}?v={{ range(1000, 9999) | random }}"></script>
 <script src="{{ url_for('static', filename='js/dashboard.js') }}?v={{ range(1000, 9999) | random }}"></script>
 {% endif %}
 

@@ -3067,18 +3067,26 @@ def api_strategic_accounts():
                 campaign_id = active_campaign.id
                 logger.info(f"📊 /api/strategic_accounts defaulting to {account_context} active campaign: {active_campaign.name} (ID: {campaign_id})")
             else:
-                logger.info(f"📊 /api/strategic_accounts - No active campaign for {account_context}")
-                return jsonify({
-                    'success': True,
-                    'accounts': [],
-                    'kpi': {
-                        'at_risk_count': 0,
-                        'growth_count': 0,
-                        'no_response_count': 0,
-                        'coverage_rate': 0.0,
-                        'total_count': 0
-                    }
-                })
+                recent_campaign = Campaign.query.filter(
+                    Campaign.business_account_id == target_business_account_id,
+                    Campaign.status.in_(['active', 'completed'])
+                ).order_by(Campaign.id.desc()).first()
+                if recent_campaign:
+                    campaign_id = recent_campaign.id
+                    logger.info(f"📊 /api/strategic_accounts defaulting to {account_context} most recent campaign: {recent_campaign.name} (ID: {campaign_id})")
+                else:
+                    logger.info(f"📊 /api/strategic_accounts - No active campaign for {account_context}")
+                    return jsonify({
+                        'success': True,
+                        'accounts': [],
+                        'kpi': {
+                            'at_risk_count': 0,
+                            'growth_count': 0,
+                            'no_response_count': 0,
+                            'coverage_rate': 0.0,
+                            'total_count': 0
+                        }
+                    })
 
         campaign = Campaign.query.filter_by(
             id=campaign_id,

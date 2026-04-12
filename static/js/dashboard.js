@@ -570,6 +570,14 @@ async function applyCampaignFilter() {
             setTimeout(() => createThemesChart(), 500);
         }
     }, 200);
+
+    // Refresh Strategic Accounts if the tab is currently visible or was previously loaded
+    const strategicTabPanel = document.getElementById('strategic-accounts');
+    const strategicTabVisible = strategicTabPanel && strategicTabPanel.classList.contains('show');
+    const saModule = window.dashboardModules && window.dashboardModules.strategicAccounts;
+    if (saModule && (strategicTabVisible || saModule.isLoaded())) {
+        saModule.loadStrategicAccounts();
+    }
 }
 
 // Clear campaign filter

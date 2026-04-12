@@ -309,6 +309,15 @@
             // Also refresh the executive summary KPI overview
             await window.dashboardModules.kpiOverview.loadKpiOverview();
         }
+
+        // Refresh Strategic Accounts if the tab is currently visible OR was previously loaded
+        // (If never visited, the shown.bs.tab handler will load it fresh when the user navigates there)
+        const strategicTabPanel = document.getElementById('strategic-accounts');
+        const strategicTabVisible = strategicTabPanel && strategicTabPanel.classList.contains('show');
+        if (window.dashboardModules.strategicAccounts &&
+                (strategicTabVisible || window.dashboardModules.strategicAccounts.isLoaded())) {
+            window.dashboardModules.strategicAccounts.loadStrategicAccounts();
+        }
         
         // Update global indicator
         updateGlobalCampaignIndicator();
