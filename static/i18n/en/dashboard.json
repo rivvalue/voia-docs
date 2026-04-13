@@ -83,5 +83,19 @@
   "filter.balance": "Balance",
   "filter.nps_category": "NPS Category",
   "filter.recommendation": "Recommendation",
-  "filter.nps_opportunity": "NPS Band"
+  "filter.nps_opportunity": "NPS Band",
+  "priorityFocus.accountsToActOn": "top 5 Accounts to act on",
+  "priorityFocus.riskType.competitor": "competitor risk",
+  "priorityFocus.riskType.pricing": "pricing concern",
+  "priorityFocus.riskType.product": "product issue",
+  "priorityFocus.riskType.service": "service gap",
+  "priorityFocus.riskType.churn": "churn risk",
+  "priorityFocus.riskType.other": "risk factor",
+  "priorityFocus.oppType.upsell": "upsell",
+  "priorityFocus.oppType.expansion": "expansion",
+  "priorityFocus.oppType.crossSell": "cross-sell",
+  "priorityFocus.oppType.referral": "referral",
+  "priorityFocus.oppType.advocacy": "advocacy",
+  "priorityFocus.oppType.renewal": "renewal",
+  "priorityFocus.oppType.other": "growth opportunity"
 }

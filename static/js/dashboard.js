@@ -3004,6 +3004,79 @@ function createGrowthFactorChart() {
             }).sort((a, b) => Number(a.nps_score) - Number(b.nps_score)).slice(0, 3);
         };
 
+        // --- Account Intelligence account lists per priority tier ---
+        const _t = key => (window.translations && window.translations[key]) || key;
+        const _aiAccounts = (dashboardData && dashboardData.account_intelligence) || [];
+
+        // Helper: get primary type label from a list of factors (risk_factors or opportunities)
+        function _getPrimaryTypeLabel(factors, kind) {
+            if (!factors || factors.length === 0) return '';
+            // Sort by count desc, pick the first
+            const sorted = [...factors].sort((a, b) => (b.count || 1) - (a.count || 1));
+            const type = (sorted[0].type || '').toLowerCase();
+            if (kind === 'risk') {
+                if (type.includes('competitor')) return _t('priorityFocus.riskType.competitor');
+                if (type.includes('pric'))       return _t('priorityFocus.riskType.pricing');
+                if (type.includes('product'))    return _t('priorityFocus.riskType.product');
+                if (type.includes('service'))    return _t('priorityFocus.riskType.service');
+                if (type.includes('churn'))      return _t('priorityFocus.riskType.churn');
+                return _t('priorityFocus.riskType.other');
+            } else {
+                if (type.includes('upsell'))     return _t('priorityFocus.oppType.upsell');
+                if (type.includes('expansion'))  return _t('priorityFocus.oppType.expansion');
+                if (type.includes('cross'))      return _t('priorityFocus.oppType.crossSell');
+                if (type.includes('referral'))   return _t('priorityFocus.oppType.referral');
+                if (type.includes('advoc'))      return _t('priorityFocus.oppType.advocacy');
+                if (type.includes('renewal'))    return _t('priorityFocus.oppType.renewal');
+                return _t('priorityFocus.oppType.other');
+            }
+        }
+
+        // P1 — risk_heavy accounts, sorted by risk_score desc, top 5
+        const _p1Accounts = _aiAccounts
+            .filter(a => a.balance === 'risk_heavy' && a.confidence_level !== 'insufficient')
+            .sort((a, b) => (b.risk_score || 0) - (a.risk_score || 0))
+            .slice(0, 5);
+
+        // P2 — balanced accounts, sorted by company_nps desc (highest NPS first = closest to
+        // tipping into opportunity_heavy territory), top 5
+        const _p2Accounts = _aiAccounts
+            .filter(a => a.balance === 'balanced' && a.confidence_level !== 'insufficient')
+            .sort((a, b) => {
+                const na = a.company_nps != null ? Number(a.company_nps) : -Infinity;
+                const nb = b.company_nps != null ? Number(b.company_nps) : -Infinity;
+                return nb - na;
+            })
+            .slice(0, 5);
+
+        // P3 — opportunity_heavy accounts, sorted by opportunity_score desc, top 5
+        const _p3Accounts = _aiAccounts
+            .filter(a => a.balance === 'opportunity_heavy' && a.confidence_level !== 'insufficient')
+            .sort((a, b) => (b.opportunity_score || 0) - (a.opportunity_score || 0))
+            .slice(0, 5);
+
+        // Helper: build account list HTML for a priority row
+        function _buildAccountListHtml(accounts, kind) {
+            if (!accounts || accounts.length === 0) return '';
+            const label = _t('priorityFocus.accountsToActOn');
+            const items = accounts.map(a => {
+                const typeLabel = kind === 'p2' ? '' : _getPrimaryTypeLabel(
+                    kind === 'p1' ? a.risk_factors : a.opportunities,
+                    kind === 'p1' ? 'risk' : 'opp'
+                );
+                const typePill = typeLabel
+                    ? `<span style="font-size:0.72rem;color:#6c757d;background:#f0f0f0;border:1px solid #ddd;border-radius:10px;padding:1px 7px;margin-left:5px;white-space:nowrap;">${escapeHtml(typeLabel)}</span>`
+                    : '';
+                return `<li style="display:flex;align-items:center;flex-wrap:wrap;gap:0;margin-bottom:3px;">
+                    <span style="font-size:0.78rem;color:#1e293b;font-weight:500;">${escapeHtml(a.company_name)}</span>${typePill}
+                </li>`;
+            }).join('');
+            return `<div style="margin-top:7px;">
+                <div style="font-size:0.72rem;color:#6c757d;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:3px;">${escapeHtml(label)}</div>
+                <ul style="list-style:none;padding:0;margin:0;">${items}</ul>
+            </div>`;
+        }
+
         const rows = [];
 
         if (riskTop && riskTop.count > 0) {
@@ -3017,7 +3090,8 @@ function createGrowthFactorChart() {
                 body: `<strong>${riskTop.count} account${riskTop.count !== 1 ? 's' : ''} (${pct}%)</strong> in the ${riskTop.nps_range} NPS band. ` +
                       `Bain research links this zone to ` + (riskTop.growth_rate ? `${riskTop.growth_rate} organic growth` : 'minimal organic growth') + `. ` +
                       `Run targeted executive outreach and resolve top pain points to prevent churn.`,
-                accounts: _getAccountsForRange(['<0', '0-29'])
+                accounts: _getAccountsForRange(['<0', '0-29']),
+                aiAccountListHtml: _buildAccountListHtml(_p1Accounts, 'p1')
             });
         }
 
@@ -3032,7 +3106,8 @@ function createGrowthFactorChart() {
                 body: `<strong>${passiveTop.count} account${passiveTop.count !== 1 ? 's' : ''} (${pct}%)</strong> in the 30–49 NPS band — your conversion opportunity. ` +
                       `A shift to the 50–69 band would lift expected growth from ~15% to ~25%. ` +
                       `Focus on closing known service gaps and demonstrating new value.`,
-                accounts: _getAccountsForRange(['30-49'])
+                accounts: _getAccountsForRange(['30-49']),
+                aiAccountListHtml: _buildAccountListHtml(_p2Accounts, 'p2')
             });
         }
 
@@ -3049,7 +3124,8 @@ function createGrowthFactorChart() {
                       `These are your growth engine — expected organic growth of ` +
                       (championTop.growth_rate ? `${championTop.growth_rate}` : 'up to 40%') + `. ` +
                       `Engage them for referrals, case studies, and co-marketing to compound growth.`,
-                accounts: _getAccountsForRange(['50-69', '70-100'])
+                accounts: _getAccountsForRange(['50-69', '70-100']),
+                aiAccountListHtml: _buildAccountListHtml(_p3Accounts, 'p3')
             });
         }
 
@@ -3066,6 +3142,7 @@ function createGrowthFactorChart() {
                             ${r.title}
                         </div>
                         <div class="text-muted" style="font-size:0.78rem;line-height:1.45;">${r.body}</div>
+                        ${r.aiAccountListHtml || ''}
                     </div>
                 </div>`;
             }).join('');

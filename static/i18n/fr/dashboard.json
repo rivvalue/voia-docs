@@ -83,5 +83,19 @@
   "filter.balance": "Équilibre",
   "filter.nps_category": "Catégorie NPS",
   "filter.recommendation": "Recommandation",
-  "filter.nps_opportunity": "Plage NPS"
+  "filter.nps_opportunity": "Plage NPS",
+  "priorityFocus.accountsToActOn": "top 5 Comptes à traiter",
+  "priorityFocus.riskType.competitor": "risque concurrentiel",
+  "priorityFocus.riskType.pricing": "préoccupation tarifaire",
+  "priorityFocus.riskType.product": "problème produit",
+  "priorityFocus.riskType.service": "lacune de service",
+  "priorityFocus.riskType.churn": "risque d'attrition",
+  "priorityFocus.riskType.other": "facteur de risque",
+  "priorityFocus.oppType.upsell": "montée en gamme",
+  "priorityFocus.oppType.expansion": "expansion",
+  "priorityFocus.oppType.crossSell": "vente croisée",
+  "priorityFocus.oppType.referral": "référencement",
+  "priorityFocus.oppType.advocacy": "ambassadeur",
+  "priorityFocus.oppType.renewal": "renouvellement",
+  "priorityFocus.oppType.other": "opportunité de croissance"
 }
