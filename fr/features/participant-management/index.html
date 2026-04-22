@@ -553,6 +553,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#fonction-du-participant" class="md-nav__link">
+    <span class="md-ellipsis">
+      Fonction du participant
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#segmentation" class="md-nav__link">
     <span class="md-ellipsis">
       Segmentation
@@ -828,6 +837,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#fonction-du-participant" class="md-nav__link">
+    <span class="md-ellipsis">
+      Fonction du participant
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#segmentation" class="md-nav__link">
     <span class="md-ellipsis">
       Segmentation
@@ -875,11 +893,29 @@
 <p><strong>Traitement en arrière-plan :</strong> Les imports CSV volumineux sont traités en arrière-plan. Le téléversement retourne immédiatement avec un identifiant de traitement, et vous recevrez une notification dans l'application lorsque l'import sera terminé. Vous pouvez continuer à utiliser la plateforme pendant l'import.</p>
 <p><strong>Validation :</strong> VOÏA vérifie les doublons d'email et les données invalides</p>
 <hr />
+<h2 id="fonction-du-participant">Fonction du participant<a class="headerlink" href="#fonction-du-participant" title="Permanent link">&para;</a></h2>
+<p>Chaque participant dispose d'un champ <strong>Fonction</strong> optionnel qui décrit son domaine professionnel au sein de son organisation — par exemple, Finance, Ingénierie, Ventes, Customer Success, Opérations ou Marketing.</p>
+<p><strong>Ce que représente la Fonction</strong>
+La Fonction est distincte du niveau hiérarchique basé sur l'ancienneté (C-level, VP, Manager, etc.) qui pilote le scoring pondéré par l'influence. Alors que le niveau hiérarchique indique le degré de séniorité d'une personne, la Fonction indique dans quel domaine de l'entreprise elle travaille. Ces deux champs sont indépendants ; renseigner l'un n'affecte pas l'autre.</p>
+<p><strong>Comment renseigner le champ Fonction</strong></p>
+<p><em>Via le formulaire du participant :</em>
+1. Ouvrez la fiche du participant en cliquant sur son nom dans la liste des participants
+2. Repérez le champ <strong>Fonction</strong> dans le formulaire de détails du participant
+3. Saisissez ou sélectionnez le domaine fonctionnel approprié
+4. Enregistrez la fiche</p>
+<p><em>Via l'import CSV :</em>
+Incluez une colonne <code>function</code> dans votre fichier CSV aux côtés des autres champs des participants. Lors de l'import, VOÏA associe automatiquement les valeurs de cette colonne au champ Fonction. Toute ligne de participant sans valeur dans la colonne <code>function</code> n'aura pas de Fonction définie — les valeurs de Fonction existantes de ces participants ne sont pas écrasées par une cellule vide.</p>
+<p><strong>Effet sur la personnalisation IA</strong>
+Lorsque la Fonction d'un participant est renseignée, l'IA conversationnelle utilise cette valeur pour personnaliser le ton et la formulation de la conversation de sondage selon le domaine spécifique de ce participant. Un répondant en Finance pourra recevoir des questions de relance formulées autour du budget et du retour sur investissement, tandis qu'un répondant en Ingénierie pourra être interrogé sur la fiabilité technique et l'intégration. Cette personnalisation se produit sans modifier le niveau hiérarchique du participant ni altérer la pondération de ses réponses dans les calculs de scoring.</p>
+<p><strong>Effet sur les analyses</strong>
+Lorsque des valeurs de Fonction sont présentes parmi les répondants d'une campagne, un panneau de <strong>répartition par fonction</strong> devient disponible dans les Insights de campagne. Consultez la section <a href="../analytics/#répartition-par-fonction">Répartition par fonction</a> pour plus de détails.</p>
+<hr />
 <h2 id="segmentation">Segmentation<a class="headerlink" href="#segmentation" title="Permanent link">&para;</a></h2>
 <p>Regroupez les participants par :
 - <strong>Entreprise :</strong> Suivez les retours par organisation
 - <strong>Rôle :</strong> Dirigeants vs. utilisateurs terrain
-- <strong>Ancienneté :</strong> Clients de longue date vs. nouveaux clients</p>
+- <strong>Ancienneté :</strong> Clients de longue date vs. nouveaux clients
+- <strong>Fonction :</strong> Domaine professionnel au sein de l'organisation (Finance, Ingénierie, Ventes, etc.)</p>
 <p><strong>Utilisez la segmentation pour :</strong>
 - Des campagnes ciblées
 - Des analyses segmentées
