@@ -498,6 +498,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#conversation-reliability" class="md-nav__link">
+    <span class="md-ellipsis">
+      Conversation Reliability
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#automatic-analysis" class="md-nav__link">
     <span class="md-ellipsis">
       Automatic Analysis
@@ -819,6 +828,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#conversation-reliability" class="md-nav__link">
+    <span class="md-ellipsis">
+      Conversation Reliability
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#automatic-analysis" class="md-nav__link">
     <span class="md-ellipsis">
       Automatic Analysis
@@ -866,7 +884,23 @@
 - Higher completion rates (customers prefer conversations)
 - Richer feedback (more detailed responses)
 - Less survey fatigue
-- Automatic language detection</p>
+- Runs in the campaign's language (English or French)</p>
+<hr />
+<h2 id="conversation-reliability">Conversation Reliability<a class="headerlink" href="#conversation-reliability" title="Permanent link">&para;</a></h2>
+<p>VOÏA's conversational engine is designed to handle connection problems without disrupting the participant's experience.</p>
+<p><strong>Automatic retry</strong>
+When a brief network hiccup or AI service disruption occurs during a conversation, VOÏA retries the turn automatically — up to three times, within a few seconds. The participant sees the normal "VOÏA is typing…" indicator throughout. Most transient problems are resolved this way and are completely invisible.</p>
+<p><strong>Clear error messages when retry is not enough</strong>
+If automatic retry cannot resolve the problem, participants see a specific, actionable message rather than a confusing technical error. Each message describes what happened and offers exactly one next step:</p>
+<ul>
+<li><em>Brief connection problem, answers preserved:</em> a "Retry" button appears so the participant can resend their last message without retyping it.</li>
+<li><em>Session could not be reloaded:</em> a "Refresh page" prompt appears. Refreshing lets VOÏA attempt to restore the conversation from where it left off.</li>
+<li><em>Session has expired:</em> a clear card explains that the previous session is no longer available, with an option to start a new conversation.</li>
+</ul>
+<p><strong>Messages always in the survey's language</strong>
+Error messages follow the campaign's language setting — French for French campaigns, English for English campaigns — regardless of the participant's browser or device language.</p>
+<p><strong>No silent restarts</strong>
+Previously, if a session could not be loaded, participants would be quietly dropped into a fresh conversation without their prior answers — with no indication that anything had changed. That behaviour is no longer possible. Any session problem now surfaces a clear prompt so participants know what happened and what to do.</p>
 <hr />
 <h2 id="automatic-analysis">Automatic Analysis<a class="headerlink" href="#automatic-analysis" title="Permanent link">&para;</a></h2>
 <p>VOÏA analyzes every response automatically:</p>
