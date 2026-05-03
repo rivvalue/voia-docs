@@ -1,0 +1,2123 @@
+
+<!doctype html>
+<html lang="fr" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Voice of Client - AI-Powered Voice Of Client Platform for B2B.">
+      
+      
+        <meta name="author" content="VOÏA Platform">
+      
+      
+        <link rel="canonical" href="https://voia-docs.rivvalue.com/fr/features/campaign-survey-settings/">
+      
+      
+        <link rel="prev" href="../campaign-management/">
+      
+      
+        <link rel="next" href="../participant-management/">
+      
+      
+      <link rel="icon" href="../../../assets/logo.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.23">
+    
+    
+      
+        <title>Configurer les paramètres du sondage - VOÏA Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.84d31ad4.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Karla:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Karla";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../overrides/custom.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#configurer-les-parametres-du-sondage" class="md-skip">
+          Aller au contenu
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="En-tête">
+    <a href="../../" title="VOÏA Documentation" class="md-header__button md-logo" aria-label="VOÏA Documentation" data-md-component="logo">
+      
+  <img src="../../../assets/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            VOÏA Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Configurer les paramètres du sondage
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Sélectionner la langue">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="../../../features/campaign-survey-settings/" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="fr" class="md-select__link">
+              Français
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Rechercher" placeholder="Rechercher" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Recherche">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Effacer" aria-label="Effacer" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initialisation de la recherche
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Onglets" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../overview/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Présentation
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Démarrage
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+  Fonctionnalités
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../licenses/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Licences
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../" title="VOÏA Documentation" class="md-nav__button md-logo" aria-label="VOÏA Documentation" data-md-component="logo">
+      
+  <img src="../../../assets/logo.png" alt="logo">
+
+    </a>
+    VOÏA Documentation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Présentation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Démarrage
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Fonctionnalités
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Fonctionnalités
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Aperçu
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ai-survey-intelligence/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Intelligence IA
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../campaign-management/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Gestion des campagnes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Configurer les paramètres du sondage
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Configurer les paramètres du sondage
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table des matières">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#ou-trouver-ces-parametres" class="md-nav__link">
+    <span class="md-ellipsis">
+      Où trouver ces paramètres
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-informations-de-base-creer-modifier-la-campagne" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Informations de base (Créer / Modifier la campagne)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-calendrier-de-la-campagne" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Calendrier de la campagne
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-confidentialite" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Confidentialité
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-contenu-de-lemail-dinvitation" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Contenu de l'e‑mail d'invitation
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-rappels" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. Rappels
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Rappels">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#emails-de-rappel-micampagne-automatique-vs-configurable" class="md-nav__link">
+    <span class="md-ellipsis">
+      E‑mails de rappel mi‑campagne — automatique vs configurable
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-configuration-du-sondage-cible-produit" class="md-nav__link">
+    <span class="md-ellipsis">
+      6. Configuration du sondage — Cible produit
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-configuration-du-sondage-industrie-et-sujets" class="md-nav__link">
+    <span class="md-ellipsis">
+      7. Configuration du sondage — Industrie et sujets
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-configuration-du-sondage-controles-du-sondage" class="md-nav__link">
+    <span class="md-ellipsis">
+      8. Configuration du sondage — Contrôles du sondage
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-configuration-du-sondage-priorisation-des-sujets" class="md-nav__link">
+    <span class="md-ellipsis">
+      9. Configuration du sondage — Priorisation des sujets
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-configuration-du-sondage-personas-guidance-par-role" class="md-nav__link">
+    <span class="md-ellipsis">
+      10. Configuration du sondage — Personas (guidance par rôle)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-configuration-du-sondage-personnalisation" class="md-nav__link">
+    <span class="md-ellipsis">
+      11. Configuration du sondage — Personnalisation
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="11. Configuration du sondage — Personnalisation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#avance-prompt-systeme-ia-personnalise" class="md-nav__link">
+    <span class="md-ellipsis">
+      Avancé — Prompt système IA personnalisé
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-enregistrement-et-etat-verrouille" class="md-nav__link">
+    <span class="md-ellipsis">
+      12. Enregistrement et état verrouillé
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exemple-complet-northwind-logistics-mise-en-service-shippilot-t1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Exemple complet : Northwind Logistics — Mise en service ShipPilot T1
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Exemple complet : Northwind Logistics — Mise en service ShipPilot T1">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#informations-de-base-calendrier-confidentialite" class="md-nav__link">
+    <span class="md-ellipsis">
+      Informations de base, calendrier, confidentialité
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rappels" class="md-nav__link">
+    <span class="md-ellipsis">
+      Rappels
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#email-dinvitation-personnalise" class="md-nav__link">
+    <span class="md-ellipsis">
+      E‑mail d'invitation personnalisé
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#emails-de-rappel-micampagne-exemple-rendu" class="md-nav__link">
+    <span class="md-ellipsis">
+      E‑mails de rappel mi‑campagne (exemple rendu)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cible-produit" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cible produit
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#industrie-et-indices-de-sujets" class="md-nav__link">
+    <span class="md-ellipsis">
+      Industrie et indices de sujets
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#controles-du-sondage" class="md-nav__link">
+    <span class="md-ellipsis">
+      Contrôles du sondage
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#priorisation-des-sujets" class="md-nav__link">
+    <span class="md-ellipsis">
+      Priorisation des sujets
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#personas-surcharges-par-role" class="md-nav__link">
+    <span class="md-ellipsis">
+      Personas (surcharges par rôle)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#personnalisation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Personnalisation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../participant-management/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Gestion des participants
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../analytics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Analytique & BI
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../communication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Communication & Courriel
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-management/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Gestion des utilisateurs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../branding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Image de marque
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../security/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Sécurité & Confidentialité
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data-export/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Export & Intégration
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../qbr/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Intelligence QBR
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../support/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Assistance
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../licenses/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Licences
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table des matières">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#ou-trouver-ces-parametres" class="md-nav__link">
+    <span class="md-ellipsis">
+      Où trouver ces paramètres
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-informations-de-base-creer-modifier-la-campagne" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Informations de base (Créer / Modifier la campagne)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-calendrier-de-la-campagne" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Calendrier de la campagne
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-confidentialite" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Confidentialité
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-contenu-de-lemail-dinvitation" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Contenu de l'e‑mail d'invitation
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-rappels" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. Rappels
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Rappels">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#emails-de-rappel-micampagne-automatique-vs-configurable" class="md-nav__link">
+    <span class="md-ellipsis">
+      E‑mails de rappel mi‑campagne — automatique vs configurable
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-configuration-du-sondage-cible-produit" class="md-nav__link">
+    <span class="md-ellipsis">
+      6. Configuration du sondage — Cible produit
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-configuration-du-sondage-industrie-et-sujets" class="md-nav__link">
+    <span class="md-ellipsis">
+      7. Configuration du sondage — Industrie et sujets
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-configuration-du-sondage-controles-du-sondage" class="md-nav__link">
+    <span class="md-ellipsis">
+      8. Configuration du sondage — Contrôles du sondage
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-configuration-du-sondage-priorisation-des-sujets" class="md-nav__link">
+    <span class="md-ellipsis">
+      9. Configuration du sondage — Priorisation des sujets
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-configuration-du-sondage-personas-guidance-par-role" class="md-nav__link">
+    <span class="md-ellipsis">
+      10. Configuration du sondage — Personas (guidance par rôle)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-configuration-du-sondage-personnalisation" class="md-nav__link">
+    <span class="md-ellipsis">
+      11. Configuration du sondage — Personnalisation
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="11. Configuration du sondage — Personnalisation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#avance-prompt-systeme-ia-personnalise" class="md-nav__link">
+    <span class="md-ellipsis">
+      Avancé — Prompt système IA personnalisé
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-enregistrement-et-etat-verrouille" class="md-nav__link">
+    <span class="md-ellipsis">
+      12. Enregistrement et état verrouillé
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exemple-complet-northwind-logistics-mise-en-service-shippilot-t1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Exemple complet : Northwind Logistics — Mise en service ShipPilot T1
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Exemple complet : Northwind Logistics — Mise en service ShipPilot T1">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#informations-de-base-calendrier-confidentialite" class="md-nav__link">
+    <span class="md-ellipsis">
+      Informations de base, calendrier, confidentialité
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rappels" class="md-nav__link">
+    <span class="md-ellipsis">
+      Rappels
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#email-dinvitation-personnalise" class="md-nav__link">
+    <span class="md-ellipsis">
+      E‑mail d'invitation personnalisé
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#emails-de-rappel-micampagne-exemple-rendu" class="md-nav__link">
+    <span class="md-ellipsis">
+      E‑mails de rappel mi‑campagne (exemple rendu)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cible-produit" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cible produit
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#industrie-et-indices-de-sujets" class="md-nav__link">
+    <span class="md-ellipsis">
+      Industrie et indices de sujets
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#controles-du-sondage" class="md-nav__link">
+    <span class="md-ellipsis">
+      Contrôles du sondage
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#priorisation-des-sujets" class="md-nav__link">
+    <span class="md-ellipsis">
+      Priorisation des sujets
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#personas-surcharges-par-role" class="md-nav__link">
+    <span class="md-ellipsis">
+      Personas (surcharges par rôle)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#personnalisation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Personnalisation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="configurer-les-parametres-du-sondage">Configurer les paramètres du sondage<a class="headerlink" href="#configurer-les-parametres-du-sondage" title="Permanent link">&para;</a></h1>
+<p>Ce guide accompagne les utilisateurs de la plateforme dans la configuration complète d'une campagne sur VOÏA — depuis la création de la campagne jusqu'au réglage fin de la conversation IA, des sujets et des personas.</p>
+<div class="admonition tip">
+<p class="admonition-title">Vous cherchez un exemple complet ?</p>
+<p>Allez directement à la section <a href="#exemple-complet-northwind-logistics-mise-en-service-shippilot-t1">Exemple complet : Northwind Logistics — Mise en service ShipPilot T1</a> au bas de cette page pour voir tous les champs renseignés avec des valeurs réalistes.</p>
+</div>
+<hr />
+<h2 id="ou-trouver-ces-parametres">Où trouver ces paramètres<a class="headerlink" href="#ou-trouver-ces-parametres" title="Permanent link">&para;</a></h2>
+<p>Deux écrans connexes interviennent dans le parcours d'une campagne :</p>
+<ol>
+<li><strong>Créer / Modifier la campagne</strong> (<code>Campagnes → Nouvelle campagne</code> ou <code>Campagnes → &lt;nom&gt; → Modifier</code>)
+   Couvre les informations de base, le calendrier, la confidentialité, le contenu de l'e‑mail d'invitation et les rappels.</li>
+<li><strong>Configuration du sondage</strong> (<code>Campagnes → &lt;nom&gt; → Configuration du sondage</code>)
+   Couvre la cible produit, l'industrie et les sujets, les contrôles du sondage, la priorisation des sujets, les personas et la personnalisation.</li>
+</ol>
+<p>La plupart des champs reprennent par défaut les <strong>valeurs définies au niveau du compte</strong>. Chaque section de l'écran de configuration possède une bascule <strong>Synchroniser avec les valeurs par défaut du compte</strong> afin que vous ne remplaciez que ce qui est réellement différent pour cette campagne.</p>
+<div class="admonition warning">
+<p class="admonition-title">Héritage et état verrouillé</p>
+<ul>
+<li>Lorsque la bascule <strong>Synchroniser avec les valeurs par défaut du compte</strong> est activée pour une section, la campagne utilise les valeurs du compte et les affiche dans un panneau « hérité » en lecture seule. Toute modification ultérieure au niveau du compte se propage automatiquement.</li>
+<li>Lorsque la bascule est désactivée, la campagne conserve sa propre copie des valeurs ; les changements au niveau du compte n'affectent plus cette campagne pour cette section. Un bouton <strong>Revenir aux valeurs par défaut du compte</strong> est proposé.</li>
+<li>Dès qu'une campagne passe en statut <strong>Active</strong> ou <strong>Terminée</strong>, l'écran de configuration devient <strong>en lecture seule</strong>. Une bannière rouge s'affiche en haut de la page et chaque champ porte une petite icône de cadenas. Cela protège les réponses en cours et préserve la configuration pour les rapports.</li>
+</ul>
+</div>
+<hr />
+<h2 id="1-informations-de-base-creer-modifier-la-campagne">1. Informations de base (Créer / Modifier la campagne)<a class="headerlink" href="#1-informations-de-base-creer-modifier-la-campagne" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Champ</th>
+<th>Rôle</th>
+<th>Valeurs autorisées / défaut</th>
+<th>Usage recommandé</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Nom de la campagne</strong></td>
+<td>Nom affiché dans la plateforme et dans les e‑mails.</td>
+<td>Texte libre, jusqu'à 200 caractères. Obligatoire.</td>
+<td>Choisissez un nom lisible pour les participants — il apparaît dans les objets d'e‑mail.</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Notes internes sur les objectifs et l'audience.</td>
+<td>Texte libre. Obligatoire pour passer en statut Prêt.</td>
+<td>Documentez le « pourquoi » pour aider les analystes à interpréter les résultats.</td>
+</tr>
+<tr>
+<td><strong>Langue de la campagne</strong></td>
+<td>Langue utilisée pour tous les e‑mails, pages de sondage et conversations IA.</td>
+<td><code>Anglais</code> ou <code>Français</code>. Défaut : <code>Anglais</code>.</td>
+<td>Choisissez la langue dominante de l'audience. Non modifiable une fois active.</td>
+</tr>
+<tr>
+<td><strong>Type de sondage</strong></td>
+<td>Mode de réalisation du sondage.</td>
+<td><code>Conversationnel (VOÏA)</code> (défaut, recommandé) ou <code>FullRead</code> (classique structuré).</td>
+<td>Le mode conversationnel offre des insights plus riches ; le classique convient aux sondages réglementaires. <strong>Non modifiable après activation.</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="2-calendrier-de-la-campagne">2. Calendrier de la campagne<a class="headerlink" href="#2-calendrier-de-la-campagne" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Champ</th>
+<th>Rôle</th>
+<th>Valeurs autorisées / défaut</th>
+<th>Usage recommandé</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Date de début</strong></td>
+<td>Premier jour d'envoi des invitations.</td>
+<td>Date ≥ aujourd'hui. Obligatoire.</td>
+<td>Prévoyez au moins un jour ouvré après la création pour la validation.</td>
+</tr>
+<tr>
+<td><strong>Date de fin</strong></td>
+<td>Dernier jour de collecte des réponses.</td>
+<td>Doit être après la date de début. Obligatoire.</td>
+<td>Une fenêtre de 2 à 4 semaines offre généralement le meilleur équilibre entre urgence et taux de complétion.</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>La date du rappel mi‑campagne et celle du rappel « Dernière chance » sont calculées à partir de ces deux dates et affichées en direct dans le formulaire.</p>
+</div>
+<hr />
+<h2 id="3-confidentialite">3. Confidentialité<a class="headerlink" href="#3-confidentialite" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Champ</th>
+<th>Rôle</th>
+<th>Défaut</th>
+<th>Usage recommandé</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Anonymiser les réponses au sondage</strong></td>
+<td>Hash les noms des participants et des entreprises dans les rapports. Les participants apparaissent sous la forme <code>Participant‑{hash}</code>.</td>
+<td>Désactivé.</td>
+<td>Laissez désactivé si vos CSM doivent assurer un suivi individuel. Activez pour les sondages d'engagement / pulse sensibles. <strong>Permanent une fois activé — à définir à la création.</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="4-contenu-de-lemail-dinvitation">4. Contenu de l'e‑mail d'invitation<a class="headerlink" href="#4-contenu-de-lemail-dinvitation" title="Permanent link">&para;</a></h2>
+<p>Lorsque <strong>Personnaliser le contenu de l'e‑mail d'invitation pour cette campagne</strong> est désactivé, VOÏA utilise les modèles d'e‑mail définis au niveau du compte. Lorsqu'il est activé, les champs ci‑dessous remplacent les modèles pour cette campagne uniquement.</p>
+<table>
+<thead>
+<tr>
+<th>Champ</th>
+<th>Rôle</th>
+<th>Valeurs autorisées</th>
+<th>Variables</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Objet de l'e‑mail</strong></td>
+<td>Ligne d'objet de l'invitation.</td>
+<td>≤ 500 caractères.</td>
+<td><code>{participant_name}</code>, <code>{campaign_name}</code>, <code>{business_account_name}</code></td>
+</tr>
+<tr>
+<td><strong>Message d'introduction</strong></td>
+<td>Paragraphe d'ouverture du corps de l'e‑mail.</td>
+<td>≤ 2000 caractères.</td>
+<td>Idem ci‑dessus.</td>
+</tr>
+<tr>
+<td><strong>Texte du bouton d'appel à l'action</strong></td>
+<td>Libellé du bouton du sondage.</td>
+<td>≤ 100 caractères.</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>Message de clôture</strong></td>
+<td>Paragraphe avant la signature.</td>
+<td>≤ 2000 caractères.</td>
+<td>Mêmes variables que l'intro.</td>
+</tr>
+<tr>
+<td><strong>Note de pied de page</strong></td>
+<td>Mention en petits caractères en bas de l'e‑mail.</td>
+<td>≤ 1000 caractères.</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Utilisez <strong>Aperçu de l'invitation</strong> sur l'écran d'édition pour visualiser l'e‑mail rendu avec votre image de marque avant d'activer la campagne.</p>
+</div>
+<hr />
+<h2 id="5-rappels">5. Rappels<a class="headerlink" href="#5-rappels" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Champ</th>
+<th>Rôle</th>
+<th>Valeurs autorisées / défaut</th>
+<th>Usage recommandé</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Envoyer des e‑mails de rappel aux non‑répondants</strong></td>
+<td>Interrupteur principal des deux rappels.</td>
+<td>Activé par défaut.</td>
+<td>Laissez activé — les rappels augmentent généralement la complétion de 15 à 25 %.</td>
+</tr>
+<tr>
+<td><strong>Rappel Dernière chance</strong></td>
+<td>Nombre de jours avant la date de fin où le rappel final est envoyé.</td>
+<td><code>7</code>, <code>10</code> (défaut) ou <code>14</code>.</td>
+<td>10 jours convient à la plupart des fenêtres de 3 à 4 semaines.</td>
+</tr>
+<tr>
+<td><strong>Rappel mi‑campagne</strong></td>
+<td>Envoyé automatiquement à mi‑parcours.</td>
+<td>Automatique — non configurable.</td>
+<td>Affiché en lecture seule dans le formulaire pour information.</td>
+</tr>
+</tbody>
+</table>
+<p>Une alerte d'espacement apparaît dans le formulaire si le rappel Dernière chance tombait avant ou trop près du rappel mi‑campagne.</p>
+<h3 id="emails-de-rappel-micampagne-automatique-vs-configurable">E‑mails de rappel mi‑campagne — automatique vs configurable<a class="headerlink" href="#emails-de-rappel-micampagne-automatique-vs-configurable" title="Permanent link">&para;</a></h3>
+<div class="admonition warning">
+<p class="admonition-title">Le contenu des e‑mails de rappel est standardisé</p>
+<p>L'<strong>objet, le corps et le texte du CTA des e‑mails de rappel ne sont pas modifiables par campagne</strong>. Seuls le nom de la campagne, le nom du participant, votre image de marque (logo, nom d'entreprise, slogan) et le lien du sondage changent. Pour influencer l'apparence des rappels, configurez votre image de marque au niveau du compte (voir <strong>Image de marque</strong>).</p>
+</div>
+<p>Deux types de rappels sont envoyés automatiquement :</p>
+<p><strong>A. Rappel mi‑campagne</strong> — envoyé automatiquement à mi‑parcours entre la date de début et la date de fin.</p>
+<ul>
+<li>Badge : <code>⏰ Rappel mi‑campagne</code></li>
+<li>Modèle d'objet : <code>Rappel : {campaign_name} - Votre avis est précieux</code></li>
+<li>Salutation : <code>Bonjour {participant_first_name},</code></li>
+<li>Intro : explique que la campagne est à mi‑parcours et invite le participant à la compléter.</li>
+<li>Bouton CTA : <code>Compléter l'enquête</code> → URL personnalisée du sondage.</li>
+<li>Une note de sécurité précise que le lien expire à la clôture de la campagne.</li>
+<li>Image de marque : logo et slogan tirés de votre <code>BrandingConfig</code>.</li>
+</ul>
+<p><strong>B. Rappel Dernière chance</strong> — envoyé le nombre de jours configuré avant la date de fin (10 par défaut).</p>
+<ul>
+<li>Badge : <code>⏰ Rappel amical</code></li>
+<li>Même modèle d'objet et même structure que le rappel mi‑campagne.</li>
+<li>L'intro met l'accent sur la clôture imminente — dernière occasion de partager un retour.</li>
+</ul>
+<hr />
+<h2 id="6-configuration-du-sondage-cible-produit">6. Configuration du sondage — Cible produit<a class="headerlink" href="#6-configuration-du-sondage-cible-produit" title="Permanent link">&para;</a></h2>
+<p>C'est la première section de l'écran de configuration.</p>
+<table>
+<thead>
+<tr>
+<th>Champ</th>
+<th>Rôle</th>
+<th>Valeurs autorisées</th>
+<th>Usage recommandé</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Cible de la campagne</strong></td>
+<td>Cible la campagne sur un produit issu de votre répertoire de produits, ou laisse la portée à l'ensemble de l'entreprise.</td>
+<td><code>Toute l'entreprise</code> ou un nom de produit issu de <code>business_account.products_directory</code>.</td>
+<td>Sélectionnez un produit pour orienter les questions IA et le reporting.</td>
+</tr>
+<tr>
+<td><strong>Synchroniser la description du produit avec les valeurs par défaut du compte</strong></td>
+<td>Lorsqu'activé, utilise la description et le texte des clients cibles définis au niveau du compte.</td>
+<td>Activé par défaut.</td>
+<td>À désactiver lorsque la campagne porte sur un autre produit ou une autre audience que votre activité habituelle.</td>
+</tr>
+<tr>
+<td><strong>Description du produit / service</strong></td>
+<td>Texte libre utilisé par l'IA pour ancrer ses questions.</td>
+<td>≤ 5000 caractères.</td>
+<td>Soyez précis et concret — ce texte alimente directement les relances de l'IA.</td>
+</tr>
+<tr>
+<td><strong>Clients cibles</strong></td>
+<td>Texte libre décrivant les personnes que vous interrogez.</td>
+<td>Texte libre.</td>
+<td>Aide l'IA à calibrer son vocabulaire et sa profondeur.</td>
+</tr>
+</tbody>
+</table>
+<p>Si un produit précédemment sélectionné n'est plus dans le répertoire, un avertissement s'affiche et vous devez choisir une nouvelle valeur.</p>
+<hr />
+<h2 id="7-configuration-du-sondage-industrie-et-sujets">7. Configuration du sondage — Industrie et sujets<a class="headerlink" href="#7-configuration-du-sondage-industrie-et-sujets" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Champ</th>
+<th>Rôle</th>
+<th>Valeurs autorisées</th>
+<th>Usage recommandé</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Remplacement de l'industrie pour la campagne</strong></td>
+<td>Modifie le prisme sectoriel utilisé par l'IA.</td>
+<td><code>Utiliser le défaut du compte</code> (vide) ou toute valeur de la liste d'industries de la plateforme.</td>
+<td>À utiliser uniquement si la campagne cible un segment différent de l'industrie par défaut du compte.</td>
+</tr>
+<tr>
+<td><strong>Domaines de focus de la conversation VOÏA</strong></td>
+<td>Tableau en lecture seule listant les indices de sujets que VOÏA mettra en avant pour l'industrie effective.</td>
+<td>Calculé automatiquement.</td>
+<td>Sert à vérifier que la bonne industrie est sélectionnée.</td>
+</tr>
+<tr>
+<td><strong>Avancé — Indices de sujets personnalisés (JSON)</strong></td>
+<td>Surcharge experte qui remplace les indices de la plateforme/du compte pour certains sujets.</td>
+<td>Objet JSON : <code>{ "Nom du sujet": "mots, clés, séparés, virgules" }</code>.</td>
+<td>Laissez vide dans 99 % des campagnes. Le bouton <code>?</code> à côté de la section ouvre un exemple avec un bouton <strong>Copier le JSON</strong>.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="8-configuration-du-sondage-controles-du-sondage">8. Configuration du sondage — Contrôles du sondage<a class="headerlink" href="#8-configuration-du-sondage-controles-du-sondage" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Champ</th>
+<th>Rôle</th>
+<th>Valeurs autorisées / défaut</th>
+<th>Usage recommandé</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Synchroniser les contrôles avec les valeurs par défaut du compte</strong></td>
+<td>Lorsqu'activé, hérite des paramètres Nb max de questions et Relances max du compte.</td>
+<td>Activé par défaut.</td>
+<td>À désactiver uniquement si cette campagne demande une conversation nettement plus courte ou plus longue.</td>
+</tr>
+<tr>
+<td><strong>Ton de la conversation</strong></td>
+<td>Ton utilisé par l'IA (défini au niveau du compte ; visible dans le panneau « Valeurs par défaut du compte »).</td>
+<td><code>Chaleureux et amical</code>, <code>Professionnel</code>, <code>Direct</code>, etc.</td>
+<td>S'aligne sur la voix de votre marque — géré dans les paramètres du compte.</td>
+</tr>
+<tr>
+<td><strong>Nombre maximal de questions</strong></td>
+<td>Plafond du nombre de questions que VOÏA peut poser.</td>
+<td><code>3</code>–<code>50</code>. Défaut <code>8</code>.</td>
+<td>6–8 est le sweet spot pour le taux de complétion.</td>
+</tr>
+<tr>
+<td><strong>Relances maximales par sujet</strong></td>
+<td>Profondeur d'investigation autorisée sur un sujet.</td>
+<td><code>1</code>–<code>5</code>. Défaut <code>2</code>.</td>
+<td>2 garde des conversations focalisées ; 3 convient aux sondages diagnostiques.</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Le panneau « Valeurs par défaut du compte » (bouton flottant à droite de la page) permet de consulter les valeurs définies au niveau du compte sans quitter cette page.</p>
+</div>
+<hr />
+<h2 id="9-configuration-du-sondage-priorisation-des-sujets">9. Configuration du sondage — Priorisation des sujets<a class="headerlink" href="#9-configuration-du-sondage-priorisation-des-sujets" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Champ</th>
+<th>Rôle</th>
+<th>Valeurs autorisées</th>
+<th>Usage recommandé</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Synchroniser les sujets avec les valeurs par défaut du compte</strong></td>
+<td>Lorsqu'activé, hérite des listes de sujets prioritaires et optionnels du compte.</td>
+<td>Activé par défaut.</td>
+<td>À désactiver lorsque la campagne porte sur un autre aspect de la relation.</td>
+</tr>
+<tr>
+<td><strong>Sujets prioritaires</strong></td>
+<td>Sujets que VOÏA doit aborder avant les optionnels.</td>
+<td>Multi‑sélection dans le catalogue de sujets de la plateforme. <strong>Le NPS est toujours prioritaire et ne peut pas être retiré.</strong></td>
+<td>Restez court (3–5 sujets) pour laisser à l'IA le temps d'approfondir.</td>
+</tr>
+<tr>
+<td><strong>Sujets optionnels</strong></td>
+<td>Sujets que VOÏA peut aborder s'il reste du temps et du budget de questions.</td>
+<td>Multi‑sélection. Un sujet coché comme prioritaire est automatiquement retiré de cette liste.</td>
+<td>À utiliser pour les thèmes « bonus » à couvrir si le participant est engagé.</td>
+</tr>
+<tr>
+<td><strong>Descriptions de sujets personnalisées</strong></td>
+<td>Champ texte libre par sujet, à côté de chaque sujet, pour guider le questionnement IA.</td>
+<td>≤ 300 caractères par sujet. Supporte les variables <code>{company_name}</code>, <code>{product_name}</code>, <code>{industry}</code>.</td>
+<td>À utiliser pour orienter l'IA vers l'angle qui compte ce trimestre.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="10-configuration-du-sondage-personas-guidance-par-role">10. Configuration du sondage — Personas (guidance par rôle)<a class="headerlink" href="#10-configuration-du-sondage-personas-guidance-par-role" title="Permanent link">&para;</a></h2>
+<p>VOÏA peut adapter son ton et ses questions au <strong>rôle</strong> du participant. La section Personas permet de fournir une guidance personnalisée par rôle et par sujet, <strong>en anglais et en français</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Champ</th>
+<th>Rôle</th>
+<th>Usage recommandé</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Synchroniser les personas avec les valeurs par défaut du compte</strong></td>
+<td>Lorsqu'activé, hérite de toutes les surcharges de personas du compte.</td>
+<td>À désactiver lorsque la campagne nécessite une guidance par rôle différente de votre approche habituelle.</td>
+</tr>
+<tr>
+<td><strong>Ajouter une surcharge de sujet</strong> (par rôle)</td>
+<td>Ajoute une ligne associant une guidance précise à un couple <code>Rôle × Sujet</code>.</td>
+<td>À utiliser pour les 2 à 4 couples <code>rôle × sujet</code> les plus importants — n'essayez pas de tout surcharger.</td>
+</tr>
+<tr>
+<td><strong>Onglets EN / FR</strong></td>
+<td>Chaque surcharge dispose d'une guidance distincte en anglais et en français.</td>
+<td>Renseignez toujours les deux langues — les campagnes francophones se rabattront sur l'anglais en l'absence de version FR, mais vous perdrez la formulation localisée.</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition tip">
+<p class="admonition-title">À quoi ressemble une bonne guidance</p>
+<p>Indiquez à l'IA <strong>comment parler</strong> (ton, vocabulaire, profondeur) et <strong>ce qu'il faut éviter</strong>, pas la réponse attendue. Exemple : <em>« Utiliser un langage technique précis. Poser des questions sur la fiabilité des EDI 204/214/990. Éviter les questions de satisfaction génériques. »</em></p>
+</div>
+<hr />
+<h2 id="11-configuration-du-sondage-personnalisation">11. Configuration du sondage — Personnalisation<a class="headerlink" href="#11-configuration-du-sondage-personnalisation" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Champ</th>
+<th>Rôle</th>
+<th>Valeurs autorisées</th>
+<th>Usage recommandé</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Message de clôture affiché après le sondage</strong></td>
+<td>Remplace le message de remerciement par défaut affiché dans le panneau « Et après ? ».</td>
+<td>Texte libre, 1 à 2 phrases recommandées.</td>
+<td>Définissez les attentes en matière de suivi (par ex. « votre CSM répondra sous 3 jours ouvrés »).</td>
+</tr>
+</tbody>
+</table>
+<h3 id="avance-prompt-systeme-ia-personnalise">Avancé — Prompt système IA personnalisé<a class="headerlink" href="#avance-prompt-systeme-ia-personnalise" title="Permanent link">&para;</a></h3>
+<p>Une section repliée tout en bas permet aux utilisateurs avancés de remplacer le prompt système par défaut de VOÏA pour cette campagne uniquement. <strong>Laissez ce champ vide sauf raison spécifique</strong> — un prompt incorrect peut dégrader la qualité du sondage et casser les analyses.</p>
+<hr />
+<h2 id="12-enregistrement-et-etat-verrouille">12. Enregistrement et état verrouillé<a class="headerlink" href="#12-enregistrement-et-etat-verrouille" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Les modifications sont enregistrées via le bouton <strong>Enregistrer la configuration</strong> dans la barre d'enregistrement collante en bas de l'écran.</li>
+<li>La barre rappelle que « Les modifications ne s'appliquent qu'à cette campagne — vos valeurs par défaut du compte restent inchangées. »</li>
+<li>Une fois la campagne <strong>Active</strong> ou <strong>Terminée</strong> :</li>
+<li>Tous les champs sont désactivés.</li>
+<li>La bannière « Mode lecture seule » apparaît en haut de la page.</li>
+<li>Une petite icône de cadenas apparaît à côté du titre de chaque section.</li>
+<li>Le bouton Enregistrer disparaît.</li>
+</ul>
+<hr />
+<h2 id="exemple-complet-northwind-logistics-mise-en-service-shippilot-t1">Exemple complet : Northwind Logistics — Mise en service ShipPilot T1<a class="headerlink" href="#exemple-complet-northwind-logistics-mise-en-service-shippilot-t1" title="Permanent link">&para;</a></h2>
+<p>Cet exemple parcourt chaque champ avec des valeurs concrètes pour un scénario réaliste. Recopiez ces valeurs pour reproduire la configuration de bout en bout.</p>
+<p><strong>Scénario :</strong> <em>Northwind Logistics</em> (un 3PL de taille intermédiaire) lance une campagne post‑onboarding NPS + expérience pour les clients qui ont mis en service son nouveau TMS « ShipPilot » au T1. L'équipe CX souhaite des conversations IA sur mesure pour trois rôles : responsables des opérations, responsables IT/intégration et sponsors C‑level.</p>
+<h3 id="informations-de-base-calendrier-confidentialite">Informations de base, calendrier, confidentialité<a class="headerlink" href="#informations-de-base-calendrier-confidentialite" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Champ</th>
+<th>Valeur exemple</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Nom de la campagne</td>
+<td><code>ShipPilot Q1 Onboarding Experience</code></td>
+</tr>
+<tr>
+<td>Description</td>
+<td><code>Post-onboarding NPS &amp; experience survey for clients who went live on ShipPilot between Jan–Mar 2026. Goal: identify onboarding friction and expansion signals.</code></td>
+</tr>
+<tr>
+<td>Type de sondage</td>
+<td><code>Conversationnel</code></td>
+</tr>
+<tr>
+<td>Langue principale</td>
+<td><code>Anglais</code> (avec invitations en français disponibles pour les clients québécois)</td>
+</tr>
+<tr>
+<td>Anonymiser les réponses</td>
+<td><code>Désactivé</code> (les CSM doivent assurer le suivi individuel)</td>
+</tr>
+<tr>
+<td>Date de début</td>
+<td><code>2026-05-06</code></td>
+</tr>
+<tr>
+<td>Date de fin</td>
+<td><code>2026-05-27</code> (fenêtre de 3 semaines)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="rappels">Rappels<a class="headerlink" href="#rappels" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Champ</th>
+<th>Valeur exemple</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Activer les rappels</td>
+<td><code>Activé</code></td>
+</tr>
+<tr>
+<td>Rappel Dernière chance</td>
+<td><code>7 jours</code> avant la date de fin</td>
+</tr>
+</tbody>
+</table>
+<h3 id="email-dinvitation-personnalise">E‑mail d'invitation personnalisé<a class="headerlink" href="#email-dinvitation-personnalise" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Champ</th>
+<th>Valeur exemple</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Personnaliser le contenu de l'e‑mail</td>
+<td><code>Activé</code></td>
+</tr>
+<tr>
+<td>Modèle d'objet</td>
+<td><code>{{client_name}}, how was your ShipPilot launch?</code></td>
+</tr>
+<tr>
+<td>Message d'introduction</td>
+<td><code>Now that ShipPilot has been live in your operations for a few weeks, we'd love a quick read on how the rollout went. Your answers go straight to the team owning your account.</code></td>
+</tr>
+<tr>
+<td>Texte du CTA</td>
+<td><code>Share my experience (5 min)</code></td>
+</tr>
+<tr>
+<td>Message de clôture</td>
+<td><code>Thank you — your feedback shapes our next ShipPilot release.</code></td>
+</tr>
+<tr>
+<td>Note de pied de page</td>
+<td><code>You're receiving this because you were a named contact on the ShipPilot onboarding for {{client_name}}.</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="emails-de-rappel-micampagne-exemple-rendu">E‑mails de rappel mi‑campagne (exemple rendu)<a class="headerlink" href="#emails-de-rappel-micampagne-exemple-rendu" title="Permanent link">&para;</a></h3>
+<p>Rappel : ces e‑mails sont standardisés — seuls l'image de marque, le nom de la campagne, le nom du participant et le lien du sondage changent.</p>
+<p><strong>A. Rappel mi‑campagne</strong> — envoyé automatiquement vers le <code>2026-05-16</code>.</p>
+<ul>
+<li><strong>Badge :</strong> <code>⏰ Rappel mi‑campagne</code></li>
+<li><strong>Objet (EN) :</strong> <code>Reminder: ShipPilot Q1 Onboarding Experience - Your Feedback is Valuable</code></li>
+<li><strong>Objet (FR) :</strong> <code>Rappel : ShipPilot Q1 Onboarding Experience - Votre avis est précieux</code></li>
+<li><strong>Salutation :</strong> <code>Hello Priya,</code> / <code>Bonjour Priya,</code></li>
+<li><strong>Intro (EN) :</strong> <code>We're halfway through the ShipPilot Q1 Onboarding Experience campaign and your perspective would really help shape the next ShipPilot release.</code></li>
+<li><strong>Intro (FR) :</strong> <code>Nous sommes à mi-parcours de la campagne ShipPilot Q1 Onboarding Experience et votre point de vue nous aiderait grandement à orienter la prochaine version de ShipPilot.</code></li>
+<li><strong>Ligne de campagne :</strong> <code>Campaign: ShipPilot Q1 Onboarding Experience</code></li>
+<li><strong>Instruction :</strong> <code>If you haven't already completed the survey, it only takes about 5 minutes.</code></li>
+<li><strong>Bouton CTA :</strong> <code>Complete Survey</code> / <code>Compléter l'enquête</code> → <code>{survey_url}</code></li>
+<li><strong>Note de sécurité :</strong> <code>This link is secure and will expire when the campaign closes on May 27, 2026.</code></li>
+<li><strong>Clôture :</strong> <code>Best regards, The Northwind Logistics Team</code> / <code>Cordialement, L'équipe Northwind Logistics</code></li>
+<li><strong>Image de marque :</strong> logo Northwind + slogan tirés de <code>BrandingConfig</code>.</li>
+</ul>
+<p><strong>B. Rappel Dernière chance</strong> — envoyé <code>7</code> jours avant la date de fin, vers le <code>2026-05-20</code>.</p>
+<ul>
+<li><strong>Badge :</strong> <code>⏰ Rappel amical</code></li>
+<li><strong>Objet (EN) :</strong> <code>Reminder: ShipPilot Q1 Onboarding Experience - Your Feedback is Valuable</code></li>
+<li><strong>Objet (FR) :</strong> <code>Rappel : ShipPilot Q1 Onboarding Experience - Votre avis est précieux</code></li>
+<li><strong>Salutation :</strong> <code>Hello Priya,</code> / <code>Bonjour Priya,</code></li>
+<li><strong>Intro (EN) :</strong> <code>The ShipPilot Q1 Onboarding Experience campaign closes in a few days — this is the last chance to share your launch experience with the team.</code></li>
+<li><strong>Intro (FR) :</strong> <code>La campagne ShipPilot Q1 Onboarding Experience se termine dans quelques jours — c'est la dernière occasion de partager votre expérience de mise en service avec l'équipe.</code></li>
+<li><strong>Instruction :</strong> <code>If you haven't already completed the survey, it only takes about 5 minutes.</code></li>
+<li><strong>Bouton CTA :</strong> <code>Complete Survey</code> / <code>Compléter l'enquête</code> → <code>{survey_url}</code></li>
+<li><strong>Note de sécurité :</strong> <code>This link is secure and will expire when the campaign closes on May 27, 2026.</code></li>
+<li><strong>Clôture :</strong> <code>Best regards, The Northwind Logistics Team</code></li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">Ce que vous ne pouvez pas modifier par campagne</p>
+<p>Le contenu des e‑mails de rappel est actuellement standardisé et ne peut pas être personnalisé par campagne. Seuls le nom de la campagne, le nom du participant, l'image de marque et le lien du sondage changent. Pour influencer l'apparence des rappels, configurez votre image de marque (logo, nom d'entreprise, slogan) au niveau du compte.</p>
+</div>
+<h3 id="cible-produit">Cible produit<a class="headerlink" href="#cible-produit" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Champ</th>
+<th>Valeur exemple</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cible de la campagne</td>
+<td><code>ShipPilot TMS</code> (sélectionnée dans le répertoire de produits)</td>
+</tr>
+<tr>
+<td>Synchroniser la description du produit avec les valeurs par défaut du compte</td>
+<td><code>Désactivé</code></td>
+</tr>
+<tr>
+<td>Description du produit / service</td>
+<td><code>ShipPilot is Northwind's cloud TMS for mid-market shippers, covering rate shopping, multi-carrier execution, EDI/API integrations and a client portal. Onboarding typically spans 6–10 weeks and includes WMS/ERP integration.</code></td>
+</tr>
+<tr>
+<td>Clients cibles</td>
+<td><code>Logistics, Operations and IT leaders at mid-market shippers ($50M–$1B revenue) who recently completed ShipPilot onboarding and are now in production use.</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="industrie-et-indices-de-sujets">Industrie et indices de sujets<a class="headerlink" href="#industrie-et-indices-de-sujets" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Champ</th>
+<th>Valeur exemple</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Remplacement de l'industrie pour la campagne</td>
+<td><code>Transportation &amp; Logistics</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Avancé — Indices de sujets personnalisés (JSON) :</strong></p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;onboarding_experience&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;go-live readiness&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;training quality&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;data migration&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;cutover weekend&quot;</span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;integration_quality&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;EDI 204/214/990&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;ERP/WMS connectors&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;API rate limits&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;sandbox parity&quot;</span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;support_experience&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;implementation manager responsiveness&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;escalation path&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;ticket SLAs&quot;</span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;value_realization&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;freight spend visibility&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;carrier mix optimization&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;time-to-first-value&quot;</span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="controles-du-sondage">Contrôles du sondage<a class="headerlink" href="#controles-du-sondage" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Champ</th>
+<th>Valeur exemple</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Synchroniser les contrôles avec les valeurs par défaut du compte</td>
+<td><code>Désactivé</code></td>
+</tr>
+<tr>
+<td>Ton de la conversation</td>
+<td><code>Chaleureux et amical</code></td>
+</tr>
+<tr>
+<td>Nombre maximal de questions</td>
+<td><code>10</code></td>
+</tr>
+<tr>
+<td>Relances maximales par sujet</td>
+<td><code>3</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="priorisation-des-sujets">Priorisation des sujets<a class="headerlink" href="#priorisation-des-sujets" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Champ</th>
+<th>Valeur exemple</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Synchroniser les sujets avec les valeurs par défaut du compte</td>
+<td><code>Désactivé</code></td>
+</tr>
+<tr>
+<td>Sujets prioritaires</td>
+<td><code>Onboarding Experience</code>, <code>Integration Quality</code>, <code>Support Experience</code> (le NPS est inclus automatiquement et verrouillé)</td>
+</tr>
+<tr>
+<td>Sujets optionnels</td>
+<td><code>Value Realization</code>, <code>Pricing</code>, <code>Product Roadmap Feedback</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Descriptions de sujets personnalisées :</strong></p>
+<ul>
+<li><strong>Onboarding Experience :</strong> <code>Focus on the 6–10 week implementation: kickoff clarity, training depth for ops users, data migration accuracy, and cutover weekend execution.</code></li>
+<li><strong>Integration Quality :</strong> <code>Probe specifically on EDI document exchange with carriers and ERP/WMS connector reliability since go-live.</code></li>
+</ul>
+<h3 id="personas-surcharges-par-role">Personas (surcharges par rôle)<a class="headerlink" href="#personas-surcharges-par-role" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Champ</th>
+<th>Valeur exemple</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Synchroniser les personas avec les valeurs par défaut du compte</td>
+<td><code>Désactivé</code></td>
+</tr>
+</tbody>
+</table>
+<p>Trois surcharges rôle × sujet sont configurées :</p>
+<p><strong>1. Operations Manager — Onboarding Experience</strong></p>
+<ul>
+<li><strong>Guidance (EN) :</strong> <code>Speak to day-to-day operational impact. Ask about training quality for dispatchers, ease of building loads in the new UI, and what slowed the team down in week 1 vs. week 4.</code></li>
+<li><strong>Guidance (FR) :</strong> <code>Aborder l'impact opérationnel quotidien. Poser des questions sur la qualité de la formation des répartiteurs, la facilité de création des chargements dans la nouvelle interface, et ce qui a ralenti l'équipe entre la semaine 1 et la semaine 4.</code></li>
+</ul>
+<p><strong>2. IT / Integration Lead — Integration Quality</strong></p>
+<ul>
+<li><strong>Guidance (EN) :</strong> <code>Use precise technical language. Ask about EDI 204/214/990 reliability, ERP/WMS connector stability, sandbox vs. production parity, and any open integration tickets. Avoid generic satisfaction questions.</code></li>
+<li><strong>Guidance (FR) :</strong> <code>Utiliser un langage technique précis. Poser des questions sur la fiabilité des EDI 204/214/990, la stabilité des connecteurs ERP/WMS, la parité entre l'environnement de test et la production, et tout ticket d'intégration en cours. Éviter les questions de satisfaction génériques.</code></li>
+</ul>
+<p><strong>3. C‑Level Sponsor — Value Realization</strong></p>
+<ul>
+<li><strong>Guidance (EN) :</strong> <code>Stay strategic and brief. Ask about freight spend visibility achieved, ROI signals so far, and confidence in expanding ShipPilot to additional business units. Do not drill into tactical/UX issues.</code></li>
+<li><strong>Guidance (FR) :</strong> <code>Rester stratégique et concis. Poser des questions sur la visibilité obtenue sur les dépenses de transport, les premiers signaux de ROI, et la confiance à étendre ShipPilot à d'autres unités d'affaires. Ne pas entrer dans les détails tactiques ou d'expérience utilisateur.</code></li>
+</ul>
+<h3 id="personnalisation">Personnalisation<a class="headerlink" href="#personnalisation" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Champ</th>
+<th>Valeur exemple</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Message de clôture affiché après le sondage</td>
+<td><code>Thanks for sharing your ShipPilot launch experience. Your account team will follow up within 3 business days on anything that needs attention. — The Northwind CX team</code></td>
+</tr>
+</tbody>
+</table>
+<p>Une fois toutes les valeurs saisies, cliquez sur <strong>Enregistrer la configuration</strong>. Depuis l'écran détail de la campagne, vous pouvez ensuite lancer une <strong>Simulation</strong> pour valider la conversation IA, franchir la porte de validation, puis <strong>Activer</strong> la campagne — moment à partir duquel l'écran de configuration passe en lecture seule.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Retour en haut de la page
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2026 VOÏA - By Rivvalue inc.
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://rivvalue.com/voia" target="_blank" rel="noopener" title="VOÏA - AI Powered Voice Of Client platform for B2B, By Rivvalue inc." class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M351.9 280H161c2.9 64.5 17.2 123.9 37.5 167.4 11.4 24.5 23.7 41.8 35.1 52.4 11.2 10.5 18.9 12.2 22.9 12.2s11.7-1.7 22.9-12.2c11.4-10.6 23.7-28 35.1-52.4 20.3-43.5 34.6-102.9 37.5-167.4zm-191-48h190.9c-2.8-64.5-17.1-123.9-37.4-167.4-11.4-24.4-23.7-41.8-35.1-52.4C268.1 1.7 260.4 0 256.4 0s-11.7 1.7-22.9 12.2c-11.4 10.6-23.7 28-35.1 52.4-20.3 43.5-34.6 102.9-37.5 167.4m-48 0c3.5-85.6 25.6-165.1 57.9-217.3C78.7 47.3 10.9 131.2 1.5 232zM1.5 280c9.4 100.8 77.2 184.7 169.3 217.3-32.3-52.2-54.4-131.7-57.9-217.3zm398.4 0c-3.5 85.6-25.6 165.1-57.9 217.3 92.1-32.7 159.9-116.5 169.3-217.3zm111.4-48C501.9 131.2 434.1 47.3 342 14.7c32.3 52.2 54.4 131.7 57.9 217.3z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy"], "search": "../../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copi\u00e9 dans le presse-papier", "clipboard.copy": "Copier dans le presse-papier", "search.result.more.one": "1 de plus sur cette page", "search.result.more.other": "# de plus sur cette page", "search.result.none": "Aucun document trouv\u00e9", "search.result.one": "1 document trouv\u00e9", "search.result.other": "# documents trouv\u00e9s", "search.result.placeholder": "Taper pour d\u00e9marrer la recherche", "search.result.term.missing": "Non trouv\u00e9", "select.version": "S\u00e9lectionner la version"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.f55a23d4.min.js"></script>
+      
+    
+  </body>
+</html>
